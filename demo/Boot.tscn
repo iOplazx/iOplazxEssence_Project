@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://kul2nfgi7k68"]
+
+[ext_resource type="Script" uid="uid://canybe0jaseae" path="res://demo/scenes/Boot.gd" id="1_82e2n"]
+[ext_resource type="Texture2D" uid="uid://da2nixkx0p7qa" path="res://icon.svg" id="2_qinae"]
+
+[node name="Boot" type="Control" unique_id=1273464555]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_82e2n")
+
+[node name="Logo" type="TextureRect" parent="." unique_id=1496426386]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_qinae")
