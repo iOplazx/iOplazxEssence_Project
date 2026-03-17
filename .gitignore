@@ -1,0 +1,15 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Exportaciones (¡Muy importante para tu privacidad!)
+export_presets.cfg
+
+# Archivos temporales
+*.tmp
+*~
+
+# Archivos de sistema operativo (evita rastros de tu PC)
+.DS_Store
+Thumbs.db
+Desktop.ini
