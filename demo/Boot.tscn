@@ -14,11 +14,15 @@ script = ExtResource("1_82e2n")
 
 [node name="Logo" type="TextureRect" parent="." unique_id=1496426386]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 134.0
+offset_bottom = 132.0
 texture = ExtResource("2_qinae")
 
 [node name="Advertencia" type="Label" parent="." unique_id=707752527]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+offset_left = 132.0
+offset_top = 31.0
+offset_right = 172.0
+offset_bottom = 54.0

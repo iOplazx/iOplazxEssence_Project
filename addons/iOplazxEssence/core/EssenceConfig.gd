@@ -24,3 +24,12 @@ class_name EssenceConfig extends Resource
 @export_group("Warning Buttons")
 ## 0 = Sin botones (desaparece solo por tiempo), 1 = OK, 2 = Yes/No, 3 = Confirm/Reject(Exit)
 @export_enum("None (Auto-fade)", "OK", "Yes / No", "Confirm / Reject (Exit)") var button_type: int = 0
+
+@export_category("Loading Screen")
+@export var show_loading_screen: bool = true
+
+@export_group("Loading Visuals")
+@export_enum("Godot", "Creator (iOplazx)", "Custom", "None") var loading_logo_type: int = 1
+@export_file("*.png", "*.jpg", "*.webp") var custom_loading_logo_path: String = ""
+@export var show_progress_bar: bool = true
+@export var show_progress_text: bool = true # Para mostrar "Cargando... 45%"

@@ -13,6 +13,12 @@ var boton_ok: Button
 var boton_yes: Button
 var boton_no: Button
 
+# Nuevos nodos para la pantalla de carga
+var pantalla_carga_container: VBoxContainer
+var barra_progreso: ProgressBar
+var texto_progreso: Label
+var logo_carga: TextureRect
+
 func _ready():
 	print("--- BOOTBASE: Arrancando ---")
 	_cargar_configuracion()
@@ -63,12 +69,14 @@ func _preparar_logo():
 	match config.logo_type:
 		0: 
 			print("Cargando logo de Godot...")
+			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.GODOT)
 		1: 
 			print("Cargando logo de iOplazx...")
+			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.EYE)
 		2: 
 			if config.custom_logo_path != "":
 				print("Cargando logo personalizado...")
-				logo_rect.texture = load(config.custom_logo_path)
+				logo_rect.texture =  EssenceLoader.get_externImage(config.custom_logo_path, true)
 
 func _animar_logo():
 	if logo_rect == null: return
@@ -200,3 +208,70 @@ func _crear_botones_advertencia():
 
 func _ir_a_carga():
 	print("7. Advertencia terminada. Preparando pantalla de Carga...")
+	
+	# Ocultamos la advertencia anterior si existía (limpiamos la pantalla)
+	if advertencia_label: advertencia_label.visible = false
+	if icono_advertencia: icono_advertencia.visible = false
+	# (Si tienes el HBoxContainer de los botones guardado en una variable, también lo ocultas aquí)
+
+	if not config.show_loading_screen:
+		print("Pantalla de carga omitida por configuración. Saltando al motor asíncrono...")
+		_iniciar_carga_asincrona()
+		return
+		
+	_crear_ui_carga()
+
+func _crear_ui_carga():
+	# Usamos un VBoxContainer para apilar Logo -> Barra -> Texto verticalmente
+	pantalla_carga_container = VBoxContainer.new()
+	pantalla_carga_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	pantalla_carga_container.add_theme_constant_override("separation", 20)
+	
+	# 1. Logo de Carga (Opcional)
+	if config.loading_logo_type != 3: # 3 es "None"
+		logo_carga = TextureRect.new()
+		logo_carga.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		logo_carga.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		logo_carga.custom_minimum_size = Vector2(200, 200)
+		
+		match config.loading_logo_type:
+			0: logo_carga.texture = load("res://icon.svg") # Logo de Godot temporal
+			1: logo_carga.texture = load("res://icon.svg") # Aquí irá tu logo iOplazx
+			2: logo_carga.texture = EssenceLoader.get_externImage(config.custom_loading_logo_path, true)
+		
+		pantalla_carga_container.add_child(logo_carga)
+
+	# 2. Barra de Progreso Nativa
+	if config.show_progress_bar:
+		barra_progreso = ProgressBar.new()
+		barra_progreso.custom_minimum_size = Vector2(500, 30)
+		barra_progreso.step = 1.0
+		barra_progreso.value = 0.0
+		# Si vamos a usar nuestro propio texto abajo, apagamos el porcentaje nativo de la barra
+		if config.show_progress_text:
+			barra_progreso.show_percentage = false 
+			
+		pantalla_carga_container.add_child(barra_progreso)
+
+	# 3. Texto de Progreso
+	if config.show_progress_text:
+		texto_progreso = Label.new()
+		texto_progreso.text = "Iniciando framework... 0%"
+		texto_progreso.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		pantalla_carga_container.add_child(texto_progreso)
+
+	# Añadimos todo el bloque a la pantalla y lo centramos
+	add_child(pantalla_carga_container)
+	pantalla_carga_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	pantalla_carga_container.modulate.a = 0.0
+	
+	# Animamos la aparición y, al terminar, disparamos el motor de tareas asíncronas
+	var tween = create_tween()
+	tween.tween_property(pantalla_carga_container, "modulate:a", 1.0, 0.5)
+	tween.finished.connect(_iniciar_carga_asincrona)
+
+# --- EL CEREBRO ASÍNCRONO ---
+
+func _iniciar_carga_asincrona():
+	print("8. Iniciando motor de tareas asíncronas...")
+	# Aquí construiremos el sistema que ejecuta tus 70 pasos sin congelar la pantalla.a...")

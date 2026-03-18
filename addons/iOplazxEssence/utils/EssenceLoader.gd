@@ -1,18 +1,22 @@
 class_name EssenceLoader extends RefCounted
 
 enum KeyImage {
+	GODOT,
 	WARNING,
 	EYE,
 	PLUS18,
 	ERROR_FALLBACK
 }
 
+const PATH_RESOURCE = "res://addons/iOplazxEssence/resources/"
+
 # Diccionario de rutas internas (Cosas que siempre existirán dentro del addon)
 const INTERNAL_IMAGES = {
-	KeyImage.WARNING: "res://addons/iOplazxEssence/resources/iconWarning.png",
-	KeyImage.EYE: "res://addons/iOplazxEssence/resources/iconEye.png",
-	KeyImage.PLUS18: "res://addons/iOplazxEssence/resources/iconPlus18.png",
-	KeyImage.ERROR_FALLBACK: "res://addons/iOplazxEssence/resources/iconImageNoLoad.png"
+	KeyImage.GODOT: PATH_RESOURCE + "icon_godot.png",
+	KeyImage.WARNING: PATH_RESOURCE + "iconWarning.png",
+	KeyImage.EYE: PATH_RESOURCE + "iconEye.png",
+	KeyImage.PLUS18: PATH_RESOURCE + "iconPlus18.png",
+	KeyImage.ERROR_FALLBACK: PATH_RESOURCE + "iconImageNoLoad.png"
 }
 
 ## Carga imágenes propias del Framework
