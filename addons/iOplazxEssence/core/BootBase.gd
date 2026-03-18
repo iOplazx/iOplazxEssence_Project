@@ -271,7 +271,79 @@ func _crear_ui_carga():
 	tween.finished.connect(_iniciar_carga_asincrona)
 
 # --- EL CEREBRO ASÍNCRONO ---
+# Array que guardará las funciones (tareas) a ejecutar
+var tareas_de_carga: Array[Callable] = []
+var paso_actual: int = 0
 
 func _iniciar_carga_asincrona():
 	print("8. Iniciando motor de tareas asíncronas...")
-	# Aquí construiremos el sistema que ejecuta tus 70 pasos sin congelar la pantalla.a...")
+	
+	# 1. Definimos la lista de tareas del framework base.
+	# En Godot 4, 'Callable' guarda la referencia a una función.
+	tareas_de_carga = [
+		Callable(self, "_tarea_cargar_subsistemas"),
+		Callable(self, "_tarea_preparar_audio"),
+		Callable(self, "_tarea_cargar_inventarios"),
+		Callable(self, "_tarea_preparar_menu")
+		# Aquí puedes añadir los 70 pasos que necesites
+	]
+	
+	# Iniciamos el bucle que recorrerá la lista
+	_procesar_siguiente_tarea()
+
+func _procesar_siguiente_tarea():
+	if paso_actual < tareas_de_carga.size():
+		# 1. Ejecutar la tarea actual
+		var tarea = tareas_de_carga[paso_actual]
+		tarea.call()
+		
+		# 2. Calcular el porcentaje (0.0 a 100.0)
+		paso_actual += 1
+		var porcentaje: float = (float(paso_actual) / float(tareas_de_carga.size())) * 100.0
+		
+		# 3. Actualizar la Interfaz Visual
+		if config.show_progress_bar and barra_progreso:
+			barra_progreso.value = porcentaje
+			
+		if config.show_progress_text and texto_progreso:
+			texto_progreso.text = "Cargando módulo %d de %d... (%d%%)" % [paso_actual, tareas_de_carga.size(), int(porcentaje)]
+		
+		# 4. MAGIA DE OPTIMIZACIÓN: Esperar al siguiente fotograma.
+		# Esto libera el procesador por una fracción de segundo para que 
+		# la RAM y la GPU dibujen la barra moviéndose fluidamente sin tirones.
+		await get_tree().process_frame
+		
+		# (Opcional) Pausa artificial solo para ver la barra en esta prueba
+		# Quita esta línea cuando tengas tareas reales pesadas
+		await get_tree().create_timer(0.5).timeout 
+		
+		# 5. Llamada recursiva para la siguiente tarea
+		_procesar_siguiente_tarea()
+	else:
+		# Ya no hay más tareas, hemos llegado al 100%
+		_finalizar_carga()
+
+# --- TAREAS DE EJEMPLO DEL FRAMEWORK ---
+
+func _tarea_cargar_subsistemas():
+	print("-> Ejecutando paso 1: Subsistemas...")
+	# Lógica pesada aquí
+
+func _tarea_preparar_audio():
+	print("-> Ejecutando paso 2: Audio...")
+	# Lógica pesada aquí
+
+func _tarea_cargar_inventarios():
+	print("-> Ejecutando paso 3: Bases de datos...")
+	# Lógica pesada aquí
+
+func _tarea_preparar_menu():
+	print("-> Ejecutando paso 4: Interfaz de usuario...")
+	# Lógica pesada aquí
+
+func _finalizar_carga():
+	if config.show_progress_text and texto_progreso:
+		texto_progreso.text = "¡Carga Completa!"
+		
+	print("9. 100% alcanzado. Listo para pasar al Menú Principal.")
+	# Aquí conectaremos el cambio de escena final
