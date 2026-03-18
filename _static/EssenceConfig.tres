@@ -5,4 +5,7 @@
 [resource]
 script = ExtResource("1_5pgjl")
 logo_type = 0
+show_warning_icon = true
+warning_icon_type = 1
+button_type = 1
 metadata/_custom_type_script = "uid://cbvfno3r005jc"

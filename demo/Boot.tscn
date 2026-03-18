@@ -17,3 +17,8 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("2_qinae")
+
+[node name="Advertencia" type="Label" parent="." unique_id=707752527]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0

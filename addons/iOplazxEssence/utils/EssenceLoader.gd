@@ -1,0 +1,36 @@
+class_name EssenceLoader extends RefCounted
+
+enum KeyImage {
+	WARNING,
+	EYE,
+	PLUS18,
+	ERROR_FALLBACK
+}
+
+# Diccionario de rutas internas (Cosas que siempre existirán dentro del addon)
+const INTERNAL_IMAGES = {
+	KeyImage.WARNING: "res://addons/iOplazxEssence/resources/iconWarning.png",
+	KeyImage.EYE: "res://addons/iOplazxEssence/resources/iconEye.png",
+	KeyImage.PLUS18: "res://addons/iOplazxEssence/resources/iconPlus18.png",
+	KeyImage.ERROR_FALLBACK: "res://addons/iOplazxEssence/resources/iconImageNoLoad.png"
+}
+
+## Carga imágenes propias del Framework
+static func get_internImage(key: KeyImage) -> Texture2D:
+	if INTERNAL_IMAGES.has(key):
+		return load(INTERNAL_IMAGES[key])
+	
+	push_error("iOplazxEssence Error: Clave de imagen interna no encontrada.")
+	return load(INTERNAL_IMAGES[KeyImage.ERROR_FALLBACK])
+
+## Carga imágenes del usuario (fuera del addon)
+static func get_externImage(ruta: String, usar_imagen_error: bool = true) -> Texture2D:
+	if ruta != "" and ResourceLoader.exists(ruta):
+		return load(ruta)
+	
+	push_error("iOplazxEssence Error: No se encontró la imagen externa en -> " + ruta)
+	
+	if usar_imagen_error:
+		return load(INTERNAL_IMAGES[KeyImage.ERROR_FALLBACK])
+	
+	return null
