@@ -3,9 +3,6 @@ class_name BootBase extends Control
 const CONFIG_PATH = "res://_static/EssenceConfig.tres"
 var config: EssenceConfig
 
-# Nodos de la escena Boot.tscn (La Demo)
-@onready var logo_rect = $Logo
-
 # Nuevos nodos para la pantalla de carga
 var pantalla_carga_container: VBoxContainer
 var barra_progreso: ProgressBar
