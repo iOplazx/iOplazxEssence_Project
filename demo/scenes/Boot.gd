@@ -7,4 +7,4 @@ func inject_custom_tasks(loader: EssenceLoadingScreen):
 func load_audio_assets():
 	print("Demo: Subiendo música a la memoria RAM...")
 	# Metemos la canción en la caja fuerte del AudioManager con la llave "menu_theme"
-	AudioManager.cache_audio("menu_theme", "res://demo/audio/better_days.mp3")
+	AudioManager.cache_audio("menu_theme", "res://demo/audio/better_days.ogg")
