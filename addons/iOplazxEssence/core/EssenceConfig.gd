@@ -33,3 +33,7 @@ class_name EssenceConfig extends Resource
 @export_file("*.png", "*.jpg", "*.webp") var custom_loading_logo_path: String = ""
 @export var show_progress_bar: bool = true
 @export var show_progress_text: bool = true # Para mostrar "Cargando... 45%"
+
+@export_category("Boot Destination")
+## La escena a la que el motor saltará cuando la barra de carga llegue al 100%
+@export_file("*.tscn") var next_scene_path: String = ""

@@ -9,4 +9,5 @@ show_warning_icon = true
 warning_icon_type = 1
 button_type = 1
 loading_logo_type = 0
+next_scene_path = "uid://c5dv33v21frxr"
 metadata/_custom_type_script = "uid://cbvfno3r005jc"

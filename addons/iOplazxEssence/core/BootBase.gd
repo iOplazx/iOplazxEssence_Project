@@ -19,6 +19,8 @@ var barra_progreso: ProgressBar
 var texto_progreso: Label
 var logo_carga: TextureRect
 
+var contenedor_botones_advertencia: HBoxContainer
+
 func _ready():
 	print("--- BOOTBASE: Arrancando ---")
 	_cargar_configuracion()
@@ -156,11 +158,11 @@ func _crear_icono_advertencia():
 
 func _crear_botones_advertencia():
 	# HBoxContainer alinea automáticamente los botones horizontalmente
-	var contenedor_botones = HBoxContainer.new()
-	contenedor_botones.alignment = BoxContainer.ALIGNMENT_CENTER
+	contenedor_botones_advertencia = HBoxContainer.new()
+	contenedor_botones_advertencia.alignment = BoxContainer.ALIGNMENT_CENTER
 	# Separación entre botones
-	contenedor_botones.add_theme_constant_override("separation", 20) 
-	contenedor_botones.modulate.a = 0.0 
+	contenedor_botones_advertencia.add_theme_constant_override("separation", 20) 
+	contenedor_botones_advertencia.modulate.a = 0.0 
 	
 	match config.button_type:
 		1: # OK
@@ -168,7 +170,7 @@ func _crear_botones_advertencia():
 			boton_ok.text = "OK"
 			boton_ok.custom_minimum_size = Vector2(150, 50)
 			boton_ok.pressed.connect(_ir_a_carga) # Avanza al siguiente paso
-			contenedor_botones.add_child(boton_ok)
+			contenedor_botones_advertencia.add_child(boton_ok)
 			
 		2: # Yes / No
 			boton_yes = Button.new()
@@ -181,8 +183,8 @@ func _crear_botones_advertencia():
 			boton_no.custom_minimum_size = Vector2(120, 50)
 			boton_no.pressed.connect(get_tree().quit) # Cierra la aplicación
 			
-			contenedor_botones.add_child(boton_yes)
-			contenedor_botones.add_child(boton_no)
+			contenedor_botones_advertencia.add_child(boton_yes)
+			contenedor_botones_advertencia.add_child(boton_no)
 			
 		3: # Confirm / Reject (Exit)
 			var boton_confirm = Button.new()
@@ -195,24 +197,27 @@ func _crear_botones_advertencia():
 			boton_reject.custom_minimum_size = Vector2(150, 50)
 			boton_reject.pressed.connect(get_tree().quit)
 			
-			contenedor_botones.add_child(boton_confirm)
-			contenedor_botones.add_child(boton_reject)
+			contenedor_botones_advertencia.add_child(boton_confirm)
+			contenedor_botones_advertencia.add_child(boton_reject)
 
-	add_child(contenedor_botones)
-	contenedor_botones.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	contenedor_botones.position.y -= 80 # Margen desde abajo
+	add_child(contenedor_botones_advertencia)
+	contenedor_botones_advertencia.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	contenedor_botones_advertencia.position.y -= 80 # Margen desde abajo
 	
 	# Fade-in de los botones
 	var tween = create_tween()
-	tween.tween_property(contenedor_botones, "modulate:a", 1.0, 1.0)
+	tween.tween_property(contenedor_botones_advertencia, "modulate:a", 1.0, 1.0)
 
 func _ir_a_carga():
-	print("7. Advertencia terminada. Preparando pantalla de Carga...")
+	print("7. Advertencia terminada. Limpiando RAM y preparando Carga...")
 	
-	# Ocultamos la advertencia anterior si existía (limpiamos la pantalla)
-	if advertencia_label: advertencia_label.visible = false
-	if icono_advertencia: icono_advertencia.visible = false
-	# (Si tienes el HBoxContainer de los botones guardado en una variable, también lo ocultas aquí)
+	# OPTIMIZACIÓN EXTREMA: Destruimos los nodos de la advertencia para liberar memoria
+	if advertencia_label: 
+		advertencia_label.queue_free()
+	if icono_advertencia: 
+		icono_advertencia.queue_free()
+	if contenedor_botones_advertencia:
+		contenedor_botones_advertencia.queue_free() # ¡Adiós botón OK fantasma!
 
 	if not config.show_loading_screen:
 		print("Pantalla de carga omitida por configuración. Saltando al motor asíncrono...")
@@ -345,5 +350,14 @@ func _finalizar_carga():
 	if config.show_progress_text and texto_progreso:
 		texto_progreso.text = "¡Carga Completa!"
 		
-	print("9. 100% alcanzado. Listo para pasar al Menú Principal.")
-	# Aquí conectaremos el cambio de escena final
+	print("9. 100% alcanzado. Cambiando de escena...")
+	
+	# Pausa de medio segundo para que el jugador alcance a leer "Carga Completa"
+	await get_tree().create_timer(0.5).timeout 
+	
+	# AQUÍ ESTÁ EL SALTO REAL
+	if config.next_scene_path != "" and ResourceLoader.exists(config.next_scene_path):
+		get_tree().change_scene_to_file(config.next_scene_path)
+	else:
+		push_error("iOplazxEssence FATAL: No se configuró una 'Next Scene Path' en EssenceConfig.tres o la ruta es incorrecta.")
+		

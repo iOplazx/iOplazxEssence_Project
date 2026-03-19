@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://c5dv33v21frxr"]
+
+[ext_resource type="Script" uid="uid://bo3a6i67seryc" path="res://demo/scenes/MainMenu.gd" id="1_xjpr8"]
+
+[node name="MainMenu" type="Control" unique_id=1532018214]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_xjpr8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=830654056]
+layout_mode = 0
+offset_right = 158.0
+offset_bottom = 93.0
+
+[node name="lblMensaje" type="Label" parent="VBoxContainer" unique_id=1426000295]
+layout_mode = 2
+text = "MI JUEGO INCREÍBLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="btnInit" type="Button" parent="VBoxContainer" unique_id=165135766]
+layout_mode = 2
+text = "NEW GAME"
+
+[node name="btnExit" type="Button" parent="VBoxContainer" unique_id=2146080828]
+layout_mode = 2
+text = "EXIT"
