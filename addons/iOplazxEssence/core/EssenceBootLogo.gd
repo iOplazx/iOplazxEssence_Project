@@ -29,10 +29,12 @@ func _preparar_logo():
 	var logo_label = Label.new()
 	logo_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	
+	logo_label.add_theme_font_size_override("font_size", 24)
+	
 	match config.logo_type:
 		0: 
 			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.GODOT) 
-			logo_label.text = "GODOT"
+			logo_label.text = "GODOT ENGINE"
 		1: 
 			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.EYE) # Cambia EYE por tu logo
 			logo_label.text = "iOplazxEssence Engine"
@@ -47,7 +49,7 @@ func _preparar_logo():
 	logo_container.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	logo_container.position.y -= 40 
 	
-	logo_container.modulate.a = 0.0 
+	logo_container.modulate.a = 0.0
 
 func _animar_logo():
 	if logo_container == null: return
