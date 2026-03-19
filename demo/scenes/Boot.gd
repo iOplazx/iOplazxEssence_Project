@@ -1,12 +1,10 @@
 extends BootBase
 
 func inject_custom_tasks(loader: EssenceLoadingScreen):
-	# Tus tareas específicas de este juego
-	loader.add_task(Callable(self, "load_player_data"))
-	loader.add_task(Callable(self, "connect_to_server"))
+	# Añadimos la tarea a la cola
+	loader.add_task(Callable(self, "load_audio_assets"))
 
-func load_player_data():
-	print("Demo: Cargando los datos del jugador desde el disco...")
-
-func connect_to_server():
-	print("Demo: Conectando al servidor multijugador...")
+func load_audio_assets():
+	print("Demo: Subiendo música a la memoria RAM...")
+	# Metemos la canción en la caja fuerte del AudioManager con la llave "menu_theme"
+	AudioManager.cache_audio("menu_theme", "res://demo/audio/better_days.mp3")
