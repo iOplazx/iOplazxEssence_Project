@@ -1,0 +1,7 @@
+[gd_resource type="Resource" format=3 uid="uid://r2qvtm55gddq"]
+
+[ext_resource type="Script" uid="uid://cdp8egpq1dadm" path="res://addons/iOplazxEssence/core/EssenceSettingsConfig.gd" id="1_dkyk6"]
+
+[resource]
+script = ExtResource("1_dkyk6")
+metadata/_custom_type_script = "uid://cbvfno3r005jc"

@@ -1,20 +1,17 @@
-extends Control
+extends EssenceMenuController
 
-@onready var boton_iniciar = $VBoxContainer/btnInit 
-@onready var boton_salir = $VBoxContainer/btnExit 
+# Precargamos la canción (asumiendo que sigues usando la "Caja Fuerte")
+# Nota: Si el Boot ya la cargó en la RAM, no necesitas precargarla aquí, solo llamarla.
 
 func _ready():
-	print("¡Bienvenido al Menú Principal!")
+	# 1. Llamamos al _ready del "Cerebro" (EssenceMenuController) para que él conecte los botones que pusiste en el Inspector
+	super._ready() 
 	
-	# 1. Sacamos la canción de la caja fuerte (Tarda 0.0001 segundos)
+	print("Demo: ¡Bienvenido al Menú Principal!")
+	
+	# 2. Sacamos la canción de la caja fuerte y la reproducimos
 	var cancion_menu = AudioManager.get_cached_audio("menu_theme")
-	
-	# 2. La reproducimos con tu transición suave
 	if cancion_menu:
 		AudioManager.play_music(cancion_menu, 2.0)
-	
-	boton_salir.pressed.connect(_cerrar_juego)
 
-func _cerrar_juego():
-	print("Cerrando el juego de forma segura...")
-	get_tree().quit()
+# ¡Y listo! Puedes borrar la función _cerrar_juego() porque el EssenceMenuController ya la tiene adentro.

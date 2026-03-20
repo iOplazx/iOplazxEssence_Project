@@ -121,5 +121,12 @@ func _run_tasks_silently():
 	_finish()
 
 func _finish():
-	loading_completed.emit()
-	queue_free() # Destruye toda la barra de carga y libera la memoria
+	# Creamos la transición de desvanecimiento (Fade out de 0.5 segundos)
+	var tween = create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, 0.5)
+	
+	# Cuando el desvanecimiento termine, entonces sí avisamos al BootBase y nos destruimos
+	tween.finished.connect(func():
+		loading_completed.emit()
+		queue_free()
+	)
