@@ -15,8 +15,11 @@ enum IdleAnimation { NONE, BREATHING }
 @export_file("*.tscn") var settings_scene: String 
 
 @export_category("Efectos Visuales (Juice)")
-## Activa una aparición en cascada de los botones al iniciar
+@export_subgroup("Configuración de Botones") 
+## Activa una aparición coordinada de los botones al iniciar
 @export var animate_buttons_entrance: bool = true
+## (Opcional) El panel que contiene los botones. Si se asigna, aparecerá antes que los botones.
+@export var buttons_panel: Control 
 
 @export_subgroup("Configuración del Título")
 ## Asigna el nodo del Título aquí (TextureRect, Label, etc.)
@@ -27,7 +30,6 @@ enum IdleAnimation { NONE, BREATHING }
 @export var entrance_duration: float = 0.5
 ## Distancia para la animación de 'Slide From Top'
 @export var slide_distance: float = 100.0
-
 ## Tipo de animación idle (bucle) para el título
 @export var idle_anim_type: IdleAnimation = IdleAnimation.BREATHING
 ## Duración de un ciclo de la animación idle (segundos)
@@ -41,11 +43,20 @@ func _ready():
 	_conectar_botones()
 	_verificar_estado_partida()
 	
+	if animate_buttons_entrance:
+		if buttons_panel:
+			buttons_panel.modulate.a = 0.0
+		var botones = [btn_new_game, btn_continue, btn_settings, btn_exit]
+		for btn in botones:
+			if btn:
+				btn.modulate.a = 0.0
+	
 	if title_container:
 		_iniciar_animaciones_titulo()
 
 	if animate_buttons_entrance:
-		_animar_entrada_botones()
+		# Llamamos a la función unificada que gestiona panel + cascade
+		_animar_entrada_ui_botones()
 
 func _conectar_botones():
 	# Solo conectamos los botones que el usuario decidió usar (haciéndolo modular)
@@ -165,3 +176,31 @@ func _tween_idle_breathing():
 	_idle_tween.tween_property(title_container, "scale", Vector2(1.05, 1.05), idle_duration).set_trans(Tween.TRANS_SINE)
 	# Regresa a la escala normal
 	_idle_tween.tween_property(title_container, "scale", Vector2(1.0, 1.0), idle_duration).set_trans(Tween.TRANS_SINE)
+
+func _animar_entrada_ui_botones():
+	# Primero, animamos el panel si existe (Fade In suave)
+	if buttons_panel:
+		var panel_tween = create_tween()
+		# Hacemos que el panel aparezca en 0.4s
+		panel_tween.tween_property(buttons_panel, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE)
+		
+		# Esperamos a que el panel casi termine para empezar la cascada
+		# Esto hace la transición más fluida
+		_lanzar_cascada_botones(0.5) 
+	else:
+		# Si no hay panel, lanzamos la cascada de botones inmediatamente
+		_lanzar_cascada_botones(0.0)
+
+# NUEVA FUNCIÓN: Solo maneja la cascada de botones
+func _lanzar_cascada_botones(start_delay: float):
+	var cascade_delay = start_delay
+	var button_duration = 0.4
+	var button_stagger = 0.15
+	var botones = [btn_new_game, btn_continue, btn_settings, btn_exit]
+	
+	for btn in botones:
+		if btn:
+			# Ya está en opacidad 0 por _ready, solo hacemos tween de aparición
+			var btn_tween = create_tween()
+			btn_tween.tween_property(btn, "modulate:a", 1.0, button_duration).set_delay(cascade_delay).set_trans(Tween.TRANS_SINE)
+			cascade_delay += button_stagger

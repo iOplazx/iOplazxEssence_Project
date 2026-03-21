@@ -16,7 +16,7 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.79607844, 0.73333335, 0.14901961, 0.81960785)
 
-[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_settings", "btn_exit", "title_container")]
+[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_settings", "btn_exit", "buttons_panel", "title_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,10 +24,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xjpr8")
-btn_new_game = NodePath("panelMenu/VBoxContainer/btnInit")
-btn_settings = NodePath("panelMenu/VBoxContainer/btnSettings")
-btn_exit = NodePath("panelMenu/VBoxContainer/btnExit")
+btn_new_game = NodePath("panelMenu/ButtonContainer/btnInit")
+btn_settings = NodePath("panelMenu/ButtonContainer/btnSettings")
+btn_exit = NodePath("panelMenu/ButtonContainer/btnExit")
 settings_scene = "uid://c7suofv1q8fjt"
+buttons_panel = NodePath("panelMenu/ButtonContainer")
 title_container = NodePath("titleImage")
 
 [node name="background" type="TextureRect" parent="." unique_id=1221495355]
@@ -67,22 +68,22 @@ offset_bottom = 113.0
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_3h6x3")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="panelMenu" unique_id=64784079]
+[node name="ButtonContainer" type="VBoxContainer" parent="panelMenu" unique_id=64784079]
 layout_mode = 2
 
-[node name="btnInit" type="Button" parent="panelMenu/VBoxContainer" unique_id=165135766]
+[node name="btnInit" type="Button" parent="panelMenu/ButtonContainer" unique_id=165135766]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 text = "NEW GAME"
 
-[node name="btnSettings" type="Button" parent="panelMenu/VBoxContainer" unique_id=74454669]
+[node name="btnSettings" type="Button" parent="panelMenu/ButtonContainer" unique_id=74454669]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 text = "SETTINGS"
 
-[node name="btnExit" type="Button" parent="panelMenu/VBoxContainer" unique_id=2146080828]
+[node name="btnExit" type="Button" parent="panelMenu/ButtonContainer" unique_id=2146080828]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
