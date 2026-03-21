@@ -52,16 +52,17 @@ layout_mode = 2
 metadata/_tab_index = 1
 metadata/_tab_name = "Video"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ContenedorPrincipal/TabContainer/mgVideo" unique_id=1717866325]
-layout_mode = 2
-
-[node name="RowSlider" parent="ContenedorPrincipal/TabContainer/mgVideo/VBoxContainer" unique_id=68071660 instance=ExtResource("1_kd5ej")]
-layout_mode = 2
-
 [node name="mgAudio" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=142263258]
 layout_mode = 2
 metadata/_tab_index = 2
 metadata/_tab_name = "Audio"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ContenedorPrincipal/TabContainer/mgAudio" unique_id=1717866325]
+visible = false
+layout_mode = 2
+
+[node name="RowSlider" parent="ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer" unique_id=68071660 instance=ExtResource("1_kd5ej")]
+layout_mode = 2
 
 [node name="btnReturn" type="Button" parent="ContenedorPrincipal" unique_id=1419415243]
 layout_mode = 2

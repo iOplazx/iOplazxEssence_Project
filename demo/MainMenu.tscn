@@ -1,38 +1,21 @@
 [gd_scene format=3 uid="uid://c5dv33v21frxr"]
 
 [ext_resource type="Script" uid="uid://bo3a6i67seryc" path="res://demo/scenes/MainMenu.gd" id="1_xjpr8"]
+[ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/generateMainMenuImage.png" id="2_3h6x3"]
+[ext_resource type="Texture2D" uid="uid://bjn2r5bicbxj6" path="res://addons/iOplazxEssence/resources/logo_demo.png" id="3_47cvb"]
 
 [node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_settings", "btn_exit")]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_xjpr8")
 btn_new_game = NodePath("VBoxContainer/btnInit")
 btn_settings = NodePath("VBoxContainer/btnSettings")
 btn_exit = NodePath("VBoxContainer/btnExit")
 settings_scene = "uid://c7suofv1q8fjt"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=830654056]
-layout_mode = 0
-offset_right = 158.0
-offset_bottom = 93.0
-
-[node name="lblMensaje" type="Label" parent="VBoxContainer" unique_id=1426000295]
-layout_mode = 2
-text = "MI JUEGO INCREÍBLE"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="btnInit" type="Button" parent="VBoxContainer" unique_id=165135766]
-layout_mode = 2
-text = "NEW GAME"
-
-[node name="btnSettings" type="Button" parent="VBoxContainer" unique_id=74454669]
-layout_mode = 2
-text = "SETTINGS"
-
-[node name="btnExit" type="Button" parent="VBoxContainer" unique_id=2146080828]
-layout_mode = 2
-text = "EXIT"
 
 [node name="Fondo" type="TextureRect" parent="." unique_id=1221495355]
 layout_mode = 1
@@ -41,5 +24,46 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("2_3h6x3")
 expand_mode = 1
 stretch_mode = 6
+metadata/_edit_lock_ = true
+
+[node name="titleImage" type="TextureRect" parent="." unique_id=1174376808]
+layout_mode = 0
+offset_left = 385.0
+offset_top = 2.0
+offset_right = 885.0
+offset_bottom = 152.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("3_47cvb")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=830654056]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="btnInit" type="Button" parent="VBoxContainer" unique_id=165135766]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+text = "NEW GAME"
+
+[node name="btnSettings" type="Button" parent="VBoxContainer" unique_id=74454669]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+text = "SETTINGS"
+
+[node name="btnExit" type="Button" parent="VBoxContainer" unique_id=2146080828]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+text = "EXIT"
