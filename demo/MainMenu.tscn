@@ -4,7 +4,19 @@
 [ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/generateMainMenuImage.png" id="2_3h6x3"]
 [ext_resource type="Texture2D" uid="uid://bjn2r5bicbxj6" path="res://addons/iOplazxEssence/resources/logo_demo.png" id="3_47cvb"]
 
-[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_settings", "btn_exit")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3h6x3"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.13333334, 0.13333334, 0.13333334, 0.85490197)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.79607844, 0.73333335, 0.14901961, 0.81960785)
+
+[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_settings", "btn_exit", "title_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,12 +24,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xjpr8")
-btn_new_game = NodePath("VBoxContainer/btnInit")
-btn_settings = NodePath("VBoxContainer/btnSettings")
-btn_exit = NodePath("VBoxContainer/btnExit")
+btn_new_game = NodePath("panelMenu/VBoxContainer/btnInit")
+btn_settings = NodePath("panelMenu/VBoxContainer/btnSettings")
+btn_exit = NodePath("panelMenu/VBoxContainer/btnExit")
 settings_scene = "uid://c7suofv1q8fjt"
+title_container = NodePath("titleImage")
 
-[node name="Fondo" type="TextureRect" parent="." unique_id=1221495355]
+[node name="background" type="TextureRect" parent="." unique_id=1221495355]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,29 +53,36 @@ size_flags_vertical = 0
 texture = ExtResource("3_47cvb")
 expand_mode = 1
 stretch_mode = 5
-
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=830654056]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 metadata/_edit_lock_ = true
 
-[node name="btnInit" type="Button" parent="VBoxContainer" unique_id=165135766]
+[node name="panelMenu" type="PanelContainer" parent="." unique_id=221700732]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 50.0
+offset_top = -157.0
+offset_right = 185.0
+offset_bottom = 113.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_3h6x3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelMenu" unique_id=64784079]
+layout_mode = 2
+
+[node name="btnInit" type="Button" parent="panelMenu/VBoxContainer" unique_id=165135766]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 text = "NEW GAME"
 
-[node name="btnSettings" type="Button" parent="VBoxContainer" unique_id=74454669]
+[node name="btnSettings" type="Button" parent="panelMenu/VBoxContainer" unique_id=74454669]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 text = "SETTINGS"
 
-[node name="btnExit" type="Button" parent="VBoxContainer" unique_id=2146080828]
+[node name="btnExit" type="Button" parent="panelMenu/VBoxContainer" unique_id=2146080828]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
