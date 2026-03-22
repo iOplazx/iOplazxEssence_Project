@@ -7,9 +7,14 @@ enum IdleAnimation { NONE, BREATHING }
 @export_category("Conexión de Botones (UI)")
 @export var btn_new_game: Button
 @export var btn_continue: Button
+@export var btn_load: Button
 @export var btn_settings: Button
 @export var btn_credits: Button
 @export var btn_exit: Button
+
+@export_subgroup("Configuración de Navegación")
+## El botón que estará seleccionado por defecto para el teclado/mando
+@export var first_focus_button: Control
 
 @export_category("Efectos Visuales (Juice)")
 @export_subgroup("Configuración de Botones") 
@@ -43,7 +48,7 @@ func _ready():
 	if animate_buttons_entrance:
 		if buttons_panel:
 			buttons_panel.modulate.a = 0.0
-		var botones = [btn_new_game, btn_continue, btn_settings, btn_credits, btn_exit]
+		var botones = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
 		for btn in botones:
 			if btn:
 				btn.modulate.a = 0.0
@@ -54,6 +59,8 @@ func _ready():
 	if animate_buttons_entrance:
 		# Llamamos a la función unificada que gestiona panel + cascade
 		_animar_entrada_ui_botones()
+		
+	_iniciar_foco_teclado()
 
 func _conectar_botones():
 	# Solo conectamos los botones que el usuario decidió usar (haciéndolo modular)
@@ -61,6 +68,8 @@ func _conectar_botones():
 		btn_new_game.pressed.connect(_on_new_game_pressed)
 	if btn_continue: 
 		btn_continue.pressed.connect(_on_continue_pressed)
+	if btn_load: 
+		btn_load.pressed.connect(_on_continue_pressed)
 	if btn_settings: 
 		btn_settings.pressed.connect(_on_settings_pressed)
 	if btn_credits:
@@ -68,12 +77,22 @@ func _conectar_botones():
 	if btn_exit: 
 		btn_exit.pressed.connect(_on_exit_pressed)
 
+
 func _verificar_estado_partida():
-	# Aquí a futuro pondremos la lógica: si no hay archivo de guardado, 
-	# apagamos el botón de "Continuar" para que no se pueda hacer clic.
+	# TODO: Conectar esto con el EssenceSaveManager en el futuro.
+	# Por ahora, simulamos que NO hay archivo de guardado.
+	var has_save_file = false 
+	
 	if btn_continue:
-		# btn_continue.disabled = true (Lo haremos en la v1.8)
-		pass
+		btn_continue.disabled = not has_save_file
+	if btn_load:
+		btn_load.disabled = not has_save_file
+		
+func _iniciar_foco_teclado():
+	if first_focus_button:
+		# Le damos el foco al botón. Si el botón entra con delay (cascada), 
+		# no pasa nada, Godot lo recuerda.
+		first_focus_button.grab_focus()
 
 # ==========================================
 # FUNCIONES DE ACCIÓN (Lógica del Framework)
@@ -83,7 +102,11 @@ func _on_new_game_pressed():
 	SceneManager.goto_new_game()
 
 func _on_continue_pressed():
-	print("Cargando partida... (Próximamente)")
+	SceneManager.goto_continue_game()
+	
+func _on_load_pressed():
+	print("Opening Load Game screen...")
+	SceneManager.goto_load_game()
 
 func _on_settings_pressed():
 	SceneManager.goto_settings()
@@ -187,7 +210,7 @@ func _lanzar_cascada_botones(start_delay: float):
 	var cascade_delay = start_delay
 	var button_duration = 0.4
 	var button_stagger = 0.15
-	var botones = [btn_new_game, btn_continue, btn_settings, btn_credits, btn_exit]
+	var botones = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
 	
 	for btn in botones:
 		if btn:

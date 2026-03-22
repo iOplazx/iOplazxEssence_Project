@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bdo14d66ogjtv" path="res://addons/iOplazxEssence/resources/backgroundBoton.png" id="1_rnxv7"]
 [ext_resource type="Texture2D" uid="uid://cih2ovck2ukx3" path="res://addons/iOplazxEssence/resources/backgroundBotonClick.png" id="2_roc1a"]
-[ext_resource type="Texture2D" uid="uid://cc8bk6lg23dyd" path="res://addons/iOplazxEssence/resources/backgroundBotonHover.png" id="3_kpenv"]
+[ext_resource type="StyleBox" uid="uid://cq6gtq8h4plpm" path="res://addons/iOplazxEssence/resources/EssenceButtonHover_1.tres" id="3_rnxv7"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_x3kw4"]
 texture = ExtResource("1_rnxv7")
@@ -13,13 +13,6 @@ texture_margin_bottom = 15.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ohj53"]
 texture = ExtResource("2_roc1a")
-texture_margin_left = 15.0
-texture_margin_top = 15.0
-texture_margin_right = 15.0
-texture_margin_bottom = 15.0
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fqoc0"]
-texture = ExtResource("3_kpenv")
 texture_margin_left = 15.0
 texture_margin_top = 15.0
 texture_margin_right = 15.0
@@ -38,5 +31,6 @@ theme_override_colors/icon_focus_color = Color(1, 1, 0.03529412, 1)
 theme_override_colors/icon_pressed_color = Color(0.6578304, 0.5116211, 0.021338094, 1)
 theme_override_styles/normal = SubResource("StyleBoxTexture_x3kw4")
 theme_override_styles/pressed = SubResource("StyleBoxTexture_ohj53")
-theme_override_styles/hover = SubResource("StyleBoxTexture_fqoc0")
+theme_override_styles/hover = ExtResource("3_rnxv7")
+theme_override_styles/focus = ExtResource("3_rnxv7")
 text = "NEW GAME"

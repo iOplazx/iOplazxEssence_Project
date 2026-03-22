@@ -25,6 +25,11 @@ func goto_new_game():
 	if _verificar_config():
 		clear_history() 
 		_navigate(_config.new_game_scene)
+func goto_continue_game(): 
+	if _verificar_config(): _navigate(_config.continue_game_scene)
+		
+func goto_load_game(): 
+	if _verificar_config(): _navigate(_config.load_game_scene)
 
 func goto_settings(): 
 	if _verificar_config(): _navigate(_config.settings_scene)
