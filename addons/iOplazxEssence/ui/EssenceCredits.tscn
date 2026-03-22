@@ -7,20 +7,26 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_82f7c"]
 bg_color = Color(0.16862746, 0.16862746, 0.16862746, 0.84313726)
 
-[node name="EssenceCredits" type="Control" unique_id=635154284 node_paths=PackedStringArray("btn_back", "lbl_game", "lbl_thanks", "lbl_framework")]
+[node name="EssenceCredits" type="Control" unique_id=635154284 node_paths=PackedStringArray("btn_back", "scroll_container", "lbl_game", "lbl_thanks", "lbl_framework")]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_i7r5x")
-btn_back = NodePath("PopupPanel/ScrollContainer/VBoxContainer/btnBack")
-lbl_game = NodePath("PopupPanel/ScrollContainer/VBoxContainer/LblGameSection")
-lbl_thanks = NodePath("PopupPanel/ScrollContainer/VBoxContainer/LblSpecialThanks")
-lbl_framework = NodePath("PopupPanel/ScrollContainer/VBoxContainer/LblFramework")
-game_credits = "Desarrollador Principal:
-Tu Nombre Aquí
+btn_back = NodePath("MarginContainer/PopupPanel/ScrollContainer/VBoxContainer/btnBack")
+scroll_container = NodePath("MarginContainer/PopupPanel/ScrollContainer")
+lbl_game = NodePath("MarginContainer/PopupPanel/ScrollContainer/VBoxContainer/LblGameSection")
+lbl_thanks = NodePath("MarginContainer/PopupPanel/ScrollContainer/VBoxContainer/LblSpecialThanks")
+lbl_framework = NodePath("MarginContainer/PopupPanel/ScrollContainer/VBoxContainer/LblFramework")
+game_title = "iOplazx Essence DEMO"
+game_credits = "Developer:
+DEVELOPER MAIN
 
-Música:
+Music:
 Better Days - LAKEY INSPIRED"
-special_thanks = Array[String](["Agradecimientos al Framework iOplazxEssence Engine "])
+special_thanks = Array[String](["Acknowledgments to the Framework iOplazxEssence Engine "])
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1773158194]
 layout_mode = 1
@@ -33,31 +39,41 @@ texture = ExtResource("1_jl0a6")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="PopupPanel" type="PanelContainer" parent="." unique_id=1797349720]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2005623709]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="PopupPanel" type="PanelContainer" parent="MarginContainer" unique_id=1797349720]
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_82f7c")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PopupPanel" unique_id=1263598174]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/PopupPanel" unique_id=1263598174]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PopupPanel/ScrollContainer" unique_id=1787700897]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PopupPanel/ScrollContainer" unique_id=1787700897]
 layout_mode = 2
+size_flags_horizontal = 6
 alignment = 1
 
-[node name="LblGameSection" type="Label" parent="PopupPanel/ScrollContainer/VBoxContainer" unique_id=2089145412]
+[node name="LblGameSection" type="Label" parent="MarginContainer/PopupPanel/ScrollContainer/VBoxContainer" unique_id=2089145412]
 layout_mode = 2
 
-[node name="LblSpecialThanks" type="Label" parent="PopupPanel/ScrollContainer/VBoxContainer" unique_id=43242596]
+[node name="LblSpecialThanks" type="Label" parent="MarginContainer/PopupPanel/ScrollContainer/VBoxContainer" unique_id=43242596]
 layout_mode = 2
 
-[node name="LblFramework" type="Label" parent="PopupPanel/ScrollContainer/VBoxContainer" unique_id=660108760]
+[node name="LblFramework" type="Label" parent="MarginContainer/PopupPanel/ScrollContainer/VBoxContainer" unique_id=660108760]
 layout_mode = 2
 
-[node name="btnBack" parent="PopupPanel/ScrollContainer/VBoxContainer" unique_id=606571041 instance=ExtResource("3_r3iwy")]
+[node name="btnBack" parent="MarginContainer/PopupPanel/ScrollContainer/VBoxContainer" unique_id=606571041 instance=ExtResource("3_r3iwy")]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
 text = "BACK"
