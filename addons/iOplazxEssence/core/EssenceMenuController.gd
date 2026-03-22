@@ -11,11 +11,6 @@ enum IdleAnimation { NONE, BREATHING }
 @export var btn_credits: Button
 @export var btn_exit: Button
 
-@export_category("Rutas de Escenas")
-@export_file("*.tscn") var new_game_scene: String 
-@export_file("*.tscn") var settings_scene: String 
-@export_file("*.tscn") var credits_scene: String
-
 @export_category("Efectos Visuales (Juice)")
 @export_subgroup("Configuración de Botones") 
 ## Activa una aparición coordinada de los botones al iniciar
@@ -85,32 +80,16 @@ func _verificar_estado_partida():
 # ==========================================
 
 func _on_new_game_pressed():
-	# Si implementamos sonidos UI en el AudioManager:
-	# AudioManager.play_ui(cancion_clic)
-	
-	if new_game_scene != "" and ResourceLoader.exists(new_game_scene):
-		print("Iniciando Nuevo Juego...")
-		get_tree().change_scene_to_file(new_game_scene)
-	else:
-		push_error("iOplazxEssence: No se asignó una escena para 'New Game'.")
+	SceneManager.goto_new_game()
 
 func _on_continue_pressed():
 	print("Cargando partida... (Próximamente)")
 
 func _on_settings_pressed():
-	if settings_scene != "" and ResourceLoader.exists(settings_scene):
-		print("Abriendo Opciones...")
-		get_tree().change_scene_to_file(settings_scene)
-	else:
-		print("Aviso: Escena de opciones no configurada.")
-		
-		
-func _on_credits_pressed(): # <-- NUEVA FUNCIÓN PARA CAMBIAR DE ESCENA
-	if credits_scene != "" and ResourceLoader.exists(credits_scene):
-		print("Abriendo Créditos...")
-		get_tree().change_scene_to_file(credits_scene)
-	else:
-		print("Aviso: Escena de créditos no configurada.")
+	SceneManager.goto_settings()
+	
+func _on_credits_pressed():
+	SceneManager.goto_credits()
 
 func _on_exit_pressed():
 	print("Cerrando motor desde el menú...")

@@ -30,7 +30,6 @@ btn_continue = NodePath("panelMenu/ButtonContainer/btnContinue")
 btn_settings = NodePath("panelMenu/ButtonContainer/btnSettings")
 btn_credits = NodePath("panelMenu/ButtonContainer/btnCredits")
 btn_exit = NodePath("panelMenu/ButtonContainer/btnExit")
-settings_scene = "uid://c7suofv1q8fjt"
 buttons_panel = NodePath("panelMenu/ButtonContainer")
 title_container = NodePath("titleImage")
 

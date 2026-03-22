@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://ubl4nvaexi55"]
+
+[ext_resource type="Script" uid="uid://ccwch6gytt4l2" path="res://addons/iOplazxEssence/core/EssenceCreditsController.gd" id="1_i7r5x"]
+[ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/generateMainMenuImage.png" id="1_jl0a6"]
+[ext_resource type="PackedScene" uid="uid://c58ydoc3e2fbk" path="res://addons/iOplazxEssence/ui/EssenceButton.tscn" id="3_r3iwy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_82f7c"]
+bg_color = Color(0.16862746, 0.16862746, 0.16862746, 0.84313726)
+
+[node name="EssenceCredits" type="Control" unique_id=635154284 node_paths=PackedStringArray("btn_back", "lbl_game", "lbl_thanks", "lbl_framework")]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_i7r5x")
+btn_back = NodePath("PopupPanel/ScrollContainer/VBoxContainer/btnBack")
+lbl_game = NodePath("PopupPanel/ScrollContainer/VBoxContainer/LblGameSection")
+lbl_thanks = NodePath("PopupPanel/ScrollContainer/VBoxContainer/LblSpecialThanks")
+lbl_framework = NodePath("PopupPanel/ScrollContainer/VBoxContainer/LblFramework")
+game_credits = "Desarrollador Principal:
+Tu Nombre Aquí
+
+Música:
+Better Days - LAKEY INSPIRED"
+special_thanks = Array[String](["Agradecimientos al Framework iOplazxEssence Engine "])
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1773158194]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_jl0a6")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="PopupPanel" type="PanelContainer" parent="." unique_id=1797349720]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_82f7c")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PopupPanel" unique_id=1263598174]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PopupPanel/ScrollContainer" unique_id=1787700897]
+layout_mode = 2
+alignment = 1
+
+[node name="LblGameSection" type="Label" parent="PopupPanel/ScrollContainer/VBoxContainer" unique_id=2089145412]
+layout_mode = 2
+
+[node name="LblSpecialThanks" type="Label" parent="PopupPanel/ScrollContainer/VBoxContainer" unique_id=43242596]
+layout_mode = 2
+
+[node name="LblFramework" type="Label" parent="PopupPanel/ScrollContainer/VBoxContainer" unique_id=660108760]
+layout_mode = 2
+
+[node name="btnBack" parent="PopupPanel/ScrollContainer/VBoxContainer" unique_id=606571041 instance=ExtResource("3_r3iwy")]
+layout_mode = 2
+text = "BACK"

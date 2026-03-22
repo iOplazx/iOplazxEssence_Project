@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EssenceRouteConfig" format=3 uid="uid://wormp1ktbu3u"]
+
+[ext_resource type="Script" uid="uid://dj64xytw2gwrt" path="res://addons/iOplazxEssence/core/EssenceRouteConfig.gd" id="1_8wc57"]
+
+[resource]
+script = ExtResource("1_8wc57")
+settings_scene = "uid://c7suofv1q8fjt"
+metadata/_custom_type_script = "uid://dj64xytw2gwrt"
