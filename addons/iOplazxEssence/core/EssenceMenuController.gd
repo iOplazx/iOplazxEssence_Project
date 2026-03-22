@@ -8,11 +8,13 @@ enum IdleAnimation { NONE, BREATHING }
 @export var btn_new_game: Button
 @export var btn_continue: Button
 @export var btn_settings: Button
+@export var btn_credits: Button
 @export var btn_exit: Button
 
 @export_category("Rutas de Escenas")
 @export_file("*.tscn") var new_game_scene: String 
 @export_file("*.tscn") var settings_scene: String 
+@export_file("*.tscn") var credits_scene: String
 
 @export_category("Efectos Visuales (Juice)")
 @export_subgroup("Configuración de Botones") 
@@ -46,7 +48,7 @@ func _ready():
 	if animate_buttons_entrance:
 		if buttons_panel:
 			buttons_panel.modulate.a = 0.0
-		var botones = [btn_new_game, btn_continue, btn_settings, btn_exit]
+		var botones = [btn_new_game, btn_continue, btn_settings, btn_credits, btn_exit]
 		for btn in botones:
 			if btn:
 				btn.modulate.a = 0.0
@@ -66,6 +68,8 @@ func _conectar_botones():
 		btn_continue.pressed.connect(_on_continue_pressed)
 	if btn_settings: 
 		btn_settings.pressed.connect(_on_settings_pressed)
+	if btn_credits:
+		btn_credits.pressed.connect(_on_credits_pressed)
 	if btn_exit: 
 		btn_exit.pressed.connect(_on_exit_pressed)
 
@@ -99,6 +103,14 @@ func _on_settings_pressed():
 		get_tree().change_scene_to_file(settings_scene)
 	else:
 		print("Aviso: Escena de opciones no configurada.")
+		
+		
+func _on_credits_pressed(): # <-- NUEVA FUNCIÓN PARA CAMBIAR DE ESCENA
+	if credits_scene != "" and ResourceLoader.exists(credits_scene):
+		print("Abriendo Créditos...")
+		get_tree().change_scene_to_file(credits_scene)
+	else:
+		print("Aviso: Escena de créditos no configurada.")
 
 func _on_exit_pressed():
 	print("Cerrando motor desde el menú...")
@@ -191,12 +203,12 @@ func _animar_entrada_ui_botones():
 		# Si no hay panel, lanzamos la cascada de botones inmediatamente
 		_lanzar_cascada_botones(0.0)
 
-# NUEVA FUNCIÓN: Solo maneja la cascada de botones
+# Solo maneja la cascada de botones
 func _lanzar_cascada_botones(start_delay: float):
 	var cascade_delay = start_delay
 	var button_duration = 0.4
 	var button_stagger = 0.15
-	var botones = [btn_new_game, btn_continue, btn_settings, btn_exit]
+	var botones = [btn_new_game, btn_continue, btn_settings, btn_credits, btn_exit]
 	
 	for btn in botones:
 		if btn:

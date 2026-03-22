@@ -17,7 +17,7 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.79607844, 0.73333335, 0.14901961, 0.81960785)
 
-[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_continue", "btn_settings", "btn_exit", "buttons_panel", "title_container")]
+[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_continue", "btn_settings", "btn_credits", "btn_exit", "buttons_panel", "title_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,6 +28,7 @@ script = ExtResource("1_xjpr8")
 btn_new_game = NodePath("panelMenu/ButtonContainer/btnInit")
 btn_continue = NodePath("panelMenu/ButtonContainer/btnContinue")
 btn_settings = NodePath("panelMenu/ButtonContainer/btnSettings")
+btn_credits = NodePath("panelMenu/ButtonContainer/btnCredits")
 btn_exit = NodePath("panelMenu/ButtonContainer/btnExit")
 settings_scene = "uid://c7suofv1q8fjt"
 buttons_panel = NodePath("panelMenu/ButtonContainer")
