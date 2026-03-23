@@ -8,7 +8,7 @@ enum KeyImage {
 	ERROR_FALLBACK
 }
 
-const PATH_RESOURCE = "res://addons/iOplazxEssence/resources/"
+const PATH_RESOURCE = "res://addons/iOplazxEssence/resources/images/"
 
 # Diccionario de rutas internas (Cosas que siempre existirán dentro del addon)
 const INTERNAL_IMAGES = {
