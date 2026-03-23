@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dk4bpg2hqdk32"
-path="res://.godot/imported/generateMainMenuImage.png-586db345ae1959d963ab0cf6de1342fd.ctex"
+uid="uid://cih2ovck2ukx3"
+path="res://.godot/imported/backgroundBotonClick.png-0030d3d49a7e65ee054966b38a135124.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/iOplazxEssence/resources/generateMainMenuImage.png"
-dest_files=["res://.godot/imported/generateMainMenuImage.png-586db345ae1959d963ab0cf6de1342fd.ctex"]
+source_file="res://addons/iOplazxEssence/resources/images/backgroundBotonClick.png"
+dest_files=["res://.godot/imported/backgroundBotonClick.png-0030d3d49a7e65ee054966b38a135124.ctex"]
 
 [params]
 

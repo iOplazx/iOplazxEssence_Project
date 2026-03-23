@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cih2ovck2ukx3"
-path="res://.godot/imported/backgroundBotonClick.png-6999c9d37fde08ee32de14decdd0589e.ctex"
+uid="uid://hhscdaovhfp3"
+path="res://.godot/imported/iconEye.png-21b26f511e6ef3e8bff144cc8b8d504c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/iOplazxEssence/resources/backgroundBotonClick.png"
-dest_files=["res://.godot/imported/backgroundBotonClick.png-6999c9d37fde08ee32de14decdd0589e.ctex"]
+source_file="res://addons/iOplazxEssence/resources/images/iconEye.png"
+dest_files=["res://.godot/imported/iconEye.png-21b26f511e6ef3e8bff144cc8b8d504c.ctex"]
 
 [params]
 

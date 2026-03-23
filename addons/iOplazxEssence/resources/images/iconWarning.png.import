@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjn2r5bicbxj6"
-path="res://.godot/imported/logo_demo.png-0c3d50019e64fed65098e4e82223aad3.ctex"
+uid="uid://btyjtvfeulknp"
+path="res://.godot/imported/iconWarning.png-b258a15f67a893bee54d185e0ad26662.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/iOplazxEssence/resources/logo_demo.png"
-dest_files=["res://.godot/imported/logo_demo.png-0c3d50019e64fed65098e4e82223aad3.ctex"]
+source_file="res://addons/iOplazxEssence/resources/images/iconWarning.png"
+dest_files=["res://.godot/imported/iconWarning.png-b258a15f67a893bee54d185e0ad26662.ctex"]
 
 [params]
 

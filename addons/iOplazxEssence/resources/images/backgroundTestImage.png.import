@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cc8bk6lg23dyd"
-path="res://.godot/imported/backgroundBotonHover.png-81de6fe3118f9fd3a34a8bdd77e369ee.ctex"
+uid="uid://cxbm1wcyeuhpr"
+path="res://.godot/imported/backgroundTestImage.png-afa52ff38ce74c481480be756061e792.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/iOplazxEssence/resources/backgroundBotonHover.png"
-dest_files=["res://.godot/imported/backgroundBotonHover.png-81de6fe3118f9fd3a34a8bdd77e369ee.ctex"]
+source_file="res://addons/iOplazxEssence/resources/images/backgroundTestImage.png"
+dest_files=["res://.godot/imported/backgroundTestImage.png-afa52ff38ce74c481480be756061e792.ctex"]
 
 [params]
 

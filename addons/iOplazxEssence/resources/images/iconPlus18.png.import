@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://hhscdaovhfp3"
-path="res://.godot/imported/iconEye.png-505fabc68b7356ec7275e7c94847453e.ctex"
+uid="uid://qh736dr7wjkb"
+path="res://.godot/imported/iconPlus18.png-6021beec2a9282403985bada33a7e753.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/iOplazxEssence/resources/iconEye.png"
-dest_files=["res://.godot/imported/iconEye.png-505fabc68b7356ec7275e7c94847453e.ctex"]
+source_file="res://addons/iOplazxEssence/resources/images/iconPlus18.png"
+dest_files=["res://.godot/imported/iconPlus18.png-6021beec2a9282403985bada33a7e753.ctex"]
 
 [params]
 
