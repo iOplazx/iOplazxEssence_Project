@@ -10,10 +10,22 @@ class_name EssenceSettingsController extends Control
 @export var row_ui_volume: EssenceRowSlider
 @export var row_voices_volume: EssenceRowSlider
 
+@export_group("UI Theme")
+@export var dropdown_ui_theme: OptionButton
+@export var btn_preview: TextureButton
+@export var preview_player: AudioStreamPlayer
+
+var _tex_play: Texture2D
+var _tex_pause: Texture2D
+
 func _ready():
+	_tex_play = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_PLAY)
+	_tex_pause = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_PAUSE)
+	
 	_setup_sliders_range()
 	_connect_signals()
-	_sync_with_audio_manager() # En lugar de cargar archivos, le preguntamos al AudioManager
+	_setup_theme_dropdown()
+	_sync_with_audio_manager()
 
 func _setup_sliders_range():
 	# Arreglado: Eliminamos el duplicado y accedemos a ".slider"
@@ -48,8 +60,75 @@ func _connect_audio_row(row: EssenceRowSlider, bus_name: String, play_test: bool
 
 func _play_test_sound():
 	# Aquí llamas al sonido que acabamos de configurar
-	# AudioManager.play_ui_sfx(tu_sonido_precargado)
+	AudioManager.play_ui_sfx()
 	pass
+	
+# ==========================================
+# LÓGICA DEL TEMA DE INTERFAZ (COMBOBOX)
+# ==========================================
+
+func _setup_theme_dropdown():
+	if not dropdown_ui_theme or not btn_preview: return
+	
+	# 1. Llenamos el ComboBox
+	dropdown_ui_theme.clear()
+	dropdown_ui_theme.add_item("Sci-Fi (Space)") # Índice 0
+	dropdown_ui_theme.add_item("Burbuja (Bubble)") # Índice 1
+	dropdown_ui_theme.add_item("Silencio")       # Índice 2
+	
+	# 2. Conectamos señales
+	dropdown_ui_theme.item_selected.connect(_on_theme_selected)
+	btn_preview.pressed.connect(_on_preview_pressed)
+	
+	if preview_player:
+		# Esta señal nativa avisa cuando el audio llega a su fin naturalmente
+		preview_player.finished.connect(_on_preview_finished)
+		
+	# Ponemos el ícono inicial
+	btn_preview.texture_normal = _tex_play
+
+func _on_theme_selected(index: int):
+	# Le avisamos al jefe global que hubo un cambio
+	AudioManager.set_ui_theme(index)
+	
+	# Si cambia de opción, detenemos cualquier preview que estuviera sonando
+	if preview_player and preview_player.playing:
+		preview_player.stop()
+		_on_preview_finished()
+		
+	# Reproducimos el nuevo sonido automáticamente como muestra (opcional)
+	if index != 2: # Si no es silencio
+		_on_preview_pressed()
+
+func _on_preview_pressed():
+	if not preview_player: return
+	
+	# Si ya estaba sonando, funciona como botón de PAUSA/STOP
+	if preview_player.playing:
+		preview_player.stop()
+		_on_preview_finished()
+		return
+		
+	# Si le dio a PLAY, verificamos qué tema está seleccionado actualmente
+	var current_theme = AudioManager.current_ui_theme
+	
+	if current_theme == 2:
+		return # Es silencio, no suena nada
+		
+	# Usamos el CACHÉ global súper optimizado que pre-cargamos en el BootBase
+	if current_theme == 0:
+		preview_player.stream = AudioManager.get_cached_audio("ui_space")
+	elif current_theme == 1:
+		preview_player.stream = AudioManager.get_cached_audio("ui_bubble")
+		
+	# Cambiamos el ícono y le damos play
+	btn_preview.texture_normal = _tex_pause
+	preview_player.play()
+
+func _on_preview_finished():
+	# Cuando el audio termina (o lo pausamos), regresamos el ícono a la normalidad
+	if btn_preview:
+		btn_preview.texture_normal = _tex_play
 
 # ==========================================
 # SINCRONIZACIÓN GLOBAL
@@ -75,3 +154,5 @@ func _sync_with_audio_manager():
 	if row_sfx_volume and row_sfx_volume.slider: row_sfx_volume.slider.value = saved_vols["SFX"]
 	if row_ui_volume and row_ui_volume.slider: row_ui_volume.slider.value = saved_vols["UI"]
 	if row_voices_volume and row_voices_volume.slider: row_voices_volume.slider.value = saved_vols["Voices"]
+	if dropdown_ui_theme: 
+			dropdown_ui_theme.selected = AudioManager.current_ui_theme

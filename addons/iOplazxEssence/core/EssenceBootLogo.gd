@@ -33,10 +33,10 @@ func _preparar_logo():
 	
 	match config.logo_type:
 		0: 
-			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.GODOT) 
+			logo_rect.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.GODOT) 
 			logo_label.text = "GODOT ENGINE"
 		1: 
-			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.IOPLAZX)
+			logo_rect.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.IOPLAZX)
 			logo_label.text = "iOPLAZXESSENCE ENGINE"
 		2: 
 			logo_rect.texture = EssenceLoader.get_externImage(config.custom_logo_path, true)

@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/RowSlider.tscn" id="1_kd5ej"]
 [ext_resource type="Script" uid="uid://kbgigc8bou1y" path="res://addons/iOplazxEssence/core/EssenceSettingsController.gd" id="1_kht5n"]
 
-[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume")]
+[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "dropdown_ui_theme", "preview_player")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,12 +11,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kht5n")
-btn_return = NodePath("ContenedorPrincipal/btnReturn")
+btn_return = NodePath("ContenedorPrincipal/mcButton/btnReturn")
 row_master_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/SliderMasterVolumen")
 row_background_music = NodePath("ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/SliderBackgroundMusic")
 row_sfx_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/SliderSFXVolume")
 row_ui_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/SliderUIVolume")
 row_voices_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/SliderVoicesVolume")
+dropdown_ui_theme = NodePath("ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/mcUITheme/RowUITheme/DropdownTheme")
+preview_player = NodePath("ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/mcUITheme/RowUITheme/PreviewPlayer")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=406427952]
 layout_mode = 1
@@ -98,6 +100,38 @@ layout_mode = 2
 label_text = "Volume Voices"
 show_mute_button = true
 
-[node name="btnReturn" type="Button" parent="ContenedorPrincipal" unique_id=1419415243]
+[node name="mcUITheme" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer" unique_id=840885535]
 layout_mode = 2
+theme_override_constants/margin_left = 51
+theme_override_constants/margin_right = 22
+
+[node name="RowUITheme" type="HBoxContainer" parent="ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/mcUITheme" unique_id=881562863]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Label" type="Label" parent="ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=157709054]
+layout_mode = 2
+text = "UI Sound Select"
+
+[node name="DropdownTheme" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=1011796989]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BtnPreview" type="TextureButton" parent="ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=1976662230]
+layout_mode = 2
+
+[node name="PreviewPlayer" type="AudioStreamPlayer" parent="ContenedorPrincipal/TabContainer/mgAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=348304788]
+bus = &"UI"
+
+[node name="mcButton" type="MarginContainer" parent="ContenedorPrincipal" unique_id=1551150671]
+layout_mode = 2
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_bottom = 6
+
+[node name="btnReturn" type="Button" parent="ContenedorPrincipal/mcButton" unique_id=1419415243]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 text = "RETURN"

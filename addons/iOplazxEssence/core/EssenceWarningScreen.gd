@@ -36,7 +36,6 @@ func mostrar_advertencia(cfg: EssenceConfig):
 	add_child(contenedor_principal)
 	contenedor_principal.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 
-	# NUEVO: Darle el foco al primer botón (solo funciona DESPUÉS de hacer add_child)
 	if primer_boton:
 		primer_boton.grab_focus()
 
@@ -58,9 +57,9 @@ func _crear_icono_advertencia():
 	icono_advertencia.custom_minimum_size = Vector2(80, 80) 
 	
 	match config.warning_icon_type:
-		0: icono_advertencia.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.WARNING)
-		1: icono_advertencia.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.EYE)
-		2: icono_advertencia.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.PLUS18)
+		0: icono_advertencia.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.WARNING)
+		1: icono_advertencia.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.EYE)
+		2: icono_advertencia.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.PLUS18)
 		3: icono_advertencia.texture = EssenceLoader.get_externImage(config.custom_warning_icon_path, true)
 	
 	contenedor_principal.add_child(icono_advertencia)
@@ -92,7 +91,7 @@ func _crear_botones_advertencia():
 			boton_ok.custom_minimum_size = Vector2(150, 50)
 			boton_ok.pressed.connect(_finalizar) 
 			contenedor_botones_advertencia.add_child(boton_ok)
-			primer_boton = boton_ok # <-- GUARDAMOS REFERENCIA
+			primer_boton = boton_ok 
 		2: # Yes / No
 			var boton_yes = Button.new()
 			boton_yes.text = "Yes"
@@ -104,7 +103,7 @@ func _crear_botones_advertencia():
 			boton_no.pressed.connect(get_tree().quit) 
 			contenedor_botones_advertencia.add_child(boton_yes)
 			contenedor_botones_advertencia.add_child(boton_no)
-			primer_boton = boton_yes # <-- GUARDAMOS REFERENCIA
+			primer_boton = boton_yes 
 		3: # Confirm / Reject
 			var boton_confirm = Button.new()
 			boton_confirm.text = "Confirm"
@@ -116,7 +115,7 @@ func _crear_botones_advertencia():
 			boton_reject.pressed.connect(get_tree().quit)
 			contenedor_botones_advertencia.add_child(boton_confirm)
 			contenedor_botones_advertencia.add_child(boton_reject)
-			primer_boton = boton_confirm # <-- GUARDAMOS REFERENCIA
+			primer_boton = boton_confirm 
 
 	margen_superior.add_child(contenedor_botones_advertencia)
 	contenedor_principal.add_child(margen_superior)

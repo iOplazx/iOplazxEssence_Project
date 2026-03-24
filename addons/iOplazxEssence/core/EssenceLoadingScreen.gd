@@ -62,8 +62,8 @@ func _build_ui():
 		logo_carga.custom_minimum_size = Vector2(200, 200)
 		
 		match config.loading_logo_type:
-			0: logo_carga.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.GODOT)
-			1: logo_carga.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.EYE) # Cambia EYE por tu logo
+			0: logo_carga.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.GODOT)
+			1: logo_carga.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.IOPLAZX) 
 			2: logo_carga.texture = EssenceLoader.get_externImage(config.custom_loading_logo_path, true)
 		
 		contenedor.add_child(logo_carga)
@@ -130,3 +130,4 @@ func _finish():
 		loading_completed.emit()
 		queue_free()
 	)
+	

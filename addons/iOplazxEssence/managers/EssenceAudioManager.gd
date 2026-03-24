@@ -14,6 +14,13 @@ var _audio_cache: Dictionary = {}
 # Ruta del archivo de guardado
 const SETTINGS_FILE = "user://essence_settings.cfg"
 
+# Precargamos usando las constantes de tu nueva biblioteca
+var ui_sound_space = preload(EssencePaths.AUDIO_UI_SPACE)
+var ui_sound_bubble = preload(EssencePaths.AUDIO_UI_BUBBLE)
+
+# 0 = Space, 1 = Bubble, 2 = Silencio
+var current_ui_theme: int = 0
+
 func _ready():
 	# Creamos los nodos al vuelo (Ahorra tener que hacer un .tscn separado)
 	music_player = AudioStreamPlayer.new()
@@ -65,13 +72,33 @@ func play_ui(stream: AudioStream):
 	ui_player.play()
 
 ## Reproduce un sonido de interfaz con variación de tono (al vuelo)
-func play_ui_sfx(stream: AudioStream, pitch: float = 1.0):
-	if stream == null: return
+func play_ui_sfx(stream: AudioStream = null, pitch: float = 1.0):
+	# 1. Si el jugador eligió "Silencio" (Índice 2), abortamos todo y no suena nada.
+	if current_ui_theme == 2:
+		return
+		
+	# 2. Decidimos qué sonido vamos a usar
+	var stream_to_play: AudioStream
 	
+	if stream != null:
+		# Si le mandaste un sonido específico desde un botón especial, respeta ese.
+		stream_to_play = stream
+	else:
+		# Si no le mandaste nada, usa el tema global que eligió el jugador
+		if current_ui_theme == 0:
+			stream_to_play = ui_sound_space
+		elif current_ui_theme == 1:
+			stream_to_play = ui_sound_bubble
+			
+	# Seguridad: Si por alguna razón el archivo no existe, cancelamos para evitar crasheos
+	if stream_to_play == null: 
+		return
+		
+	# 3. Creamos el reproductor temporal, lo configuramos y lo hacemos sonar
 	var player = AudioStreamPlayer.new()
 	add_child(player)
 	
-	player.stream = stream
+	player.stream = stream_to_play
 	player.pitch_scale = pitch
 	player.bus = "UI" 
 	
@@ -145,3 +172,12 @@ func load_audio_settings() -> Dictionary:
 	set_bus_volume("Voices", vols["Voices"])
 	
 	return vols
+	
+func set_ui_theme(theme_index: int):
+	current_ui_theme = theme_index
+	
+	# Guardamos directamente en el archivo .cfg
+	var config = ConfigFile.new()
+	config.load(SETTINGS_FILE)
+	config.set_value("audio", "ui_theme", current_ui_theme)
+	config.save(SETTINGS_FILE)
