@@ -36,8 +36,8 @@ func _preparar_logo():
 			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.GODOT) 
 			logo_label.text = "GODOT ENGINE"
 		1: 
-			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.EYE) # Cambia EYE por tu logo
-			logo_label.text = "iOplazxEssence Engine"
+			logo_rect.texture = EssenceLoader.get_internImage(EssenceLoader.KeyImage.IOPLAZX)
+			logo_label.text = "iOPLAZXESSENCE ENGINE"
 		2: 
 			logo_rect.texture = EssenceLoader.get_externImage(config.custom_logo_path, true)
 			logo_label.text = config.custom_logo_text

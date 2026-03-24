@@ -67,6 +67,23 @@ func set_master_volume(volume_percent: float):
 	var db = linear_to_db(clamp(volume_percent / 100.0, 0.001, 1.0))
 	var master_bus_index = AudioServer.get_bus_index("Master")
 	AudioServer.set_bus_volume_db(master_bus_index, db)
+	
+# Dentro de AudioManager.gd
+func play_ui_sfx(stream: AudioStream, pitch: float = 1.0):
+	if stream == null: return
+	
+	# Creamos un reproductor temporal "al vuelo"
+	var player = AudioStreamPlayer.new()
+	add_child(player)
+	
+	player.stream = stream
+	player.pitch_scale = pitch
+	player.bus = "UI" # Asegúrate de tener un bus llamado UI en tu mezclador
+	
+	player.play()
+	
+	# Se destruye solo cuando termina de sonar para no gastar RAM
+	player.finished.connect(player.queue_free)
 
 # ==========================================
 # MÉTODOS PRIVADOS

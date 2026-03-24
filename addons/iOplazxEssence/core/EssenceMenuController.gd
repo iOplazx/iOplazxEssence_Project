@@ -16,6 +16,12 @@ enum IdleAnimation { NONE, BREATHING }
 ## El botón que estará seleccionado por defecto para el teclado/mando
 @export var first_focus_button: Control
 
+@export_group("UI Audio")
+## Sound for hover/focus (navigation)
+@export var sound_hover: AudioStream
+## Sound for pressing the button (confirmation)
+@export var sound_click: AudioStream
+
 @export_category("Efectos Visuales (Juice)")
 @export_subgroup("Configuración de Botones") 
 ## Activa una aparición coordinada de los botones al iniciar
@@ -60,6 +66,7 @@ func _ready():
 		# Llamamos a la función unificada que gestiona panel + cascade
 		_animar_entrada_ui_botones()
 		
+	_setup_ui_sounds()
 	_iniciar_foco_teclado()
 
 func _conectar_botones():
@@ -93,6 +100,30 @@ func _iniciar_foco_teclado():
 		# Le damos el foco al botón. Si el botón entra con delay (cascada), 
 		# no pasa nada, Godot lo recuerda.
 		first_focus_button.grab_focus()
+		
+func _setup_ui_sounds():
+	# Creamos la lista de botones que quieres que "suenen"
+	var group_buttons = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
+	
+	for btn in group_buttons:
+		if btn:
+			# SEÑAL 1: Mouse entra al botón
+			btn.mouse_entered.connect(_play_hover_ui)
+			# SEÑAL 2: El teclado/mando se posiciona sobre el botón (Focus)
+			btn.focus_entered.connect(_play_hover_ui)
+			# SEÑAL 3: Se hace click o se pulsa Enter/Espacio
+			btn.pressed.connect(_play_click_ui)
+
+func _play_hover_ui():
+	if sound_hover:
+		# Variamos el tono un poquito (entre 0.9 y 1.1) para que no sea monótono
+		var pitch = randf_range(0.95, 1.05)
+		AudioManager.play_ui_sfx(sound_hover, pitch)
+
+func _play_click_ui():
+	if sound_click:
+		# El click suele ser un tono fijo para dar sensación de firmeza
+		AudioManager.play_ui_sfx(sound_click, 1.0)
 
 # ==========================================
 # FUNCIONES DE ACCIÓN (Lógica del Framework)

@@ -1,9 +1,10 @@
 [gd_scene format=3 uid="uid://c5dv33v21frxr"]
 
 [ext_resource type="Script" uid="uid://bo3a6i67seryc" path="res://demo/scenes/MainMenu.gd" id="1_xjpr8"]
-[ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/generateMainMenuImage.png" id="2_3h6x3"]
-[ext_resource type="Texture2D" uid="uid://bjn2r5bicbxj6" path="res://addons/iOplazxEssence/resources/logo_demo.png" id="3_47cvb"]
+[ext_resource type="AudioStream" uid="uid://bmh0ol5thn3fh" path="res://addons/iOplazxEssence/resources/audio/spaceUiSound.wav" id="2_tvdue"]
+[ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/images/generateMainMenuImage.png" id="3_tvdue"]
 [ext_resource type="PackedScene" uid="uid://c58ydoc3e2fbk" path="res://addons/iOplazxEssence/ui/EssenceButton.tscn" id="4_47cvb"]
+[ext_resource type="Texture2D" uid="uid://bjn2r5bicbxj6" path="res://addons/iOplazxEssence/resources/images/logo_demo.png" id="4_cuc3c"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3h6x3"]
 content_margin_left = 20.0
@@ -32,6 +33,7 @@ btn_settings = NodePath("panelMenu/ButtonContainer/btnSettings")
 btn_credits = NodePath("panelMenu/ButtonContainer/btnCredits")
 btn_exit = NodePath("panelMenu/ButtonContainer/btnExit")
 first_focus_button = NodePath("panelMenu/ButtonContainer/btnSettings")
+sound_hover = ExtResource("2_tvdue")
 buttons_panel = NodePath("panelMenu/ButtonContainer")
 title_container = NodePath("titleImage")
 
@@ -42,7 +44,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_3h6x3")
+texture = ExtResource("3_tvdue")
 expand_mode = 1
 stretch_mode = 6
 metadata/_edit_lock_ = true
@@ -55,7 +57,7 @@ offset_right = 885.0
 offset_bottom = 152.0
 size_flags_horizontal = 4
 size_flags_vertical = 0
-texture = ExtResource("3_47cvb")
+texture = ExtResource("4_cuc3c")
 expand_mode = 1
 stretch_mode = 5
 metadata/_edit_lock_ = true

@@ -2,6 +2,7 @@ class_name EssenceLoader extends RefCounted
 
 enum KeyImage {
 	GODOT,
+	IOPLAZX,
 	WARNING,
 	EYE,
 	PLUS18,
@@ -13,6 +14,7 @@ const PATH_RESOURCE = "res://addons/iOplazxEssence/resources/images/"
 # Diccionario de rutas internas (Cosas que siempre existirán dentro del addon)
 const INTERNAL_IMAGES = {
 	KeyImage.GODOT: PATH_RESOURCE + "icon_godot.png",
+	KeyImage.IOPLAZX: PATH_RESOURCE + "ioplazx_logo.png",
 	KeyImage.WARNING: PATH_RESOURCE + "iconWarning.png",
 	KeyImage.EYE: PATH_RESOURCE + "iconEye.png",
 	KeyImage.PLUS18: PATH_RESOURCE + "iconPlus18.png",

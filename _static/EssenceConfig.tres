@@ -4,7 +4,6 @@
 
 [resource]
 script = ExtResource("1_5pgjl")
-logo_type = 0
 show_warning_icon = true
 button_type = 1
 loading_logo_type = 0
