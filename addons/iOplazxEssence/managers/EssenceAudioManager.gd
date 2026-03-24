@@ -21,6 +21,10 @@ var ui_sound_bubble = preload(EssencePaths.AUDIO_UI_BUBBLE)
 # 0 = Space, 1 = Bubble, 2 = Silencio
 var current_ui_theme: int = 0
 
+# Configuración extra
+var mute_on_focus_loss: bool = false
+var _was_muted_manually: bool = false # Para recordar si el jugador ya lo tenía en silencio
+
 func _ready():
 	# Creamos los nodos al vuelo (Ahorra tener que hacer un .tscn separado)
 	music_player = AudioStreamPlayer.new()
@@ -147,6 +151,7 @@ func save_audio_settings(vol_master: float, vol_music: float, vol_sfx: float, vo
 	config.set_value("audio", "UI", vol_ui)
 	config.set_value("audio", "Voices", vol_voices)
 	
+	config.set_value("audio", "mute_on_focus", mute_on_focus_loss)
 	config.save(SETTINGS_FILE)
 	print("iOplazxEssence: Audio Global Guardado.")
 
@@ -165,6 +170,7 @@ func load_audio_settings() -> Dictionary:
 		vols["Voices"] = config.get_value("audio", "Voices", 1.0)
 		
 		current_ui_theme = config.get_value("audio", "ui_theme", 0)
+		mute_on_focus_loss = config.get_value("audio", "mute_on_focus", false)
 	
 	# Aplica los volúmenes a los canales reales de Godot
 	set_bus_volume("Master", vols["Master"])
@@ -183,3 +189,19 @@ func set_ui_theme(theme_index: int):
 	config.load(SETTINGS_FILE)
 	config.set_value("audio", "ui_theme", current_ui_theme)
 	config.save(SETTINGS_FILE)
+
+# ==========================================
+# MÉTODOS NATIVO
+# ==========================================
+# Detecta cuando el juego se minimiza o pierde el foco
+func _notification(what):
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		if mute_on_focus_loss:
+			var master_idx = AudioServer.get_bus_index("Master")
+			_was_muted_manually = AudioServer.is_bus_mute(master_idx)
+			AudioServer.set_bus_mute(master_idx, true) # Silenciamos
+			
+	elif what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
+		if mute_on_focus_loss:
+			var master_idx = AudioServer.get_bus_index("Master")
+			AudioServer.set_bus_mute(master_idx, _was_muted_manually) # Restauramos

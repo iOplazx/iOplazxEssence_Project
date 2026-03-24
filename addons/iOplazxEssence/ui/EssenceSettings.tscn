@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/RowSlider.tscn" id="1_kd5ej"]
 [ext_resource type="Script" uid="uid://kbgigc8bou1y" path="res://addons/iOplazxEssence/core/EssenceSettingsController.gd" id="1_kht5n"]
 
-[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "dropdown_ui_theme", "btn_preview", "preview_player")]
+[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "dpdMode", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "chkMuteFocusLoss", "dropdown_ui_theme", "btn_preview", "preview_player")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,11 +12,13 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kht5n")
 btn_return = NodePath("ContenedorPrincipal/mcButton/btnReturn")
+dpdMode = NodePath("ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow/dpdMode")
 row_master_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderMasterVolumen")
 row_background_music = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderBackgroundMusic")
 row_sfx_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderSFXVolume")
 row_ui_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderUIVolume")
 row_voices_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderVoicesVolume")
+chkMuteFocusLoss = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer/chkMuteFocusLoss")
 dropdown_ui_theme = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/DropdownTheme")
 btn_preview = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/BtnPreview")
 preview_player = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/PreviewPlayer")
@@ -51,7 +53,7 @@ text = "SETTINGS"
 [node name="TabContainer" type="TabContainer" parent="ContenedorPrincipal" unique_id=591929740]
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 2
+current_tab = 1
 tab_0/title = "Game"
 tab_1/title = "Video"
 tab_2/title = "Audio"
@@ -63,12 +65,41 @@ metadata/_tab_index = 0
 metadata/_tab_name = "Game"
 
 [node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 metadata/_tab_name = "Video"
 
+[node name="mcBodyVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgVideo" unique_id=638501453]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo" unique_id=747591223]
+layout_mode = 2
+
+[node name="mcSelectWindow" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer" unique_id=637307176]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+
+[node name="RowSelectWindow" type="HBoxContainer" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer/mcSelectWindow" unique_id=626340078]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Label" type="Label" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow" unique_id=596438634]
+layout_mode = 2
+text = "Display Mode: "
+
+[node name="dpdMode" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow" unique_id=1913361322]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
 [node name="mgAudio" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=142263258]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 metadata/_tab_name = "Audio"
@@ -76,7 +107,9 @@ metadata/_tab_name = "Audio"
 [node name="mcBodyAudio" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgAudio" unique_id=1785240557]
 layout_mode = 2
 theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio" unique_id=1717866325]
 layout_mode = 2
@@ -105,6 +138,22 @@ show_mute_button = true
 layout_mode = 2
 label_text = "Volume Voices"
 show_mute_button = true
+
+[node name="mcMuteFocus" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=469593136]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcMuteFocus" unique_id=111413911]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="lblMuteFocusLoss" type="Label" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer" unique_id=1086182117]
+layout_mode = 2
+text = "Mute on Focus Loss"
+
+[node name="chkMuteFocusLoss" type="CheckBox" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer" unique_id=1144616071]
+layout_mode = 2
 
 [node name="mcUITheme" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=840885535]
 layout_mode = 2
