@@ -16,12 +16,6 @@ enum IdleAnimation { NONE, BREATHING }
 ## El botón que estará seleccionado por defecto para el teclado/mando
 @export var first_focus_button: Control
 
-@export_group("UI Audio")
-## Sound for hover/focus (navigation)
-@export var sound_hover: AudioStream
-## Sound for pressing the button (confirmation)
-@export var sound_click: AudioStream
-
 @export_category("Efectos Visuales (Juice)")
 @export_subgroup("Configuración de Botones") 
 ## Activa una aparición coordinada de los botones al iniciar
@@ -63,31 +57,21 @@ func _ready():
 		_iniciar_animaciones_titulo()
 
 	if animate_buttons_entrance:
-		# Llamamos a la función unificada que gestiona panel + cascade
 		_animar_entrada_ui_botones()
 		
 	_setup_ui_sounds()
 	_iniciar_foco_teclado()
 
 func _conectar_botones():
-	# Solo conectamos los botones que el usuario decidió usar (haciéndolo modular)
-	if btn_new_game: 
-		btn_new_game.pressed.connect(_on_new_game_pressed)
-	if btn_continue: 
-		btn_continue.pressed.connect(_on_continue_pressed)
-	if btn_load: 
-		btn_load.pressed.connect(_on_continue_pressed)
-	if btn_settings: 
-		btn_settings.pressed.connect(_on_settings_pressed)
-	if btn_credits:
-		btn_credits.pressed.connect(_on_credits_pressed)
-	if btn_exit: 
-		btn_exit.pressed.connect(_on_exit_pressed)
-
+	if btn_new_game: btn_new_game.pressed.connect(_on_new_game_pressed)
+	if btn_continue: btn_continue.pressed.connect(_on_continue_pressed)
+	if btn_load: btn_load.pressed.connect(_on_load_pressed) # CORREGIDO (Antes apuntaba a continue)
+	if btn_settings: btn_settings.pressed.connect(_on_settings_pressed)
+	if btn_credits: btn_credits.pressed.connect(_on_credits_pressed)
+	if btn_exit: btn_exit.pressed.connect(_on_exit_pressed)
 
 func _verificar_estado_partida():
 	# TODO: Conectar esto con el EssenceSaveManager en el futuro.
-	# Por ahora, simulamos que NO hay archivo de guardado.
 	var has_save_file = false 
 	
 	if btn_continue:
@@ -97,36 +81,33 @@ func _verificar_estado_partida():
 		
 func _iniciar_foco_teclado():
 	if first_focus_button:
-		# Le damos el foco al botón. Si el botón entra con delay (cascada), 
-		# no pasa nada, Godot lo recuerda.
 		first_focus_button.grab_focus()
 		
+# ==========================================
+# LÓGICA DE AUDIO DE INTERFAZ (OPTIMIZADA)
+# ==========================================
 func _setup_ui_sounds():
-	# Creamos la lista de botones que quieres que "suenen"
 	var group_buttons = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
 	
 	for btn in group_buttons:
 		if btn:
-			# SEÑAL 1: Mouse entra al botón
 			btn.mouse_entered.connect(_play_hover_ui)
-			# SEÑAL 2: El teclado/mando se posiciona sobre el botón (Focus)
 			btn.focus_entered.connect(_play_hover_ui)
-			# SEÑAL 3: Se hace click o se pulsa Enter/Espacio
 			btn.pressed.connect(_play_click_ui)
 
 func _play_hover_ui():
-	if sound_hover:
-		# Variamos el tono un poquito (entre 0.9 y 1.1) para que no sea monótono
-		var pitch = randf_range(0.95, 1.05)
-		AudioManager.play_ui_sfx(sound_hover, pitch)
+	var pitch = randf_range(0.95, 1.05)
+	# Le pasamos null al principio para que el AudioManager decida el tema,
+	# y luego le pasamos nuestro pitch dinámico.
+	AudioManager.play_ui_sfx(null, pitch)
 
 func _play_click_ui():
-	if sound_click:
-		# El click suele ser un tono fijo para dar sensación de firmeza
-		AudioManager.play_ui_sfx(sound_click, 1.0)
+	# Llamamos a la función global. El AudioManager sabrá qué tema usar basándose
+	# en los ajustes guardados por el jugador.
+	AudioManager.play_ui_sfx()
 
 # ==========================================
-# FUNCIONES DE ACCIÓN (Lógica del Framework)
+# FUNCIONES DE ACCIÓN
 # ==========================================
 
 func _on_new_game_pressed():
@@ -150,102 +131,36 @@ func _on_exit_pressed():
 	get_tree().quit()
 	
 # ==========================================
-# EFECTOS VISUALES LIGEROS (TWEENS)
+# EFECTOS VISUALES (Usando nuestra biblioteca global)
 # ==========================================
 
-func _animar_entrada_botones():
-	var delay = 0.0
-	var botones = [btn_new_game, btn_continue, btn_settings, btn_exit]
-	
-	for btn in botones:
-		if btn:
-			# Empezamos totalmente transparentes
-			btn.modulate.a = 0.0 
-			var tween = create_tween()
-			# Aparecen en 0.4 segundos, pero cada botón se espera un poco más que el anterior
-			tween.tween_property(btn, "modulate:a", 1.0, 0.4).set_delay(delay)
-			delay += 0.15
-
-# Función genérica para manejar el estado de las animaciones del título
 func _iniciar_animaciones_titulo():
-	# Primero, configuramos el estado inicial basado en la animación de entrada
+	var tween_entrada: Tween
+	
 	match entrance_anim_type:
 		EntranceAnimation.NONE:
 			title_container.modulate.a = 1.0
-			_iniciar_animacion_idle() # Saltamos directo al idle
+			_iniciar_animacion_idle() 
 		EntranceAnimation.FADE_IN:
-			title_container.modulate.a = 0.0
-			_tween_entrance_fade()
+			tween_entrada = EssenceUIAnimator.fade_in(title_container, entrance_duration)
 		EntranceAnimation.SLIDE_FROM_TOP:
-			title_container.modulate.a = 1.0
-			# Mueve el pivote al centro para el slide si el layout no lo hace
-			title_container.pivot_offset = title_container.size / 2.0
-			var original_y = title_container.position.y
-			title_container.position.y -= slide_distance
-			_tween_entrance_slide(original_y)
+			tween_entrada = EssenceUIAnimator.slide_from_top(title_container, slide_distance, entrance_duration)
+			
+	# Si hubo animación de entrada, conectamos el idle al terminar
+	if tween_entrada:
+		tween_entrada.finished.connect(_iniciar_animacion_idle)
 
-# Animaciones de Entrada (Finite Tweens)
-func _tween_entrance_fade():
-	var tween = create_tween()
-	# Un fade-in suave
-	tween.tween_property(title_container, "modulate:a", 1.0, entrance_duration).set_trans(Tween.TRANS_SINE)
-	# Al terminar la entrada, empezamos el idle
-	tween.finished.connect(_iniciar_animacion_idle)
-
-func _tween_entrance_slide(target_y: float):
-	var tween = create_tween()
-	# Un deslizamiento con "rebote" (TRANS_BACK) al final para que se vea más pro
-	tween.tween_property(title_container, "position:y", target_y, entrance_duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	# Al terminar la entrada, empezamos el idle
-	tween.finished.connect(_iniciar_animacion_idle)
-
-# Animaciones Idle (Bucle)
 func _iniciar_animacion_idle():
-	match idle_anim_type:
-		IdleAnimation.NONE:
-			pass
-		IdleAnimation.BREATHING:
-			_tween_idle_breathing()
-
-func _tween_idle_breathing():
-	# Matamos cualquier tween idle previo para evitar duplicados si se recarga la escena
-	if _idle_tween and _idle_tween.is_running():
-		_idle_tween.kill()
-
-	# Aseguramos pivote en el centro
-	title_container.pivot_offset = title_container.size / 2.0
-	
-	# Creamos un Tween infinito
-	_idle_tween = create_tween().set_loops()
-	# Escala al 105% en la mitad del ciclo con curva suave
-	_idle_tween.tween_property(title_container, "scale", Vector2(1.05, 1.05), idle_duration).set_trans(Tween.TRANS_SINE)
-	# Regresa a la escala normal
-	_idle_tween.tween_property(title_container, "scale", Vector2(1.0, 1.0), idle_duration).set_trans(Tween.TRANS_SINE)
+	if idle_anim_type == IdleAnimation.BREATHING:
+		# Guardamos la referencia por si necesitamos matarla al cambiar de menú
+		_idle_tween = EssenceUIAnimator.breathing(title_container, idle_duration)
 
 func _animar_entrada_ui_botones():
-	# Primero, animamos el panel si existe (Fade In suave)
-	if buttons_panel:
-		var panel_tween = create_tween()
-		# Hacemos que el panel aparezca en 0.4s
-		panel_tween.tween_property(buttons_panel, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE)
-		
-		# Esperamos a que el panel casi termine para empezar la cascada
-		# Esto hace la transición más fluida
-		_lanzar_cascada_botones(0.5) 
-	else:
-		# Si no hay panel, lanzamos la cascada de botones inmediatamente
-		_lanzar_cascada_botones(0.0)
-
-# Solo maneja la cascada de botones
-func _lanzar_cascada_botones(start_delay: float):
-	var cascade_delay = start_delay
-	var button_duration = 0.4
-	var button_stagger = 0.15
-	var botones = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
+	var cascade_start = 0.0
 	
-	for btn in botones:
-		if btn:
-			# Ya está en opacidad 0 por _ready, solo hacemos tween de aparición
-			var btn_tween = create_tween()
-			btn_tween.tween_property(btn, "modulate:a", 1.0, button_duration).set_delay(cascade_delay).set_trans(Tween.TRANS_SINE)
-			cascade_delay += button_stagger
+	if buttons_panel:
+		EssenceUIAnimator.fade_in(buttons_panel, 0.4)
+		cascade_start = 0.5 # Le damos tiempo al panel para aparecer
+		
+	var botones = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
+	EssenceUIAnimator.cascade_fade_in(botones, 0.4, 0.15, cascade_start)

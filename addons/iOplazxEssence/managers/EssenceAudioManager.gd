@@ -163,6 +163,8 @@ func load_audio_settings() -> Dictionary:
 		vols["SFX"] = config.get_value("audio", "SFX", 1.0)
 		vols["UI"] = config.get_value("audio", "UI", 1.0)
 		vols["Voices"] = config.get_value("audio", "Voices", 1.0)
+		
+		current_ui_theme = config.get_value("audio", "ui_theme", 0)
 	
 	# Aplica los volúmenes a los canales reales de Godot
 	set_bus_volume("Master", vols["Master"])
