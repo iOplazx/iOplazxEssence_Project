@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://smbsdshmfr42"
+
+[deps]
+
+files=["res://addons/iOplazxEssence/static_loc/system.en.translation", "res://addons/iOplazxEssence/static_loc/system.es.translation"]
+
+source_file="res://addons/iOplazxEssence/static_loc/system.csv"
+dest_files=["res://addons/iOplazxEssence/static_loc/system.en.translation", "res://addons/iOplazxEssence/static_loc/system.es.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

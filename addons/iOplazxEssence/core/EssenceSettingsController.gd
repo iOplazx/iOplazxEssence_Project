@@ -33,6 +33,19 @@ class_name EssenceSettingsController extends Control
 @export var btn_preview: TextureButton
 @export var preview_player: AudioStreamPlayer
 
+# ==========================================
+# PESTAÑA LENGUAJE
+# ==========================================
+@export_group("Tab: Language")
+
+@export_subgroup("UI Connections")
+## El VBoxContainer donde se apilarán las tarjetas
+@export var list_languages: VBoxContainer 
+
+@export_subgroup("Prefabs")
+## Arrastra aquí tu escena EssenceLanguageCard.tscn
+@export var language_card_prefab: PackedScene
+
 var _tex_play: Texture2D
 var _tex_pause: Texture2D
 
@@ -43,6 +56,7 @@ func _ready():
 	_setup_extra_settings()
 	_connect_signals()
 	_sync_with_managers() # Sincronizamos la UI con los Autoloads
+	_populate_languages()
 
 func _load_icons():
 	# Usamos tu arquitectura global para cargar los iconos a prueba de fallos
@@ -190,3 +204,45 @@ func _sync_with_managers():
 		chkMuteFocusLoss.set_block_signals(true)
 		chkMuteFocusLoss.button_pressed = AudioManager.mute_on_focus_loss
 		chkMuteFocusLoss.set_block_signals(false)
+
+
+##### METODOS ####
+func _populate_languages():
+	if not list_languages or not language_card_prefab:
+		return
+		
+	# 1. Limpiamos la lista para evitar duplicados si el jugador entra y sale del menú
+	for child in list_languages.get_children():
+		child.queue_free()
+		
+	# 2. Le pedimos al Manager la lista REAL de idiomas detectados
+	var real_data = LanguageManager.get_language_list()
+	
+	# 3. Instanciamos las tarjetas
+	for data in real_data:
+		var card: EssenceLanguageCard = language_card_prefab.instantiate()
+		list_languages.add_child(card)
+		
+		# Inyectamos los datos reales (nombre, autor, ruta de bandera)
+		card.setup_card(data)
+		
+		# Conectamos las señales
+		card.on_apply_requested.connect(_on_language_apply)
+		card.on_info_requested.connect(_on_language_info)
+
+# Funciones receptoras de las señales
+func _on_language_apply(folder_code: String):
+	print("Essence: Aplicando idioma -> ", folder_code)
+	
+	# Le decimos al motor de Godot que cambie el idioma globalmente
+	TranslationServer.set_locale(folder_code)
+	
+	# Reproducimos sonido de éxito
+	AudioManager.play_ui_sfx()
+	
+	# Opcional: Aquí podrías guardar la preferencia en el archivo de guardado del usuario
+	# EssenceSaveManager.save_setting("language", folder_code)
+
+func _on_language_info(data: Dictionary):
+	print("Mostrando créditos de: ", data.get("name", "Unknown"))
+	# Aquí abriremos la ventana emergente después

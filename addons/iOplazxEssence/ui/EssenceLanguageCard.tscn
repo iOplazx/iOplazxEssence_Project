@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://b20lw8s6c0q6u"]
+
+[ext_resource type="Script" uid="uid://c05c17igci7a8" path="res://addons/iOplazxEssence/scriptsItems/EssenceLanguageCard.gd" id="1_ih1k2"]
+
+[sub_resource type="FontVariation" id="FontVariation_NameBold"]
+variation_embolden = 0.6
+
+[sub_resource type="LabelSettings" id="LabelSettings_5lrc5"]
+font = SubResource("FontVariation_NameBold")
+font_size = 18
+
+[sub_resource type="FontVariation" id="FontVariation_ih1k2"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_p0ue0"]
+font = SubResource("FontVariation_ih1k2")
+font_size = 14
+font_color = Color(0.3372549, 0.3372549, 0.3372549, 0.7764706)
+
+[node name="LanguageCard" type="PanelContainer" unique_id=364303819]
+script = ExtResource("1_ih1k2")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1164903510]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1285925565]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="FlagIcon" type="TextureRect" parent="MarginContainer/HBoxContainer" unique_id=623597276]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextInfo" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1352616882]
+layout_mode = 2
+alignment = 1
+
+[node name="lblName" type="Label" parent="MarginContainer/HBoxContainer/TextInfo" unique_id=1675959854]
+layout_mode = 2
+text = "Name"
+label_settings = SubResource("LabelSettings_5lrc5")
+
+[node name="lblAuthor" type="Label" parent="MarginContainer/HBoxContainer/TextInfo" unique_id=282070567]
+layout_mode = 2
+text = "Author"
+label_settings = SubResource("LabelSettings_p0ue0")
+
+[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer" unique_id=481805760]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonsActions" type="HBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=2114101190]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="btnInfo" type="Button" parent="MarginContainer/HBoxContainer/ButtonsActions" unique_id=1219082812]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "i"
+
+[node name="btnApply" type="Button" parent="MarginContainer/HBoxContainer/ButtonsActions" unique_id=602472919]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Apply"

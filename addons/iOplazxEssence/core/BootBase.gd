@@ -36,10 +36,12 @@ func _iniciar_fase_carga():
 	pantalla_carga.loading_completed.connect(_finalizar_secuencia)
 	
 	# ==========================================
-	# 1. TAREAS DEL MOTOR (Aquí agregamos el Audio)
+	# 1. TAREAS DEL MOTOR (El orden es importante)
 	# ==========================================
-	pantalla_carga.add_task(Callable(self, "_tarea_motor_nucleo"))
-	pantalla_carga.add_task(Callable(self, "_tarea_preparar_audio")) 
+	pantalla_carga.add_task(_tarea_sistema_archivos)
+	pantalla_carga.add_task(_tarea_motor_nucleo)
+	pantalla_carga.add_task(_tarea_preparar_audio)
+	# (Aquí meteremos _tarea_cargar_idiomas en el futuro)
 	
 	# 2. Le preguntamos al juego del usuario si tiene tareas extra
 	inject_custom_tasks(pantalla_carga)
@@ -74,3 +76,13 @@ func _tarea_preparar_audio():
 	# Usamos las rutas globales para meter los sonidos de UI a la caja fuerte del AudioManager
 	AudioManager.cache_audio("ui_space", EssencePaths.AUDIO_UI_SPACE)
 	AudioManager.cache_audio("ui_bubble", EssencePaths.AUDIO_UI_BUBBLE)
+	
+func _tarea_sistema_archivos():
+	print("-> Verificando e inicializando sistema de archivos locales y remotos...")
+	FileManager.initialize_file_system()
+	
+	print("-> Escaneando idiomas disponibles...")
+	LanguageManager.scan_all_languages()
+	
+	# ¡NUEVA LÍNEA! Subimos los diccionarios a la RAM
+	LanguageManager.inject_translations()

@@ -21,6 +21,8 @@ config/icon="res://icon.svg"
 AudioManager="*uid://cvagoya4eyiag"
 SceneManager="*uid://exttdiqc5tx4"
 DisplayManager="*uid://ceci6st8lqdn0"
+LanguageManager="*uid://dsq88kypeo403"
+FileManager="*uid://d3bd41whggi54"
 
 [display]
 

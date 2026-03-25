@@ -27,7 +27,8 @@ enum KeyImage {
 	PLUS18,
 	ERROR_FALLBACK,
 	ICON_PLAY,  
-	ICON_PAUSE
+	ICON_PAUSE,
+	ICON_INFO
 }
 
 const INTERNAL_IMAGES = {
@@ -38,5 +39,6 @@ const INTERNAL_IMAGES = {
 	KeyImage.PLUS18: PATH_IMAGES + "iconPlus18.png",
 	KeyImage.ERROR_FALLBACK: PATH_IMAGES + "iconImageNoLoad.png",
 	KeyImage.ICON_PLAY: PATH_IMAGES + "icon_play.png",
-	KeyImage.ICON_PAUSE: PATH_IMAGES + "icon_pause.png"
+	KeyImage.ICON_PAUSE: PATH_IMAGES + "icon_pause.png",
+	KeyImage.ICON_INFO: PATH_IMAGES + "icon_info.png"
 }
