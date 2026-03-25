@@ -36,7 +36,14 @@ func setup_card(data: Dictionary):
 	
 	# Cargamos la bandera desde fuera del proyecto (la carpeta localization)
 	if tex_flag and data.has("flag_path"):
-		tex_flag.texture = EssenceLoader.get_externImage(data["flag_path"])
+		var path = data["flag_path"]
+		
+		# Si la bandera está DENTRO del proyecto (Static)
+		if path.begins_with("res://"):
+			tex_flag.texture = load(path)
+		# Si la bandera está FUERA (Remote/Mods)
+		else:
+			tex_flag.texture = EssenceLoader.get_externImage(path)
 
 func _on_info_pressed():
 	on_info_requested.emit(_language_data)

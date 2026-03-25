@@ -16,8 +16,13 @@ font = SubResource("FontVariation_ih1k2")
 font_size = 14
 font_color = Color(0.3372549, 0.3372549, 0.3372549, 0.7764706)
 
-[node name="LanguageCard" type="PanelContainer" unique_id=364303819]
+[node name="LanguageCard" type="PanelContainer" unique_id=364303819 node_paths=PackedStringArray("tex_flag", "lbl_name", "lbl_author", "btn_info", "btn_apply")]
 script = ExtResource("1_ih1k2")
+tex_flag = NodePath("MarginContainer/HBoxContainer/FlagIcon")
+lbl_name = NodePath("MarginContainer/HBoxContainer/TextInfo/lblName")
+lbl_author = NodePath("MarginContainer/HBoxContainer/TextInfo/lblAuthor")
+btn_info = NodePath("MarginContainer/HBoxContainer/ButtonsActions/btnInfo")
+btn_apply = NodePath("MarginContainer/HBoxContainer/ButtonsActions/btnApply")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1164903510]
 layout_mode = 2
