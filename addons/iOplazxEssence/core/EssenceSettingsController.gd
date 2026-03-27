@@ -208,40 +208,35 @@ func _sync_with_managers():
 
 ##### METODOS ####
 func _populate_languages():
-	if not list_languages or not language_card_prefab:
-		return
+	if not list_languages or not language_card_prefab: return
 		
-	# 1. Limpiamos la lista para evitar duplicados si el jugador entra y sale del menú
 	for child in list_languages.get_children():
 		child.queue_free()
 		
-	# 2. Le pedimos al Manager la lista REAL de idiomas detectados
 	var real_data = LanguageManager.get_language_list()
+	var current_locale = TranslationServer.get_locale() # Preguntamos al motor qué idioma está usando
 	
-	# 3. Instanciamos las tarjetas
 	for data in real_data:
 		var card: EssenceLanguageCard = language_card_prefab.instantiate()
 		list_languages.add_child(card)
 		
-		# Inyectamos los datos reales (nombre, autor, ruta de bandera)
-		card.setup_card(data)
+		# Le pasamos el idioma actual para que sepa si debe bloquear su botón
+		card.setup_card(data, current_locale)
 		
-		# Conectamos las señales
 		card.on_apply_requested.connect(_on_language_apply)
 		card.on_info_requested.connect(_on_language_info)
 
 # Funciones receptoras de las señales
 func _on_language_apply(folder_code: String):
-	print("Essence: Aplicando idioma -> ", folder_code)
+	print("Essence: Aplicando idioma global -> ", folder_code)
 	
-	# Le decimos al motor de Godot que cambie el idioma globalmente
-	TranslationServer.set_locale(folder_code)
-	
-	# Reproducimos sonido de éxito
+	TranslationServer.set_locale(folder_code) 
 	AudioManager.play_ui_sfx()
 	
-	# Opcional: Aquí podrías guardar la preferencia en el archivo de guardado del usuario
-	# EssenceSaveManager.save_setting("language", folder_code)
+	# Le avisamos a las tarjetas que actualicen sus botones sin recargar la lista
+	for card in list_languages.get_children():
+		if card.has_method("refresh_state"):
+			card.refresh_state(folder_code)
 
 func _on_language_info(data: Dictionary):
 	print("Mostrando créditos de: ", data.get("name", "Unknown"))

@@ -12,6 +12,7 @@ signal on_apply_requested(folder_name: String)
 @export var btn_apply: Button
 
 var _language_data: Dictionary = {}
+var _my_folder_code: String = ""
 
 func _ready():
 	# 1. Cargamos el icono que acabas de agregar al EssencePaths
@@ -26,24 +27,32 @@ func _ready():
 		btn_apply.pressed.connect(_on_apply_pressed)
 
 # Esta es la función mágica que usaremos más adelante para llenar los datos
-func setup_card(data: Dictionary):
+func setup_card(data: Dictionary, current_locale: String):
 	_language_data = data
+	_my_folder_code = data.get("folder", "en")
 	
-	if lbl_name: 
-		lbl_name.text = data.get("name", "Unknown")
-	if lbl_author: 
-		lbl_author.text = "Por: " + data.get("author", "Comunidad")
+	if lbl_name: lbl_name.text = data.get("name", "Unknown")
+	if lbl_author: lbl_author.text = "Por: " + data.get("author", "Comunidad")
 	
-	# Cargamos la bandera desde fuera del proyecto (la carpeta localization)
 	if tex_flag and data.has("flag_path"):
 		var path = data["flag_path"]
-		
-		# Si la bandera está DENTRO del proyecto (Static)
 		if path.begins_with("res://"):
 			tex_flag.texture = load(path)
-		# Si la bandera está FUERA (Remote/Mods)
 		else:
 			tex_flag.texture = EssenceLoader.get_externImage(path)
+			
+	# Evaluamos el estado inicial del botón
+	refresh_state(current_locale)
+
+func refresh_state(current_locale: String):
+	if not btn_apply: return
+	
+	if _my_folder_code == current_locale:
+		btn_apply.disabled = true
+		btn_apply.text = tr("MENU_SELECTED") # Godot traducirá esto automáticamente
+	else:
+		btn_apply.disabled = false
+		btn_apply.text = tr("MENU_APPLY")
 
 func _on_info_pressed():
 	on_info_requested.emit(_language_data)

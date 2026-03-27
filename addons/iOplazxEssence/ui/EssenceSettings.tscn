@@ -51,28 +51,27 @@ theme_override_constants/margin_top = 4
 
 [node name="lblTitle" type="Label" parent="ContenedorPrincipal/MarginContainer" unique_id=1952673200]
 layout_mode = 2
-text = "SETTINGS"
+text = "SETTINGS_TITLE"
 
 [node name="TabContainer" type="TabContainer" parent="ContenedorPrincipal" unique_id=591929740]
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 3
-tab_0/title = "Game"
-tab_1/title = "Video"
-tab_2/title = "Audio"
-tab_3/title = "Language"
+current_tab = 0
+tab_0/title = "SETTINGS_GAME"
+tab_1/title = "SETTINGS_VIDEO"
+tab_2/title = "SETTINGS_AUDIO"
+tab_3/title = "SETTINGS_LANGUAGE"
 
 [node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=1140037773]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
-metadata/_tab_name = "Game"
+metadata/_tab_name = "SETTINGS_GAME"
 
 [node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
-metadata/_tab_name = "Video"
+metadata/_tab_name = "SETTINGS_VIDEO"
 
 [node name="mcBodyVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgVideo" unique_id=638501453]
 layout_mode = 2
@@ -97,7 +96,7 @@ alignment = 1
 
 [node name="Label" type="Label" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow" unique_id=596438634]
 layout_mode = 2
-text = "Display Mode: "
+text = "SETTINGS_DISPLAY_MODE"
 
 [node name="dpdMode" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow" unique_id=1913361322]
 custom_minimum_size = Vector2(300, 0)
@@ -107,7 +106,7 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
-metadata/_tab_name = "Audio"
+metadata/_tab_name = "SETTINGS_AUDIO"
 
 [node name="mcBodyAudio" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgAudio" unique_id=1785240557]
 layout_mode = 2
@@ -121,27 +120,27 @@ layout_mode = 2
 
 [node name="SliderMasterVolumen" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=1890518606 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
-label_text = "Volume Master"
+label_text = "SETTINGS_AUDIO_VOLUME_MASTER"
 show_mute_button = true
 
 [node name="SliderBackgroundMusic" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=68071660 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
-label_text = "Background Music"
+label_text = "SETTINGS_AUDIO_BACKGROUND_MUSIC"
 show_mute_button = true
 
 [node name="SliderSFXVolume" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=1446374806 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
-label_text = "Volume SFX"
+label_text = "SETTINGS_AUDIO_VOLUME_SFX"
 show_mute_button = true
 
 [node name="SliderUIVolume" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=1759862518 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
-label_text = "Volume UI"
+label_text = "SETTINGS_AUDIO_VOLUME_UI"
 show_mute_button = true
 
 [node name="SliderVoicesVolume" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=242912620 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
-label_text = "Volume Voices"
+label_text = "SETTINGS_AUDIO_VOLUME_VOICES"
 show_mute_button = true
 
 [node name="mcMuteFocus" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=469593136]
@@ -155,7 +154,7 @@ theme_override_constants/separation = 10
 
 [node name="lblMuteFocusLoss" type="Label" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer" unique_id=1086182117]
 layout_mode = 2
-text = "Mute on Focus Loss"
+text = "SETTINGS_AUDIO_MFL"
 
 [node name="chkMuteFocusLoss" type="CheckBox" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer" unique_id=1144616071]
 layout_mode = 2
@@ -173,7 +172,7 @@ alignment = 1
 
 [node name="Label" type="Label" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=157709054]
 layout_mode = 2
-text = "UI Sound Select"
+text = "SETTINGS_AUDIO_TYPE_SELECTED"
 
 [node name="DropdownTheme" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=1011796989]
 custom_minimum_size = Vector2(300, 0)
@@ -186,9 +185,10 @@ layout_mode = 2
 bus = &"UI"
 
 [node name="mcLanguage" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=1169789274]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 3
-metadata/_tab_name = "Language"
+metadata/_tab_name = "SETTINGS_LANGUAGE"
 
 [node name="mcBodyLanguage" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mcLanguage" unique_id=856349842]
 layout_mode = 2
@@ -224,4 +224,4 @@ custom_minimum_size = Vector2(200, 20)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-text = "RETURN"
+text = "SETTINGS_RETURN"

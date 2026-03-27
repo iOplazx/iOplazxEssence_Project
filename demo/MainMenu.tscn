@@ -77,24 +77,24 @@ layout_mode = 2
 
 [node name="btnInit" parent="panelMenu/ButtonContainer" unique_id=606571041 instance=ExtResource("4_47cvb")]
 layout_mode = 2
+text = "MENU_NEW_GAME"
 
 [node name="btnContinue" parent="panelMenu/ButtonContainer" unique_id=591873522 instance=ExtResource("4_47cvb")]
 layout_mode = 2
-text = "CONTINUE"
+text = "MENU_CONTINUE"
 
 [node name="btnLoad" parent="panelMenu/ButtonContainer" unique_id=311038086 instance=ExtResource("4_47cvb")]
 layout_mode = 2
-text = "LOAD"
+text = "MENU_LOAD"
 
 [node name="btnSettings" parent="panelMenu/ButtonContainer" unique_id=360171189 instance=ExtResource("4_47cvb")]
 layout_mode = 2
-text = "SETTINGS"
+text = "MENU_SETTINGS"
 
 [node name="btnCredits" parent="panelMenu/ButtonContainer" unique_id=220401854 instance=ExtResource("4_47cvb")]
 layout_mode = 2
-text = "CREDITS"
+text = "MENU_CREDITS"
 
 [node name="btnExit" parent="panelMenu/ButtonContainer" unique_id=2026497379 instance=ExtResource("4_47cvb")]
 layout_mode = 2
-text = "EXIT
-"
+text = "MENU_EXIT"
