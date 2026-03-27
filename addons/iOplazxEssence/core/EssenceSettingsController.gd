@@ -58,7 +58,6 @@ var _tex_pause: Texture2D
 
 func _ready():
 	_load_icons()
-	_setup_sliders_range()
 	_setup_theme_dropdown()
 	_setup_extra_settings()
 	_setup_game_tab() # Inicializa la pestaña Game
@@ -76,14 +75,6 @@ func _load_icons():
 # ==========================================
 # SETUP DE UI Y SEÑALES
 # ==========================================
-
-func _setup_sliders_range():
-	var rows = [row_master_volume, row_background_music, row_sfx_volume, row_ui_volume, row_voices_volume]
-	for r in rows:
-		if r and r.slider:
-			r.slider.min_value = 0.0
-			r.slider.max_value = 1.0
-			r.slider.step = 0.01
 
 func _connect_signals():
 	if btn_return:
@@ -131,12 +122,10 @@ func _setup_game_tab():
 		dpd_save_style.select(Preferences.get_setting("game", "save_style", 1)) 
 		dpd_save_style.item_selected.connect(_on_save_style_selected)
 		
-	# 4. Velocidad de Texto (0.0 a 1.0)
+	# 4. Velocidad de Texto (La configuración de límites se hace en el Inspector)
 	if slider_text_speed and slider_text_speed.slider:
-		slider_text_speed.slider.min_value = 0.0
-		slider_text_speed.slider.max_value = 1.0
-		slider_text_speed.slider.step = 0.05
-		slider_text_speed.slider.value = Preferences.get_setting("game", "text_speed", 0.5)
+		# Cargamos la preferencia (Por defecto ponemos 1.0 que es la velocidad normal)
+		slider_text_speed.slider.value = Preferences.get_setting("game", "text_speed", 1.0)
 		
 		# Guardamos solo cuando suelta el click para no saturar el disco
 		slider_text_speed.slider.drag_ended.connect(func(_changed): _on_text_speed_changed(slider_text_speed.slider.value))

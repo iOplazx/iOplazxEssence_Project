@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_5pgjl")
+skip_splash_screen = true
+show_warning_screen = false
 show_warning_icon = true
 button_type = 1
 loading_logo_type = 0

@@ -101,6 +101,13 @@ layout_mode = 2
 [node name="SliderTextSpeed" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=1831517089 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
 label_text = "SETTINGS_GAME_TEXT_SPEED"
+min_value = 0.5
+max_value = 2.0
+step = 0.1
+visual_multiplier = 1.0
+decimal_places = 1
+value_prefix = "x"
+value_suffix = ""
 
 [node name="RowAutosave" type="HBoxContainer" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=1502662492]
 layout_mode = 2
