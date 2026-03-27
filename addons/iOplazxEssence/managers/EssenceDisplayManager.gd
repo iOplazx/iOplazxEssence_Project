@@ -1,12 +1,11 @@
 extends Node
 
-const SETTINGS_FILE = "user://essence_settings.cfg"
 var current_window_mode: int = 0
 
 func _ready():
 	load_video_settings()
 
-## Cambia el modo y guarda en el archivo
+## Cambia el modo y guarda en la RAM/Disco
 func set_window_mode(mode_index: int):
 	current_window_mode = mode_index
 	
@@ -23,14 +22,12 @@ func set_window_mode(mode_index: int):
 	_save_video_settings()
 
 func _save_video_settings():
-	var config = ConfigFile.new()
-	config.load(SETTINGS_FILE) # Cargamos el existente para no borrar lo de audio
-	config.set_value("video", "window_mode", current_window_mode)
-	config.save(SETTINGS_FILE)
+	# Usamos el cerebro centralizado
+	Preferences.set_setting("video", "window_mode", current_window_mode)
+	Preferences.save_to_disk()
 
 func load_video_settings():
-	var config = ConfigFile.new()
-	if config.load(SETTINGS_FILE) == OK:
-		current_window_mode = config.get_value("video", "window_mode", 0)
+	# Pedimos la configuración a la RAM de forma instantánea
+	current_window_mode = Preferences.get_setting("video", "window_mode", 0)
 	
 	set_window_mode(current_window_mode)

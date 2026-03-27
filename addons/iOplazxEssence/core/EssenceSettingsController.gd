@@ -233,10 +233,13 @@ func _on_language_apply(folder_code: String):
 	TranslationServer.set_locale(folder_code) 
 	AudioManager.play_ui_sfx()
 	
+	LanguageManager.save_language_preference(folder_code)
+	
 	# Le avisamos a las tarjetas que actualicen sus botones sin recargar la lista
+	var current_locale = TranslationServer.get_locale()
 	for card in list_languages.get_children():
 		if card.has_method("refresh_state"):
-			card.refresh_state(folder_code)
+			card.refresh_state(current_locale)
 
 func _on_language_info(data: Dictionary):
 	print("Mostrando créditos de: ", data.get("name", "Unknown"))
