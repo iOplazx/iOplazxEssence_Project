@@ -3,9 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/RowSlider.tscn" id="1_kd5ej"]
 [ext_resource type="Script" uid="uid://kbgigc8bou1y" path="res://addons/iOplazxEssence/core/EssenceSettingsController.gd" id="1_kht5n"]
 [ext_resource type="PackedScene" uid="uid://b20lw8s6c0q6u" path="res://addons/iOplazxEssence/ui/EssenceLanguageCard.tscn" id="2_8ot2k"]
-[ext_resource type="PackedScene" uid="uid://b4q5ktoou3y03" path="res://addons/iOplazxEssence/ui/EssenceInfoPanel.tscn" id="3_2v3th"]
+[ext_resource type="PackedScene" uid="uid://eoxnxw3ulco1" path="res://addons/iOplazxEssence/ui/EssenceInfoPanel.tscn" id="3_2v3th"]
 
-[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "dpdMode", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "chkMuteFocusLoss", "dropdown_ui_theme", "btn_preview", "preview_player", "list_languages")]
+[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "dpdMode", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "chkMuteFocusLoss", "dropdown_ui_theme", "btn_preview", "preview_player", "list_languages", "btn_reimport_langs")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,6 +25,7 @@ dropdown_ui_theme = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAud
 btn_preview = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/BtnPreview")
 preview_player = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/PreviewPlayer")
 list_languages = NodePath("ContenedorPrincipal/TabContainer/mcLanguage/mcBodyLanguage/VBoxContainer/mcSelectWindow/ScrollLanguages/ListLanguages")
+btn_reimport_langs = NodePath("ContenedorPrincipal/TabContainer/mcLanguage/mcBodyLanguage/VBoxContainer/mcReimportButton/btnReimport")
 language_card_prefab = ExtResource("2_8ot2k")
 info_panel_prefab = ExtResource("3_2v3th")
 
@@ -215,6 +216,16 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
+
+[node name="mcReimportButton" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mcLanguage/mcBodyLanguage/VBoxContainer" unique_id=987654321]
+layout_mode = 2
+theme_override_constants/margin_top = 10
+
+[node name="btnReimport" type="Button" parent="ContenedorPrincipal/TabContainer/mcLanguage/mcBodyLanguage/VBoxContainer/mcReimportButton" unique_id=123456789]
+custom_minimum_size = Vector2(250, 30)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "MENU_RESCAN_LANGUAGES"
 
 [node name="mcButton" type="MarginContainer" parent="ContenedorPrincipal" unique_id=1551150671]
 layout_mode = 2

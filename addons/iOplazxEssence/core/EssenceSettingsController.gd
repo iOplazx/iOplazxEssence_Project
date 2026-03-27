@@ -41,6 +41,7 @@ class_name EssenceSettingsController extends Control
 @export_subgroup("UI Connections")
 ## El VBoxContainer donde se apilarán las tarjetas
 @export var list_languages: VBoxContainer 
+@export var btn_reimport_langs: Button
 
 @export_subgroup("Prefabs")
 ## Arrastra aquí tu escena EssenceLanguageCard.tscn
@@ -58,6 +59,8 @@ func _ready():
 	_connect_signals()
 	_sync_with_managers() # Sincronizamos la UI con los Autoloads
 	_populate_languages()
+	if btn_reimport_langs:
+		btn_reimport_langs.pressed.connect(_on_reimport_langs_pressed)
 
 func _load_icons():
 	# Usamos tu arquitectura global para cargar los iconos a prueba de fallos
@@ -256,3 +259,17 @@ func _on_language_info(data: Dictionary):
 	# Le pasamos los datos para que llene sus textos
 	if panel.has_method("setup"):
 		panel.setup(data)
+		
+func _on_reimport_langs_pressed():
+	AudioManager.play_ui_sfx()
+	print("Essence: Re-escaneando y regenerando carpetas de idiomas...")
+	
+	# 1. Escaneamos. Si el usuario borró la carpeta, esto la volverá a crear vacía
+	# y si añadió un mod nuevo, lo detectará de inmediato.
+	LanguageManager.scan_all_languages()
+	
+	# 2. Inyectamos los nuevos diccionarios a la RAM en vivo
+	LanguageManager.inject_translations()
+	
+	# 3. Borramos las tarjetas viejas y generamos las nuevas
+	_populate_languages()
