@@ -45,6 +45,7 @@ class_name EssenceSettingsController extends Control
 @export_subgroup("Prefabs")
 ## Arrastra aquí tu escena EssenceLanguageCard.tscn
 @export var language_card_prefab: PackedScene
+@export var info_panel_prefab: PackedScene
 
 var _tex_play: Texture2D
 var _tex_pause: Texture2D
@@ -242,5 +243,16 @@ func _on_language_apply(folder_code: String):
 			card.refresh_state(current_locale)
 
 func _on_language_info(data: Dictionary):
-	print("Mostrando créditos de: ", data.get("name", "Unknown"))
-	# Aquí abriremos la ventana emergente después
+	if not info_panel_prefab:
+		push_error("Essence: Falta asignar el info_panel_prefab en el Inspector.")
+		return
+		
+	# Instanciamos el panel
+	var panel = info_panel_prefab.instantiate()
+	
+	# Lo agregamos como hijo del nodo raíz del menú para que flote por encima de todo
+	add_child(panel) 
+	
+	# Le pasamos los datos para que llene sus textos
+	if panel.has_method("setup"):
+		panel.setup(data)

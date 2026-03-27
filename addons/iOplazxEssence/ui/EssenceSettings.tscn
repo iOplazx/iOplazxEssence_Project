@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/RowSlider.tscn" id="1_kd5ej"]
 [ext_resource type="Script" uid="uid://kbgigc8bou1y" path="res://addons/iOplazxEssence/core/EssenceSettingsController.gd" id="1_kht5n"]
 [ext_resource type="PackedScene" uid="uid://b20lw8s6c0q6u" path="res://addons/iOplazxEssence/ui/EssenceLanguageCard.tscn" id="2_8ot2k"]
+[ext_resource type="PackedScene" uid="uid://b4q5ktoou3y03" path="res://addons/iOplazxEssence/ui/EssenceInfoPanel.tscn" id="3_2v3th"]
 
 [node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "dpdMode", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "chkMuteFocusLoss", "dropdown_ui_theme", "btn_preview", "preview_player", "list_languages")]
 layout_mode = 3
@@ -25,6 +26,7 @@ btn_preview = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBo
 preview_player = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/PreviewPlayer")
 list_languages = NodePath("ContenedorPrincipal/TabContainer/mcLanguage/mcBodyLanguage/VBoxContainer/mcSelectWindow/ScrollLanguages/ListLanguages")
 language_card_prefab = ExtResource("2_8ot2k")
+info_panel_prefab = ExtResource("3_2v3th")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=406427952]
 layout_mode = 1

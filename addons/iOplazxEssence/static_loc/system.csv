@@ -20,4 +20,7 @@ SETTINGS_AUDIO_VOLUME_SFX,Volume SFX,Volumen SFX
 SETTINGS_AUDIO_VOLUME_UI,Volume UI,Volumen UI
 SETTINGS_AUDIO_VOLUME_VOICES,Volume Voices,Volumen de voces
 SETTINGS_AUDIO_MFL,Mute on Focus Loss, Silenciar al perder el foco
-SETTINGS_AUDIO_TYPE_SELECTED,UI Sound Select, Seleccionar sonido UI
+SETTINGS_AUDIO_TYPE_SELECTED,UI Sound Select,Seleccionar sonido UI
+MENU_AUTHOR,Author,Autor
+MENU_AI_WARNING,Translated by AI,Traducido por IA
+MENU_CLOSE,CLOSE,CERRAR

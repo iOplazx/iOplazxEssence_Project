@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://b4q5ktoou3y03"]
+
+[ext_resource type="Script" uid="uid://cd38mrpths1jv" path="res://addons/iOplazxEssence/scriptsItems/EssenceInfoPanel.gd" id="1_lmdm1"]
+
+[node name="EssenceInfoPanel" type="Control" unique_id=1815266833 node_paths=PackedStringArray("lbl_title", "lbl_author", "lbl_ai_warning", "btn_close", "window_panel")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lmdm1")
+lbl_title = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/lblTitle")
+lbl_author = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/lblAuthor")
+lbl_ai_warning = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/lblAiWarning")
+btn_close = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/MarginContainer/btnClose")
+window_panel = NodePath("CenterContainer/WindowPanel")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1439094508]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.05, 0.85)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=932745706]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="WindowPanel" type="PanelContainer" parent="CenterContainer" unique_id=1986168910]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/WindowPanel" unique_id=1422008435]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer" unique_id=1385950876]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="lblTitle" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=1501570391]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "LANGUAGE NAME"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=332475358]
+layout_mode = 2
+
+[node name="lblAuthor" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=1444248128]
+layout_mode = 2
+text = "Author: iOplazx"
+horizontal_alignment = 1
+
+[node name="lblAiWarning" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=1192732967]
+modulate = Color(1, 0.784314, 0.254902, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Translated by AI"
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=585449424]
+layout_mode = 2
+theme_override_constants/margin_top = 10
+
+[node name="btnClose" type="Button" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer/MarginContainer" unique_id=385051110]
+custom_minimum_size = Vector2(150, 35)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "CLOSE"
