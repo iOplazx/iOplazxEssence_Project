@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://b20lw8s6c0q6u" path="res://addons/iOplazxEssence/ui/EssenceLanguageCard.tscn" id="2_8ot2k"]
 [ext_resource type="PackedScene" uid="uid://eoxnxw3ulco1" path="res://addons/iOplazxEssence/ui/EssenceInfoPanel.tscn" id="3_2v3th"]
 
-[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "dpdMode", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "chkMuteFocusLoss", "dropdown_ui_theme", "btn_preview", "preview_player", "list_languages", "btn_reimport_langs")]
+[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "dpd_difficulty", "slider_text_speed", "dpd_autosave", "dpd_save_style", "dpdMode", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "chkMuteFocusLoss", "dropdown_ui_theme", "btn_preview", "preview_player", "list_languages", "btn_reimport_langs")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,6 +14,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kht5n")
 btn_return = NodePath("ContenedorPrincipal/mcButton/btnReturn")
+dpd_difficulty = NodePath("ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
+slider_text_speed = NodePath("ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/SliderTextSpeed")
+dpd_autosave = NodePath("ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowAutosave/dpdAutosave")
+dpd_save_style = NodePath("ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowSaveStyle/dpdSaveStyle")
 dpdMode = NodePath("ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow/dpdMode")
 row_master_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderMasterVolumen")
 row_background_music = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderBackgroundMusic")
@@ -65,10 +69,64 @@ tab_1/title = "SETTINGS_VIDEO"
 tab_2/title = "SETTINGS_AUDIO"
 tab_3/title = "SETTINGS_LANGUAGE"
 
-[node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=1140037773]
+[node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851]
 layout_mode = 2
 metadata/_tab_index = 0
 metadata/_tab_name = "SETTINGS_GAME"
+
+[node name="mcBodyGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgGame" unique_id=1026931173]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame" unique_id=791857527]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="RowDifficulty" type="HBoxContainer" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=67673323]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowDifficulty" unique_id=719561921]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_DIFFICULTY"
+
+[node name="dpdDifficulty" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowDifficulty" unique_id=466822050]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="SliderTextSpeed" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=1831517089 instance=ExtResource("1_kd5ej")]
+layout_mode = 2
+label_text = "SETTINGS_GAME_TEXT_SPEED"
+
+[node name="RowAutosave" type="HBoxContainer" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=1502662492]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowAutosave" unique_id=1263897445]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_AUTOSAVE"
+
+[node name="dpdAutosave" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowAutosave" unique_id=1555082471]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="RowSaveStyle" type="HBoxContainer" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=65522896]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowSaveStyle" unique_id=1061515573]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_SAVE_STYLE"
+
+[node name="dpdSaveStyle" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowSaveStyle" unique_id=1749316504]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
 
 [node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976]
 visible = false

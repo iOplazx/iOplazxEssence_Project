@@ -6,10 +6,18 @@ class_name EssenceSettingsController extends Control
 @export var btn_return: Button
 
 # ==========================================
+# PESTAÑA JUEGO
+# ==========================================
+@export_group("Tab: Game")
+@export var dpd_difficulty: OptionButton
+@export var slider_text_speed: Control 
+@export var dpd_autosave: OptionButton
+@export var dpd_save_style: OptionButton
+
+# ==========================================
 # PESTAÑA VIDEO
 # ==========================================
 @export_group("Tab: Video")
-
 @export_subgroup("Display Settings")
 @export var dpdMode: OptionButton
 
@@ -17,7 +25,6 @@ class_name EssenceSettingsController extends Control
 # PESTAÑA AUDIO
 # ==========================================
 @export_group("Tab: Audio")
-
 @export_subgroup("Volume Sliders")
 @export var row_master_volume: EssenceRowSlider 
 @export var row_background_music: EssenceRowSlider
@@ -37,33 +44,32 @@ class_name EssenceSettingsController extends Control
 # PESTAÑA LENGUAJE
 # ==========================================
 @export_group("Tab: Language")
-
 @export_subgroup("UI Connections")
-## El VBoxContainer donde se apilarán las tarjetas
 @export var list_languages: VBoxContainer 
 @export var btn_reimport_langs: Button
 
 @export_subgroup("Prefabs")
-## Arrastra aquí tu escena EssenceLanguageCard.tscn
 @export var language_card_prefab: PackedScene
 @export var info_panel_prefab: PackedScene
 
+# Variables privadas
 var _tex_play: Texture2D
 var _tex_pause: Texture2D
 
 func _ready():
-	_load_icons() # Cargamos las imágenes en RAM primero
+	_load_icons()
 	_setup_sliders_range()
 	_setup_theme_dropdown()
 	_setup_extra_settings()
+	_setup_game_tab() # Inicializa la pestaña Game
 	_connect_signals()
-	_sync_with_managers() # Sincronizamos la UI con los Autoloads
+	_sync_with_managers()
 	_populate_languages()
+	
 	if btn_reimport_langs:
 		btn_reimport_langs.pressed.connect(_on_reimport_langs_pressed)
 
 func _load_icons():
-	# Usamos tu arquitectura global para cargar los iconos a prueba de fallos
 	_tex_play = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_PLAY)
 	_tex_pause = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_PAUSE)
 
@@ -92,23 +98,60 @@ func _connect_signals():
 func _connect_audio_row(row: EssenceRowSlider, bus_name: String, play_test: bool = false):
 	if row and row.slider:
 		row.slider.value_changed.connect(func(val): AudioManager.set_bus_volume(bus_name, val))
-		
 		if play_test:
 			row.slider.drag_ended.connect(func(_changed): _save_all_settings(); AudioManager.play_ui_sfx())
 		else:
 			row.slider.drag_ended.connect(func(_changed): _save_all_settings())
 
 # ==========================================
-# LÓGICA DEL TEMA DE INTERFAZ (COMBOBOX)
+# SETUP PESTAÑA GAME
+# ==========================================
+func _setup_game_tab():
+	# 1. Dificultad
+	if dpd_difficulty:
+		dpd_difficulty.clear()
+		dpd_difficulty.add_item(tr("DIFF_NORMAL"), 0)
+		dpd_difficulty.select(Preferences.get_setting("game", "difficulty", 0))
+		dpd_difficulty.item_selected.connect(_on_difficulty_selected)
+
+	# 2. Autoguardado
+	if dpd_autosave:
+		dpd_autosave.clear()
+		var autosave_options = ["TIME_NEVER", "TIME_5M", "TIME_15M", "TIME_30M", "TIME_1H", "TIME_2H", "TIME_5H", "TIME_12H", "TIME_1D", "TIME_1W"]
+		for i in range(autosave_options.size()):
+			dpd_autosave.add_item(tr(autosave_options[i]), i)
+		dpd_autosave.select(Preferences.get_setting("game", "autosave_interval", 0))
+		dpd_autosave.item_selected.connect(_on_autosave_selected)
+
+	# 3. Estilo de Guardado
+	if dpd_save_style:
+		dpd_save_style.clear()
+		dpd_save_style.add_item(tr("STYLE_GRID"), 0)
+		dpd_save_style.add_item(tr("STYLE_LIST"), 1)
+		dpd_save_style.select(Preferences.get_setting("game", "save_style", 1)) 
+		dpd_save_style.item_selected.connect(_on_save_style_selected)
+		
+	# 4. Velocidad de Texto (0.0 a 1.0)
+	if slider_text_speed and slider_text_speed.slider:
+		slider_text_speed.slider.min_value = 0.0
+		slider_text_speed.slider.max_value = 1.0
+		slider_text_speed.slider.step = 0.05
+		slider_text_speed.slider.value = Preferences.get_setting("game", "text_speed", 0.5)
+		
+		# Guardamos solo cuando suelta el click para no saturar el disco
+		slider_text_speed.slider.drag_ended.connect(func(_changed): _on_text_speed_changed(slider_text_speed.slider.value))
+
+# ==========================================
+# LÓGICA DEL TEMA DE INTERFAZ
 # ==========================================
 
 func _setup_theme_dropdown():
 	if not dropdown_ui_theme or not btn_preview: return
 	
 	dropdown_ui_theme.clear()
-	dropdown_ui_theme.add_item("Sci-Fi (Space)") # Índice 0
-	dropdown_ui_theme.add_item("Burbuja (Bubble)") # Índice 1
-	dropdown_ui_theme.add_item("Silencio")       # Índice 2
+	dropdown_ui_theme.add_item("Sci-Fi (Space)")
+	dropdown_ui_theme.add_item("Burbuja (Bubble)")
+	dropdown_ui_theme.add_item("Silencio") 
 	
 	dropdown_ui_theme.item_selected.connect(_on_theme_selected)
 	btn_preview.pressed.connect(_on_preview_pressed)
@@ -170,7 +213,7 @@ func _on_window_mode_selected(index: int):
 
 func _on_mute_focus_toggled(toggled_on: bool):
 	AudioManager.mute_on_focus_loss = toggled_on
-	_save_all_settings() # Mucho más limpio, reutilizamos la función de abajo
+	_save_all_settings()
 	AudioManager.play_ui_sfx()
 
 # ==========================================
@@ -187,7 +230,6 @@ func _save_all_settings():
 	AudioManager.save_audio_settings(vol_master, vol_music, vol_sfx, vol_ui, vol_voices)
 
 func _sync_with_managers():
-	# 1. Sincronizar Sliders de Audio
 	var saved_vols = AudioManager.load_audio_settings()
 	if row_master_volume and row_master_volume.slider: row_master_volume.slider.value = saved_vols["Master"]
 	if row_background_music and row_background_music.slider: row_background_music.slider.value = saved_vols["Music"]
@@ -195,22 +237,18 @@ func _sync_with_managers():
 	if row_ui_volume and row_ui_volume.slider: row_ui_volume.slider.value = saved_vols["UI"]
 	if row_voices_volume and row_voices_volume.slider: row_voices_volume.slider.value = saved_vols["Voices"]
 	
-	# 2. Sincronizar Tema de UI
-	if dropdown_ui_theme: 
-		dropdown_ui_theme.selected = AudioManager.current_ui_theme
-			
-	# 3. Sincronizar Modo de Ventana
-	if dpdMode:
-		dpdMode.selected = DisplayManager.current_window_mode
+	if dropdown_ui_theme: dropdown_ui_theme.selected = AudioManager.current_ui_theme
+	if dpdMode: dpdMode.selected = DisplayManager.current_window_mode
 		
-	# 4. Sincronizar Check de Silencio (bloqueamos señales para no disparar el guardado por accidente al cargar)
 	if chkMuteFocusLoss:
 		chkMuteFocusLoss.set_block_signals(true)
 		chkMuteFocusLoss.button_pressed = AudioManager.mute_on_focus_loss
 		chkMuteFocusLoss.set_block_signals(false)
 
+# ==========================================
+# LÓGICA DE IDIOMAS Y TARJETAS
+# ==========================================
 
-##### METODOS ####
 func _populate_languages():
 	if not list_languages or not language_card_prefab: return
 		
@@ -218,58 +256,58 @@ func _populate_languages():
 		child.queue_free()
 		
 	var real_data = LanguageManager.get_language_list()
-	var current_locale = TranslationServer.get_locale() # Preguntamos al motor qué idioma está usando
+	var current_locale = TranslationServer.get_locale() 
 	
 	for data in real_data:
 		var card: EssenceLanguageCard = language_card_prefab.instantiate()
 		list_languages.add_child(card)
-		
-		# Le pasamos el idioma actual para que sepa si debe bloquear su botón
 		card.setup_card(data, current_locale)
-		
 		card.on_apply_requested.connect(_on_language_apply)
 		card.on_info_requested.connect(_on_language_info)
 
-# Funciones receptoras de las señales
 func _on_language_apply(folder_code: String):
-	print("Essence: Aplicando idioma global -> ", folder_code)
-	
 	TranslationServer.set_locale(folder_code) 
 	AudioManager.play_ui_sfx()
-	
 	LanguageManager.save_language_preference(folder_code)
 	
-	# Le avisamos a las tarjetas que actualicen sus botones sin recargar la lista
 	var current_locale = TranslationServer.get_locale()
 	for card in list_languages.get_children():
 		if card.has_method("refresh_state"):
 			card.refresh_state(current_locale)
 
 func _on_language_info(data: Dictionary):
-	if not info_panel_prefab:
-		push_error("Essence: Falta asignar el info_panel_prefab en el Inspector.")
-		return
-		
-	# Instanciamos el panel
+	if not info_panel_prefab: return
 	var panel = info_panel_prefab.instantiate()
-	
-	# Lo agregamos como hijo del nodo raíz del menú para que flote por encima de todo
 	add_child(panel) 
-	
-	# Le pasamos los datos para que llene sus textos
 	if panel.has_method("setup"):
 		panel.setup(data)
 		
 func _on_reimport_langs_pressed():
 	AudioManager.play_ui_sfx()
-	print("Essence: Re-escaneando y regenerando carpetas de idiomas...")
-	
-	# 1. Escaneamos. Si el usuario borró la carpeta, esto la volverá a crear vacía
-	# y si añadió un mod nuevo, lo detectará de inmediato.
 	LanguageManager.scan_all_languages()
-	
-	# 2. Inyectamos los nuevos diccionarios a la RAM en vivo
 	LanguageManager.inject_translations()
-	
-	# 3. Borramos las tarjetas viejas y generamos las nuevas
 	_populate_languages()
+
+# ==========================================
+# RECEPTORES DE SEÑALES (PESTAÑA GAME)
+# ==========================================
+
+func _on_difficulty_selected(index: int):
+	AudioManager.play_ui_sfx()
+	Preferences.set_setting("game", "difficulty", index)
+	Preferences.save_to_disk()
+
+func _on_autosave_selected(index: int):
+	AudioManager.play_ui_sfx()
+	Preferences.set_setting("game", "autosave_interval", index)
+	Preferences.save_to_disk()
+
+func _on_save_style_selected(index: int):
+	AudioManager.play_ui_sfx()
+	Preferences.set_setting("game", "save_style", index)
+	Preferences.save_to_disk()
+
+func _on_text_speed_changed(value: float):
+	Preferences.set_setting("game", "text_speed", value)
+	Preferences.save_to_disk()
+	AudioManager.play_ui_sfx()

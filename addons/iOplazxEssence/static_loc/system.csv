@@ -25,3 +25,20 @@ MENU_AUTHOR,Author,Autor
 MENU_AI_WARNING,Translated by AI,Traducido por IA
 MENU_CLOSE,CLOSE,CERRAR
 MENU_RESCAN_LANGUAGES,Rescan Languages,Recargar Idiomas
+SETTINGS_GAME_DIFFICULTY,Difficulty:,Dificultad:
+SETTINGS_GAME_TEXT_SPEED,Auto Text Speed:,Velocidad de Texto Auto:
+SETTINGS_GAME_AUTOSAVE,Auto-Save Interval:,Intervalo de Autoguardado:
+SETTINGS_GAME_SAVE_STYLE,Save Menu Style:,Estilo del Menú de Guardado:
+DIFF_NORMAL,Normal,Normal
+STYLE_GRID,Grid (Classic),Cuadrícula (Clásico)
+STYLE_LIST,List (Modern),Lista (Moderno)
+TIME_NEVER,Never,Nunca
+TIME_5M,5 Minutes,5 Minutos
+TIME_15M,15 Minutes,15 Minutos
+TIME_30M,30 Minutes,30 Minutos
+TIME_1H,1 Hour,1 Hora
+TIME_2H,2 Hours,2 Horas
+TIME_5H,5 Hours,5 Horas
+TIME_12H,12 Hours,12 Horas
+TIME_1D,1 Day,1 Día
+TIME_1W,1 Week,1 Semana
