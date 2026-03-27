@@ -83,6 +83,7 @@ func _tarea_sistema_archivos():
 	
 	print("-> Escaneando idiomas disponibles...")
 	LanguageManager.scan_all_languages()
-	
-	# ¡NUEVA LÍNEA! Subimos los diccionarios a la RAM
 	LanguageManager.inject_translations()
+	
+	# Forzamos el idioma correcto antes de que el jugador vea el menú
+	LanguageManager.apply_initial_language()

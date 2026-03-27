@@ -3,6 +3,7 @@ extends Node
 # Diccionario maestro para evitar duplicados. 
 # Estructura: {"en": {"name": "English", "author": "...", "flag_path": "...", "folder": "en"}}
 var _available_languages: Dictionary = {}
+var _core_default_locale: String = "en"
 
 func _ready():
 	pass # Lo inicializaremos desde el BootBase después de los archivos
@@ -78,6 +79,10 @@ func _parse_language_folder(lang_code: String, folder_path: String):
 			lang_data["name"] = config.get_value("info", "name", lang_code)
 			lang_data["author"] = config.get_value("info", "author", "Unknown")
 			lang_data["is_ai"] = config.get_value("info", "is_ai", false)
+			
+			#Si es la carpeta interna del motor y dice ser el default, lo guardamos
+			if "static_loc" in folder_path and config.get_value("info", "is_default", false):
+				_core_default_locale = lang_code
 	
 	# Buscamos la bandera
 	if FileAccess.file_exists(flag_path):
@@ -128,3 +133,16 @@ func _load_translations_from_dir(path: String):
 				print(" -> Inyectado con éxito: ", file_name)
 				
 		file_name = dir.get_next()
+
+func apply_initial_language():
+	print("Essence: Determinando idioma inicial...")
+	
+	# TODO: Aquí leeremos el archivo de guardado (Ej. EssenceSaveManager.get_setting("language"))
+	var saved_language = "" 
+	
+	if saved_language != "":
+		print(" -> Idioma cargado desde preferencias: ", saved_language)
+		TranslationServer.set_locale(saved_language)
+	else:
+		print(" -> Primera vez jugando. Forzando idioma por defecto del Core: ", _core_default_locale)
+		TranslationServer.set_locale(_core_default_locale)
