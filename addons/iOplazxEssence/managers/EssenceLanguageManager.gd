@@ -76,6 +76,9 @@ func _parse_language_folder(lang_code: String, folder_path: String):
 			lang_data["author"] = config.get_value("info", "author", "Unknown")
 			lang_data["is_ai"] = config.get_value("info", "is_ai", false)
 			
+			lang_data["version"] = config.get_value("info", "version", "1.0.0")
+			lang_data["description"] = config.get_value("info", "description", "")
+			
 			if "static_loc" in folder_path and config.get_value("info", "is_default", false):
 				_core_default_locale = lang_code
 	
