@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ubl4nvaexi55"]
 
-[ext_resource type="Script" uid="uid://ccwch6gytt4l2" path="res://addons/iOplazxEssence/core/EssenceCreditsController.gd" id="1_i7r5x"]
-[ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/generateMainMenuImage.png" id="1_jl0a6"]
+[ext_resource type="Script" uid="uid://ccwch6gytt4l2" path="res://addons/iOplazxEssence/core/controllers/EssenceCreditsController.gd" id="1_i7r5x"]
+[ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/images/generateMainMenuImage.png" id="1_jl0a6"]
 [ext_resource type="PackedScene" uid="uid://c58ydoc3e2fbk" path="res://addons/iOplazxEssence/ui/EssenceButton.tscn" id="3_r3iwy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_82f7c"]

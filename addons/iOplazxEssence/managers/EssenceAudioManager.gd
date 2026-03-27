@@ -172,13 +172,18 @@ func set_ui_theme(theme_index: int):
 # ==========================================
 
 func _notification(what):
-	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+	# Usamos las notificaciones de APLICACIÓN en lugar de VENTANA
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if mute_on_focus_loss:
 			var master_idx = AudioServer.get_bus_index("Master")
+			# Guardamos si el usuario ya lo tenía silenciado manualmente
 			_was_muted_manually = AudioServer.is_bus_mute(master_idx)
 			AudioServer.set_bus_mute(master_idx, true) 
+			print("Essence: Foco de aplicación perdido - Silenciando")
 			
-	elif what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
 		if mute_on_focus_loss:
 			var master_idx = AudioServer.get_bus_index("Master")
+			# Solo restauramos el sonido si NO estaba silenciado manualmente antes de salir
 			AudioServer.set_bus_mute(master_idx, _was_muted_manually)
+			print("Essence: Foco de aplicación recuperado - Restaurando audio")

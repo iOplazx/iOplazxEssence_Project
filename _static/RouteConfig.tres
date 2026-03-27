@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="EssenceRouteConfig" format=3 uid="uid://b3v578cmcp1pr"]
 
-[ext_resource type="Script" uid="uid://dj64xytw2gwrt" path="res://addons/iOplazxEssence/core/EssenceRouteConfig.gd" id="1_nte1n"]
+[ext_resource type="Script" uid="uid://dj64xytw2gwrt" path="res://addons/iOplazxEssence/core/configs/EssenceRouteConfig.gd" id="1_nte1n"]
 
 [resource]
 script = ExtResource("1_nte1n")

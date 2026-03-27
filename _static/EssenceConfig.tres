@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="EssenceConfig" format=3 uid="uid://brymtyo7debjs"]
 
-[ext_resource type="Script" uid="uid://cbvfno3r005jc" path="res://addons/iOplazxEssence/core/EssenceConfig.gd" id="1_5pgjl"]
+[ext_resource type="Script" uid="uid://cbvfno3r005jc" path="res://addons/iOplazxEssence/core/configs/EssenceConfig.gd" id="1_5pgjl"]
 
 [resource]
 script = ExtResource("1_5pgjl")

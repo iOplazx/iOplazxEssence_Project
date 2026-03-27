@@ -1,11 +1,15 @@
 [gd_scene format=3 uid="uid://c7suofv1q8fjt"]
 
 [ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/RowSlider.tscn" id="1_kd5ej"]
-[ext_resource type="Script" uid="uid://kbgigc8bou1y" path="res://addons/iOplazxEssence/core/EssenceSettingsController.gd" id="1_kht5n"]
+[ext_resource type="Script" uid="uid://kbgigc8bou1y" path="res://addons/iOplazxEssence/core/controllers/EssenceSettingsController.gd" id="1_kht5n"]
 [ext_resource type="PackedScene" uid="uid://b20lw8s6c0q6u" path="res://addons/iOplazxEssence/ui/EssenceLanguageCard.tscn" id="2_8ot2k"]
+[ext_resource type="Script" uid="uid://dg2pfy1nu8r2q" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabGame.gd" id="2_i07iq"]
 [ext_resource type="PackedScene" uid="uid://eoxnxw3ulco1" path="res://addons/iOplazxEssence/ui/EssenceInfoPanel.tscn" id="3_2v3th"]
+[ext_resource type="Script" uid="uid://dnf4dfoua0qlm" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabVideo.gd" id="4_jvark"]
+[ext_resource type="Script" uid="uid://dlj1lvkwmnm7d" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabAudio.gd" id="5_ih3y7"]
+[ext_resource type="Script" uid="uid://cafo3qn5a1ocy" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabLanguage.gd" id="6_f5i2u"]
 
-[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "dpd_difficulty", "slider_text_speed", "dpd_autosave", "dpd_save_style", "dpdMode", "row_master_volume", "row_background_music", "row_sfx_volume", "row_ui_volume", "row_voices_volume", "chkMuteFocusLoss", "dropdown_ui_theme", "btn_preview", "preview_player", "list_languages", "btn_reimport_langs")]
+[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,24 +18,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kht5n")
 btn_return = NodePath("ContenedorPrincipal/mcButton/btnReturn")
-dpd_difficulty = NodePath("ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
-slider_text_speed = NodePath("ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/SliderTextSpeed")
-dpd_autosave = NodePath("ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowAutosave/dpdAutosave")
-dpd_save_style = NodePath("ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowSaveStyle/dpdSaveStyle")
-dpdMode = NodePath("ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow/dpdMode")
-row_master_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderMasterVolumen")
-row_background_music = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderBackgroundMusic")
-row_sfx_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderSFXVolume")
-row_ui_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderUIVolume")
-row_voices_volume = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/SliderVoicesVolume")
-chkMuteFocusLoss = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer/chkMuteFocusLoss")
-dropdown_ui_theme = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/DropdownTheme")
-btn_preview = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/BtnPreview")
-preview_player = NodePath("ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/PreviewPlayer")
-list_languages = NodePath("ContenedorPrincipal/TabContainer/mcLanguage/mcBodyLanguage/VBoxContainer/mcSelectWindow/ScrollLanguages/ListLanguages")
-btn_reimport_langs = NodePath("ContenedorPrincipal/TabContainer/mcLanguage/mcBodyLanguage/VBoxContainer/mcReimportButton/btnReimport")
-language_card_prefab = ExtResource("2_8ot2k")
-info_panel_prefab = ExtResource("3_2v3th")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=406427952]
 layout_mode = 1
@@ -69,8 +55,13 @@ tab_1/title = "SETTINGS_VIDEO"
 tab_2/title = "SETTINGS_AUDIO"
 tab_3/title = "SETTINGS_LANGUAGE"
 
-[node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851]
+[node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851 node_paths=PackedStringArray("dpd_difficulty", "slider_text_speed", "dpd_autosave", "dpd_save_style")]
 layout_mode = 2
+script = ExtResource("2_i07iq")
+dpd_difficulty = NodePath("mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
+slider_text_speed = NodePath("mcBodyGame/VBoxContainer/SliderTextSpeed")
+dpd_autosave = NodePath("mcBodyGame/VBoxContainer/RowAutosave/dpdAutosave")
+dpd_save_style = NodePath("mcBodyGame/VBoxContainer/RowSaveStyle/dpdSaveStyle")
 metadata/_tab_index = 0
 metadata/_tab_name = "SETTINGS_GAME"
 
@@ -135,9 +126,11 @@ text = "SETTINGS_GAME_SAVE_STYLE"
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
-[node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976]
+[node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976 node_paths=PackedStringArray("dpd_mode")]
 visible = false
 layout_mode = 2
+script = ExtResource("4_jvark")
+dpd_mode = NodePath("mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow/dpdMode")
 metadata/_tab_index = 1
 metadata/_tab_name = "SETTINGS_VIDEO"
 
@@ -170,9 +163,19 @@ text = "SETTINGS_DISPLAY_MODE"
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="mgAudio" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=142263258]
+[node name="mgAudio" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=142263258 node_paths=PackedStringArray("row_master", "row_music", "row_sfx", "row_ui", "row_voices", "chk_mute_focus", "dpd_theme", "btn_preview", "preview_player")]
 visible = false
 layout_mode = 2
+script = ExtResource("5_ih3y7")
+row_master = NodePath("mcBodyAudio/VBoxContainer/SliderMasterVolumen")
+row_music = NodePath("mcBodyAudio/VBoxContainer/SliderBackgroundMusic")
+row_sfx = NodePath("mcBodyAudio/VBoxContainer/SliderSFXVolume")
+row_ui = NodePath("mcBodyAudio/VBoxContainer/SliderUIVolume")
+row_voices = NodePath("mcBodyAudio/VBoxContainer/SliderVoicesVolume")
+chk_mute_focus = NodePath("mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer/chkMuteFocusLoss")
+dpd_theme = NodePath("mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/DropdownTheme")
+btn_preview = NodePath("mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/BtnPreview")
+preview_player = NodePath("mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/PreviewPlayer")
 metadata/_tab_index = 2
 metadata/_tab_name = "SETTINGS_AUDIO"
 
@@ -252,9 +255,14 @@ layout_mode = 2
 [node name="PreviewPlayer" type="AudioStreamPlayer" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=348304788]
 bus = &"UI"
 
-[node name="mcLanguage" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=1169789274]
+[node name="mcLanguage" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=1169789274 node_paths=PackedStringArray("list_languages", "btn_reimport")]
 visible = false
 layout_mode = 2
+script = ExtResource("6_f5i2u")
+list_languages = NodePath("mcBodyLanguage/VBoxContainer/mcSelectWindow/ScrollLanguages/ListLanguages")
+btn_reimport = NodePath("mcBodyLanguage/VBoxContainer/mcReimportButton/btnReimport")
+card_prefab = ExtResource("2_8ot2k")
+info_prefab = ExtResource("3_2v3th")
 metadata/_tab_index = 3
 metadata/_tab_name = "SETTINGS_LANGUAGE"
 
