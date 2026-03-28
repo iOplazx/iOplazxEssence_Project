@@ -28,6 +28,7 @@ MENU_AI_WARNING,Translated by AI,Traducido por IA
 MENU_CLOSE,CLOSE,CERRAR
 MENU_RESCAN_LANGUAGES,Rescan Languages,Recargar Idiomas
 SETTINGS_GAME_DIFFICULTY,Difficulty:,Dificultad:
+SETTINGS_GAME_NSFW,Enable Explicit Content (NSFW):,Activar Contenido Explícito (NSFW):
 SETTINGS_GAME_TEXT_SPEED,Auto Text Speed:,Velocidad de Texto Auto:
 SETTINGS_GAME_AUTOSAVE,Auto-Save Interval:,Intervalo de Autoguardado:
 SETTINGS_GAME_SAVE_STYLE,Save Menu Style:,Estilo del Menú de Guardado:
@@ -55,3 +56,7 @@ APP_QUIT_TITLE,Quit Game,Salir del Juego
 APP_QUIT_MSG,Are you sure you want to quit?,¿Estás seguro de que quieres salir?
 LANG_REIMPORT_TITLE,Reimport Languages,Reimportar Idiomas
 LANG_REIMPORT_MSG,Are you sure you want to scan and reload all language files?,¿Estás seguro de que deseas escanear y recargar todos los archivos de idioma?
+SETTINGS_VIDEO_SAVE_CHANGE,Apply Changes,Aplicar Cambios
+SETTINGS_GAME_SAVE_CHANGE,Apply Changes,Aplicar Cambios
+SETTINGS_DISCARD_TITLE,Unsaved Changes,Cambios sin guardar
+SETTINGS_DISCARD_MSG,Are you sure you want to exit without applying changes?,¿Estás seguro de que deseas salir sin aplicar los cambios?

@@ -2,16 +2,24 @@ extends MarginContainer
 
 @export_category("Tab: Game")
 @export var dpd_difficulty: OptionButton
+@export var chk_nsfw: CheckButton
 @export var slider_text_speed: EssenceRowSlider 
 @export var dpd_autosave: OptionButton
 @export var dpd_save_style: OptionButton
+
+var _pending_changes: bool = false
+@export var btn_apply: Button # Agrega este botón a tu UI
 
 func _ready():
 	# Conectamos el slider una sola vez aquí para que sea eficiente
 	if slider_text_speed and slider_text_speed.slider:
 		slider_text_speed.slider.drag_ended.connect(func(_changed): _on_text_speed_changed(slider_text_speed.slider.value))
-
+	
+	if btn_apply and not btn_apply.pressed.is_connected(_on_apply_pressed):
+		btn_apply.pressed.connect(_on_apply_pressed)
+	
 	_setup_game_tab()
+	_setup_nsfw_toggle()
 
 func _setup_game_tab():
 	# 1. Dificultad
@@ -59,28 +67,63 @@ func _setup_game_tab():
 		# Solo actualizamos el valor, la señal ya está conectada en _ready
 		slider_text_speed.slider.value = Preferences.get_setting("game", "text_speed", 1.0)
 
+func _setup_nsfw_toggle():
+	if chk_nsfw:
+		chk_nsfw.text = tr("SETTINGS_GAME_NSFW")
+		
+		# Cargamos la preferencia. Por defecto lo pondremos en 'true' (Sin censura)
+		# Usamos set_pressed_no_signal para que no dispare el sonido al cargar el menú
+		var is_nsfw_enabled = Preferences.get_setting("game", "nsfw_enabled", true)
+		chk_nsfw.set_pressed_no_signal(is_nsfw_enabled)
+		
+		# Conectamos la señal de "toggled" (cuando se activa o desactiva)
+		if not chk_nsfw.toggled.is_connected(_on_nsfw_toggled):
+			chk_nsfw.toggled.connect(_on_nsfw_toggled)
+
+func _on_nsfw_toggled(button_pressed: bool):
+	AudioManager.play_ui_sfx()
+	
+	# Guardamos el estado en nuestro diccionario global
+	Preferences.set_setting("game", "nsfw_enabled", button_pressed)
+	Preferences.save_to_disk()
+	
+	print("iOplazxEssence: Modo NSFW (Sin censura) = ", button_pressed)
+
 func _notification(what):
 	if what == NOTIFICATION_TRANSLATION_CHANGED:
 		# Al llamar a esta función, los 4 elementos (Dificultad, Autosave, Style y Slider)
 		# se redibujarán con el nuevo idioma sin perder la posición del usuario.
 		_setup_game_tab()
+	if what == NOTIFICATION_TRANSLATION_CHANGED:
+		_setup_game_tab()
+		_setup_nsfw_toggle()
 
 func _on_difficulty_selected(idx):
 	Preferences.set_setting("game", "difficulty", idx)
-	Preferences.save_to_disk()
+	_pending_changes = true
 	AudioManager.play_ui_sfx()
 
 func _on_autosave_selected(idx):
 	Preferences.set_setting("game", "autosave_interval", idx)
-	Preferences.save_to_disk()
+	_pending_changes = true
 	AudioManager.play_ui_sfx()
 
 func _on_save_style_selected(idx):
 	Preferences.set_setting("game", "save_style", idx)
-	Preferences.save_to_disk()
+	_pending_changes = true
 	AudioManager.play_ui_sfx()
 
 func _on_text_speed_changed(val):
 	Preferences.set_setting("game", "text_speed", val)
-	Preferences.save_to_disk()
+	_pending_changes = true
 	AudioManager.play_ui_sfx()
+	
+func _on_apply_pressed():
+	Preferences.save_to_disk()
+	_pending_changes = false # Bajamos la bandera
+	AudioManager.play_ui_sfx()
+	print("iOplazxEssence: Cambios de juego guardados.")
+
+# La función estandarizada para el controlador
+func has_unsaved_changes() -> bool:
+	return _pending_changes

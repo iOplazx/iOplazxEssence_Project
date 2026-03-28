@@ -60,7 +60,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/icon_separation = 6
 theme_override_constants/icon_max_width = 32
-current_tab = 2
+current_tab = 0
 tab_0/title = "SETTINGS_GAME"
 tab_0/icon = ExtResource("2_jvark")
 tab_1/title = "SETTINGS_VIDEO"
@@ -70,14 +70,15 @@ tab_2/icon = ExtResource("4_222oe")
 tab_3/title = "SETTINGS_LANGUAGE"
 tab_3/icon = ExtResource("5_4tiqc")
 
-[node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851 node_paths=PackedStringArray("dpd_difficulty", "slider_text_speed", "dpd_autosave", "dpd_save_style")]
-visible = false
+[node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851 node_paths=PackedStringArray("dpd_difficulty", "chk_nsfw", "slider_text_speed", "dpd_autosave", "dpd_save_style", "btn_apply") groups=["settings_tabs"]]
 layout_mode = 2
 script = ExtResource("2_i07iq")
 dpd_difficulty = NodePath("mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
+chk_nsfw = NodePath("mcBodyGame/VBoxContainer/chkbNFSW")
 slider_text_speed = NodePath("mcBodyGame/VBoxContainer/SliderTextSpeed")
 dpd_autosave = NodePath("mcBodyGame/VBoxContainer/RowAutosave/dpdAutosave")
 dpd_save_style = NodePath("mcBodyGame/VBoxContainer/RowSaveStyle/dpdSaveStyle")
+btn_apply = NodePath("mcBotonSaveChange/btnSaveChangeGame")
 metadata/_tab_index = 0
 metadata/_tab_name = "SETTINGS_GAME"
 
@@ -104,6 +105,11 @@ text = "SETTINGS_GAME_DIFFICULTY"
 [node name="dpdDifficulty" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowDifficulty" unique_id=466822050]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
+
+[node name="chkbNFSW" type="CheckButton" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=2101603264]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "SETTINGS_GAME_CHECK_NSFW"
 
 [node name="SliderTextSpeed" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=1831517089 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
@@ -142,11 +148,23 @@ text = "SETTINGS_GAME_SAVE_STYLE"
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
-[node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976 node_paths=PackedStringArray("dpd_mode")]
+[node name="mcBotonSaveChange" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgGame" unique_id=1262097692]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="btnSaveChangeGame" type="Button" parent="ContenedorPrincipal/TabContainer/mgGame/mcBotonSaveChange" unique_id=2059383208]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "SETTINGS_GAME_SAVE_CHANGE"
+
+[node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976 node_paths=PackedStringArray("dpd_mode", "btn_apply") groups=["settings_tabs"]]
 visible = false
 layout_mode = 2
 script = ExtResource("4_jvark")
 dpd_mode = NodePath("mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow/dpdMode")
+btn_apply = NodePath("mcBodyVideo/mcBotonSaveChange/btnSaveChangeVideo")
 metadata/_tab_index = 1
 metadata/_tab_name = "SETTINGS_VIDEO"
 
@@ -179,7 +197,19 @@ text = "SETTINGS_DISPLAY_MODE"
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
+[node name="mcBotonSaveChange" type="MarginContainer" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo" unique_id=1694712849]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="btnSaveChangeVideo" type="Button" parent="ContenedorPrincipal/TabContainer/mgVideo/mcBodyVideo/mcBotonSaveChange" unique_id=520428770]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "SETTINGS_VIDEO_SAVE_CHANGE"
+
 [node name="mgAudio" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=142263258 node_paths=PackedStringArray("row_master", "row_music", "row_sfx", "row_ui", "row_voices", "chk_mute_focus", "dpd_theme", "btn_preview", "preview_player")]
+visible = false
 layout_mode = 2
 script = ExtResource("5_ih3y7")
 row_master = NodePath("mcBodyAudio/VBoxContainer/SliderMasterVolumen")
