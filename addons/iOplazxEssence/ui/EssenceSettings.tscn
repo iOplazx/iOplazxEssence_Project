@@ -4,10 +4,19 @@
 [ext_resource type="Script" uid="uid://kbgigc8bou1y" path="res://addons/iOplazxEssence/core/controllers/EssenceSettingsController.gd" id="1_kht5n"]
 [ext_resource type="PackedScene" uid="uid://b20lw8s6c0q6u" path="res://addons/iOplazxEssence/ui/EssenceLanguageCard.tscn" id="2_8ot2k"]
 [ext_resource type="Script" uid="uid://dg2pfy1nu8r2q" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabGame.gd" id="2_i07iq"]
+[ext_resource type="Texture2D" uid="uid://bbs1258esj7ba" path="res://addons/iOplazxEssence/resources/images/icon_game.png" id="2_jvark"]
 [ext_resource type="PackedScene" uid="uid://eoxnxw3ulco1" path="res://addons/iOplazxEssence/ui/EssenceInfoPanel.tscn" id="3_2v3th"]
+[ext_resource type="Texture2D" uid="uid://7qmhi53qgyi7" path="res://addons/iOplazxEssence/resources/images/icon_video.png" id="3_15fyf"]
+[ext_resource type="Texture2D" uid="uid://cycsd84p84eya" path="res://addons/iOplazxEssence/resources/images/icon_audio.png" id="4_222oe"]
 [ext_resource type="Script" uid="uid://dnf4dfoua0qlm" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabVideo.gd" id="4_jvark"]
+[ext_resource type="Texture2D" uid="uid://c78tjtch3chfj" path="res://addons/iOplazxEssence/resources/images/icon_language.png" id="5_4tiqc"]
 [ext_resource type="Script" uid="uid://dlj1lvkwmnm7d" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabAudio.gd" id="5_ih3y7"]
 [ext_resource type="Script" uid="uid://cafo3qn5a1ocy" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabLanguage.gd" id="6_f5i2u"]
+[ext_resource type="Texture2D" uid="uid://cr8greyke17um" path="res://addons/iOplazxEssence/resources/images/icon_volume_master_music.png" id="10_11hq8"]
+[ext_resource type="Texture2D" uid="uid://ct8tp7w56bq1x" path="res://addons/iOplazxEssence/resources/images/icon_volume_bg_music.png" id="11_o0d8h"]
+[ext_resource type="Texture2D" uid="uid://bav1i2yfbfom8" path="res://addons/iOplazxEssence/resources/images/icon_volume_sfx_1.png" id="12_15fyf"]
+[ext_resource type="Texture2D" uid="uid://dar5eu3157ogs" path="res://addons/iOplazxEssence/resources/images/icon_volume_UI.png" id="13_dm8yb"]
+[ext_resource type="Texture2D" uid="uid://cuymwe61fbn33" path="res://addons/iOplazxEssence/resources/images/icon_volume_voices.png" id="14_8ak5c"]
 
 [node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return")]
 layout_mode = 3
@@ -49,11 +58,17 @@ text = "SETTINGS_TITLE"
 [node name="TabContainer" type="TabContainer" parent="ContenedorPrincipal" unique_id=591929740]
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 1
+theme_override_constants/icon_separation = 6
+theme_override_constants/icon_max_width = 32
+current_tab = 2
 tab_0/title = "SETTINGS_GAME"
+tab_0/icon = ExtResource("2_jvark")
 tab_1/title = "SETTINGS_VIDEO"
+tab_1/icon = ExtResource("3_15fyf")
 tab_2/title = "SETTINGS_AUDIO"
+tab_2/icon = ExtResource("4_222oe")
 tab_3/title = "SETTINGS_LANGUAGE"
+tab_3/icon = ExtResource("5_4tiqc")
 
 [node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851 node_paths=PackedStringArray("dpd_difficulty", "slider_text_speed", "dpd_autosave", "dpd_save_style")]
 visible = false
@@ -128,6 +143,7 @@ custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
 [node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976 node_paths=PackedStringArray("dpd_mode")]
+visible = false
 layout_mode = 2
 script = ExtResource("4_jvark")
 dpd_mode = NodePath("mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow/dpdMode")
@@ -164,7 +180,6 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
 [node name="mgAudio" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=142263258 node_paths=PackedStringArray("row_master", "row_music", "row_sfx", "row_ui", "row_voices", "chk_mute_focus", "dpd_theme", "btn_preview", "preview_player")]
-visible = false
 layout_mode = 2
 script = ExtResource("5_ih3y7")
 row_master = NodePath("mcBodyAudio/VBoxContainer/SliderMasterVolumen")
@@ -191,26 +206,31 @@ layout_mode = 2
 
 [node name="SliderMasterVolumen" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=1890518606 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
+icon_texture = ExtResource("10_11hq8")
 label_text = "SETTINGS_AUDIO_VOLUME_MASTER"
 show_mute_button = true
 
 [node name="SliderBackgroundMusic" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=68071660 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
+icon_texture = ExtResource("11_o0d8h")
 label_text = "SETTINGS_AUDIO_BACKGROUND_MUSIC"
 show_mute_button = true
 
 [node name="SliderSFXVolume" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=1446374806 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
+icon_texture = ExtResource("12_15fyf")
 label_text = "SETTINGS_AUDIO_VOLUME_SFX"
 show_mute_button = true
 
 [node name="SliderUIVolume" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=1759862518 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
+icon_texture = ExtResource("13_dm8yb")
 label_text = "SETTINGS_AUDIO_VOLUME_UI"
 show_mute_button = true
 
 [node name="SliderVoicesVolume" parent="ContenedorPrincipal/TabContainer/mgAudio/mcBodyAudio/VBoxContainer" unique_id=242912620 instance=ExtResource("1_kd5ej")]
 layout_mode = 2
+icon_texture = ExtResource("14_8ak5c")
 label_text = "SETTINGS_AUDIO_VOLUME_VOICES"
 show_mute_button = true
 
