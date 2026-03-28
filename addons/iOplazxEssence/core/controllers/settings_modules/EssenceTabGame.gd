@@ -81,19 +81,13 @@ func _setup_nsfw_toggle():
 			chk_nsfw.toggled.connect(_on_nsfw_toggled)
 
 func _on_nsfw_toggled(button_pressed: bool):
-	AudioManager.play_ui_sfx()
-	
-	# Guardamos el estado en nuestro diccionario global
 	Preferences.set_setting("game", "nsfw_enabled", button_pressed)
-	Preferences.save_to_disk()
+	_pending_changes = true # Levantamos la bandera sucia
+	AudioManager.play_ui_sfx()
 	
 	print("iOplazxEssence: Modo NSFW (Sin censura) = ", button_pressed)
 
 func _notification(what):
-	if what == NOTIFICATION_TRANSLATION_CHANGED:
-		# Al llamar a esta función, los 4 elementos (Dificultad, Autosave, Style y Slider)
-		# se redibujarán con el nuevo idioma sin perder la posición del usuario.
-		_setup_game_tab()
 	if what == NOTIFICATION_TRANSLATION_CHANGED:
 		_setup_game_tab()
 		_setup_nsfw_toggle()
