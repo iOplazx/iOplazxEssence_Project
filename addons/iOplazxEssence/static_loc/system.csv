@@ -49,3 +49,7 @@ CREDITS_FRAMEWORK_TITLE,Framework Details,Detalles del Framework
 CREDITS_DEVELOPED_WITH,Developed with,Desarrollado con
 CREDITS_VERSION,Version,Versión
 CREDITS_UPDATED,Updated,Actualizado
+MENU_YES,Yes,Sí
+MENU_NO,No,No
+APP_QUIT_TITLE,Quit Game,Salir del Juego
+APP_QUIT_MSG,Are you sure you want to quit?,¿Estás seguro de que quieres salir?

@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://0r4e2ko046sj"]
+
+[ext_resource type="Script" uid="uid://bwp6c7ueew4o2" path="res://addons/iOplazxEssence/scriptsItems/EssenceConfirmBox.gd" id="1_u2d13"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rur1u"]
+bg_color = Color(0.3106171, 0.31061712, 0.310617, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_yg015"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_l8dw3"]
+
+[node name="EssenceConfirmBox" type="ColorRect" unique_id=467826887 node_paths=PackedStringArray("lbl_title", "lbl_message", "btn_yes", "btn_no")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+script = ExtResource("1_u2d13")
+lbl_title = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/lbl_title")
+lbl_message = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/lbl_message")
+btn_yes = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/btn_yes")
+btn_no = NodePath("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/btn_no")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1847478982]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1019992203]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_rur1u")
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=1334930638]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=890451884]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="lbl_title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=259304568]
+layout_mode = 2
+text = "lbl_title"
+label_settings = SubResource("LabelSettings_yg015")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=582295846]
+layout_mode = 2
+
+[node name="lbl_message" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=915156649]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+text = "lbl_message"
+label_settings = SubResource("LabelSettings_l8dw3")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=20970373]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="btn_yes" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1948114897]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "MENU_YES"
+
+[node name="btn_no" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=119859987]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "MENU_NO"

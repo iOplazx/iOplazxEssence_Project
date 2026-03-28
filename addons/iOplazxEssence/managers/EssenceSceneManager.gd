@@ -5,6 +5,9 @@ var _history: Array[String] = []
 var _config: EssenceRouteConfig
 
 func _ready():
+	# 1. Desactivamos el cierre automático de la ventana (para atrapar la "X")
+	get_tree().set_auto_accept_quit(false)
+	
 	# El framework busca automáticamente la configuración del usuario en _static/
 	var config_path = "res://_static/RouteConfig.tres"
 	if ResourceLoader.exists(config_path):
@@ -81,3 +84,33 @@ func _verificar_config() -> bool:
 		push_error("iOplazxEssence: No se puede navegar porque RouteConfig.tres no está cargado.")
 		return false
 	return true
+
+# ==========================================
+# GESTIÓN DE SALIDA DEL JUEGO
+# ==========================================
+
+func request_quit():
+	# Evitamos abrir la caja 2 veces si el usuario hace spam de clics
+	if get_tree().root.has_node("EssenceConfirmBox"): 
+		return
+	
+	# Instanciamos la caja genérica usando tu ruta de Constants
+	var box = load(EssencePaths.PATH_UI + "EssenceConfirmBox.tscn").instantiate()
+	box.name = "EssenceConfirmBox"
+	
+	# Lo añadimos al 'root' para que esté por encima de todo
+	get_tree().root.add_child(box) 
+	
+	# Configuramos los textos
+	box.setup("APP_QUIT_TITLE", "APP_QUIT_MSG", "MENU_YES", "MENU_NO")
+	
+	# Escuchamos la decisión del jugador
+	box.on_choice.connect(func(accepted):
+		if accepted:
+			print("iOplazxEssence: Cerrando el motor...")
+			get_tree().quit()
+	)
+
+func _notification(what):
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		request_quit()

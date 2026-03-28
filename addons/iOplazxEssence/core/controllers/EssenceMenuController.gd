@@ -127,8 +127,7 @@ func _on_credits_pressed():
 	SceneManager.goto_credits()
 
 func _on_exit_pressed():
-	print("Cerrando motor desde el menú...")
-	get_tree().quit()
+	SceneManager.request_quit()
 	
 # ==========================================
 # EFECTOS VISUALES (Usando nuestra biblioteca global)
