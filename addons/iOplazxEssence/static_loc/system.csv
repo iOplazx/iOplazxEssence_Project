@@ -53,3 +53,5 @@ MENU_YES,Yes,Sí
 MENU_NO,No,No
 APP_QUIT_TITLE,Quit Game,Salir del Juego
 APP_QUIT_MSG,Are you sure you want to quit?,¿Estás seguro de que quieres salir?
+LANG_REIMPORT_TITLE,Reimport Languages,Reimportar Idiomas
+LANG_REIMPORT_MSG,Are you sure you want to scan and reload all language files?,¿Estás seguro de que deseas escanear y recargar todos los archivos de idioma?

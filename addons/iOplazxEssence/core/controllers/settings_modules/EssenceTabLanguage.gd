@@ -41,7 +41,27 @@ func _on_info(data):
 	if p.has_method("setup"): p.setup(data)
 
 func _on_reimport():
+	# Reproducimos el sonido del botón inicial
 	AudioManager.play_ui_sfx()
-	LanguageManager.scan_all_languages()
-	LanguageManager.inject_translations()
-	_populate()
+	
+	# Evitamos abrir la caja 2 veces si el usuario hace doble clic rápido
+	if get_tree().root.has_node("EssenceConfirmBox"): 
+		return
+		
+	# Instanciamos la caja genérica
+	var box = load(EssencePaths.PATH_UI + "EssenceConfirmBox.tscn").instantiate()
+	box.name = "EssenceConfirmBox"
+	get_tree().root.add_child(box)
+	
+	# Le pasamos las claves de traducción específicas para esta acción
+	box.setup("LANG_REIMPORT_TITLE", "LANG_REIMPORT_MSG", "MENU_YES", "MENU_NO")
+	
+	# Escuchamos la respuesta con una función lambda
+	box.on_choice.connect(func(accepted):
+		if accepted:
+			print("iOplazxEssence: Reimportando idiomas...")
+			# Aquí va tu lógica original que solo se ejecuta si dice que "Sí"
+			LanguageManager.scan_all_languages()
+			LanguageManager.inject_translations()
+			_populate()
+	)
