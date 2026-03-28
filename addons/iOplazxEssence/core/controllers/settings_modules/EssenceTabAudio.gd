@@ -39,7 +39,7 @@ func _setup_audio_tab():
 	if dpd_theme:
 		dpd_theme.clear()
 		dpd_theme.add_item("Sci-Fi (Space)")
-		dpd_theme.add_item("Burbuja (Bubble)")
+		dpd_theme.add_item("Bubble Effect")
 		dpd_theme.add_item("Silencio")
 		dpd_theme.item_selected.connect(_on_theme_selected)
 		

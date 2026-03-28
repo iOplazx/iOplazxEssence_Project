@@ -49,13 +49,14 @@ text = "SETTINGS_TITLE"
 [node name="TabContainer" type="TabContainer" parent="ContenedorPrincipal" unique_id=591929740]
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 0
+current_tab = 1
 tab_0/title = "SETTINGS_GAME"
 tab_1/title = "SETTINGS_VIDEO"
 tab_2/title = "SETTINGS_AUDIO"
 tab_3/title = "SETTINGS_LANGUAGE"
 
 [node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851 node_paths=PackedStringArray("dpd_difficulty", "slider_text_speed", "dpd_autosave", "dpd_save_style")]
+visible = false
 layout_mode = 2
 script = ExtResource("2_i07iq")
 dpd_difficulty = NodePath("mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
@@ -127,7 +128,6 @@ custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
 [node name="mgVideo" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=441801976 node_paths=PackedStringArray("dpd_mode")]
-visible = false
 layout_mode = 2
 script = ExtResource("4_jvark")
 dpd_mode = NodePath("mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow/dpdMode")

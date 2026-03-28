@@ -7,15 +7,22 @@ extends MarginContainer
 func _ready():
 	_setup_video_tab()
 	_sync_video()
+	
+func _notification(what):
+	if what == NOTIFICATION_TRANSLATION_CHANGED:
+		_setup_video_tab()
+		_sync_video()
 
 func _setup_video_tab():
 	if dpd_mode:
-		dpd_mode.clear()
-		# Usamos tr() por si luego quieres traducir "Windowed" y "Fullscreen"
-		dpd_mode.add_item(tr("VIDEO_WINDOWED"), 0)
-		dpd_mode.add_item(tr("VIDEO_FULLSCREEN"), 1)
+		var current_selection = dpd_mode.selected # Guardamos qué tenía elegido el usuario
+		dpd_mode.clear() 
 		
-		dpd_mode.item_selected.connect(_on_window_mode_selected)
+		# Usamos las claves exactas de tu CSV
+		dpd_mode.add_item(tr("SETTINGS_VIDEO_WINDOWED"), 0)
+		dpd_mode.add_item(tr("SETTINGS_VIDEO_FULLSCREEN"), 1)
+		
+		dpd_mode.select(current_selection) # Restauramos la selección tras el cambio
 
 func _sync_video():
 	if dpd_mode:
