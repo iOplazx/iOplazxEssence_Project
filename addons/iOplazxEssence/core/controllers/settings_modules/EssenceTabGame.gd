@@ -6,6 +6,7 @@ extends MarginContainer
 @export var slider_text_speed: EssenceRowSlider 
 @export var dpd_autosave: OptionButton
 @export var dpd_save_style: OptionButton
+@export var dpd_save_location: OptionButton
 
 var _pending_changes: bool = false
 @export var btn_apply: Button 
@@ -36,6 +37,9 @@ func _connect_signals():
 		
 	if chk_nsfw and not chk_nsfw.toggled.is_connected(_on_nsfw_toggled):
 		chk_nsfw.toggled.connect(_on_nsfw_toggled)
+		
+	if dpd_save_location and not dpd_save_location.item_selected.is_connected(_on_save_location_selected):
+		dpd_save_location.item_selected.connect(_on_save_location_selected)
 
 # ==========================================
 # 2. ACTUALIZACIÓN DE TEXTOS
@@ -61,6 +65,11 @@ func _setup_texts():
 		
 	if btn_apply:
 		btn_apply.text = tr("SETTINGS_VIDEO_SAVE_CHANGE") # Reutilizamos la llave de aplicar
+		
+	if dpd_save_location:
+		dpd_save_location.clear()
+		dpd_save_location.add_item(tr("SETTINGS_SAVE_LOC_GLOBAL"), 0)
+		dpd_save_location.add_item(tr("SETTINGS_SAVE_LOC_VERSION"), 1)
 
 # ==========================================
 # 3. SINCRONIZACIÓN VISUAL
@@ -76,6 +85,9 @@ func _sync_values():
 		
 	if slider_text_speed and slider_text_speed.slider:
 		slider_text_speed.slider.value = Preferences.get_setting("game", "text_speed", 1.0)
+	
+	if dpd_save_location:
+		dpd_save_location.select(Preferences.get_setting("game", "save_location", 0))
 
 # ==========================================
 # REACCIÓN A EVENTOS GLOBALES
@@ -114,6 +126,11 @@ func _on_nsfw_toggled(button_pressed: bool):
 	_pending_changes = true 
 	AudioManager.play_ui_sfx()
 	print("iOplazxEssence: Modo NSFW (Sin censura) = ", button_pressed)
+	
+func _on_save_location_selected(idx):
+	Preferences.set_setting("game", "save_location", idx)
+	_pending_changes = true
+	AudioManager.play_ui_sfx()
 
 func _on_apply_pressed():
 	Preferences.save_to_disk()

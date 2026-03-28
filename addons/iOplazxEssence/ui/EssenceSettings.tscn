@@ -71,7 +71,7 @@ tab_2/icon = ExtResource("4_222oe")
 tab_3/title = "SETTINGS_LANGUAGE"
 tab_3/icon = ExtResource("5_4tiqc")
 
-[node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851 node_paths=PackedStringArray("dpd_difficulty", "chk_nsfw", "slider_text_speed", "dpd_autosave", "dpd_save_style", "btn_apply") groups=["settings_tabs"]]
+[node name="mgGame" type="MarginContainer" parent="ContenedorPrincipal/TabContainer" unique_id=2137221851 node_paths=PackedStringArray("dpd_difficulty", "chk_nsfw", "slider_text_speed", "dpd_autosave", "dpd_save_style", "dpd_save_location", "btn_apply") groups=["settings_tabs"]]
 layout_mode = 2
 script = ExtResource("2_i07iq")
 dpd_difficulty = NodePath("mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
@@ -79,6 +79,7 @@ chk_nsfw = NodePath("mcBodyGame/VBoxContainer/chkbNFSW")
 slider_text_speed = NodePath("mcBodyGame/VBoxContainer/SliderTextSpeed")
 dpd_autosave = NodePath("mcBodyGame/VBoxContainer/RowAutosave/dpdAutosave")
 dpd_save_style = NodePath("mcBodyGame/VBoxContainer/RowSaveStyle/dpdSaveStyle")
+dpd_save_location = NodePath("mcBodyGame/VBoxContainer/RowSaveLocation/dpdSaveLocation")
 btn_apply = NodePath("mcBotonSaveChange/btnSaveChangeGame")
 metadata/_tab_index = 0
 metadata/_tab_name = "SETTINGS_GAME"
@@ -146,6 +147,19 @@ layout_mode = 2
 text = "SETTINGS_GAME_SAVE_STYLE"
 
 [node name="dpdSaveStyle" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowSaveStyle" unique_id=1749316504]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="RowSaveLocation" type="HBoxContainer" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer" unique_id=1335062818]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowSaveLocation" unique_id=1939642990]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_SAVE_STYLE"
+
+[node name="dpdSaveLocation" type="OptionButton" parent="ContenedorPrincipal/TabContainer/mgGame/mcBodyGame/VBoxContainer/RowSaveLocation" unique_id=1893543353]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
