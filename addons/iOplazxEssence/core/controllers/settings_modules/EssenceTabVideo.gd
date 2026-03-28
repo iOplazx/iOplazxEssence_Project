@@ -40,7 +40,7 @@ func _setup_video_tab():
 func _sync_video():
 	if dpd_mode:
 		dpd_mode.selected = DisplayManager.current_window_mode
-		_unsaved_mode = dpd_mode.selected # Sincronizamos la variable temporal
+		_unsaved_mode = dpd_mode.selected
 
 func _on_mode_changed(index: int):
 	# Solo guardamos la intención, NO aplicamos el cambio aún

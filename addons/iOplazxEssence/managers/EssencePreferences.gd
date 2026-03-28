@@ -2,6 +2,7 @@ extends Node
 
 const SETTINGS_FILE = "user://essence_settings.cfg"
 const DEFAULT_MOLD = "res://_static/default_settings.cfg"
+signal settings_restored
 
 var _config: ConfigFile = ConfigFile.new()
 var _is_loaded: bool = false 
@@ -77,3 +78,6 @@ func restore_defaults():
 	_copy_mold_to_user() # Planchamos el archivo del usuario con el molde
 	load_from_disk()     # Refrescamos la RAM
 	print("Essence: Valores por defecto aplicados exitosamente.")
+	
+	# --- AGREGAR ESTA LÍNEA AQUÍ ABAJO ---
+	settings_restored.emit() # Avisamos a todos los managers

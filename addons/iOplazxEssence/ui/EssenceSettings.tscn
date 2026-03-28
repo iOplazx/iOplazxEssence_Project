@@ -18,7 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://dar5eu3157ogs" path="res://addons/iOplazxEssence/resources/images/icon_volume_UI.png" id="13_dm8yb"]
 [ext_resource type="Texture2D" uid="uid://cuymwe61fbn33" path="res://addons/iOplazxEssence/resources/images/icon_volume_voices.png" id="14_8ak5c"]
 
-[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return")]
+[node name="EssenceSettings" type="Control" unique_id=1910327270 node_paths=PackedStringArray("btn_return", "btn_restore")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,7 +26,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kht5n")
-btn_return = NodePath("ContenedorPrincipal/mcButton/btnReturn")
+btn_return = NodePath("ContenedorPrincipal/mcButton/HBoxContainer/btnReturn")
+btn_restore = NodePath("ContenedorPrincipal/mcButton/HBoxContainer/btnRestore")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=406427952]
 layout_mode = 1
@@ -355,9 +356,20 @@ layout_mode = 2
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_bottom = 6
 
-[node name="btnReturn" type="Button" parent="ContenedorPrincipal/mcButton" unique_id=1419415243]
+[node name="HBoxContainer" type="HBoxContainer" parent="ContenedorPrincipal/mcButton" unique_id=642052255]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="btnReturn" type="Button" parent="ContenedorPrincipal/mcButton/HBoxContainer" unique_id=1419415243]
 custom_minimum_size = Vector2(200, 20)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "SETTINGS_RETURN"
+
+[node name="btnRestore" type="Button" parent="ContenedorPrincipal/mcButton/HBoxContainer" unique_id=872062028]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "SETTINGS_RESTORE_TITLE"

@@ -4,6 +4,14 @@ var current_window_mode: int = 0
 
 func _ready():
 	load_video_settings()
+	
+	# --- NUEVO: Conectamos la oreja del DisplayManager ---
+	Preferences.settings_restored.connect(_on_settings_restored)
+
+# --- NUEVO: La función que reacciona al grito de Preferences ---
+func _on_settings_restored():
+	print("DisplayManager: Ajustes restaurados. Aplicando resolución de fábrica...")
+	load_video_settings() # Re-ejecuta la carga para volver a Fullscreen
 
 ## Cambia el modo y guarda en la RAM/Disco
 func set_window_mode(mode_index: int):

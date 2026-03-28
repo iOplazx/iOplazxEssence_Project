@@ -60,3 +60,5 @@ SETTINGS_VIDEO_SAVE_CHANGE,Apply Changes,Aplicar Cambios
 SETTINGS_GAME_SAVE_CHANGE,Apply Changes,Aplicar Cambios
 SETTINGS_DISCARD_TITLE,Unsaved Changes,Cambios sin guardar
 SETTINGS_DISCARD_MSG,Are you sure you want to exit without applying changes?,¿Estás seguro de que deseas salir sin aplicar los cambios?
+SETTINGS_RESTORE_TITLE,Restore Defaults,Restaurar Predeterminados
+SETTINGS_RESTORE_MSG,Are you sure you want to restore all settings to their default values?,¿Estás seguro de que deseas restaurar todas las configuraciones a sus valores de fábrica?

@@ -36,8 +36,8 @@ func _ready():
 	ui_player.bus = "UI"
 	add_child(ui_player)
 	
-	# Leemos los ajustes usando el nuevo sistema centralizado
 	load_audio_settings()
+	Preferences.settings_restored.connect(_on_settings_restored)
 
 # ==========================================
 # MÉTODOS PÚBLICOS PARA EL USUARIO
@@ -103,6 +103,11 @@ func play_ui_sfx(stream: AudioStream = null, pitch: float = 1.0):
 func _cambiar_pista(stream: AudioStream):
 	music_player.stream = stream
 	music_player.play()
+	
+# --- NUEVO: La función que reacciona al grito de Preferences ---
+func _on_settings_restored():
+	print("AudioManager: Ajustes restaurados. Recalculando volúmenes...")
+	load_audio_settings() # Re-ejecutamos tu propia función para actualizar los buses
 
 # ==========================================
 # MÉTODOS DE CACHÉ
