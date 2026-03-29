@@ -1,84 +1,142 @@
 extends Node
 # Singleton: EssenceSceneManager (Autoload)
 
+enum TransitionType { INSTANT, FADE_BLACK, FADE_WHITE }
+
 var _history: Array[String] = []
 var _config: EssenceRouteConfig
 
+# Elementos visuales para la transición
+var _curtain_layer: CanvasLayer
+var _curtain: ColorRect
+var _is_transitioning: bool = false
+
 func _ready():
-	# 1. Desactivamos el cierre automático de la ventana (para atrapar la "X")
+	# 1. Desactivamos el cierre automático de la ventana
 	get_tree().set_auto_accept_quit(false)
 	
-	# El framework busca automáticamente la configuración del usuario en _static/
+	# 2. Creamos el "Telón" visual para las transiciones
+	_setup_curtain()
+	
+	# 3. Cargamos la configuración de rutas
 	var config_path = "res://_static/RouteConfig.tres"
 	if ResourceLoader.exists(config_path):
 		_config = load(config_path) as EssenceRouteConfig
 		print("iOplazxEssence: RouteConfig cargado exitosamente.")
 	else:
-		# Aviso en rojo en la consola si el archivo no existe
 		push_error("iOplazxEssence: Falta el archivo RouteConfig.tres en res://_static/")
+
+func _setup_curtain():
+	_curtain_layer = CanvasLayer.new()
+	_curtain_layer.layer = 128 # Capa súper alta para tapar menús y UI
+	
+	_curtain = ColorRect.new()
+	_curtain.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_curtain.color = Color(0, 0, 0, 0) # Totalmente transparente al inicio
+	_curtain.mouse_filter = Control.MOUSE_FILTER_IGNORE # Deja pasar los clics
+	
+	_curtain_layer.add_child(_curtain)
+	add_child(_curtain_layer)
 
 # ==========================================
 # MÉTODOS DE VIAJE DIRECTO (Rutas Base)
 # ==========================================
+# Todos tienen FADE_BLACK por defecto, pero puedes pasarle INSTANT si quieres un salto brusco
 
-func goto_main_menu(): 
-	if _verificar_config(): _navigate(_config.main_menu_scene)
+func goto_main_menu(transition: TransitionType = TransitionType.FADE_BLACK): 
+	if _verificar_config(): _navigate(_config.main_menu_scene, transition)
 
-func goto_new_game(): 
+func goto_new_game(transition: TransitionType = TransitionType.FADE_BLACK): 
 	if _verificar_config():
 		clear_history() 
-		_navigate(_config.new_game_scene)
-func goto_continue_game(): 
-	if _verificar_config(): _navigate(_config.continue_game_scene)
+		_navigate(_config.new_game_scene, transition)
 		
-func goto_load_game(): 
-	if _verificar_config(): _navigate(_config.load_game_scene)
+func goto_continue_game(transition: TransitionType = TransitionType.FADE_BLACK): 
+	if _verificar_config(): _navigate(_config.continue_game_scene, transition)
+		
+func goto_load_game(transition: TransitionType = TransitionType.FADE_BLACK): 
+	if _verificar_config(): _navigate(_config.load_game_scene, transition)
 
-func goto_settings(): 
-	if _verificar_config(): _navigate(_config.settings_scene)
+func goto_settings(transition: TransitionType = TransitionType.FADE_BLACK): 
+	if _verificar_config(): _navigate(_config.settings_scene, transition)
 
-func goto_credits(): 
-	if _verificar_config(): _navigate(_config.credits_scene)
+func goto_credits(transition: TransitionType = TransitionType.FADE_BLACK): 
+	if _verificar_config(): _navigate(_config.credits_scene, transition)
 
-# ==========================================
-# MÉTODOS DE VIAJE CUSTOM (Rutas del Usuario)
-# ==========================================
-
-func goto_custom(route_name: String):
+func goto_custom(route_name: String, transition: TransitionType = TransitionType.FADE_BLACK):
 	if _verificar_config():
 		if _config.custom_routes.has(route_name):
-			_navigate(_config.custom_routes[route_name])
+			_navigate(_config.custom_routes[route_name], transition)
 		else:
-			push_error("iOplazxEssence: La ruta custom '" + route_name + "' no existe en RouteConfig.tres")
+			push_error("iOplazxEssence: La ruta custom '" + route_name + "' no existe.")
 
 # ==========================================
-# MOTOR INTERNO DE NAVEGACIÓN
+# MOTOR INTERNO DE NAVEGACIÓN Y ANIMACIÓN
 # ==========================================
 
-func _navigate(path: String) -> void:
+func _navigate(path: String, transition: TransitionType) -> void:
 	if path == "" or not ResourceLoader.exists(path):
 		push_error("iOplazxEssence: Ruta inválida o vacía: " + str(path))
+		return
+		
+	if _is_transitioning:
+		print("iOplazxEssence: Ya hay una transición en curso. Ignorando...")
 		return
 		
 	var current_scene_path = get_tree().current_scene.scene_file_path
 	if current_scene_path:
 		_history.append(current_scene_path)
 		
+	if transition == TransitionType.INSTANT:
+		print("Viajando a -> ", path)
+		get_tree().change_scene_to_file(path)
+	else:
+		_perform_fade_transition(path, transition)
+
+func _perform_fade_transition(path: String, transition: TransitionType):
+	_is_transitioning = true
+	_curtain.mouse_filter = Control.MOUSE_FILTER_STOP # Bloqueamos clics durante el viaje
+	
+	# Decidimos el color objetivo (Blanco o Negro)
+	var target_color = Color.BLACK if transition == TransitionType.FADE_BLACK else Color.WHITE
+	_curtain.color = target_color
+	_curtain.color.a = 0.0
+	
+	# 1. Oscurecemos la pantalla
+	var tween = create_tween()
+	tween.tween_property(_curtain, "color:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE)
+	await tween.finished
+	
+	# 2. Cambiamos la escena (el usuario no lo nota porque está todo negro)
 	print("Viajando a -> ", path)
 	get_tree().change_scene_to_file(path)
+	
+	# 3. Volvemos a iluminar la pantalla
+	tween = create_tween()
+	tween.tween_property(_curtain, "color:a", 0.0, 0.4).set_trans(Tween.TRANS_SINE)
+	await tween.finished
+	
+	_curtain.mouse_filter = Control.MOUSE_FILTER_IGNORE # Permitimos clics de nuevo
+	_is_transitioning = false
 
-func go_back() -> void:
+func go_back(transition: TransitionType = TransitionType.FADE_BLACK) -> void:
 	if _history.is_empty(): 
 		print("Historial vacío, no hay a dónde volver.")
 		return
+		
+	if _is_transitioning: return
+		
 	var previous_scene = _history.pop_back()
 	print("Regresando a -> ", previous_scene)
-	get_tree().change_scene_to_file(previous_scene)
+	
+	if transition == TransitionType.INSTANT:
+		get_tree().change_scene_to_file(previous_scene)
+	else:
+		_perform_fade_transition(previous_scene, transition)
 
 func clear_history() -> void:
 	_history.clear()
 
-# Función auxiliar de seguridad
 func _verificar_config() -> bool:
 	if _config == null:
 		push_error("iOplazxEssence: No se puede navegar porque RouteConfig.tres no está cargado.")
@@ -90,33 +148,32 @@ func _verificar_config() -> bool:
 # ==========================================
 
 func request_quit():
-	# Evitamos abrir la caja 2 veces si el usuario hace spam de clics
-	if get_tree().root.has_node("EssenceConfirmBox"): 
+	if get_tree().root.has_node("EssenceConfirmBox") or _is_transitioning: 
 		return
 	
-	# Instanciamos la caja genérica
 	var box = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceConfirmBox.tscn").instantiate()
 	box.name = "EssenceConfirmBox"
-	
-	# Lo añadimos al 'root' para que esté por encima de todo
 	get_tree().root.add_child(box) 
 	
-	# Configuramos los textos
 	box.setup("APP_QUIT_TITLE", "APP_QUIT_MSG", "MENU_YES", "MENU_NO")
 	
-	# Escuchamos la decisión del jugador
 	box.on_choice.connect(func(accepted):
 		if accepted:
-			print("iOplazxEssence: Iniciando apagado de audio...")
-			
-			# 1. (Opcional) Ocultamos la caja de confirmación para que no se quede en pantalla 
-			# mientras esperamos el audio (si es que tu caja no se destruye sola al hacer clic).
+			print("iOplazxEssence: Iniciando secuencia de cierre total...")
 			box.hide() 
 			
-			# 2. Hacemos el fundido a silencio y ESPERAMOS a que termine
+			_is_transitioning = true
+			_curtain.mouse_filter = Control.MOUSE_FILTER_STOP # Bloquear clics
+			_curtain.color = Color.BLACK
+			_curtain.color.a = 0.0
+			
+			# Hacemos el fundido a negro visual al mismo tiempo...
+			var tween = create_tween()
+			tween.tween_property(_curtain, "color:a", 1.0, 1.5).set_trans(Tween.TRANS_SINE)
+			
+			# ... que hacemos el fundido a silencio
 			await AudioManager.fade_out_and_stop(1.5)
 			
-			# 3. La música terminó, ahora sí cerramos todo con elegancia
 			print("iOplazxEssence: Cerrando el motor...")
 			get_tree().quit()
 	)
