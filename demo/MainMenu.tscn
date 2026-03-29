@@ -31,7 +31,7 @@ btn_load = NodePath("panelMenu/ButtonContainer/btnLoad")
 btn_settings = NodePath("panelMenu/ButtonContainer/btnSettings")
 btn_credits = NodePath("panelMenu/ButtonContainer/btnCredits")
 btn_exit = NodePath("panelMenu/ButtonContainer/btnExit")
-first_focus_button = NodePath("panelMenu/ButtonContainer/btnSettings")
+first_focus_button = NodePath("panelMenu/ButtonContainer/btnInit")
 buttons_panel = NodePath("panelMenu/ButtonContainer")
 title_container = NodePath("titleImage")
 

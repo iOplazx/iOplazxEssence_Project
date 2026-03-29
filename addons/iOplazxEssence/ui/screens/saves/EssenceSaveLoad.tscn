@@ -4,87 +4,134 @@
 [ext_resource type="PackedScene" uid="uid://biiqsymbr6bbx" path="res://addons/iOplazxEssence/ui/screens/saves/EssenceSaveSlotClassic.tscn" id="2_0ovsk"]
 [ext_resource type="PackedScene" uid="uid://v6c6fpdc1myv" path="res://addons/iOplazxEssence/ui/screens/saves/EssenceSaveSlotModern.tscn" id="3_g861x"]
 
-[node name="EssenceSaveLoad" type="Control" unique_id=1079801324 node_paths=PackedStringArray("grid_classic", "list_modern", "lbl_title", "box_pagination", "btn_mode_save", "btn_mode_load", "btn_back")]
+[node name="EssenceSaveLoad" type="Control" unique_id=1025781134 node_paths=PackedStringArray("grid_classic", "list_modern", "lbl_title", "box_pagination", "btn_mode_save", "btn_mode_load", "btn_back")]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_u8y72")
-grid_classic = NodePath("MainLayout/ContentArea/ClassicView")
-list_modern = NodePath("MainLayout/ContentArea/ModernView/VBoxSlots")
-lbl_title = NodePath("MainLayout/Header/lblTitle")
-box_pagination = NodePath("MainLayout/Pagination")
-btn_mode_save = NodePath("MainLayout/Header/HBoxContainer/btnModeSave")
-btn_mode_load = NodePath("MainLayout/Header/HBoxContainer/btnModeLoad")
-btn_back = NodePath("MainLayout/Footer/btnBack")
+grid_classic = NodePath("MainMargin/MainLayout/ContentArea/ClassicView")
+list_modern = NodePath("MainMargin/MainLayout/ContentArea/ModernView/VBoxSlots")
+lbl_title = NodePath("MainMargin/MainLayout/Header/lblTitle")
+box_pagination = NodePath("MainMargin/MainLayout/Pagination/PageNumbers")
+btn_mode_save = NodePath("MainMargin/MainLayout/Header/HBoxContainer/btnModeSave")
+btn_mode_load = NodePath("MainMargin/MainLayout/Header/HBoxContainer/btnModeLoad")
+btn_back = NodePath("MainMargin/MainLayout/Footer/btnBack")
 prefab_classic = ExtResource("2_0ovsk")
 prefab_modern = ExtResource("3_g861x")
 
-[node name="Background" type="TextureRect" parent="." unique_id=815202303]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Background" type="ColorRect" parent="." unique_id=754673205]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1885198, 0.17544413, 0.14642361, 0.9411765)
 
-[node name="MainLayout" type="VBoxContainer" parent="." unique_id=802916276]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="MainMargin" type="MarginContainer" parent="." unique_id=1617917420]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
 
-[node name="Header" type="HBoxContainer" parent="MainLayout" unique_id=1143614205]
+[node name="MainLayout" type="VBoxContainer" parent="MainMargin" unique_id=676930137]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Header" type="HBoxContainer" parent="MainMargin/MainLayout" unique_id=822950443]
 layout_mode = 2
 
-[node name="lblTitle" type="Label" parent="MainLayout/Header" unique_id=1568331339]
+[node name="lblTitle" type="Label" parent="MainMargin/MainLayout/Header" unique_id=1706324933]
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "SAVE_MENU_LOADSAVE"
 
-[node name="ControlSpace" type="HSeparator" parent="MainLayout/Header" unique_id=1182766572]
+[node name="ControlSpace" type="Control" parent="MainMargin/MainLayout/Header" unique_id=2128084967]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/Header" unique_id=437986844]
+[node name="HBoxContainer" type="HBoxContainer" parent="MainMargin/MainLayout/Header" unique_id=823172403]
 layout_mode = 2
+theme_override_constants/separation = 10
 
-[node name="btnModeSave" type="Button" parent="MainLayout/Header/HBoxContainer" unique_id=1500103069]
+[node name="btnModeSave" type="Button" parent="MainMargin/MainLayout/Header/HBoxContainer" unique_id=1059221917]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
+text = "SAVE_BTN_SAVE"
 
-[node name="btnModeLoad" type="Button" parent="MainLayout/Header/HBoxContainer" unique_id=735018055]
+[node name="btnModeLoad" type="Button" parent="MainMargin/MainLayout/Header/HBoxContainer" unique_id=768561438]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
+text = "SAVE_BTN_LOAD"
 
-[node name="ContentArea" type="MarginContainer" parent="MainLayout" unique_id=430520501]
+[node name="ContentArea" type="MarginContainer" parent="MainMargin/MainLayout" unique_id=1898580493]
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="ClassicView" type="GridContainer" parent="MainLayout/ContentArea" unique_id=692969935]
+[node name="ClassicView" type="GridContainer" parent="MainMargin/MainLayout/ContentArea" unique_id=2123611460]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 30
+theme_override_constants/v_separation = 30
+columns = 3
 
-[node name="ModernView" type="ScrollContainer" parent="MainLayout/ContentArea" unique_id=988925880]
+[node name="ModernView" type="ScrollContainer" parent="MainMargin/MainLayout/ContentArea" unique_id=1832526522]
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="VBoxSlots" type="VBoxContainer" parent="MainLayout/ContentArea/ModernView" unique_id=1405971627]
+[node name="VBoxSlots" type="VBoxContainer" parent="MainMargin/MainLayout/ContentArea/ModernView" unique_id=2035925162]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 15
 
-[node name="Pagination" type="HBoxContainer" parent="MainLayout" unique_id=353950958]
+[node name="Pagination" type="HBoxContainer" parent="MainMargin/MainLayout" unique_id=10977011]
 layout_mode = 2
+alignment = 1
 
-[node name="btnPrevPage" type="Button" parent="MainLayout/Pagination" unique_id=1928574238]
+[node name="btnPrevPage" type="Button" parent="MainMargin/MainLayout/Pagination" unique_id=512007010]
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "<"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/Pagination" unique_id=1294457095]
+[node name="PageNumbers" type="HBoxContainer" parent="MainMargin/MainLayout/Pagination" unique_id=1391711484]
 layout_mode = 2
+theme_override_constants/separation = 10
 
-[node name="btnNextPage" type="Button" parent="MainLayout/Pagination" unique_id=135246845]
+[node name="btnNextPage" type="Button" parent="MainMargin/MainLayout/Pagination" unique_id=1181810476]
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = ">"
 
-[node name="Footer" type="HBoxContainer" parent="MainLayout" unique_id=580736870]
+[node name="Footer" type="HBoxContainer" parent="MainMargin/MainLayout" unique_id=44858737]
 layout_mode = 2
 
-[node name="btnImport" type="Button" parent="MainLayout/Footer" unique_id=558348099]
+[node name="btnBack" type="Button" parent="MainMargin/MainLayout/Footer" unique_id=1450200632]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "SAVE_BACK"
+
+[node name="ControlSpace" type="Control" parent="MainMargin/MainLayout/Footer" unique_id=717948878]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="btnImport" type="Button" parent="MainMargin/MainLayout/Footer" unique_id=324433743]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "SAVE_IMPORT_GAME"
 
-[node name="btnExport" type="Button" parent="MainLayout/Footer" unique_id=1405802049]
+[node name="btnExport" type="Button" parent="MainMargin/MainLayout/Footer" unique_id=1326015409]
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "SAVE_EXPORT_GAME"
-
-[node name="btnBack" type="Button" parent="MainLayout/Footer" unique_id=1719993742]
-layout_mode = 2
-text = "SAVE_BACK"
