@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://v6c6fpdc1myv"]
+
+[ext_resource type="Script" uid="uid://bagota4jhojsp" path="res://addons/iOplazxEssence/core/controllers/saves_module/EssenceSaveSlotModern.gd" id="1_54c42"]
+
+[node name="SlotModern" type="PanelContainer" unique_id=713909698 node_paths=PackedStringArray("img_screenshot", "lbl_title", "lbl_location", "lbl_date", "btn_save", "btn_load", "btn_delete")]
+script = ExtResource("1_54c42")
+img_screenshot = NodePath("HBox/ScreenshotRect")
+lbl_title = NodePath("HBox/TextDetails/lblSaveTitle")
+lbl_location = NodePath("HBox/TextDetails/lblLocation")
+lbl_date = NodePath("HBox/TextDetails/lblDate")
+btn_save = NodePath("HBox/Actions/btnSave")
+btn_load = NodePath("HBox/Actions/btnLoad")
+btn_delete = NodePath("HBox/Actions/btnDelete")
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=2013721000]
+layout_mode = 2
+
+[node name="ScreenshotRect" type="TextureRect" parent="HBox" unique_id=1328415827]
+layout_mode = 2
+
+[node name="TextDetails" type="VBoxContainer" parent="HBox" unique_id=529107860]
+layout_mode = 2
+
+[node name="lblSaveTitle" type="Label" parent="HBox/TextDetails" unique_id=1615935810]
+layout_mode = 2
+
+[node name="lblLocation" type="Label" parent="HBox/TextDetails" unique_id=1559960047]
+layout_mode = 2
+
+[node name="lblDate" type="Label" parent="HBox/TextDetails" unique_id=392629262]
+layout_mode = 2
+
+[node name="Actions" type="VBoxContainer" parent="HBox" unique_id=1523848573]
+layout_mode = 2
+
+[node name="btnSave" type="Button" parent="HBox/Actions" unique_id=1514941811]
+layout_mode = 2
+
+[node name="btnLoad" type="Button" parent="HBox/Actions" unique_id=691015375]
+layout_mode = 2
+
+[node name="btnDelete" type="Button" parent="HBox/Actions" unique_id=1923326321]
+layout_mode = 2

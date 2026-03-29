@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_nte1n")
+load_game_scene = "uid://c2yexvr2in0cr"
 settings_scene = "uid://c7suofv1q8fjt"
 credits_scene = "uid://ubl4nvaexi55"
 metadata/_custom_type_script = "uid://dj64xytw2gwrt"

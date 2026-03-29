@@ -95,28 +95,28 @@ func _navigate(path: String, transition: TransitionType) -> void:
 
 func _perform_fade_transition(path: String, transition: TransitionType):
 	_is_transitioning = true
-	_curtain.mouse_filter = Control.MOUSE_FILTER_STOP # Bloqueamos clics durante el viaje
 	
-	# Decidimos el color objetivo (Blanco o Negro)
+	# NUEVO: Bloqueo absoluto de TODO el input (Mouse, Teclado, Mando)
+	get_tree().root.set_disable_input(true)
+	
 	var target_color = Color.BLACK if transition == TransitionType.FADE_BLACK else Color.WHITE
 	_curtain.color = target_color
 	_curtain.color.a = 0.0
 	
-	# 1. Oscurecemos la pantalla
-	var tween = create_tween()
+	# NUEVO: .set_pause_mode(...) asegura que la transición funcione aunque el juego esté pausado
+	var tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(_curtain, "color:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE)
 	await tween.finished
 	
-	# 2. Cambiamos la escena (el usuario no lo nota porque está todo negro)
 	print("Viajando a -> ", path)
 	get_tree().change_scene_to_file(path)
 	
-	# 3. Volvemos a iluminar la pantalla
-	tween = create_tween()
+	tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(_curtain, "color:a", 0.0, 0.4).set_trans(Tween.TRANS_SINE)
 	await tween.finished
 	
-	_curtain.mouse_filter = Control.MOUSE_FILTER_IGNORE # Permitimos clics de nuevo
+	# NUEVO: Restauramos el input al terminar
+	get_tree().root.set_disable_input(false)
 	_is_transitioning = false
 
 func go_back(transition: TransitionType = TransitionType.FADE_BLACK) -> void:
@@ -163,15 +163,17 @@ func request_quit():
 			box.hide() 
 			
 			_is_transitioning = true
-			_curtain.mouse_filter = Control.MOUSE_FILTER_STOP # Bloquear clics
+			
+			# NUEVO: Apagamos controles para que no puedan interactuar mientras se cierra
+			get_tree().root.set_disable_input(true) 
+			
 			_curtain.color = Color.BLACK
 			_curtain.color.a = 0.0
 			
-			# Hacemos el fundido a negro visual al mismo tiempo...
-			var tween = create_tween()
+			# NUEVO: Tween blindado contra la pausa
+			var tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 			tween.tween_property(_curtain, "color:a", 1.0, 1.5).set_trans(Tween.TRANS_SINE)
 			
-			# ... que hacemos el fundido a silencio
 			await AudioManager.fade_out_and_stop(1.5)
 			
 			print("iOplazxEssence: Cerrando el motor...")

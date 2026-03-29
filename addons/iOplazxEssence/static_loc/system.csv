@@ -64,3 +64,6 @@ SETTINGS_RESTORE_TITLE,Restore Defaults,Restaurar Predeterminados
 SETTINGS_RESTORE_MSG,Are you sure you want to restore all settings to their default values?,¿Estás seguro de que deseas restaurar todas las configuraciones a sus valores de fábrica?
 SETTINGS_SAVE_LOC_GLOBAL,Global (AppData),Global (AppData)
 SETTINGS_SAVE_LOC_VERSION,Version Folder (Portable),Carpeta de Versión (Portátil)
+SAVE_IMPORT_GAME,IMPORT GAME,IMPORTAR PARTIDA
+SAVE_EXPORT_GAME,EXPORT GAMES,EXPORTAR PARTIDAS
+SAVE_BACK,RETURN,REGRESAR

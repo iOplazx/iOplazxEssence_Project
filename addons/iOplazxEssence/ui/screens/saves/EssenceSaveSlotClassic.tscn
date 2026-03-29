@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://biiqsymbr6bbx"]
+
+[ext_resource type="Script" uid="uid://6gh7sqmidw5j" path="res://addons/iOplazxEssence/core/controllers/saves_module/EssenceSaveSlotClassic.gd" id="1_4wnk8"]
+
+[node name="SlotClassic" type="PanelContainer" unique_id=1100819466 node_paths=PackedStringArray("img_screenshot", "lbl_slot_number", "lbl_save_date")]
+script = ExtResource("1_4wnk8")
+img_screenshot = NodePath("VBox/ScreenshotRect")
+lbl_slot_number = NodePath("VBox/SlotInfo/lblSlotNumber")
+lbl_save_date = NodePath("VBox/SlotInfo/lblSaveDate")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=897226038]
+layout_mode = 2
+
+[node name="ScreenshotRect" type="TextureRect" parent="VBox" unique_id=252235417]
+layout_mode = 2
+
+[node name="SlotInfo" type="HBoxContainer" parent="VBox" unique_id=2121356318]
+layout_mode = 2
+
+[node name="lblSlotNumber" type="Label" parent="VBox/SlotInfo" unique_id=747426923]
+layout_mode = 2
+
+[node name="lblSaveDate" type="Label" parent="VBox/SlotInfo" unique_id=2037692873]
+layout_mode = 2

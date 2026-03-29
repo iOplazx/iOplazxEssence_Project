@@ -65,7 +65,7 @@ func _ready():
 func _conectar_botones():
 	if btn_new_game: btn_new_game.pressed.connect(_on_new_game_pressed)
 	if btn_continue: btn_continue.pressed.connect(_on_continue_pressed)
-	if btn_load: btn_load.pressed.connect(_on_load_pressed) # CORREGIDO (Antes apuntaba a continue)
+	if btn_load: btn_load.pressed.connect(_on_load_pressed) 
 	if btn_settings: btn_settings.pressed.connect(_on_settings_pressed)
 	if btn_credits: btn_credits.pressed.connect(_on_credits_pressed)
 	if btn_exit: btn_exit.pressed.connect(_on_exit_pressed)
@@ -76,8 +76,8 @@ func _verificar_estado_partida():
 	
 	if btn_continue:
 		btn_continue.disabled = not has_save_file
-	if btn_load:
-		btn_load.disabled = not has_save_file
+	#if btn_load:
+	#	btn_load.disabled = not has_save_file
 		
 func _iniciar_foco_teclado():
 	if first_focus_button:
