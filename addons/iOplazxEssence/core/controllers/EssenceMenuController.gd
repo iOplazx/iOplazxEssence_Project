@@ -127,7 +127,8 @@ func _on_credits_pressed():
 	SceneManager.goto_credits()
 
 func _on_exit_pressed():
-	SceneManager.request_quit()
+	AudioManager.play_ui_sfx()
+	SceneManager.request_quit() # Que llame al diálogo normal
 	
 # ==========================================
 # EFECTOS VISUALES (Usando nuestra biblioteca global)

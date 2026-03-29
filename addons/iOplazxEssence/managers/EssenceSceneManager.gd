@@ -94,7 +94,7 @@ func request_quit():
 	if get_tree().root.has_node("EssenceConfirmBox"): 
 		return
 	
-	# Instanciamos la caja genérica usando tu ruta de Constants
+	# Instanciamos la caja genérica
 	var box = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceConfirmBox.tscn").instantiate()
 	box.name = "EssenceConfirmBox"
 	
@@ -107,6 +107,16 @@ func request_quit():
 	# Escuchamos la decisión del jugador
 	box.on_choice.connect(func(accepted):
 		if accepted:
+			print("iOplazxEssence: Iniciando apagado de audio...")
+			
+			# 1. (Opcional) Ocultamos la caja de confirmación para que no se quede en pantalla 
+			# mientras esperamos el audio (si es que tu caja no se destruye sola al hacer clic).
+			box.hide() 
+			
+			# 2. Hacemos el fundido a silencio y ESPERAMOS a que termine
+			await AudioManager.fade_out_and_stop(1.5)
+			
+			# 3. La música terminó, ahora sí cerramos todo con elegancia
 			print("iOplazxEssence: Cerrando el motor...")
 			get_tree().quit()
 	)

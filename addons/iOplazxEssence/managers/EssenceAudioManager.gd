@@ -1,7 +1,9 @@
 extends Node
 
 # Reproductores dedicados
-var music_player: AudioStreamPlayer
+var music_player_1: AudioStreamPlayer
+var music_player_2: AudioStreamPlayer
+var _active_music_player: AudioStreamPlayer
 var sfx_player: AudioStreamPlayer
 var ui_player: AudioStreamPlayer
 
@@ -22,11 +24,19 @@ var current_ui_theme: int = 0
 var mute_on_focus_loss: bool = false
 var _was_muted_manually: bool = false # Para recordar si el jugador ya lo tenía en silencio
 
+signal fade_completed
+
 func _ready():
 	# Creamos los nodos al vuelo
-	music_player = AudioStreamPlayer.new()
-	music_player.bus = "Music" 
-	add_child(music_player)
+	music_player_1 = AudioStreamPlayer.new()
+	music_player_1.bus = "Music" 
+	add_child(music_player_1)
+	
+	music_player_2 = AudioStreamPlayer.new()
+	music_player_2.bus = "Music" 
+	add_child(music_player_2)
+	
+	_active_music_player = music_player_1
 	
 	sfx_player = AudioStreamPlayer.new()
 	sfx_player.bus = "SFX"
@@ -42,24 +52,6 @@ func _ready():
 # ==========================================
 # MÉTODOS PÚBLICOS PARA EL USUARIO
 # ==========================================
-
-func play_music(stream: AudioStream, fade_duration: float = 1.0):
-	if music_player.stream == stream and music_player.playing:
-		return 
-		
-	if _fade_tween and _fade_tween.is_running():
-		_fade_tween.kill() 
-		
-	_fade_tween = create_tween()
-	
-	if music_player.playing:
-		_fade_tween.tween_property(music_player, "volume_db", -60.0, fade_duration / 2.0)
-		_fade_tween.tween_callback(func(): _cambiar_pista(stream))
-		_fade_tween.tween_property(music_player, "volume_db", 0.0, fade_duration / 2.0)
-	else:
-		music_player.volume_db = -60.0
-		_cambiar_pista(stream)
-		_fade_tween.tween_property(music_player, "volume_db", 0.0, fade_duration)
 
 func play_sfx(stream: AudioStream):
 	sfx_player.stream = stream
@@ -95,19 +87,63 @@ func play_ui_sfx(stream: AudioStream = null, pitch: float = 1.0):
 	
 	player.play()
 	player.finished.connect(player.queue_free)
+	
+func fade_out_and_stop(duration: float = 1.0):
+	if not _active_music_player.playing:
+		return # Si no hay música, salimos de inmediato
+		
+	if _fade_tween and _fade_tween.is_running():
+		_fade_tween.kill()
+		
+	_fade_tween = create_tween()
+	_fade_tween.tween_property(_active_music_player, "volume_db", -60.0, duration)
+	
+	# Usamos el 'await' nativo del Tween de Godot 4
+	await _fade_tween.finished
+	_active_music_player.stop()
+
+func play_music(stream: AudioStream, crossfade_duration: float = 1.0):
+	if _active_music_player.stream == stream and _active_music_player.playing:
+		return 
+		
+	# ¡EL SECRETO! Guardamos quién es el viejo antes de cambiar nada
+	var old_player = _active_music_player 
+	var next_player = music_player_2 if _active_music_player == music_player_1 else music_player_1
+	
+	next_player.stream = stream
+	next_player.volume_db = -60.0
+	next_player.play()
+	
+	if _fade_tween and _fade_tween.is_running():
+		_fade_tween.kill()
+		
+	_fade_tween = create_tween()
+	_fade_tween.set_parallel(true) 
+	
+	if old_player.playing:
+		_fade_tween.tween_property(old_player, "volume_db", -60.0, crossfade_duration)
+	
+	_fade_tween.tween_property(next_player, "volume_db", 0.0, crossfade_duration)
+	
+	# Le decimos al callback que apague ESPECÍFICAMENTE al viejo
+	_fade_tween.chain().tween_callback(func(): old_player.stop())
+	
+	_active_music_player = next_player
 
 # ==========================================
 # MÉTODOS PRIVADOS
 # ==========================================
 
-func _cambiar_pista(stream: AudioStream):
-	music_player.stream = stream
-	music_player.play()
-	
-# --- NUEVO: La función que reacciona al grito de Preferences ---
+# --- La función que reacciona al grito de Preferences ---
 func _on_settings_restored():
 	print("AudioManager: Ajustes restaurados. Recalculando volúmenes...")
 	load_audio_settings() # Re-ejecutamos tu propia función para actualizar los buses
+
+func _on_quit_pressed():
+	AudioManager.play_ui_sfx()
+	AudioManager.fade_out_and_stop(1.5) # 1.5 segundos de fade out
+	await AudioManager.fade_completed   # El juego se pausa aquí esperando
+	get_tree().quit()                   # Ahora sí, cierra el juego
 
 # ==========================================
 # MÉTODOS DE CACHÉ
