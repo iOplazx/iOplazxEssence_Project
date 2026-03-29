@@ -84,7 +84,7 @@ func _on_reimport():
 	if get_tree().root.has_node("EssenceConfirmBox"): 
 		return
 		
-	var box = load(EssencePaths.PATH_UI + "EssenceConfirmBox.tscn").instantiate()
+	var box = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceConfirmBox.tscn").instantiate()
 	box.name = "EssenceConfirmBox"
 	get_tree().root.add_child(box)
 	

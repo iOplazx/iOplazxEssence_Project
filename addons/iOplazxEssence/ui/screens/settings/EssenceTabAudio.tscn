@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://d083l8wkigtey"]
+
+[ext_resource type="Script" uid="uid://dlj1lvkwmnm7d" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabAudio.gd" id="1_jusio"]
+[ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/widgets/RowSlider.tscn" id="2_aao1j"]
+[ext_resource type="Texture2D" uid="uid://cr8greyke17um" path="res://addons/iOplazxEssence/resources/images/icon_volume_master_music.png" id="3_246lx"]
+[ext_resource type="Texture2D" uid="uid://ct8tp7w56bq1x" path="res://addons/iOplazxEssence/resources/images/icon_volume_bg_music.png" id="4_dnlcb"]
+[ext_resource type="Texture2D" uid="uid://bav1i2yfbfom8" path="res://addons/iOplazxEssence/resources/images/icon_volume_sfx_1.png" id="5_k60ow"]
+[ext_resource type="Texture2D" uid="uid://dar5eu3157ogs" path="res://addons/iOplazxEssence/resources/images/icon_volume_UI.png" id="6_pirjt"]
+[ext_resource type="Texture2D" uid="uid://cuymwe61fbn33" path="res://addons/iOplazxEssence/resources/images/icon_volume_voices.png" id="7_ckxi0"]
+
+[node name="mgAudio" type="MarginContainer" unique_id=964859787 node_paths=PackedStringArray("row_master", "row_music", "row_sfx", "row_ui", "row_voices", "chk_mute_focus", "dpd_theme", "btn_preview", "preview_player")]
+script = ExtResource("1_jusio")
+row_master = NodePath("mcBodyAudio/VBoxContainer/SliderMasterVolumen")
+row_music = NodePath("mcBodyAudio/VBoxContainer/SliderBackgroundMusic")
+row_sfx = NodePath("mcBodyAudio/VBoxContainer/SliderSFXVolume")
+row_ui = NodePath("mcBodyAudio/VBoxContainer/SliderUIVolume")
+row_voices = NodePath("mcBodyAudio/VBoxContainer/SliderVoicesVolume")
+chk_mute_focus = NodePath("mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer/chkMuteFocusLoss")
+dpd_theme = NodePath("mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/DropdownTheme")
+btn_preview = NodePath("mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/BtnPreview")
+preview_player = NodePath("mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme/PreviewPlayer")
+metadata/_tab_index = 2
+metadata/_tab_name = "SETTINGS_AUDIO"
+
+[node name="mcBodyAudio" type="MarginContainer" parent="." unique_id=968898136]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="mcBodyAudio" unique_id=825821218]
+layout_mode = 2
+
+[node name="SliderMasterVolumen" parent="mcBodyAudio/VBoxContainer" unique_id=1890518606 instance=ExtResource("2_aao1j")]
+layout_mode = 2
+icon_texture = ExtResource("3_246lx")
+label_text = "SETTINGS_AUDIO_VOLUME_MASTER"
+show_mute_button = true
+
+[node name="SliderBackgroundMusic" parent="mcBodyAudio/VBoxContainer" unique_id=456344390 instance=ExtResource("2_aao1j")]
+layout_mode = 2
+icon_texture = ExtResource("4_dnlcb")
+label_text = "SETTINGS_AUDIO_BACKGROUND_MUSIC"
+show_mute_button = true
+
+[node name="SliderSFXVolume" parent="mcBodyAudio/VBoxContainer" unique_id=445158427 instance=ExtResource("2_aao1j")]
+layout_mode = 2
+icon_texture = ExtResource("5_k60ow")
+label_text = "SETTINGS_AUDIO_VOLUME_SFX"
+show_mute_button = true
+
+[node name="SliderUIVolume" parent="mcBodyAudio/VBoxContainer" unique_id=1476864219 instance=ExtResource("2_aao1j")]
+layout_mode = 2
+icon_texture = ExtResource("6_pirjt")
+label_text = "SETTINGS_AUDIO_VOLUME_UI"
+show_mute_button = true
+
+[node name="SliderVoicesVolume" parent="mcBodyAudio/VBoxContainer" unique_id=718910707 instance=ExtResource("2_aao1j")]
+layout_mode = 2
+icon_texture = ExtResource("7_ckxi0")
+label_text = "SETTINGS_AUDIO_VOLUME_VOICES"
+show_mute_button = true
+
+[node name="mcMuteFocus" type="MarginContainer" parent="mcBodyAudio/VBoxContainer" unique_id=1240862398]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="mcBodyAudio/VBoxContainer/mcMuteFocus" unique_id=1967184233]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="lblMuteFocusLoss" type="Label" parent="mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer" unique_id=1962589187]
+layout_mode = 2
+text = "SETTINGS_AUDIO_MFL"
+
+[node name="chkMuteFocusLoss" type="CheckBox" parent="mcBodyAudio/VBoxContainer/mcMuteFocus/HBoxContainer" unique_id=617838539]
+layout_mode = 2
+
+[node name="mcUITheme" type="MarginContainer" parent="mcBodyAudio/VBoxContainer" unique_id=1544944252]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+
+[node name="RowUITheme" type="HBoxContainer" parent="mcBodyAudio/VBoxContainer/mcUITheme" unique_id=856688657]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Label" type="Label" parent="mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=825432858]
+layout_mode = 2
+text = "SETTINGS_AUDIO_TYPE_SELECTED"
+
+[node name="DropdownTheme" type="OptionButton" parent="mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=1328767736]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="BtnPreview" type="TextureButton" parent="mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=2103644546]
+layout_mode = 2
+
+[node name="PreviewPlayer" type="AudioStreamPlayer" parent="mcBodyAudio/VBoxContainer/mcUITheme/RowUITheme" unique_id=1719928238]
+bus = &"UI"

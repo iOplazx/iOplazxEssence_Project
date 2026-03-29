@@ -64,7 +64,7 @@ func _setup_texts():
 		chk_nsfw.text = tr("SETTINGS_GAME_NSFW")
 		
 	if btn_apply:
-		btn_apply.text = tr("SETTINGS_VIDEO_SAVE_CHANGE") # Reutilizamos la llave de aplicar
+		btn_apply.text = tr("SETTINGS_VIDEO_SAVE_CHANGE") 
 		
 	if dpd_save_location:
 		dpd_save_location.clear()

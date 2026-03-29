@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bo3a6i67seryc" path="res://demo/scenes/MainMenu.gd" id="1_xjpr8"]
 [ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/images/generateMainMenuImage.png" id="3_tvdue"]
-[ext_resource type="PackedScene" uid="uid://c58ydoc3e2fbk" path="res://addons/iOplazxEssence/ui/EssenceButton.tscn" id="4_47cvb"]
+[ext_resource type="PackedScene" uid="uid://c58ydoc3e2fbk" path="res://addons/iOplazxEssence/ui/widgets/EssenceButton.tscn" id="4_47cvb"]
 [ext_resource type="Texture2D" uid="uid://bjn2r5bicbxj6" path="res://addons/iOplazxEssence/resources/images/logo_demo.png" id="4_cuc3c"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3h6x3"]

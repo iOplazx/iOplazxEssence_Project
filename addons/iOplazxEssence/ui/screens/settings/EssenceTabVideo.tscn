@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://becbiih4sijik"]
+
+[ext_resource type="Script" uid="uid://dnf4dfoua0qlm" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabVideo.gd" id="1_t2pyr"]
+
+[node name="mgVideo" type="MarginContainer" unique_id=1318671311 node_paths=PackedStringArray("dpd_mode", "btn_apply") groups=["settings_tabs"]]
+script = ExtResource("1_t2pyr")
+dpd_mode = NodePath("mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow/dpdMode")
+btn_apply = NodePath("mcBodyVideo/mcBotonSaveChange/btnSaveChangeVideo")
+metadata/_tab_index = 1
+metadata/_tab_name = "SETTINGS_VIDEO"
+
+[node name="mcBodyVideo" type="MarginContainer" parent="." unique_id=1494266912]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="mcBodyVideo" unique_id=1808235728]
+layout_mode = 2
+
+[node name="mcSelectWindow" type="MarginContainer" parent="mcBodyVideo/VBoxContainer" unique_id=1991602765]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+
+[node name="RowSelectWindow" type="HBoxContainer" parent="mcBodyVideo/VBoxContainer/mcSelectWindow" unique_id=183403702]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Label" type="Label" parent="mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow" unique_id=968526935]
+layout_mode = 2
+text = "SETTINGS_DISPLAY_MODE"
+
+[node name="dpdMode" type="OptionButton" parent="mcBodyVideo/VBoxContainer/mcSelectWindow/RowSelectWindow" unique_id=73019971]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="mcBotonSaveChange" type="MarginContainer" parent="mcBodyVideo" unique_id=372067247]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="btnSaveChangeVideo" type="Button" parent="mcBodyVideo/mcBotonSaveChange" unique_id=2023594350]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "SETTINGS_VIDEO_SAVE_CHANGE"

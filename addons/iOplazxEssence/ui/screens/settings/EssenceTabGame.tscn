@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://dfx2xrrp1qxdh"]
+
+[ext_resource type="Script" uid="uid://dg2pfy1nu8r2q" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabGame.gd" id="1_hcnkt"]
+[ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/widgets/RowSlider.tscn" id="2_01fne"]
+
+[node name="mgGame" type="MarginContainer" unique_id=518972696 node_paths=PackedStringArray("dpd_difficulty", "chk_nsfw", "slider_text_speed", "dpd_autosave", "dpd_save_style", "dpd_save_location", "btn_apply") groups=["settings_tabs"]]
+script = ExtResource("1_hcnkt")
+dpd_difficulty = NodePath("mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
+chk_nsfw = NodePath("mcBodyGame/VBoxContainer/chkbNFSW")
+slider_text_speed = NodePath("mcBodyGame/VBoxContainer/SliderTextSpeed")
+dpd_autosave = NodePath("mcBodyGame/VBoxContainer/RowAutosave/dpdAutosave")
+dpd_save_style = NodePath("mcBodyGame/VBoxContainer/RowSaveStyle/dpdSaveStyle")
+dpd_save_location = NodePath("mcBodyGame/VBoxContainer/RowSaveLocation/dpdSaveLocation")
+btn_apply = NodePath("mcBotonSaveChange/btnSaveChangeGame")
+metadata/_tab_index = 0
+metadata/_tab_name = "SETTINGS_GAME"
+
+[node name="mcBodyGame" type="MarginContainer" parent="." unique_id=1607302097]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="mcBodyGame" unique_id=1433339629]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="RowDifficulty" type="HBoxContainer" parent="mcBodyGame/VBoxContainer" unique_id=1925390635]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="mcBodyGame/VBoxContainer/RowDifficulty" unique_id=354745285]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_DIFFICULTY"
+
+[node name="dpdDifficulty" type="OptionButton" parent="mcBodyGame/VBoxContainer/RowDifficulty" unique_id=2117601932]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="chkbNFSW" type="CheckButton" parent="mcBodyGame/VBoxContainer" unique_id=471657907]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "SETTINGS_GAME_CHECK_NSFW"
+
+[node name="SliderTextSpeed" parent="mcBodyGame/VBoxContainer" unique_id=1890518606 instance=ExtResource("2_01fne")]
+layout_mode = 2
+label_text = "SETTINGS_GAME_TEXT_SPEED"
+min_value = 0.5
+max_value = 2.0
+step = 0.1
+visual_multiplier = 1.0
+decimal_places = 1
+value_prefix = "x"
+value_suffix = ""
+
+[node name="RowAutosave" type="HBoxContainer" parent="mcBodyGame/VBoxContainer" unique_id=994463621]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="mcBodyGame/VBoxContainer/RowAutosave" unique_id=1832644457]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_AUTOSAVE"
+
+[node name="dpdAutosave" type="OptionButton" parent="mcBodyGame/VBoxContainer/RowAutosave" unique_id=374716378]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="RowSaveStyle" type="HBoxContainer" parent="mcBodyGame/VBoxContainer" unique_id=1199924126]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="mcBodyGame/VBoxContainer/RowSaveStyle" unique_id=285014952]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_SAVE_STYLE"
+
+[node name="dpdSaveStyle" type="OptionButton" parent="mcBodyGame/VBoxContainer/RowSaveStyle" unique_id=998403771]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="RowSaveLocation" type="HBoxContainer" parent="mcBodyGame/VBoxContainer" unique_id=1687776811]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="mcBodyGame/VBoxContainer/RowSaveLocation" unique_id=1932834157]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_SAVE_STYLE"
+
+[node name="dpdSaveLocation" type="OptionButton" parent="mcBodyGame/VBoxContainer/RowSaveLocation" unique_id=986262909]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="mcBotonSaveChange" type="MarginContainer" parent="." unique_id=80042797]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="btnSaveChangeGame" type="Button" parent="mcBotonSaveChange" unique_id=1576415762]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "SETTINGS_GAME_SAVE_CHANGE"

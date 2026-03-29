@@ -9,6 +9,10 @@ const PATH_IMAGES = BASE_RESOURCES + "images/"
 const PATH_AUDIO = BASE_RESOURCES + "audio/"
 const PATH_CORE = BASE_RUTE + "core/"
 const PATH_UI = BASE_RUTE + "ui/"
+const PATH_UI_CARDS = BASE_RUTE + "ui/cards/"
+const PATH_UI_OVERLAYS = BASE_RUTE + "ui/overlays/"
+const PATH_UI_SCREEN = BASE_RUTE + "ui/screens/"
+const PATH_UI_WIDGETS = BASE_RUTE + "ui/widgets/"
 
 # ==========================================
 # CONSTANTES DIRECTAS (Para usar con preload en Audio/Escenas)

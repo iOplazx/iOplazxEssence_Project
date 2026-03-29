@@ -95,7 +95,7 @@ func request_quit():
 		return
 	
 	# Instanciamos la caja genérica usando tu ruta de Constants
-	var box = load(EssencePaths.PATH_UI + "EssenceConfirmBox.tscn").instantiate()
+	var box = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceConfirmBox.tscn").instantiate()
 	box.name = "EssenceConfirmBox"
 	
 	# Lo añadimos al 'root' para que esté por encima de todo
