@@ -50,7 +50,7 @@ func _conectar_botones_estaticos():
 
 func _set_mode(is_save: bool):
 	_is_save_mode = is_save
-	lbl_title.text = tr("MENU_SAVE_GAME") if _is_save_mode else tr("MENU_LOAD_GAME")
+	lbl_title.text = tr("PAGE_TITLE_SAVE") if _is_save_mode else tr("PAGE_TITLE_LOAD")
 	AudioManager.play_ui_sfx()
 	_refresh_slots()
 
@@ -65,7 +65,10 @@ func _refresh_slots():
 		
 	if list_modern:
 		for c in list_modern.get_children(): c.queue_free()
-		list_modern.visible = (_current_style == 1)
+		
+		# ¡EL ARREGLO ESTÁ AQUÍ! 
+		# Encendemos la visibilidad del PADRE (el ScrollContainer)
+		list_modern.get_parent().visible = (_current_style == 1)
 	
 	# 2. Generamos los 6 slots de la página actual
 	for i in range(_slots_per_page):

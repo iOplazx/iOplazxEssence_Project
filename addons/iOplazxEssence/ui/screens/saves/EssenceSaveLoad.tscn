@@ -86,7 +86,6 @@ theme_override_constants/v_separation = 30
 columns = 3
 
 [node name="ModernView" type="ScrollContainer" parent="MainMargin/MainLayout/ContentArea" unique_id=1832526522]
-visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
