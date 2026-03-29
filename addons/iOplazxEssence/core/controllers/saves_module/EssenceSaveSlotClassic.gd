@@ -22,20 +22,27 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 	if lbl_slot_number:
 		lbl_slot_number.text = visual_id
 	
-	if save_data == null:
+	# ARREGLO 1: Preguntamos si está vacío, no si es null
+	if save_data.is_empty():
 		_has_data = false
 		if lbl_save_date: 
 			lbl_save_date.text = tr("SLOT_EMPTY") # Escribirá "Vacío"
-		# img_screenshot.texture = predeterminada
 	else:
 		_has_data = true
 		if lbl_save_date: 
-			lbl_save_date.text = save_data["date"] # Escribirá "29/03/2026..."
-		# img_screenshot.texture = load(save_data["screenshot_path"])
+			# Usamos .get() por seguridad extra
+			lbl_save_date.text = save_data.get("date", "Sin fecha") 
 		
-	# Deshabilitar si estamos en modo Cargar y el slot está vacío
-	# disabled = (not _is_save_mode and not _has_data)
+	# Deshabilitar si estamos en modo Cargar y el slot está vacío no aplica igual
+	# en un PanelContainer, así que lo controlaremos en el clic.
 
-func _pressed():
-	var action = "SAVE" if _is_save_mode else "LOAD"
-	on_slot_clicked.emit(action, _my_slot_id)
+# ARREGLO 2: Como es un Panel, atrapamos el clic del ratón así
+func _gui_input(event: InputEvent):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		# Si estamos en modo Cargar y está vacío, bloqueamos el clic
+		if not _is_save_mode and not _has_data:
+			print("Slot vacío. No se puede cargar.")
+			return
+			
+		var action = "SAVE" if _is_save_mode else "LOAD"
+		on_slot_clicked.emit(action, _my_slot_id)

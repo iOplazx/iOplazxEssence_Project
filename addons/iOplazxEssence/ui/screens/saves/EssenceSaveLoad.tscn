@@ -79,8 +79,8 @@ size_flags_vertical = 3
 
 [node name="ClassicView" type="GridContainer" parent="MainMargin/MainLayout/ContentArea" unique_id=2123611460]
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+size_flags_horizontal = 6
+size_flags_vertical = 6
 theme_override_constants/h_separation = 30
 theme_override_constants/v_separation = 30
 columns = 3

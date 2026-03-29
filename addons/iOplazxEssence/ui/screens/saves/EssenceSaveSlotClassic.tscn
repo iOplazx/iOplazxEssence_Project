@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://6gh7sqmidw5j" path="res://addons/iOplazxEssence/core/controllers/saves_module/EssenceSaveSlotClassic.gd" id="1_4wnk8"]
 
 [node name="SlotClassic" type="PanelContainer" unique_id=1100819466 node_paths=PackedStringArray("img_screenshot", "lbl_slot_number", "lbl_save_date")]
+custom_minimum_size = Vector2(300, 200)
 script = ExtResource("1_4wnk8")
 img_screenshot = NodePath("VBox/ScreenshotRect")
 lbl_slot_number = NodePath("VBox/SlotInfo/lblSlotNumber")
