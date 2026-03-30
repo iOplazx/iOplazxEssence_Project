@@ -56,8 +56,8 @@ APP_QUIT_TITLE,Quit Game,Salir del Juego
 APP_QUIT_MSG,Are you sure you want to quit?,¿Estás seguro de que quieres salir?
 LANG_REIMPORT_TITLE,Reimport Languages,Reimportar Idiomas
 LANG_REIMPORT_MSG,Are you sure you want to scan and reload all language files?,¿Estás seguro de que deseas escanear y recargar todos los archivos de idioma?
-SETTINGS_VIDEO_SAVE_CHANGE,Apply Changes,Aplicar Cambios
-SETTINGS_GAME_SAVE_CHANGE,Apply Changes,Aplicar Cambios
+SETTINGS_VIDEO_SAVE_CHANGE,APPLY CHANGES,APLICAR CAMBIOS
+SETTINGS_GAME_SAVE_CHANGE,APPLY CHANGES,APLICAR CAMBIOS
 SETTINGS_DISCARD_TITLE,Unsaved Changes,Cambios sin guardar
 SETTINGS_DISCARD_MSG,Are you sure you want to exit without applying changes?,¿Estás seguro de que deseas salir sin aplicar los cambios?
 SETTINGS_RESTORE_TITLE,Restore Defaults,Restaurar Predeterminados
@@ -72,3 +72,4 @@ SAVE_BTN_SAVE,SAVE,GUARDAR
 SAVE_BTN_LOAD,LOAD,GARGAR
 PAGE_TITLE_SAVE,SAVE GAME,GUARDAR PARTIDA
 PAGE_TITLE_LOAD,LOAD GAME,CARGAR PARTIDA
+PAGE_SAVELOAD_BTN_ADDNEWSLOT,ADD NEW SLOT,AGREGAR OTRO ESPACIO

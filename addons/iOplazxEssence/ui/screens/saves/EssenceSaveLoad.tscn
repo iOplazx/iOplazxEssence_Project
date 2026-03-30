@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://biiqsymbr6bbx" path="res://addons/iOplazxEssence/ui/screens/saves/EssenceSaveSlotClassic.tscn" id="2_0ovsk"]
 [ext_resource type="PackedScene" uid="uid://v6c6fpdc1myv" path="res://addons/iOplazxEssence/ui/screens/saves/EssenceSaveSlotModern.tscn" id="3_g861x"]
 
-[node name="EssenceSaveLoad" type="Control" unique_id=1025781134 node_paths=PackedStringArray("grid_classic", "list_modern", "lbl_title", "box_pagination", "btn_mode_save", "btn_mode_load", "btn_back")]
+[node name="EssenceSaveLoad" type="Control" unique_id=1025781134 node_paths=PackedStringArray("grid_classic", "list_modern", "lbl_title", "mode_toggle_container", "pagination_container", "btn_add_new_slot", "box_pagination", "btn_mode_save", "btn_mode_load", "btn_back")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,8 +13,11 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_u8y72")
 grid_classic = NodePath("MainMargin/MainLayout/ContentArea/ClassicView")
-list_modern = NodePath("MainMargin/MainLayout/ContentArea/ModernView/VBoxSlots")
+list_modern = NodePath("MainMargin/MainLayout/ContentArea/ModernView/MarginContainer/VBoxSlots")
 lbl_title = NodePath("MainMargin/MainLayout/Header/lblTitle")
+mode_toggle_container = NodePath("MainMargin/MainLayout/Header/HBoxContainer")
+pagination_container = NodePath("MainMargin/MainLayout/Pagination")
+btn_add_new_slot = NodePath("MainMargin/MainLayout/ContentArea/ModernView/MarginContainer/btnAddNewSlot")
 box_pagination = NodePath("MainMargin/MainLayout/Pagination/PageNumbers")
 btn_mode_save = NodePath("MainMargin/MainLayout/Header/HBoxContainer/btnModeSave")
 btn_mode_load = NodePath("MainMargin/MainLayout/Header/HBoxContainer/btnModeLoad")
@@ -90,10 +93,21 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="VBoxSlots" type="VBoxContainer" parent="MainMargin/MainLayout/ContentArea/ModernView" unique_id=2035925162]
+[node name="MarginContainer" type="MarginContainer" parent="MainMargin/MainLayout/ContentArea/ModernView" unique_id=1438206653]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxSlots" type="VBoxContainer" parent="MainMargin/MainLayout/ContentArea/ModernView/MarginContainer" unique_id=2035925162]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 15
+
+[node name="btnAddNewSlot" type="Button" parent="MainMargin/MainLayout/ContentArea/ModernView/MarginContainer" unique_id=797496496]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+text = "PAGE_SAVELOAD_BTN_ADDNEWSLOT"
 
 [node name="Pagination" type="HBoxContainer" parent="MainMargin/MainLayout" unique_id=10977011]
 layout_mode = 2

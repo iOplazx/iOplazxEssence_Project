@@ -11,10 +11,11 @@ config_version=5
 [application]
 
 config/name="iOplazxEssence_Project"
+config/version="0.0.1"
 run/main_scene="uid://kul2nfgi7k68"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/show_image=false
-config/icon="res://icon.svg"
+config/icon="uid://dvp7ydrt6x37m"
 
 [autoload]
 

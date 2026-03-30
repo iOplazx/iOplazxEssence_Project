@@ -8,6 +8,11 @@ class_name EssenceSaveLoadController extends Control
 @export var list_modern: VBoxContainer
 @export var lbl_title: Label
 
+@export_category("Contenedores de Modo")
+@export var mode_toggle_container: Control  
+@export var pagination_container: Control   
+@export var btn_add_new_slot: Button        
+
 @export_category("Paginación y Modos")
 @export var box_pagination: HBoxContainer
 @export var btn_mode_save: Button
@@ -58,19 +63,35 @@ func _set_mode(is_save: bool):
 # GENERACIÓN DE SLOTS
 # ==========================================
 func _refresh_slots():
-	# 1. Limpiamos y mostramos con redes de seguridad
+	var is_classic = (_current_style == 0)
+	
+	# 1. Visibilidad de Contenedores Principales
+	if grid_classic: grid_classic.visible = is_classic
+	if list_modern: list_modern.get_parent().visible = not is_classic
+	
+	# 2. Visibilidad de Elementos Exclusivos
+	if mode_toggle_container: mode_toggle_container.visible = is_classic
+	if pagination_container: pagination_container.visible = is_classic
+	
+	# 3. Tratamiento especial del botón "Añadir"
+	if btn_add_new_slot: 
+		btn_add_new_slot.visible = not is_classic
+		if not is_classic:
+			# Lo movemos siempre al final de la lista
+			btn_add_new_slot.get_parent().move_child(btn_add_new_slot, -1)
+
+	# 4. Generación de Contenido
+	if is_classic:
+		_generar_slots_classic()
+	else:
+		_generar_slots_modern()
+
+func _generar_slots_classic():
+	# Limpiamos los slots anteriores
 	if grid_classic:
 		for c in grid_classic.get_children(): c.queue_free()
-		grid_classic.visible = (_current_style == 0)
-		
-	if list_modern:
-		for c in list_modern.get_children(): c.queue_free()
-		
-		# ¡EL ARREGLO ESTÁ AQUÍ! 
-		# Encendemos la visibilidad del PADRE (el ScrollContainer)
-		list_modern.get_parent().visible = (_current_style == 1)
 	
-	# 2. Generamos los 6 slots de la página actual
+	# Generamos los 6 slots de la página actual
 	for i in range(_slots_per_page):
 		var slot_id = ""
 		if _current_page == 0:
@@ -79,20 +100,32 @@ func _refresh_slots():
 			var slot_num = ((_current_page - 1) * _slots_per_page) + (i + 1)
 			slot_id = "save_" + str(_current_page) + "_" + str(i + 1) 
 			
-		_crear_instancia_slot(slot_id)
+		_crear_instancia_slot(slot_id, grid_classic)
 
-func _crear_instancia_slot(slot_id: String):
-	# TODO: Aquí le pediremos al SaveManager si existe un archivo para este slot_id
+func _generar_slots_modern():
+	if list_modern:
+		for c in list_modern.get_children(): 
+			# Limpiamos todo EXCEPTO el botón de añadir nuevo slot
+			if c != btn_add_new_slot: 
+				c.queue_free()
+	
+	# TODO: Aquí el SaveManager nos dirá cuántos slots tiene el usuario creados.
+	# Por ahora simulamos 5 slots.
+	for i in range(5):
+		var slot_id = "modern_save_" + str(i + 1)
+		_crear_instancia_slot(slot_id, list_modern)
+
+func _crear_instancia_slot(slot_id: String, container: Control):
 	var mock_data: Dictionary = {}
 	
 	if _current_style == 0:
 		var slot = prefab_classic.instantiate()
-		grid_classic.add_child(slot)
+		container.add_child(slot)
 		slot.setup(slot_id, mock_data, _is_save_mode)
 		slot.on_slot_clicked.connect(_handle_slot_action)
 	else:
 		var slot = prefab_modern.instantiate()
-		list_modern.add_child(slot)
+		container.add_child(slot)
 		slot.setup(slot_id, mock_data, _is_save_mode)
 		slot.on_action_requested.connect(_handle_slot_action)
 
@@ -102,25 +135,21 @@ func _crear_instancia_slot(slot_id: String):
 func _handle_slot_action(action: String, slot_id: String):
 	AudioManager.play_ui_sfx()
 	
-	# Revisamos si el jugador quiere confirmaciones en los ajustes
 	var ask_confirm = Preferences.get_setting("game", "confirm_on_save", true)
 	
 	if ask_confirm:
-		# Mostrar el EssenceConfirmBox aquí antes de ejecutar
 		print("iOplazxEssence: Abriendo caja de confirmación para ", action, " en ", slot_id)
 		# ... lógica de tu confirm box ...
 	else:
 		print("iOplazxEssence: Ejecutando ", action, " directamente en ", slot_id)
 		# TODO: Ejecutar el guardado/cargado real
 		
-	# Después de guardar/borrar, recargamos la vista
 	_refresh_slots()
 
 # ==========================================
 # PAGINACIÓN BÁSICA (A, 1, 2, 3...)
 # ==========================================
 func _generar_botones_paginacion():
-	# Limpiamos si hay botones viejos
 	for c in box_pagination.get_children(): c.queue_free()
 	
 	var btn_auto = Button.new()
@@ -128,7 +157,7 @@ func _generar_botones_paginacion():
 	btn_auto.pressed.connect(func(): _cambiar_pagina(0))
 	box_pagination.add_child(btn_auto)
 	
-	for i in range(1, 10): # Generamos 9 páginas de ejemplo
+	for i in range(1, 10): 
 		var btn = Button.new()
 		btn.text = str(i)
 		btn.pressed.connect(func(): _cambiar_pagina(i))
