@@ -25,6 +25,7 @@ SceneManager="*uid://exttdiqc5tx4"
 DisplayManager="*uid://ceci6st8lqdn0"
 LanguageManager="*uid://dsq88kypeo403"
 FileManager="*uid://d3bd41whggi54"
+SaveManager="*uid://dcihy8ccvq3jw"
 
 [display]
 

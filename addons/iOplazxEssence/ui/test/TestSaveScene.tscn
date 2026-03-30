@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dbcs7828cew15"]
+
+[ext_resource type="Script" uid="uid://c5gij173ao6h3" path="res://addons/iOplazxEssence/scriptsItems/TestSaveScene.gd" id="1_qd6tp"]
+
+[node name="TestSaveScene" type="Node" unique_id=791504865 node_paths=PackedStringArray("btn_save", "btn_load", "btn_return", "lbl_output", "test_element")]
+script = ExtResource("1_qd6tp")
+btn_save = NodePath("VBoxContainer/HBoxContainer/btnSave")
+btn_load = NodePath("VBoxContainer/HBoxContainer/btnLoad")
+btn_return = NodePath("VBoxContainer/HBoxContainer/btnReturn")
+lbl_output = NodePath("VBoxContainer/ScrollContainer/lblOutput")
+test_element = NodePath("TestElement")
+
+[node name="Background" type="ColorRect" parent="." unique_id=660247948]
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.32172796, 0.32172796, 0.32172796, 1)
+
+[node name="TestElement" type="ColorRect" parent="." unique_id=772960954]
+custom_minimum_size = Vector2(200, 200)
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=393522600]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=2132015401]
+layout_mode = 2
+
+[node name="btnSave" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1371424922]
+layout_mode = 2
+text = "WORD_SAVE_GAME"
+
+[node name="btnLoad" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=627594780]
+layout_mode = 2
+text = "WORD_LOAD_GAME"
+
+[node name="btnReturn" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1160568684]
+layout_mode = 2
+text = "WORD_RETURN_MAINMENU"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer" unique_id=1730963824]
+layout_mode = 2
+
+[node name="lblOutput" type="Label" parent="VBoxContainer/ScrollContainer" unique_id=1048442031]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+autowrap_mode = 2

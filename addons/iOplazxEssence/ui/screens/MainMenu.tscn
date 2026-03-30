@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://oli3ry0u0tyc"]
+
+[ext_resource type="Script" uid="uid://bo3a6i67seryc" path="res://demo/scenes/MainMenu.gd" id="1_b2j7d"]
+[ext_resource type="Texture2D" uid="uid://dk4bpg2hqdk32" path="res://addons/iOplazxEssence/resources/images/generateMainMenuImage.png" id="2_yntk2"]
+[ext_resource type="Texture2D" uid="uid://bjn2r5bicbxj6" path="res://addons/iOplazxEssence/resources/images/logo_demo.png" id="3_grfeb"]
+[ext_resource type="PackedScene" uid="uid://c58ydoc3e2fbk" path="res://addons/iOplazxEssence/ui/widgets/EssenceButton.tscn" id="4_oaf5b"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3h6x3"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(0.13333334, 0.13333334, 0.13333334, 0.85490197)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.79607844, 0.73333335, 0.14901961, 0.81960785)
+
+[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_continue", "btn_load", "btn_settings", "btn_credits", "btn_exit", "first_focus_button", "buttons_panel", "title_container")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_b2j7d")
+btn_new_game = NodePath("panelMenu/ButtonContainer/btnInit")
+btn_continue = NodePath("panelMenu/ButtonContainer/btnContinue")
+btn_load = NodePath("panelMenu/ButtonContainer/btnLoad")
+btn_settings = NodePath("panelMenu/ButtonContainer/btnSettings")
+btn_credits = NodePath("panelMenu/ButtonContainer/btnCredits")
+btn_exit = NodePath("panelMenu/ButtonContainer/btnExit")
+first_focus_button = NodePath("panelMenu/ButtonContainer/btnInit")
+buttons_panel = NodePath("panelMenu/ButtonContainer")
+title_container = NodePath("titleImage")
+
+[node name="background" type="TextureRect" parent="." unique_id=1221495355]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_yntk2")
+expand_mode = 1
+stretch_mode = 6
+metadata/_edit_lock_ = true
+
+[node name="titleImage" type="TextureRect" parent="." unique_id=1174376808]
+layout_mode = 0
+offset_left = 385.0
+offset_top = 2.0
+offset_right = 885.0
+offset_bottom = 152.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("3_grfeb")
+expand_mode = 1
+stretch_mode = 5
+metadata/_edit_lock_ = true
+
+[node name="panelMenu" type="PanelContainer" parent="." unique_id=221700732]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 50.0
+offset_top = -157.0
+offset_right = 185.0
+offset_bottom = 113.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_3h6x3")
+
+[node name="ButtonContainer" type="VBoxContainer" parent="panelMenu" unique_id=64784079]
+layout_mode = 2
+
+[node name="btnInit" parent="panelMenu/ButtonContainer" unique_id=606571041 instance=ExtResource("4_oaf5b")]
+layout_mode = 2
+text = "MENU_NEW_GAME"
+
+[node name="btnContinue" parent="panelMenu/ButtonContainer" unique_id=591873522 instance=ExtResource("4_oaf5b")]
+layout_mode = 2
+text = "MENU_CONTINUE"
+
+[node name="btnLoad" parent="panelMenu/ButtonContainer" unique_id=311038086 instance=ExtResource("4_oaf5b")]
+layout_mode = 2
+text = "MENU_LOAD"
+
+[node name="btnSettings" parent="panelMenu/ButtonContainer" unique_id=360171189 instance=ExtResource("4_oaf5b")]
+layout_mode = 2
+text = "MENU_SETTINGS"
+
+[node name="btnCredits" parent="panelMenu/ButtonContainer" unique_id=220401854 instance=ExtResource("4_oaf5b")]
+layout_mode = 2
+text = "MENU_CREDITS"
+
+[node name="btnExit" parent="panelMenu/ButtonContainer" unique_id=2026497379 instance=ExtResource("4_oaf5b")]
+layout_mode = 2
+text = "MENU_EXIT"

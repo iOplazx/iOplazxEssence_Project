@@ -79,5 +79,4 @@ func restore_defaults():
 	load_from_disk()     # Refrescamos la RAM
 	print("Essence: Valores por defecto aplicados exitosamente.")
 	
-	# --- AGREGAR ESTA LÍNEA AQUÍ ABAJO ---
 	settings_restored.emit() # Avisamos a todos los managers
