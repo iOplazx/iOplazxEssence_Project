@@ -6,13 +6,14 @@
 [ext_resource type="Texture2D" uid="uid://fwqudcao7suo" path="res://addons/iOplazxEssence/resources/images/icon_load.png" id="3_xfdxw"]
 [ext_resource type="Texture2D" uid="uid://cxyunorkubncg" path="res://addons/iOplazxEssence/resources/images/icon_trash.png" id="4_6uswm"]
 
-[node name="SlotModern" type="PanelContainer" unique_id=713909698 node_paths=PackedStringArray("img_screenshot", "lbl_title", "lbl_location", "lbl_date", "btn_save", "btn_load", "btn_delete")]
+[node name="SlotModern" type="PanelContainer" unique_id=713909698 node_paths=PackedStringArray("img_screenshot", "lbl_title", "lbl_location", "lbl_date", "lbl_play_time", "btn_save", "btn_load", "btn_delete")]
 custom_minimum_size = Vector2(300, 50)
 script = ExtResource("1_54c42")
 img_screenshot = NodePath("HBox/ScreenshotRect")
-lbl_title = NodePath("HBox/TextDetails/lblSaveTitle")
-lbl_location = NodePath("HBox/TextDetails/lblLocation")
-lbl_date = NodePath("HBox/TextDetails/lblDate")
+lbl_title = NodePath("HBox/TextDetails/TopRow/lblSaveTitle")
+lbl_location = NodePath("HBox/TextDetails/BottomRow/lblLocation")
+lbl_date = NodePath("HBox/TextDetails/BottomRow/lblDate")
+lbl_play_time = NodePath("HBox/TextDetails/TopRow/lblPlayTime")
 btn_save = NodePath("HBox/Actions/btnSave")
 btn_load = NodePath("HBox/Actions/btnLoad")
 btn_delete = NodePath("HBox/Actions/btnDelete")
@@ -31,14 +32,35 @@ custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="lblSaveTitle" type="Label" parent="HBox/TextDetails" unique_id=1615935810]
+[node name="TopRow" type="HBoxContainer" parent="HBox/TextDetails" unique_id=1787866347]
 layout_mode = 2
 
-[node name="lblLocation" type="Label" parent="HBox/TextDetails" unique_id=1559960047]
+[node name="lblSaveTitle" type="Label" parent="HBox/TextDetails/TopRow" unique_id=1615935810]
+layout_mode = 2
+text = "Partida 01"
+
+[node name="Spacer" type="Control" parent="HBox/TextDetails/TopRow" unique_id=305849453]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="lblPlayTime" type="Label" parent="HBox/TextDetails/TopRow" unique_id=1868155844]
+layout_mode = 2
+text = "12:45:00"
+
+[node name="BottomRow" type="HBoxContainer" parent="HBox/TextDetails" unique_id=651304250]
 layout_mode = 2
 
-[node name="lblDate" type="Label" parent="HBox/TextDetails" unique_id=392629262]
+[node name="lblLocation" type="Label" parent="HBox/TextDetails/BottomRow" unique_id=1559960047]
 layout_mode = 2
+text = "Castillo de Kumi"
+
+[node name="Spacer" type="Control" parent="HBox/TextDetails/BottomRow" unique_id=1166029090]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="lblDate" type="Label" parent="HBox/TextDetails/BottomRow" unique_id=392629262]
+layout_mode = 2
+text = "30/03/2026"
 
 [node name="Actions" type="HBoxContainer" parent="HBox" unique_id=1132557407]
 layout_mode = 2

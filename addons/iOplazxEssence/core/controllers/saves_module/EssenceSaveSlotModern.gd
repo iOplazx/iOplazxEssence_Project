@@ -6,6 +6,7 @@ signal on_action_requested(action: String, slot_id: String)
 @export var lbl_title: Label
 @export var lbl_location: Label
 @export var lbl_date: Label
+@export var lbl_play_time: Label 
 
 @export var btn_save: Button
 @export var btn_load: Button
@@ -30,9 +31,10 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 		lbl_title.text = tr("SLOT_EMPTY")
 		lbl_location.text = "---"
 		lbl_date.text = "---"
+		if lbl_play_time: lbl_play_time.text = "--:--:--" # Limpiamos el tiempo
 		
 		# Estado de los botones si está vacío
-		btn_save.disabled = not is_save_mode # Solo puedes guardar si estás en modo guardar
+		btn_save.disabled = not is_save_mode 
 		btn_load.disabled = true
 		btn_delete.disabled = true
 	else:
@@ -40,7 +42,8 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 		
 		lbl_title.text = save_data.get("title", "Partida Guardada")
 		lbl_location.text = save_data.get("location", "Desconocido")
-		lbl_date.text = save_data.get("date", "00/00/00")
+		lbl_date.text = save_data.get("date", "00/00/00 00:00:00")
+		if lbl_play_time: lbl_play_time.text = save_data.get("play_time", "00:00:00") # Asignamos el tiempo
 		
 		# Estado de los botones si tiene datos
 		btn_save.disabled = not is_save_mode

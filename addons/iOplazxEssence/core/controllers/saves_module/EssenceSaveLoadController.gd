@@ -109,15 +109,23 @@ func _generar_slots_modern():
 			if c != btn_add_new_slot: 
 				c.queue_free()
 	
-	# TODO: Aquí el SaveManager nos dirá cuántos slots tiene el usuario creados.
-	# Por ahora simulamos 5 slots.
+	# Generamos 5 slots. Al primero le daremos datos falsos para probar el diseño.
 	for i in range(5):
 		var slot_id = "modern_save_" + str(i + 1)
-		_crear_instancia_slot(slot_id, list_modern)
+		var mock_data: Dictionary = {}
+		
+		# Simulamos datos SOLO para el primer slot
+		if i == 0:
+			mock_data = {
+				"title": "Capítulo 3: La Traición",
+				"location": "Castillo de Kumi - Nivel Inferior",
+				"date": "30/03/2026 03:56:33",
+				"play_time": "14:23:05"
+			}
+			
+		_crear_instancia_slot(slot_id, list_modern, mock_data)
 
-func _crear_instancia_slot(slot_id: String, container: Control):
-	var mock_data: Dictionary = {}
-	
+func _crear_instancia_slot(slot_id: String, container: Control, mock_data: Dictionary = {}):
 	if _current_style == 0:
 		var slot = prefab_classic.instantiate()
 		container.add_child(slot)
