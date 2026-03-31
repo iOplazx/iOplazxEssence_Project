@@ -1,7 +1,9 @@
 class_name BootBase extends Control
 
 const CONFIG_PATH = "res://_static/EssenceConfig.tres"
+const ROUTES_PATH = "res://_static/RouteConfig.tres"
 var config: EssenceConfig
+var routes: EssenceRouteConfig
 
 func _ready():
 	print("--- iOplazxEssence: Secuencia de Arranque ---")
@@ -14,6 +16,8 @@ func _cargar_configuracion():
 		config = load(CONFIG_PATH) as EssenceConfig
 	if config == null:
 		config = EssenceConfig.new()
+	if ResourceLoader.exists(ROUTES_PATH):
+		routes = load(ROUTES_PATH) as EssenceRouteConfig
 
 func _iniciar_fase_logo():
 	print("2. Iniciando módulo de Logo...")
@@ -51,10 +55,12 @@ func _iniciar_fase_carga():
 
 func _finalizar_secuencia():
 	print("5. Todo listo. Saltando al Menú Principal...")
-	if config.next_scene_path != "" and ResourceLoader.exists(config.next_scene_path):
-		get_tree().change_scene_to_file(config.next_scene_path)
+	
+	# Ahora usamos 'routes.main_menu_scene' en lugar de 'config.next_scene_path'
+	if routes != null and routes.main_menu_scene != "" and ResourceLoader.exists(routes.main_menu_scene):
+		get_tree().change_scene_to_file(routes.main_menu_scene)
 	else:
-		push_error("iOplazxEssence FATAL: Next Scene Path no configurada.")
+		push_error("iOplazxEssence FATAL: La ruta 'main_menu_scene' no está configurada en RouteConfig.tres")
 
 # ==========================================
 # FUNCIONES VIRTUALES PARA EL USUARIO
