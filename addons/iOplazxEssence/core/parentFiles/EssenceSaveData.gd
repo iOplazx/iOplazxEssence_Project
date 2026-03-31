@@ -3,7 +3,7 @@ class_name EssenceSaveData extends RefCounted
 # ==========================================
 # DATOS OBLIGATORIOS DEL FRAMEWORK
 # ==========================================
-var version: String = "1.0.0"
+var version: int = 1
 var timestamp: float = 0.0
 var title: String = "Auto-Save"
 var play_time: String = "00:00:00"
@@ -37,7 +37,7 @@ func from_dict(data: Dictionary):
 	var meta = data.get("essence_meta", {})
 	
 	# Sanitización base con valores por defecto seguros
-	version = meta.get("version", "1.0.0")
+	version = meta.get("version", 1)
 	timestamp = meta.get("timestamp", 0.0)
 	title = meta.get("title", "Unknown Save")
 	play_time = meta.get("play_time", "00:00:00")

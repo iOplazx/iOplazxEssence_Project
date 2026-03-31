@@ -15,6 +15,11 @@ const PATH_UI_SCREEN = BASE_RUTE + "ui/screens/"
 const PATH_UI_WIDGETS = BASE_RUTE + "ui/widgets/"
 
 # ==========================================
+# RUTAS CARPETAS
+# ==========================================
+const CARPET_STATIC = "res://_static/"
+
+# ==========================================
 # CONSTANTES DIRECTAS (Para usar con preload en Audio/Escenas)
 # ==========================================
 const AUDIO_UI_SPACE = PATH_AUDIO + "spaceUiSound.wav"

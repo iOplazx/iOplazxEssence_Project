@@ -30,7 +30,7 @@ func _verificar_directorios():
 
 func _verificar_config():
 	# Cargamos el archivo MasterConfig (asegúrate de que esta ruta sea la correcta en tu proyecto)
-	_config = load("res://addons/iOplazxEssence/MasterConfig.tres") as EssenceMasterConfig
+	_config = load(EssencePaths.CARPET_STATIC+"MasterConfig.tres") as EssenceMasterConfig
 	
 	if not _config:
 		push_warning("iOplazxEssence: No se encontró MasterConfig.tres. Usando valores por defecto.")
