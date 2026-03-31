@@ -9,8 +9,8 @@ var _save_extension: String = ".ess"
 var _current_version: int = 1
 
 var intent_is_save_mode: bool = false
-
 const INDEX_FILE = "save_index.json"
+var _config: EssenceMasterConfig
 
 # Señales para comunicar al UI o al juego que algo terminó
 signal on_save_completed(slot_id: String)
@@ -18,8 +18,22 @@ signal on_load_completed(slot_id: String, data: Dictionary)
 signal on_save_error(slot_id: String, error_msg: String)
 
 func _ready():
+	_verificar_config()
+	_verificar_directorios()
 	_cargar_llave_secreta()
 	_configurar_directorio_usuario()
+	
+func _verificar_directorios():
+	if not DirAccess.dir_exists_absolute(_save_dir):
+		DirAccess.make_dir_recursive_absolute(_save_dir)
+		print("iOplazxEssence: Carpeta de guardados creada en ", _save_dir)
+
+func _verificar_config():
+	# Cargamos el archivo MasterConfig (asegúrate de que esta ruta sea la correcta en tu proyecto)
+	_config = load("res://addons/iOplazxEssence/MasterConfig.tres") as EssenceMasterConfig
+	
+	if not _config:
+		push_warning("iOplazxEssence: No se encontró MasterConfig.tres. Usando valores por defecto.")
 
 # ==========================================
 # EL PUENTE: CONFIGURACIÓN DESDE EL JUEGO
@@ -79,20 +93,15 @@ func get_file_path(slot_id: String) -> String:
 # ==========================================
 # ESCRITURA Y CIFRADO
 # ==========================================
-func save_game(slot_id: String, user_data: Dictionary, metadata: Dictionary = {}) -> bool:
+func save_game(slot_id: String, save_object: EssenceSaveData) -> bool:
 	var path = get_file_path(slot_id)
 	
-	var save_package = {
-		"essence_meta": {
-			"version": _current_version,
-			"timestamp": Time.get_unix_time_from_system(),
-			"date_string": Time.get_date_string_from_system().replace("T", " ")
-		},
-		"game_data": user_data
-	}
-	
-	save_package["essence_meta"].merge(metadata, true)
-	
+	# -----------------------------------------------------------------
+	# ¡EL OBJETO HACE ALL EL TRABAJO PESADO!
+	# Llama a to_dict() del Padre, el cual internamente llama a 
+	# _get_child_data() del Hijo. El diccionario ya sale perfecto.
+	# -----------------------------------------------------------------
+	var save_package = save_object.to_dict() 
 	var json_string = JSON.stringify(save_package)
 	
 	var file = FileAccess.open_encrypted_with_pass(path, FileAccess.WRITE, _encryption_key)
@@ -111,6 +120,17 @@ func save_game(slot_id: String, user_data: Dictionary, metadata: Dictionary = {}
 	print("iOplazxEssence: Partida guardada con éxito en ", path)
 	on_save_completed.emit(slot_id)
 	return true
+	
+func crear_nuevo_objeto_guardado() -> EssenceSaveData:
+	var config = load("res://addons/ioplazx_essence/MasterConfig.tres")
+	
+	if config and config.custom_save_script:
+		# ¡AQUÍ ESTÁ LA MAGIA! 
+		# .new() crea una instancia del script HIJO que el usuario asignó
+		return config.custom_save_script.new() 
+	else:
+		# Si el usuario no ha puesto nada, usamos la clase base por seguridad
+		return EssenceSaveData.new()
 
 # ==========================================
 # LECTURA Y DESCIFRADO
@@ -291,12 +311,23 @@ func take_temp_screenshot() -> void:
 
 # La UI llama a esto cuando el jugador elige un Slot
 func commit_save(slot_id: String) -> bool:
-	if _temp_game_data.is_empty():
+	if _temp_game_data.is_empty() and _temp_meta_data.is_empty():
 		push_error("iOplazxEssence: No hay datos en caché para guardar.")
 		return false
 		
-	# Reutilizamos tu función original de guardado
-	var success = save_game(slot_id, _temp_game_data, _temp_meta_data)
+	# 1. Creamos la instancia dinámicamente usando tu Factory y MasterConfig
+	var save_obj = EssenceSaveFactory.create_save_instance(_config)
+	
+	# 2. Le inyectamos la metadata visual que mandó la escena (el Test)
+	save_obj.title = _temp_meta_data.get("title", "Auto-Save")
+	save_obj.play_time = _temp_meta_data.get("play_time", "00:00:00")
+	
+	# 3. Le inyectamos los datos del juego. 
+	# Usamos _load_child_data() para que el objeto absorba el diccionario temporal
+	save_obj._load_child_data(_temp_game_data)
+	
+	# 4. ¡AHORA SÍ! Llamamos al nuevo save_game (Solo 2 argumentos)
+	var success = save_game(slot_id, save_obj)
 	
 	if success:
 		# Renombramos la foto temporal para que pertenezca a este slot

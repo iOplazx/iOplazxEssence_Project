@@ -9,5 +9,4 @@ show_warning_screen = false
 show_warning_icon = true
 button_type = 1
 loading_logo_type = 2
-custom_loading_logo_path = "uid://dvp7ydrt6x37m"
 metadata/_custom_type_script = "uid://cbvfno3r005jc"

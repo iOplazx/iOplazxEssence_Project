@@ -13,3 +13,8 @@ class_name EssenceMasterConfig extends Resource
 @export_dir var path_persistent: String = "res://game_data/persistent/"
 @export_dir var path_remote_template: String = "res://game_data/remote/"
 @export_dir var path_global_template: String = "res://game_data/global/"
+
+@export_category("Save System Customization")
+## Drag your script that inherits from EssenceSaveData here (e.g., res://game_data/MySave.gd)
+## If left empty, the framework will use the basic template.
+@export var custom_save_script: GDScript
