@@ -33,6 +33,5 @@ func _on_btn_load_game_pressed():
 	SceneManager.goto_load_game()
 
 func _on_return_pressed():
-	# lbl_output.text = "Volviendo al menú principal..."
-	SceneManager.go_back()
-	print("Saliendo de la escena de prueba.")
+	# Esto te devolverá al Main Menu de forma segura
+	SceneManager.goto_main_menu()
