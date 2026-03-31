@@ -268,3 +268,43 @@ func take_and_save_screenshot(slot_id: String) -> void:
 		print("iOplazxEssence: Snapshot guardado exitosamente en ", image_path)
 	else:
 		printerr("iOplazxEssence: Falló el guardado del snapshot. Código: ", err)
+
+# ==========================================
+# CACHÉ TEMPORAL (Para transiciones de escena)
+# ==========================================
+var _temp_game_data: Dictionary = {}
+var _temp_meta_data: Dictionary = {}
+var loaded_game_data: Dictionary = {} # Para cuando carguemos una partida
+
+# El juego llama a esto ANTES de ir a la pantalla de Guardar
+func cache_current_state(game_data: Dictionary, meta_data: Dictionary):
+	_temp_game_data = game_data
+	_temp_meta_data = meta_data
+
+# Toma la foto y la guarda como archivo temporal
+func take_temp_screenshot() -> void:
+	await RenderingServer.frame_post_draw
+	var img = get_viewport().get_texture().get_image()
+	if img and not img.is_empty():
+		img.resize(320, 180, Image.INTERPOLATE_BILINEAR)
+		img.save_webp(_save_dir + "temp_snap.webp")
+
+# La UI llama a esto cuando el jugador elige un Slot
+func commit_save(slot_id: String) -> bool:
+	if _temp_game_data.is_empty():
+		push_error("iOplazxEssence: No hay datos en caché para guardar.")
+		return false
+		
+	# Reutilizamos tu función original de guardado
+	var success = save_game(slot_id, _temp_game_data, _temp_meta_data)
+	
+	if success:
+		# Renombramos la foto temporal para que pertenezca a este slot
+		var dir = DirAccess.open(_save_dir)
+		if dir and dir.file_exists("temp_snap.webp"):
+			# Si ya existía una foto vieja de este slot, la sobrescribe
+			if dir.file_exists(slot_id + ".webp"):
+				dir.remove(slot_id + ".webp")
+			dir.rename("temp_snap.webp", slot_id + ".webp")
+			
+	return success

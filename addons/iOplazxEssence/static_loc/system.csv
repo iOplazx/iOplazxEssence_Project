@@ -77,6 +77,12 @@ PAGE_SAVELOAD_BTN_ADDNEWSLOT,ADD NEW SLOT,AGREGAR OTRO ESPACIO
 WORD_SAVE_GAME,SAVE GAME,GUARDAR PARTIDA
 WORD_LOAD_GAME,LOAD GAME,CARGAR PARTIDA
 WORD_RETURN_MAINMENU,RETURN TO MAIN MENU,REGRESAR AL MENU PRINCIPAL
+OVERWRITE_SAVE_TITLE,OVERWRITE SAVE,SOBRESCRIBIR PARTIDA
+OVERWRITE_SAVE_MSG,Are you sure you want to overwrite this save? Current data will be lost.,¿Estás seguro de que deseas sobrescribir esta partida? Los datos actuales se perderán.
+NEW_SAVE_TITLE,NEW SAVE,NUEVA PARTIDA
+NEW_SAVE_MSG,Do you want to save your progress in this slot?,¿Deseas guardar tu progreso en este espacio?
+LOAD_SAVE_TITLE,LOAD GAME,CARGAR PARTIDA
+LOAD_SAVE_MSG,Are you sure you want to load this save? Unsaved progress will be lost.,¿Estás seguro de que deseas cargar esta partida? El progreso no guardado se perderá.
 GLOBAL_YES,Yes,Sí
 GLOBAL_NO,No,No
 GLOBAL_OK,OK,Aceptar

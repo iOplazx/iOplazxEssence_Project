@@ -25,13 +25,42 @@ func _ready():
 		
 	if ResourceLoader.exists(ROUTES_PATH):
 		routes = load(ROUTES_PATH) as EssenceRouteConfig
+	
+	# Si hay datos de carga pendientes en el Manager, los aplicamos
+	if not SaveManager.loaded_game_data.is_empty():
+		var saved_color = SaveManager.loaded_game_data.get("box_color", "ffffff")
+		test_element.color = Color(saved_color)
+		lbl_output.text = "¡Partida cargada exitosamente!"
+		
+		# Limpiamos el caché para no volver a cargarlo si entramos otra vez
+		SaveManager.loaded_game_data.clear()
 
 func _on_btn_save_game_pressed():
-	SceneManager.goto_save_game()
+	lbl_output.text = "Tomando captura y preparando datos..."
+	
+	# 1. Tomamos la foto temporal (usamos await porque espera el renderizado)
+	await SaveManager.take_temp_screenshot()
+	
+	# 2. Empaquetamos los datos del "juego"
+	var current_game_data = {
+		"box_color": test_element.color.to_html() if test_element else "ffffff",
+		"player_hp": 100 # Ejemplo extra
+	}
+	
+	# 3. Empaquetamos los datos visuales para la lista de UI
+	var current_meta_data = {
+		"title": "Prueba de Guardado",
+		"location": "Escena Sandbox",
+		"play_time": "00:15:20"
+	}
+	
+	# 4. Guardamos en el bolsillo del Autoload y viajamos
+	SaveManager.cache_current_state(current_game_data, current_meta_data)
+	SceneManager.goto_save_game(SceneManager.TransitionType.INSTANT)
 
 func _on_btn_load_game_pressed():
-	SceneManager.goto_load_game()
+	# Para cargar no necesitamos empacar datos, solo ir a la UI
+	SceneManager.goto_load_game(SceneManager.TransitionType.INSTANT)
 
 func _on_return_pressed():
-	# Esto te devolverá al Main Menu de forma segura
 	SceneManager.goto_main_menu()

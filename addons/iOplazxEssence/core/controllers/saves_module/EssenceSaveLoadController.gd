@@ -35,6 +35,8 @@ var _is_save_mode: bool = false
 # 0 = Classic (Ren'Py), 1 = Modern (Lista)
 var _current_style: int = 0 
 
+var _all_saves_meta: Dictionary = {}
+
 func _ready():
 	_conectar_botones_estaticos()
 	
@@ -46,7 +48,7 @@ func _ready():
 	print("iOplazxEssence: Abriendo pantalla de guardado. ¿Es modo Save?: ", open_as_save)
 	
 	_set_mode(open_as_save)
-	# Nota: Borré el _refresh_slots() que tenías aquí abajo porque _set_mode ya lo llama.
+	
 
 func _conectar_botones_estaticos():
 	if btn_back: btn_back.pressed.connect(func(): AudioManager.play_ui_sfx(); SceneManager.go_back())
@@ -89,9 +91,31 @@ func _set_mode(is_save: bool):
 func _refresh_slots():
 	var is_classic = (_current_style == 0)
 	
-	# 1. Visibilidad de Contenedores Principales
-	if grid_classic: grid_classic.visible = is_classic
-	if list_modern: list_modern.get_parent().visible = not is_classic
+	_all_saves_meta = SaveManager.get_all_metadata()
+	
+	print("iOplazxEssence: Datos encontrados en disco: ", _all_saves_meta.keys())
+	
+	# 1. Visibilidad y Filtros: Modo Clásico
+	if grid_classic: 
+		grid_classic.visible = is_classic
+		# Rastrear hacia arriba hasta encontrar el ScrollContainer clásico
+		var classic_scroll = grid_classic
+		while classic_scroll and not classic_scroll is ScrollContainer:
+			classic_scroll = classic_scroll.get_parent()
+		if classic_scroll:
+			classic_scroll.visible = is_classic
+			classic_scroll.mouse_filter = Control.MOUSE_FILTER_PASS if is_classic else Control.MOUSE_FILTER_IGNORE
+			
+	# 1.5 Visibilidad y Filtros: Modo Moderno (El culpable)
+	if list_modern: 
+		list_modern.visible = not is_classic
+		# Rastrear hacia arriba hasta encontrar el ScrollContainer moderno (ModernView)
+		var modern_scroll = list_modern
+		while modern_scroll and not modern_scroll is ScrollContainer:
+			modern_scroll = modern_scroll.get_parent()
+		if modern_scroll:
+			modern_scroll.visible = not is_classic
+			modern_scroll.mouse_filter = Control.MOUSE_FILTER_PASS if not is_classic else Control.MOUSE_FILTER_IGNORE
 	
 	# 2. Visibilidad de Elementos Exclusivos
 	if mode_toggle_container: mode_toggle_container.visible = is_classic
@@ -101,7 +125,6 @@ func _refresh_slots():
 	if btn_add_new_slot: 
 		btn_add_new_slot.visible = not is_classic
 		if not is_classic:
-			# Lo movemos siempre al final de la lista
 			btn_add_new_slot.get_parent().move_child(btn_add_new_slot, -1)
 
 	# 4. Generación de Contenido
@@ -123,8 +146,10 @@ func _generar_slots_classic():
 		else:
 			var slot_num = ((_current_page - 1) * _slots_per_page) + (i + 1)
 			slot_id = "save_" + str(_current_page) + "_" + str(i + 1) 
-			
-		_crear_instancia_slot(slot_id, grid_classic)
+		
+		var real_data = _all_saves_meta.get(slot_id, {})
+		
+		_crear_instancia_slot(slot_id, grid_classic, real_data)
 
 func _generar_slots_modern():
 	if list_modern:
@@ -159,15 +184,59 @@ func _handle_slot_action(action: String, slot_id: String):
 	AudioManager.play_ui_sfx()
 	
 	var ask_confirm = Preferences.get_setting("game", "confirm_on_save", true)
+	var slot_has_data = _all_saves_meta.has(slot_id)
 	
-	if ask_confirm:
-		print("iOplazxEssence: Abriendo caja de confirmación para ", action, " en ", slot_id)
-		# ... lógica de tu confirm box ...
-	else:
-		print("iOplazxEssence: Ejecutando ", action, " directamente en ", slot_id)
-		# TODO: Ejecutar el guardado/cargado real
+	# Si el jugador desactivó las confirmaciones en los ajustes y va a guardar en un slot vacío, lo dejamos pasar directo.
+	if not ask_confirm and (action == "SAVE" and not slot_has_data):
+		_ejecutar_accion_real(action, slot_id)
+		return
+
+	# Si llegamos aquí, instanciamos la caja de confirmación
+	var box = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceConfirmBox.tscn").instantiate()
+	get_tree().root.add_child(box)
+	
+	var title = ""
+	var msg = ""
+	
+	# Configuramos los textos dinámicamente según la acción
+	if action == "SAVE":
+		if slot_has_data:
+			title = "OVERWRITE_SAVE_TITLE" # "Sobrescribir Partida"
+			msg = "OVERWRITE_SAVE_MSG" # "¿Deseas sobrescribir esta partida? Los datos anteriores se perderán."
+		else:
+			title = "NEW_SAVE_TITLE" # "Nueva Partida"
+			msg = "NEW_SAVE_MSG" # "¿Deseas guardar la partida en este espacio?"
+	elif action == "LOAD":
+		title = "LOAD_SAVE_TITLE" # "Cargar Partida"
+		msg = "LOAD_SAVE_MSG" # "¿Deseas cargar esta partida? El progreso no guardado se perderá."
+
+	# Pasamos las llaves al dialog (tu confirm_box debería usar tr() internamente para traducirlas)
+	box.setup(title, msg, "MENU_YES", "MENU_NO")
+	
+	# Escuchamos la respuesta del usuario
+	box.on_choice.connect(func(accepted: bool):
+		if accepted:
+			_ejecutar_accion_real(action, slot_id)
+		else:
+			print("iOplazxEssence: Acción cancelada por el usuario.")
+			
+		# Muy importante: Eliminar el dialog una vez usado
+		box.queue_free() 
+	)
 		
-	_refresh_slots()
+func _ejecutar_accion_real(action: String, slot_id: String):
+	if action == "SAVE":
+		var success = SaveManager.commit_save(slot_id)
+		if success:
+			print("iOplazxEssence: Partida guardada con éxito en ", slot_id)
+			_refresh_slots() 
+			
+	elif action == "LOAD":
+		var data = SaveManager.load_game(slot_id)
+		if not data.is_empty():
+			print("iOplazxEssence: Partida cargada. Restaurando mundo...")
+			SaveManager.loaded_game_data = data.get("game_data", {})
+			SceneManager.go_back()
 
 # ==========================================
 # PAGINACIÓN BÁSICA (A, 1, 2, 3...)
@@ -191,3 +260,4 @@ func _cambiar_pagina(page_num: int):
 		_current_page = page_num
 		AudioManager.play_ui_sfx()
 		_refresh_slots()
+		
