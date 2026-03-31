@@ -38,15 +38,15 @@ var _current_style: int = 0
 func _ready():
 	_conectar_botones_estaticos()
 	
-	# Leemos de las preferencias qué estilo eligió el jugador en los Ajustes
 	_current_style = Preferences.get_setting("game", "save_style", 0)
-	
-	# Por defecto, abrimos en modo "Cargar", pero si venimos del juego pausado, 
-	# podríamos cambiar esto a "Guardar"
-	_set_mode(false) 
-	
 	_generar_botones_paginacion()
-	_refresh_slots()
+	
+	# Leemos la intención y ponemos un print para debuggear
+	var open_as_save = SaveManager.intent_is_save_mode
+	print("iOplazxEssence: Abriendo pantalla de guardado. ¿Es modo Save?: ", open_as_save)
+	
+	_set_mode(open_as_save)
+	# Nota: Borré el _refresh_slots() que tenías aquí abajo porque _set_mode ya lo llama.
 
 func _conectar_botones_estaticos():
 	if btn_back: btn_back.pressed.connect(func(): AudioManager.play_ui_sfx(); SceneManager.go_back())
@@ -55,7 +55,31 @@ func _conectar_botones_estaticos():
 
 func _set_mode(is_save: bool):
 	_is_save_mode = is_save
-	lbl_title.text = tr("PAGE_TITLE_SAVE") if _is_save_mode else tr("PAGE_TITLE_LOAD")
+	
+	# 1. Ajuste del Título (Neutro para Moderno, Específico para Clásico)
+	var final_title = ""
+	if _current_style == 1:
+		final_title = tr("PAGE_TITLE_SAVES_MODERN") 
+	else:
+		final_title = tr("PAGE_TITLE_SAVE") if _is_save_mode else tr("PAGE_TITLE_LOAD")
+		
+	# Verificamos si el nodo del Título existe antes de intentar cambiarlo
+	if lbl_title:
+		lbl_title.text = final_title
+	else:
+		push_error("iOplazxEssence CRÍTICO: 'lbl_title' está vacío. ¡Arrastra el Label de título al Inspector!")
+		
+	# 2. Ajuste visual de las pestañas (Solo relevante en Clásico)
+	if btn_mode_save: 
+		btn_mode_save.disabled = _is_save_mode
+	else:
+		push_warning("iOplazxEssence: No asignaste 'btn_mode_save' en el Inspector.")
+		
+	if btn_mode_load: 
+		btn_mode_load.disabled = not _is_save_mode
+	else:
+		push_warning("iOplazxEssence: No asignaste 'btn_mode_load' en el Inspector.")
+	
 	AudioManager.play_ui_sfx()
 	_refresh_slots()
 
@@ -113,15 +137,6 @@ func _generar_slots_modern():
 	for i in range(5):
 		var slot_id = "modern_save_" + str(i + 1)
 		var mock_data: Dictionary = {}
-		
-		# Simulamos datos SOLO para el primer slot
-		if i == 0:
-			mock_data = {
-				"title": "Capítulo 3: La Traición",
-				"location": "Castillo de Kumi - Nivel Inferior",
-				"date": "30/03/2026 03:56:33",
-				"play_time": "14:23:05"
-			}
 			
 		_crear_instancia_slot(slot_id, list_modern, mock_data)
 

@@ -8,6 +8,8 @@ var _encryption_key: String = "iOplazx_Default_Insecure_Key_!#"
 var _save_extension: String = ".ess" 
 var _current_version: int = 1
 
+var intent_is_save_mode: bool = false
+
 const INDEX_FILE = "save_index.json"
 
 # Señales para comunicar al UI o al juego que algo terminó

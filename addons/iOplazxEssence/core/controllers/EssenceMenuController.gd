@@ -117,7 +117,6 @@ func _on_continue_pressed():
 	SceneManager.goto_continue_game()
 	
 func _on_load_pressed():
-	print("Opening Load Game screen...")
 	SceneManager.goto_load_game()
 
 func _on_settings_pressed():

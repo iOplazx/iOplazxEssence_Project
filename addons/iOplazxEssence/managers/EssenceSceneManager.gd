@@ -55,6 +55,11 @@ func goto_continue_game(transition: TransitionType = TransitionType.FADE_BLACK):
 	if _verificar_config(): _navigate(_config.continue_game_scene, transition)
 		
 func goto_load_game(transition: TransitionType = TransitionType.FADE_BLACK): 
+	SaveManager.intent_is_save_mode = false
+	if _verificar_config(): _navigate(_config.load_game_scene, transition)
+
+func goto_save_game(transition: TransitionType = TransitionType.FADE_BLACK):
+	SaveManager.intent_is_save_mode = true
 	if _verificar_config(): _navigate(_config.load_game_scene, transition)
 
 func goto_settings(transition: TransitionType = TransitionType.FADE_BLACK): 

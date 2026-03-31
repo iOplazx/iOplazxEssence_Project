@@ -2,7 +2,9 @@
 
 [ext_resource type="Script" uid="uid://c5gij173ao6h3" path="res://addons/iOplazxEssence/scriptsItems/TestSaveScene.gd" id="1_qd6tp"]
 
-[node name="TestSaveScene" type="Node" unique_id=791504865 node_paths=PackedStringArray("btn_save", "btn_load", "btn_return", "lbl_output", "test_element")]
+[node name="TestSaveScene" type="Control" unique_id=1888341287 node_paths=PackedStringArray("btn_save", "btn_load", "btn_return", "lbl_output", "test_element")]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_qd6tp")
 btn_save = NodePath("VBoxContainer/HBoxContainer/btnSave")
 btn_load = NodePath("VBoxContainer/HBoxContainer/btnLoad")
@@ -11,6 +13,7 @@ lbl_output = NodePath("VBoxContainer/ScrollContainer/lblOutput")
 test_element = NodePath("TestElement")
 
 [node name="Background" type="ColorRect" parent="." unique_id=660247948]
+layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 size_flags_horizontal = 3
@@ -19,10 +22,12 @@ color = Color(0.32172796, 0.32172796, 0.32172796, 1)
 
 [node name="TestElement" type="ColorRect" parent="." unique_id=772960954]
 custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=393522600]
+layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
