@@ -5,8 +5,6 @@ class_name EssenceSaveManager extends Node
 # ==========================================
 var _save_dir: String = "user://saves/"
 var _encryption_key: String = "iOplazx_Default_Insecure_Key_!#"
-var _save_extension: String = ".ess" 
-var _current_version: int = 1
 
 var intent_is_save_mode: bool = false
 const INDEX_FILE = "save_index.json"
@@ -19,29 +17,16 @@ signal on_save_error(slot_id: String, error_msg: String)
 
 func _ready():
 	_verificar_config()
-	_verificar_directorios()
 	_cargar_llave_secreta()
 	_configurar_directorio_usuario()
 	
-func _verificar_directorios():
-	if not DirAccess.dir_exists_absolute(_save_dir):
-		DirAccess.make_dir_recursive_absolute(_save_dir)
-		print("iOplazxEssence: Carpeta de guardados creada en ", _save_dir)
-
+	
 func _verificar_config():
 	# Cargamos el archivo MasterConfig (asegúrate de que esta ruta sea la correcta en tu proyecto)
 	_config = load(EssencePaths.CARPET_STATIC+"MasterConfig.tres") as EssenceMasterConfig
 	
 	if not _config:
 		push_warning("iOplazxEssence: No se encontró MasterConfig.tres. Usando valores por defecto.")
-
-# ==========================================
-# EL PUENTE: CONFIGURACIÓN DESDE EL JUEGO
-# ==========================================
-func setup_config(extension: String, version: int):
-	_save_extension = extension
-	_current_version = version
-	print("iOplazxEssence: Configuración de guardado actualizada (", extension, ", v", version, ")")
 
 # ==========================================
 # INYECCIÓN DE DEPENDENCIAS
@@ -64,31 +49,28 @@ func _configurar_directorio_usuario():
 	# 0 = Global (user://), 1 = Remoto (junto al .exe)
 	var save_location: int = 0 
 	
-	# Acceso seguro al Autoload 'Preferences'
 	if Engine.has_singleton("Preferences") or get_tree().root.has_node("Preferences"):
 		var prefs_node = get_node("/root/Preferences")
-		# Pedimos el valor "save_location" de la sección "game", con 0 como respaldo
 		save_location = prefs_node.get_setting("game", "save_location", 0)
 	else:
-		push_warning("iOplazxEssence: Autoload 'Preferences' no detectado. Usando modo de guardado Global (0) por defecto.")
+		push_warning("iOplazxEssence: Autoload 'Preferences' no detectado. Usando modo Global (0).")
 	
-	# Lógica de asignación de rutas
-	# Solo usamos el modo Remoto si save_location es 1 Y NO estamos dentro del editor de Godot
 	if save_location == 1 and not OS.has_feature("editor"):
 		var exe_folder = OS.get_executable_path().get_base_dir()
 		_save_dir = exe_folder.path_join("saves/")
 	else:
 		_save_dir = "user://saves/"
 		
-	# Nos aseguramos de que la carpeta exista físicamente en la ruta elegida
+	# FUSIÓN: Ahora creamos la carpeta recursivamente SOLO después de saber la ruta final
 	if not DirAccess.dir_exists_absolute(_save_dir):
-		DirAccess.make_dir_absolute(_save_dir)
+		DirAccess.make_dir_recursive_absolute(_save_dir)
+		print("iOplazxEssence: Carpeta de guardados creada en ", _save_dir)
 
 # ==========================================
 # RUTAS DINÁMICAS
 # ==========================================
 func get_file_path(slot_id: String) -> String:
-	return _save_dir + slot_id + _save_extension
+	return _save_dir + slot_id + GameConstants.EXTENSION_SAVE_FILE
 
 # ==========================================
 # ESCRITURA Y CIFRADO
@@ -170,8 +152,8 @@ func get_all_metadata() -> Dictionary:
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
 		while file_name != "":
-			if not dir.current_is_dir() and file_name.ends_with(_save_extension):
-				var slot_id = file_name.replace(_save_extension, "")
+			if not dir.current_is_dir() and file_name.ends_with(GameConstants.EXTENSION_SAVE_FILE):
+				var slot_id = file_name.replace(GameConstants.EXTENSION_SAVE_FILE, "")
 				var data = load_game(slot_id)
 				if not data.is_empty():
 					all_saves[slot_id] = data.get("essence_meta", {})
@@ -187,9 +169,9 @@ func _run_migrations(package: Dictionary) -> Dictionary:
 	var file_version = meta.get("version", 1)
 	var game_data = package.get("game_data", {})
 	
-	if file_version < _current_version:
-		print("iOplazxEssence: Migrando partida de v", file_version, " a v", _current_version)
-		meta["version"] = _current_version 
+	if file_version < GameConstants.CURRENT_SAVE_VERSION:
+		print("iOplazxEssence: Migrando partida de v", file_version, " a v", GameConstants.CURRENT_SAVE_VERSION)
+		meta["version"] = GameConstants.CURRENT_SAVE_VERSION
 		
 	package["game_data"] = game_data
 	return package
