@@ -49,8 +49,8 @@ func _configurar_directorio_usuario():
 	# 0 = Global (user://), 1 = Remoto (junto al .exe)
 	var save_location: int = 0 
 	
-	if Engine.has_singleton("Preferences") or get_tree().root.has_node("Preferences"):
-		var prefs_node = get_node("/root/Preferences")
+	if Engine.has_singleton("Preferences"):
+		var prefs_node = Engine.get_singleton("Preferences")
 		save_location = prefs_node.get_setting("game", "save_location", 0)
 	else:
 		push_warning("iOplazxEssence: Autoload 'Preferences' no detectado. Usando modo Global (0).")
@@ -61,7 +61,6 @@ func _configurar_directorio_usuario():
 	else:
 		_save_dir = "user://saves/"
 		
-	# FUSIÓN: Ahora creamos la carpeta recursivamente SOLO después de saber la ruta final
 	if not DirAccess.dir_exists_absolute(_save_dir):
 		DirAccess.make_dir_recursive_absolute(_save_dir)
 		print("iOplazxEssence: Carpeta de guardados creada en ", _save_dir)

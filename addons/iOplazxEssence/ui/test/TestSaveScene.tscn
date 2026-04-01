@@ -55,7 +55,7 @@ layout_mode = 2
 text = "WORD_RETURN_MAINMENU"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="VBC/VBoxContainer" unique_id=1730963824]
-custom_minimum_size = Vector2(300, 150)
+custom_minimum_size = Vector2(300, 300)
 layout_mode = 2
 
 [node name="lblOutput" type="Label" parent="VBC/VBoxContainer/ScrollContainer" unique_id=1048442031]
@@ -66,4 +66,4 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_qd6tp")
 text = "TEST"
-autowrap_mode = 2
+autowrap_mode = 3
