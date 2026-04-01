@@ -302,6 +302,7 @@ func commit_save(slot_id: String) -> bool:
 	
 	# 2. Le inyectamos la metadata visual que mandó la escena (el Test)
 	save_obj.title = _temp_meta_data.get("title", "Auto-Save")
+	save_obj.description = _temp_meta_data.get("description", "")
 	save_obj.play_time = _temp_meta_data.get("play_time", "00:00:00")
 	
 	# 3. Le inyectamos los datos del juego. 

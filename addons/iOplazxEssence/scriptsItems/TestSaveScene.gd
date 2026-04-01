@@ -47,7 +47,7 @@ func _on_btn_save_game_pressed():
 	# 3. Empaquetamos los datos visuales para la lista de UI
 	var current_meta_data = {
 		"title": "Prueba de Guardado",
-		"location": "Escena Sandbox",
+		"description": "Escena Sandbox - Nivel 1",
 		"play_time": "00:15:20"
 	}
 	
