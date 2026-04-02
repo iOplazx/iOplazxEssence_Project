@@ -46,14 +46,8 @@ func _cargar_llave_secreta():
 		file.close()
 
 func _configurar_directorio_usuario():
-	# 0 = Global (user://), 1 = Remoto (junto al .exe)
-	var save_location: int = 0 
-	
-	if Engine.has_singleton("Preferences"):
-		var prefs_node = Engine.get_singleton("Preferences")
-		save_location = prefs_node.get_setting("game", "save_location", 0)
-	else:
-		push_warning("iOplazxEssence: Autoload 'Preferences' no detectado. Usando modo Global (0).")
+	# 1. Llamada directa a la RAM. Cero retrasos, cero comprobaciones falsas.
+	var save_location: int = Preferences.get_setting("game", "save_location", 0)
 	
 	if save_location == 1 and not OS.has_feature("editor"):
 		var exe_folder = OS.get_executable_path().get_base_dir()
@@ -64,7 +58,7 @@ func _configurar_directorio_usuario():
 	if not DirAccess.dir_exists_absolute(_save_dir):
 		DirAccess.make_dir_recursive_absolute(_save_dir)
 		print("iOplazxEssence: Carpeta de guardados creada en ", _save_dir)
-
+		
 # ==========================================
 # RUTAS DINÁMICAS
 # ==========================================
