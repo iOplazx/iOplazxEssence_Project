@@ -201,10 +201,17 @@ func _handle_slot_action(action: String, slot_id: String):
 	var ask_confirm = Preferences.get_setting("game", "confirm_on_save", true)
 	var slot_has_data = _all_saves_meta.has(slot_id)
 	
+	# === LÓGICA DE EDICIÓN ===
+	if action == "EDIT":
+		_mostrar_dialogo_edicion(slot_id, _all_saves_meta[slot_id].get("title", ""))
+		return
+	
+	# === LÓGICA DE SALTO DE CONFIRMACIÓN ===
 	if not ask_confirm and (action == "SAVE" and not slot_has_data):
 		_ejecutar_accion_real(action, slot_id)
 		return
-
+		
+	# === CAJA DE CONFIRMACIÓN (SAVE, LOAD, DELETE) ===
 	var box = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceConfirmBox.tscn").instantiate()
 	get_tree().root.add_child(box)
 	
@@ -221,6 +228,9 @@ func _handle_slot_action(action: String, slot_id: String):
 	elif action == "LOAD":
 		title = "LOAD_SAVE_TITLE"
 		msg = "LOAD_SAVE_MSG"
+	elif action == "DELETE":
+		title = "DELETE_SAVE_TITLE"
+		msg = "DELETE_SAVE_MSG" # "¿Estás seguro de querer borrar esta partida permanentemente?"
 
 	box.setup(title, msg, "MENU_YES", "MENU_NO")
 	
@@ -229,6 +239,25 @@ func _handle_slot_action(action: String, slot_id: String):
 			_ejecutar_accion_real(action, slot_id)
 		box.queue_free() 
 	)
+	
+func _mostrar_dialogo_edicion(slot_id: String, current_title: String):
+	# Aquí asumirás que crearás un EssenceInputBox (similar al ConfirmBox pero con un LineEdit)
+	# Si aún no lo tienes, puedes probar con prints por ahora.
+	
+	# var input_box = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceInputBox.tscn").instantiate()
+	# get_tree().root.add_child(input_box)
+	# input_box.setup("RENAME_SAVE_TITLE", "Escribe el nuevo nombre:", current_title)
+	# input_box.on_submit.connect(func(new_text: String):
+	# 	if new_text.strip_edges() != "":
+	# 		SaveManager.update_save_title(slot_id, new_text)
+	# 		_refresh_slots()
+	# 	input_box.queue_free()
+	# )
+	
+	# Simulación temporal (Quita esto cuando tengas el UI de Input)
+	print("Abriendo popup de edición para: ", slot_id, " (Título actual: ", current_title, ")")
+	# SaveManager.update_save_title(slot_id, "Nuevo Título Probado")
+	# _refresh_slots()
 		
 func _ejecutar_accion_real(action: String, slot_id: String):
 	if action == "SAVE":
@@ -241,6 +270,10 @@ func _ejecutar_accion_real(action: String, slot_id: String):
 		if not data.is_empty() and data.has("game_data"):
 			SaveManager.loaded_game_data = data["game_data"]
 			SceneManager.go_back()
+			
+	elif action == "DELETE":
+		SaveManager.delete_save(slot_id)
+		_refresh_slots() # Recargamos la UI para que se vea vacío de nuevo)
 
 # ==========================================
 # DELEGACIÓN DE UI (PAGINADOR)

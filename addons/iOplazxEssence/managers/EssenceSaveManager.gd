@@ -323,3 +323,35 @@ func commit_save(slot_id: String) -> bool:
 			dir.rename("temp_snap.webp", slot_id + ".webp")
 			
 	return success
+
+# Borra el archivo .ess, su foto y lo quita del index
+func delete_save(slot_id: String):
+	var dir = DirAccess.open(_save_dir)
+	if dir:
+		if dir.file_exists(slot_id + ".ess"):
+			dir.remove(slot_id + ".ess")
+		if dir.file_exists(slot_id + ".webp"):
+			dir.remove(slot_id + ".webp")
+			
+	_update_save_index(slot_id, true) # true = está borrando
+	print("iOplazxEssence: Partida borrada exitosamente -> ", slot_id)
+
+# Actualiza solo el título en la metadata sin afectar los datos del juego
+func update_save_title(slot_id: String, new_title: String):
+	var path = _save_dir + slot_id + ".ess"
+	if FileAccess.file_exists(path):
+		# 1. Leemos el archivo actual
+		var file_read = FileAccess.open(path, FileAccess.READ)
+		var json_string = file_read.get_as_text()
+		file_read.close()
+		
+		# 2. Convertimos y modificamos
+		var data = JSON.parse_string(json_string)
+		if typeof(data) == TYPE_DICTIONARY and data.has("essence_meta"):
+			data["essence_meta"]["title"] = new_title
+			
+			# 3. Reescribimos el archivo
+			var file_write = FileAccess.open(path, FileAccess.WRITE)
+			file_write.store_string(JSON.stringify(data, "\t"))
+			file_write.close()
+			print("iOplazxEssence: Título actualizado a '", new_title, "' en ", slot_id)
