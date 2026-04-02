@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://bocmcorhh81jm"]
+
+[ext_resource type="Script" uid="uid://cwmxkr6j4nc6c" path="res://addons/iOplazxEssence/scriptsItems/EssenceInputBox.gd" id="1_4yr6g"]
+
+[node name="EssenceInputBox" type="Control" unique_id=1346954466 node_paths=PackedStringArray("lbl_title", "lbl_msg", "input_text", "btn_confirm", "btn_cancel")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4yr6g")
+lbl_title = NodePath("PanelContainer/VBoxContainer/LblTitle")
+lbl_msg = NodePath("PanelContainer/VBoxContainer/LblMsg")
+input_text = NodePath("PanelContainer/VBoxContainer/InputText")
+btn_confirm = NodePath("PanelContainer/VBoxContainer/HBoxContainer/BtnConfirm")
+btn_cancel = NodePath("PanelContainer/VBoxContainer/HBoxContainer/BtnCancel")
+
+[node name="BG_Overlay" type="ColorRect" parent="." unique_id=588699643]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.13725491, 0.13725491, 0.13725491, 0.7529412)
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=2091506086]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -100.0
+offset_right = 100.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=222464945]
+layout_mode = 2
+
+[node name="LblTitle" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1276855607]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "TITLE"
+
+[node name="LblMsg" type="Label" parent="PanelContainer/VBoxContainer" unique_id=122112350]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "MESSAGE"
+
+[node name="InputText" type="LineEdit" parent="PanelContainer/VBoxContainer" unique_id=1119274929]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=1210048015]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="BtnCancel" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1371873351]
+layout_mode = 2
+text = "CANCEL"
+
+[node name="BtnConfirm" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1524063890]
+layout_mode = 2
+text = "CONFIRM"

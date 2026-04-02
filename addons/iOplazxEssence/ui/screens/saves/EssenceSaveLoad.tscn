@@ -108,6 +108,7 @@ layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 8
 text = "PAGE_SAVELOAD_BTN_ADDNEWSLOT"
+metadata/_edit_use_anchors_ = true
 
 [node name="Pagination" type="HBoxContainer" parent="MainMargin/MainLayout" unique_id=10977011]
 layout_mode = 2
