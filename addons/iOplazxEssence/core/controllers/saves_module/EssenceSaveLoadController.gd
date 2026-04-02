@@ -208,7 +208,6 @@ func _on_add_new_pressed():
 func _handle_slot_action(action: String, slot_id: String):
 	AudioManager.play_ui_sfx()
 	
-	var ask_confirm = Preferences.get_setting("game", "confirm_on_save", true)
 	var slot_has_data = _all_saves_meta.has(slot_id)
 	
 	# === LÓGICA DE EDICIÓN ===
@@ -216,8 +215,24 @@ func _handle_slot_action(action: String, slot_id: String):
 		_mostrar_dialogo_edicion(slot_id, _all_saves_meta[slot_id].get("title", ""))
 		return
 	
+	# === VERIFICACIÓN DE PREFERENCIAS DE CONFIRMACIÓN ===
+	var ask_confirm: bool = true
+	
+	if action == "SAVE":
+		ask_confirm = Preferences.get_setting("game", "confirm_save", true)
+		# Excepción de UX: Si el slot está vacío, guardamos directo sin preguntar, 
+		# sin importar cómo estén las preferencias.
+		if not slot_has_data:
+			ask_confirm = false
+			
+	elif action == "LOAD":
+		ask_confirm = Preferences.get_setting("game", "confirm_load", true)
+		
+	elif action == "DELETE":
+		ask_confirm = Preferences.get_setting("game", "confirm_delete", true)
+	
 	# === LÓGICA DE SALTO DE CONFIRMACIÓN ===
-	if not ask_confirm and (action == "SAVE" and not slot_has_data):
+	if not ask_confirm:
 		_ejecutar_accion_real(action, slot_id)
 		return
 		
@@ -229,18 +244,16 @@ func _handle_slot_action(action: String, slot_id: String):
 	var msg = ""
 	
 	if action == "SAVE":
-		if slot_has_data:
-			title = "OVERWRITE_SAVE_TITLE"
-			msg = "OVERWRITE_SAVE_MSG"
-		else:
-			title = "NEW_SAVE_TITLE"
-			msg = "NEW_SAVE_MSG"
+		# Ya sabemos que si llegó aquí es porque tiene datos (por la excepción de arriba), 
+		# así que siempre será un mensaje de Sobrescribir.
+		title = "OVERWRITE_SAVE_TITLE"
+		msg = "OVERWRITE_SAVE_MSG"
 	elif action == "LOAD":
 		title = "LOAD_SAVE_TITLE"
 		msg = "LOAD_SAVE_MSG"
 	elif action == "DELETE":
 		title = "DELETE_SAVE_TITLE"
-		msg = "DELETE_SAVE_MSG" # "¿Estás seguro de querer borrar esta partida permanentemente?"
+		msg = "DELETE_SAVE_MSG"
 
 	box.setup(title, msg, "MENU_YES", "MENU_NO")
 	

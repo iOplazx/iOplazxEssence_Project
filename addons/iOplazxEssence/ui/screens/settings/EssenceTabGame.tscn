@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://dg2pfy1nu8r2q" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabGame.gd" id="1_hcnkt"]
 [ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/widgets/RowSlider.tscn" id="2_01fne"]
+[ext_resource type="Theme" uid="uid://7qlrwukoknkb" path="res://addons/iOplazxEssence/resources/file/HSeparationChkButton.tres" id="3_01fne"]
 
-[node name="mgGame" type="MarginContainer" unique_id=518972696 node_paths=PackedStringArray("dpd_difficulty", "chk_nsfw", "slider_text_speed", "dpd_autosave", "dpd_save_style", "dpd_save_location", "btn_apply") groups=["settings_tabs"]]
+[node name="mgGame" type="MarginContainer" unique_id=518972696 node_paths=PackedStringArray("dpd_difficulty", "chk_nsfw", "slider_text_speed", "dpd_autosave", "dpd_save_style", "dpd_save_location", "chk_confirm_save", "chk_confirm_load", "chk_confirm_delete", "btn_apply") groups=["settings_tabs"]]
 script = ExtResource("1_hcnkt")
 dpd_difficulty = NodePath("mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
 chk_nsfw = NodePath("mcBodyGame/VBoxContainer/chkbNFSW")
@@ -11,6 +12,9 @@ slider_text_speed = NodePath("mcBodyGame/VBoxContainer/SliderTextSpeed")
 dpd_autosave = NodePath("mcBodyGame/VBoxContainer/RowAutosave/dpdAutosave")
 dpd_save_style = NodePath("mcBodyGame/VBoxContainer/RowSaveStyle/dpdSaveStyle")
 dpd_save_location = NodePath("mcBodyGame/VBoxContainer/RowSaveLocation/dpdSaveLocation")
+chk_confirm_save = NodePath("mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkOverwrite")
+chk_confirm_load = NodePath("mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkLoad")
+chk_confirm_delete = NodePath("mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkDelete")
 btn_apply = NodePath("mcBotonSaveChange/btnSaveChangeGame")
 metadata/_tab_index = 0
 metadata/_tab_name = "SETTINGS_GAME"
@@ -42,6 +46,7 @@ layout_mode = 2
 [node name="chkbNFSW" type="CheckButton" parent="mcBodyGame/VBoxContainer" unique_id=471657907]
 layout_mode = 2
 size_flags_horizontal = 0
+theme = ExtResource("3_01fne")
 text = "SETTINGS_GAME_CHECK_NSFW"
 
 [node name="SliderTextSpeed" parent="mcBodyGame/VBoxContainer" unique_id=1890518606 instance=ExtResource("2_01fne")]
@@ -93,6 +98,28 @@ text = "SETTINGS_GAME_SAVE_STYLE"
 [node name="dpdSaveLocation" type="OptionButton" parent="mcBodyGame/VBoxContainer/RowSaveLocation" unique_id=986262909]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="mcBodyGame/VBoxContainer" unique_id=1830619748]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VBchkConfirmPreferences" type="VBoxContainer" parent="mcBodyGame/VBoxContainer/MarginContainer" unique_id=598362043]
+layout_mode = 2
+
+[node name="chkOverwrite" type="CheckButton" parent="mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=255994715]
+layout_mode = 2
+theme = ExtResource("3_01fne")
+text = "Overwrite"
+
+[node name="chkLoad" type="CheckButton" parent="mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=713950173]
+layout_mode = 2
+theme = ExtResource("3_01fne")
+text = "Load"
+
+[node name="chkDelete" type="CheckButton" parent="mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=1353209289]
+layout_mode = 2
+theme = ExtResource("3_01fne")
+text = "Delete"
 
 [node name="mcBotonSaveChange" type="MarginContainer" parent="." unique_id=80042797]
 layout_mode = 2

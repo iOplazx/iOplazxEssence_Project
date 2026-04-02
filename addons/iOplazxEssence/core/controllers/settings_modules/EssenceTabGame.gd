@@ -8,6 +8,11 @@ extends MarginContainer
 @export var dpd_save_style: OptionButton
 @export var dpd_save_location: OptionButton
 
+@export_category("Confirmaciones")
+@export var chk_confirm_save: CheckButton
+@export var chk_confirm_load: CheckButton
+@export var chk_confirm_delete: CheckButton
+
 var _pending_changes: bool = false
 @export var btn_apply: Button 
 
@@ -40,6 +45,15 @@ func _connect_signals():
 		
 	if dpd_save_location and not dpd_save_location.item_selected.is_connected(_on_save_location_selected):
 		dpd_save_location.item_selected.connect(_on_save_location_selected)
+		
+	if chk_confirm_save and not chk_confirm_save.toggled.is_connected(_on_confirm_save_toggled):
+		chk_confirm_save.toggled.connect(_on_confirm_save_toggled)
+		
+	if chk_confirm_load and not chk_confirm_load.toggled.is_connected(_on_confirm_load_toggled):
+		chk_confirm_load.toggled.connect(_on_confirm_load_toggled)
+		
+	if chk_confirm_delete and not chk_confirm_delete.toggled.is_connected(_on_confirm_delete_toggled):
+		chk_confirm_delete.toggled.connect(_on_confirm_delete_toggled)
 
 # ==========================================
 # 2. ACTUALIZACIÓN DE TEXTOS
@@ -70,6 +84,10 @@ func _setup_texts():
 		dpd_save_location.clear()
 		dpd_save_location.add_item(tr("SETTINGS_SAVE_LOC_GLOBAL"), 0)
 		dpd_save_location.add_item(tr("SETTINGS_SAVE_LOC_VERSION"), 1)
+		
+	if chk_confirm_save: chk_confirm_save.text = tr("SETTINGS_CONFIRM_SAVE")
+	if chk_confirm_load: chk_confirm_load.text = tr("SETTINGS_CONFIRM_LOAD")
+	if chk_confirm_delete: chk_confirm_delete.text = tr("SETTINGS_CONFIRM_DELETE")
 
 # ==========================================
 # 3. SINCRONIZACIÓN VISUAL
@@ -88,6 +106,14 @@ func _sync_values():
 	
 	if dpd_save_location:
 		dpd_save_location.select(Preferences.get_setting("game", "save_location", 0))
+	
+	if chk_confirm_save:
+		chk_confirm_save.set_pressed_no_signal(Preferences.get_setting("game", "confirm_save", true))
+	if chk_confirm_load:
+		chk_confirm_load.set_pressed_no_signal(Preferences.get_setting("game", "confirm_load", true))
+	if chk_confirm_delete:
+		chk_confirm_delete.set_pressed_no_signal(Preferences.get_setting("game", "confirm_delete", true))
+
 
 # ==========================================
 # REACCIÓN A EVENTOS GLOBALES
@@ -96,7 +122,7 @@ func _notification(what):
 	if what == NOTIFICATION_TRANSLATION_CHANGED:
 		_setup_texts()
 		_sync_values()
-		_pending_changes = false # Bajamos la bandera porque acabamos de leer los datos oficiales
+		_pending_changes = false 
 
 # ==========================================
 # SEÑALES DE USUARIO
@@ -129,6 +155,21 @@ func _on_nsfw_toggled(button_pressed: bool):
 	
 func _on_save_location_selected(idx):
 	Preferences.set_setting("game", "save_location", idx)
+	_pending_changes = true
+	AudioManager.play_ui_sfx()
+	
+func _on_confirm_save_toggled(button_pressed: bool):
+	Preferences.set_setting("game", "confirm_save", button_pressed)
+	_pending_changes = true
+	AudioManager.play_ui_sfx()
+
+func _on_confirm_load_toggled(button_pressed: bool):
+	Preferences.set_setting("game", "confirm_load", button_pressed)
+	_pending_changes = true
+	AudioManager.play_ui_sfx()
+
+func _on_confirm_delete_toggled(button_pressed: bool):
+	Preferences.set_setting("game", "confirm_delete", button_pressed)
 	_pending_changes = true
 	AudioManager.play_ui_sfx()
 
