@@ -202,7 +202,17 @@ func _crear_instancia_slot(slot_id: String, container: Control, save_data: Dicti
 func _on_add_new_pressed():
 	AudioManager.play_ui_sfx()
 	var target_slot_id = EssenceSlotMapper.get_next_empty_slot_id(_all_saves_meta)
+	
+	# 1. Ejecutamos el guardado
+	# Si _handle_slot_action no es async, asegúrate de que SaveManager.commit_save devuelva true
 	_handle_slot_action("SAVE", target_slot_id)
+	
+	# 2. ESPERA CRÍTICA:
+	# Esperamos un instante a que el sistema operativo registre el nuevo archivo .webp
+	await get_tree().create_timer(0.1).timeout
+	
+	# 3. Refrescamos la lista de slots
+	_refresh_slots()
 
 # ==========================================
 # ACCIONES GLOBALES (GUARDAR / CARGAR)

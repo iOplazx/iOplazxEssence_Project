@@ -27,10 +27,15 @@ func _ready():
 		_restaurar_partida_cargada()
 		
 func _preparar_datos_para_menu():
-	lbl_output.text = "Tomando captura y preparando datos..."
+	lbl_output.text = "Capturando pantalla..."
 	
-	# Esperamos a que tome la foto de la partida en vivo
+	# Forzamos un frame de espera ANTES de la captura para limpiar basura visual
+	await get_tree().process_frame
 	await SaveManager.take_temp_screenshot()
+	
+	# Un pequeño delay extra para que el Athlon termine de escribir el archivo .webp
+	# 0.1 segundos es imperceptible pero vital para el disco duro
+	await get_tree().create_timer(0.1).timeout
 	
 	var current_game_data = {
 		"box_color": test_element.color.to_html(false) if test_element else "ffffff",
@@ -40,7 +45,7 @@ func _preparar_datos_para_menu():
 	var current_meta_data = {
 		"title": "Prueba de Guardado",
 		"description": "Escena Sandbox - Nivel 1",
-		"play_time": "00:15:20"
+		"play_time": "99:15:20"
 	}
 	
 	# Llenamos la caché (Esto es lo que avisa al Modern UI que hay partida)

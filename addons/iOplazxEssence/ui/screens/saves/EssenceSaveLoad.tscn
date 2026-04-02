@@ -17,7 +17,7 @@ list_modern = NodePath("MainMargin/MainLayout/ContentArea/ModernView/MarginConta
 lbl_title = NodePath("MainMargin/MainLayout/Header/lblTitle")
 mode_toggle_container = NodePath("MainMargin/MainLayout/Header/HBoxContainer")
 pagination_container = NodePath("MainMargin/MainLayout/Pagination")
-btn_add_new_slot = NodePath("MainMargin/MainLayout/ContentArea/ModernView/MarginContainer/btnAddNewSlot")
+btn_add_new_slot = NodePath("MainMargin/MainLayout/ContentArea/btnAddNewSlot")
 box_pagination = NodePath("MainMargin/MainLayout/Pagination/PageNumbers")
 btn_mode_save = NodePath("MainMargin/MainLayout/Header/HBoxContainer/btnModeSave")
 btn_mode_load = NodePath("MainMargin/MainLayout/Header/HBoxContainer/btnModeLoad")
@@ -103,7 +103,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 15
 
-[node name="btnAddNewSlot" type="Button" parent="MainMargin/MainLayout/ContentArea/ModernView/MarginContainer" unique_id=797496496]
+[node name="btnAddNewSlot" type="Button" parent="MainMargin/MainLayout/ContentArea" unique_id=797496496]
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 8
