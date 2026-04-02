@@ -64,9 +64,9 @@ SETTINGS_RESTORE_TITLE,Restore Defaults,Restaurar Predeterminados
 SETTINGS_RESTORE_MSG,Are you sure you want to restore all settings to their default values?,¿Estás seguro de que deseas restaurar todas las configuraciones a sus valores de fábrica?
 SETTINGS_SAVE_LOC_GLOBAL,Global (AppData),Global (AppData)
 SETTINGS_SAVE_LOC_VERSION,Version Folder (Portable),Carpeta de Versión (Portátil)
-SETTINGS_CONFIRM_SAVE,Confirm the overwrite action:,Confirmar la accion de sobrescribir:
-SETTINGS_CONFIRM_LOAD,Confirm the action to load game:,Confirmar la accion de cargar partida:
-SETTINGS_CONFIRM_DELETE,Confirm the action to delete the game:,Confirmar la accion de borrar partida:
+SETTINGS_CONFIRM_SAVE,"Are you sure you want to overwrite?","¿Confirmas que deseas sobrescribir?"
+SETTINGS_CONFIRM_LOAD,"Are you sure you want to load?","¿Confirmas que deseas cargar partida?"
+SETTINGS_CONFIRM_DELETE,"Are you sure you want to delete?","¿Confirmas que deseas borrar partida?"
 SAVE_IMPORT_GAME,IMPORT GAME,IMPORTAR PARTIDA
 SAVE_EXPORT_GAME,EXPORT GAMES,EXPORTAR PARTIDAS
 SAVE_BACK,RETURN,REGRESAR

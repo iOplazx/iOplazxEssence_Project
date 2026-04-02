@@ -287,40 +287,33 @@ func take_temp_screenshot() -> void:
 
 # La UI llama a esto cuando el jugador elige un Slot
 func commit_save(slot_id: String) -> bool:
-	if _temp_game_data.is_empty() and _temp_meta_data.is_empty():
-		push_error("iOplazxEssence: No hay datos en caché para guardar.")
-		return false
+	if _temp_game_data.is_empty() and _temp_meta_data.is_empty(): return false
 		
-	# --- MICRÓFONOS DE DEBUG ---
-	print("--- DEBUG FACTORY ---")
-	print("1. ¿Existe el _config?: ", _config)
-	if _config != null:
-		print("2. ¿Tiene script asignado?: ", _config.custom_save_script)
-	print("---------------------")
-	# ---------------------------
-		
-	# 1. Creamos la instancia dinámicamente usando tu Factory y MasterConfig
+	var path = get_file_path(slot_id)
 	var save_obj = EssenceSaveFactory.create_save_instance(_config)
 	
-	# 2. Le inyectamos la metadata visual que mandó la escena (el Test)
-	save_obj.title = _temp_meta_data.get("title", "Auto-Save")
-	save_obj.description = _temp_meta_data.get("description", "")
-	save_obj.play_time = _temp_meta_data.get("play_time", "00:00:00")
+	# Verificamos la INTENCIÓN (Create vs Overwrite)
+	if FileAccess.file_exists(path):
+		var old_data = load_game(slot_id)
+		# Le decimos al objeto que se fusione con lo viejo
+		save_obj.prepare_as_overwrite(old_data, _temp_meta_data, _temp_game_data)
+	else:
+		# Le decimos al objeto que nazca desde cero
+		save_obj.prepare_as_new(_temp_meta_data, _temp_game_data)
+		
+		# Si es nuevo, sacamos la página y slot del ID
+		var parts = slot_id.split("_")
+		if parts.size() >= 3:
+			save_obj.page = int(parts[1])
+			save_obj.slot_number = int(parts[2])
 	
-	# 3. Le inyectamos los datos del juego. 
-	# Usamos _load_child_data() para que el objeto absorba el diccionario temporal
-	save_obj._load_child_data(_temp_game_data)
-	
-	# 4. ¡AHORA SÍ! Llamamos al nuevo save_game (Solo 2 argumentos)
+	# El Manager solo se encarga de guardar en disco
 	var success = save_game(slot_id, save_obj)
 	
 	if success:
-		# Renombramos la foto temporal para que pertenezca a este slot
 		var dir = DirAccess.open(_save_dir)
 		if dir and dir.file_exists("temp_snap.webp"):
-			# Si ya existía una foto vieja de este slot, la sobrescribe
-			if dir.file_exists(slot_id + ".webp"):
-				dir.remove(slot_id + ".webp")
+			if dir.file_exists(slot_id + ".webp"): dir.remove(slot_id + ".webp")
 			dir.rename("temp_snap.webp", slot_id + ".webp")
 			
 	return success
