@@ -177,9 +177,6 @@ func _generar_slots_modern():
 			btn_add_new_slot.pressed.disconnect(_on_add_new_pressed)
 		btn_add_new_slot.pressed.connect(_on_add_new_pressed)
 		
-		# ¡TRUCO DE ARQUITECTURA!
-		# Le pedimos al verdadero padre del botón que lo mande al fondo (-1).
-		# Así no importa si está dentro del VBox o del MarginContainer, siempre funcionará.
 		var real_parent = btn_add_new_slot.get_parent()
 		if real_parent:
 			real_parent.move_child(btn_add_new_slot, -1)
@@ -269,26 +266,27 @@ func _handle_slot_action(action: String, slot_id: String):
 	)
 	
 func _mostrar_dialogo_edicion(slot_id: String, current_title: String):
-	# 1. Cargamos el InputBox
 	var input_prefab = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceInputBox.tscn")
-	if not input_prefab:
-		push_error("iOplazxEssence: No se encontró EssenceInputBox.tscn")
-		return
+	if not input_prefab: return
 		
 	var input_box = input_prefab.instantiate()
 	get_tree().root.add_child(input_box)
 	
-	# 2. Lo configuramos con los textos (Recuerda añadir las llaves a tu CSV de traducción)
 	input_box.setup("RENAME_SAVE_TITLE", "RENAME_SAVE_MSG", current_title)
 	
-	# 3. Esperamos la respuesta
 	input_box.on_submit.connect(func(new_text: String):
-		# Si no está vacío, significa que escribió algo y le dio a Confirmar
 		if new_text.strip_edges() != "":
+			# 1. Le pedimos al Manager que guarde en el disco
 			SaveManager.update_save_title(slot_id, new_text)
-			_refresh_slots() # Recargamos la interfaz para que se vea el nuevo nombre
 			
-		input_box.queue_free() # Destruimos la ventana en cualquier caso (Confirmar o Cancelar)
+			# 2. Actualizamos nuestra caché local de la interfaz
+			if _all_saves_meta.has(slot_id):
+				_all_saves_meta[slot_id]["title"] = new_text
+				
+			# 3. Recargamos los slots para que el texto cambie visualmente
+			_refresh_slots() 
+			
+		input_box.queue_free()
 	)
 
 func _ejecutar_accion_real(action: String, slot_id: String):

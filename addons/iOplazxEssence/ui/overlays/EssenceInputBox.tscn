@@ -86,10 +86,10 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="BtnCancel" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1371873351]
-layout_mode = 2
-text = "CANCEL"
-
 [node name="BtnConfirm" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1524063890]
 layout_mode = 2
 text = "CONFIRM"
+
+[node name="BtnCancel" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1371873351]
+layout_mode = 2
+text = "CANCEL"

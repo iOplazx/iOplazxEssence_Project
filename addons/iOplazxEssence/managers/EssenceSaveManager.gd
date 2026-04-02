@@ -340,20 +340,21 @@ func delete_save(slot_id: String):
 func update_save_title(slot_id: String, new_title: String):
 	var path = _save_dir + slot_id + ".ess"
 	if FileAccess.file_exists(path):
-		# 1. Leemos el archivo actual
+		# 1. LECTURA BINARIA
 		var file_read = FileAccess.open(path, FileAccess.READ)
-		var json_string = file_read.get_as_text()
+		if file_read == null: return
+		var save_data = file_read.get_var(true) 
 		file_read.close()
 		
-		# 2. Convertimos y modificamos
-		var data = JSON.parse_string(json_string)
-		if typeof(data) == TYPE_DICTIONARY and data.has("essence_meta"):
-			data["essence_meta"]["title"] = new_title
+		# 2. MODIFICAMOS EL DICCIONARIO
+		if typeof(save_data) == TYPE_DICTIONARY and save_data.has("essence_meta"):
+			save_data["essence_meta"]["title"] = new_title
 			
-			# 3. Reescribimos el archivo
+			# 3. ESCRITURA BINARIA
 			var file_write = FileAccess.open(path, FileAccess.WRITE)
-			file_write.store_string(JSON.stringify(data, "\t"))
+			file_write.store_var(save_data, true)
 			file_write.close()
+				
 			print("iOplazxEssence: Título actualizado a '", new_title, "' en ", slot_id)
 
 # ==========================================
