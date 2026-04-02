@@ -22,11 +22,11 @@ func _ready():
 	
 	
 func _verificar_config():
-	# Cargamos el archivo MasterConfig (asegúrate de que esta ruta sea la correcta en tu proyecto)
-	_config = load(EssencePaths.CARPET_STATIC+"MasterConfig.tres") as EssenceMasterConfig
+	# cambio a EssenceMasterConfig
+	_config = load(EssencePaths.CARPET_STATIC+"EssenceMasterConfig.tres") as EssenceMasterConfig
 	
 	if not _config:
-		push_warning("iOplazxEssence: No se encontró MasterConfig.tres. Usando valores por defecto.")
+		push_warning("iOplazxEssence: No se encontró EssenceMasterConfig.tres. Usando valores por defecto.")
 
 # ==========================================
 # INYECCIÓN DE DEPENDENCIAS
@@ -295,6 +295,14 @@ func commit_save(slot_id: String) -> bool:
 	if _temp_game_data.is_empty() and _temp_meta_data.is_empty():
 		push_error("iOplazxEssence: No hay datos en caché para guardar.")
 		return false
+		
+	# --- MICRÓFONOS DE DEBUG ---
+	print("--- DEBUG FACTORY ---")
+	print("1. ¿Existe el _config?: ", _config)
+	if _config != null:
+		print("2. ¿Tiene script asignado?: ", _config.custom_save_script)
+	print("---------------------")
+	# ---------------------------
 		
 	# 1. Creamos la instancia dinámicamente usando tu Factory y MasterConfig
 	var save_obj = EssenceSaveFactory.create_save_instance(_config)

@@ -31,13 +31,18 @@ func _restaurar_partida_cargada():
 	var saved_color_hex = SaveManager.loaded_game_data.get("box_color", "ffffff")
 	var saved_hp = SaveManager.loaded_game_data.get("player_hp", 0)
 	
-	# Restauramos el color (Asegurando el formato correcto para Godot)
+	# ¡EL ARREGLO ESTÁ AQUÍ!
+	# Validamos que el texto tenga el prefijo "#" para que Godot no se confunda
+	if not saved_color_hex.begins_with("#"):
+		saved_color_hex = "#" + saved_color_hex
+	
+	# Restauramos el color usando el formato estricto
 	if test_element:
 		test_element.color = Color(saved_color_hex)
 	
 	# Imprimimos el reporte detallado en el Output
 	var info_text = "¡PARTIDA CARGADA!\n"
-	info_text += "Color restaurado: #" + saved_color_hex + "\n"
+	info_text += "Color restaurado: " + saved_color_hex + "\n"
 	info_text += "HP del Jugador: " + str(saved_hp)
 	
 	lbl_output.text = info_text

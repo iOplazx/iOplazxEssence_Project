@@ -43,6 +43,10 @@ func _ready():
 	
 	_current_style = Preferences.get_setting("game", "save_style", 0)
 	
+	_all_saves_meta = SaveManager.get_all_metadata()
+	if _current_style == 0:
+		_saltar_a_pagina_reciente()
+	
 	# Inicializamos la paginación visualmente
 	_generar_botones_paginacion()
 	
@@ -259,3 +263,37 @@ func _cambiar_pagina(page_num: int):
 		AudioManager.play_ui_sfx()
 		_generar_botones_paginacion() 
 		_refresh_slots()
+		
+# ==========================================
+# UX: SALTO INTELIGENTE A LA ÚLTIMA PARTIDA
+# ==========================================
+func _saltar_a_pagina_reciente():
+	var highest_manual_time: float = -1.0
+	var highest_auto_time: float = -1.0
+	var target_manual_page: int = 1
+	
+	for slot_id in _all_saves_meta.keys():
+		var meta = _all_saves_meta[slot_id]
+		var time = meta.get("timestamp", 0.0)
+		
+		# Verificamos manuales
+		if slot_id.begins_with("save_"):
+			if time > highest_manual_time:
+				highest_manual_time = time
+				# Extraemos la página directamente del nombre del ID (ej. "save_3_1" -> 3)
+				var parts = slot_id.split("_")
+				if parts.size() >= 3:
+					target_manual_page = parts[1].to_int()
+					
+		# Verificamos automáticos
+		elif slot_id.begins_with("auto_"):
+			if time > highest_auto_time:
+				highest_auto_time = time
+				
+	# Aplicamos las reglas de prioridad
+	if highest_manual_time > -1.0:
+		paginator.set_page(target_manual_page)
+	elif highest_auto_time > -1.0:
+		paginator.set_page(0) # Página de Auto-saves
+	else:
+		paginator.set_page(1) # Valor por defecto si no hay nada
