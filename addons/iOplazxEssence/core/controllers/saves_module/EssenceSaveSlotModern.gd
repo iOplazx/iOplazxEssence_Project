@@ -45,15 +45,13 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 	else:
 		_has_data = true
 		
-		if lbl_title: lbl_title.text = save_data.get("title", "Partida Guardada")
+		if lbl_title: lbl_title.text = save_data.get("title", "Pre title")
 		if lbl_description: lbl_description.text = save_data.get("description", "Desconocido")
 		if lbl_date: lbl_date.text = save_data.get("date_string", "00/00/00 00:00:00")
 		if lbl_play_time: lbl_play_time.text = save_data.get("play_time", "00:00:00")
 		
 		_cargar_imagen_screenshot(slot_id)
 		
-		# Si tiene datos, se puede cargar, editar o borrar. 
-		# Sobrescribir (Save) solo si hay un juego activo en RAM.
 		if btn_save: btn_save.disabled = not is_save_mode
 		if btn_edit: btn_edit.disabled = false
 		if btn_load: btn_load.disabled = false

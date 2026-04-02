@@ -8,6 +8,7 @@ var _encryption_key: String = "iOplazx_Default_Insecure_Key_!#"
 
 var intent_is_save_mode: bool = false
 const INDEX_FILE = "save_index.json"
+const KEY_META = "essence_meta"
 var _config: EssenceMasterConfig
 
 # Señales para comunicar al UI o al juego que algo terminó
@@ -338,24 +339,37 @@ func delete_save(slot_id: String):
 
 # Actualiza solo el título en la metadata sin afectar los datos del juego
 func update_save_title(slot_id: String, new_title: String):
-	var path = _save_dir + slot_id + ".ess"
+	# Usamos tu propia función get_file_path para asegurar la extensión correcta
+	var path = get_file_path(slot_id) 
+	
 	if FileAccess.file_exists(path):
-		# 1. LECTURA BINARIA
-		var file_read = FileAccess.open(path, FileAccess.READ)
-		if file_read == null: return
-		var save_data = file_read.get_var(true) 
+		# 1. ABRIR CON CONTRASEÑA (Igual que en load_game)
+		var file_read = FileAccess.open_encrypted_with_pass(path, FileAccess.READ, _encryption_key)
+		if file_read == null: 
+			printerr("iOplazxEssence: Error al abrir archivo para editar título (¿Llave incorrecta?)")
+			return
+			
+		var json_string = file_read.get_as_text()
 		file_read.close()
 		
-		# 2. MODIFICAMOS EL DICCIONARIO
-		if typeof(save_data) == TYPE_DICTIONARY and save_data.has("essence_meta"):
-			save_data["essence_meta"]["title"] = new_title
-			
-			# 3. ESCRITURA BINARIA
-			var file_write = FileAccess.open(path, FileAccess.WRITE)
-			file_write.store_var(save_data, true)
-			file_write.close()
+		# 2. PARSEAR EL JSON DESENCRIPTADO
+		var save_data = JSON.parse_string(json_string)
+		
+		# 3. MODIFICAR EL DICCIONARIO USANDO LA CONSTANTE
+		if typeof(save_data) == TYPE_DICTIONARY:
+			if save_data.has(KEY_META):
+				save_data[KEY_META]["title"] = new_title
+			else:
+				save_data["title"] = new_title # Fallback por si la estructura cambia
 				
-			print("iOplazxEssence: Título actualizado a '", new_title, "' en ", slot_id)
+			# 4. VOLVER A GUARDAR ENCRIPTADO (Igual que en save_game)
+			var file_write = FileAccess.open_encrypted_with_pass(path, FileAccess.WRITE, _encryption_key)
+			if file_write:
+				file_write.store_string(JSON.stringify(save_data))
+				file_write.close()
+				print("iOplazxEssence: Éxito. Título en disco cambiado a '", new_title, "'")
+			else:
+				printerr("iOplazxEssence: Error al reescribir archivo encriptado.")
 
 # ==========================================
 # LIMPIEZA DE MEMORIA
