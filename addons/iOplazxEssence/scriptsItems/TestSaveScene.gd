@@ -25,6 +25,26 @@ func _ready():
 	# 2. Revisamos si venimos de la pantalla de Cargar Partida
 	if not SaveManager.loaded_game_data.is_empty():
 		_restaurar_partida_cargada()
+		
+func _preparar_datos_para_menu():
+	lbl_output.text = "Tomando captura y preparando datos..."
+	
+	# Esperamos a que tome la foto de la partida en vivo
+	await SaveManager.take_temp_screenshot()
+	
+	var current_game_data = {
+		"box_color": test_element.color.to_html(false) if test_element else "ffffff",
+		"player_hp": 100 
+	}
+	
+	var current_meta_data = {
+		"title": "Prueba de Guardado",
+		"description": "Escena Sandbox - Nivel 1",
+		"play_time": "00:15:20"
+	}
+	
+	# Llenamos la caché (Esto es lo que avisa al Modern UI que hay partida)
+	SaveManager.cache_current_state(current_game_data, current_meta_data)
 
 func _restaurar_partida_cargada():
 	# Extraemos los datos del bolsillo
@@ -51,26 +71,11 @@ func _restaurar_partida_cargada():
 	SaveManager.loaded_game_data.clear()
 
 func _on_btn_save_game_pressed():
-	lbl_output.text = "Tomando captura y preparando datos..."
-	
-	await SaveManager.take_temp_screenshot()
-	
-	# to_html(false) exporta sin el canal Alpha, lo hace más seguro al cargar
-	var current_game_data = {
-		"box_color": test_element.color.to_html(false) if test_element else "ffffff",
-		"player_hp": 100 
-	}
-	
-	var current_meta_data = {
-		"title": "Prueba de Guardado",
-		"description": "Escena Sandbox - Nivel 1",
-		"play_time": "00:15:20"
-	}
-	
-	SaveManager.cache_current_state(current_game_data, current_meta_data)
+	await _preparar_datos_para_menu()
 	SceneManager.goto_save_game(SceneManager.TransitionType.INSTANT)
 
 func _on_btn_load_game_pressed():
+	await _preparar_datos_para_menu()
 	SceneManager.goto_load_game(SceneManager.TransitionType.INSTANT)
 
 func _on_return_pressed():

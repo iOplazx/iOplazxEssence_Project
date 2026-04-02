@@ -169,22 +169,32 @@ func _generar_slots_modern():
 
 	# 4. Configurar el botón "Crear Nuevo" al final de la lista
 	if btn_add_new_slot:
-		btn_add_new_slot.visible = _is_save_mode
+		var has_live_data = not SaveManager._temp_game_data.is_empty()
+		
+		btn_add_new_slot.visible = has_live_data
+		
 		if btn_add_new_slot.pressed.is_connected(_on_add_new_pressed):
 			btn_add_new_slot.pressed.disconnect(_on_add_new_pressed)
 		btn_add_new_slot.pressed.connect(_on_add_new_pressed)
+		
 		list_modern.move_child(btn_add_new_slot, -1)
 
 func _crear_instancia_slot(slot_id: String, container: Control, save_data: Dictionary = {}):
 	if _current_style == 0:
+		# El Clásico sigue obedeciendo a sus pestañas (_is_save_mode)
 		var slot = prefab_classic.instantiate()
 		container.add_child(slot)
 		slot.setup(slot_id, save_data, _is_save_mode)
 		slot.on_slot_clicked.connect(_handle_slot_action)
 	else:
+		# El Moderno obedece a la existencia de una partida viva
 		var slot = prefab_modern.instantiate()
 		container.add_child(slot)
-		slot.setup(slot_id, save_data, _is_save_mode)
+		
+		# ¿Hay datos vivos en la RAM listos para guardarse?
+		var has_live_data = not SaveManager._temp_game_data.is_empty()
+		
+		slot.setup(slot_id, save_data, has_live_data)
 		slot.on_action_requested.connect(_handle_slot_action)
 
 func _on_add_new_pressed():

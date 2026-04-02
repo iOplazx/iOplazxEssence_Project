@@ -37,7 +37,7 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 		if lbl_play_time: lbl_play_time.text = "--:--:--" 
 		if img_screenshot: img_screenshot.texture = null
 		
-		# Estado de botones: Si está vacío, solo puedes Guardar (y solo si estás en ese modo)
+		# Mantener botones visibles pero desactivados para no romper el tamaño de la tarjeta
 		if btn_save: btn_save.disabled = not is_save_mode 
 		if btn_edit: btn_edit.disabled = true
 		if btn_load: btn_load.disabled = true
@@ -45,7 +45,6 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 	else:
 		_has_data = true
 		
-		# Usamos las llaves correctas que definimos en EssenceSaveData
 		if lbl_title: lbl_title.text = save_data.get("title", "Partida Guardada")
 		if lbl_description: lbl_description.text = save_data.get("description", "Desconocido")
 		if lbl_date: lbl_date.text = save_data.get("date_string", "00/00/00 00:00:00")
@@ -53,7 +52,8 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 		
 		_cargar_imagen_screenshot(slot_id)
 		
-		# Estado de botones: Si tiene datos, puedes hacer de todo
+		# Si tiene datos, se puede cargar, editar o borrar. 
+		# Sobrescribir (Save) solo si hay un juego activo en RAM.
 		if btn_save: btn_save.disabled = not is_save_mode
 		if btn_edit: btn_edit.disabled = false
 		if btn_load: btn_load.disabled = false

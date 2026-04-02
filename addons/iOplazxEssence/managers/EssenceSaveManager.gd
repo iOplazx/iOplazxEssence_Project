@@ -355,3 +355,11 @@ func update_save_title(slot_id: String, new_title: String):
 			file_write.store_string(JSON.stringify(data, "\t"))
 			file_write.close()
 			print("iOplazxEssence: Título actualizado a '", new_title, "' en ", slot_id)
+
+# ==========================================
+# LIMPIEZA DE MEMORIA
+# ==========================================
+func clear_temp_cache():
+	_temp_game_data.clear()
+	_temp_meta_data.clear()
+	print("iOplazxEssence: Caché de guardado temporal vaciada.")
