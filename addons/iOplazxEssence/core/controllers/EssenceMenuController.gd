@@ -43,7 +43,7 @@ var _idle_tween: Tween
 func _ready():
 	print("EssenceMenuController: Inicializando menú principal...")
 	# ¡Limpiamos la RAM de cualquier partida anterior!
-	SaveManager.clear_temp_cache()
+	SaveManager.clear_all_temp()
 	_conectar_botones()
 	_verificar_estado_partida()
 	
@@ -119,7 +119,7 @@ func _on_continue_pressed():
 	SceneManager.goto_continue_game()
 	
 func _on_load_pressed():
-	SaveManager.clear_temp_cache() # Destruimos datos residuales
+	SaveManager.clear_all_temp() # Destruimos datos residuales
 	SceneManager.goto_load_game()
 
 func _on_settings_pressed():

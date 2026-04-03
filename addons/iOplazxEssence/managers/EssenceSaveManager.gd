@@ -311,10 +311,22 @@ func commit_save(slot_id: String) -> bool:
 	var success = save_game(slot_id, save_obj)
 	
 	if success:
-		var dir = DirAccess.open(_save_dir)
-		if dir and dir.file_exists("temp_snap.webp"):
-			if dir.file_exists(slot_id + ".webp"): dir.remove(slot_id + ".webp")
-			dir.rename("temp_snap.webp", slot_id + ".webp")
+		# 1. Definimos las rutas completas para no dejar dudas
+		var source_path = _save_dir + "temp_snap.webp"
+		var target_path = _save_dir + slot_id + ".webp"
+
+		# 2. Verificamos si la foto temporal realmente existe antes de copiar
+		if FileAccess.file_exists(source_path):
+			# USAMOS copy_absolute para evitar el Error 7
+			var err = DirAccess.copy_absolute(source_path, target_path)
+				
+			if err == OK:
+					print("iOplazxEssence: Foto copiada exitosamente a: ", target_path)
+			else:
+					printerr("iOplazxEssence: Error al copiar la foto. Código: ", err)
+		else:
+		# Si llegamos aquí, es que take_temp_screenshot() no ha terminado o no se llamó
+			push_warning("iOplazxEssence: No se pudo copiar porque " + source_path + " no existe aún.")
 			
 	return success
 
@@ -367,7 +379,20 @@ func update_save_title(slot_id: String, new_title: String):
 # ==========================================
 # LIMPIEZA DE MEMORIA
 # ==========================================
-func clear_temp_cache():
+# Borra SOLO la imagen temporal (Útil para liberar espacio en disco rápido)
+func delete_temp_screenshot():
+	var dir = DirAccess.open(_save_dir)
+	if dir and dir.file_exists("temp_snap.webp"):
+		dir.remove("temp_snap.webp")
+		print("iOplazxEssence: Foto temporal eliminada.")
+
+# Limpia SOLO los diccionarios de la RAM
+func clear_temp_data():
 	_temp_game_data.clear()
 	_temp_meta_data.clear()
-	print("iOplazxEssence: Caché de guardado temporal vaciada.")
+	print("iOplazxEssence: Diccionarios de caché vaciados.")
+
+# El "Botón de Pánico": Limpia todo al cerrar el sistema de guardado
+func clear_all_temp():
+	delete_temp_screenshot()
+	clear_temp_data()

@@ -54,7 +54,12 @@ func _ready():
 	_set_mode(open_as_save)
 	
 func _conectar_botones_estaticos():
-	if btn_back: btn_back.pressed.connect(func(): AudioManager.play_ui_sfx(); SceneManager.go_back())
+	if btn_back:
+		btn_back.pressed.connect(func(): 
+			AudioManager.play_ui_sfx()
+			SaveManager.delete_temp_screenshot()
+			SceneManager.go_back()
+		)
 	if btn_mode_save: btn_mode_save.pressed.connect(func(): _set_mode(true))
 	if btn_mode_load: btn_mode_load.pressed.connect(func(): _set_mode(false))
 
