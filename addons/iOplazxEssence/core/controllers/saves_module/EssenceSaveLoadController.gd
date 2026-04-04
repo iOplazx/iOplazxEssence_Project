@@ -23,6 +23,13 @@ class_name EssenceSaveLoadController extends Control
 @export var prefab_classic: PackedScene
 @export var prefab_modern: PackedScene
 
+@export_category("Control de Archivos")
+@export var btn_export: Button
+@export var btn_import: Button
+
+# Supongamos que tienes una referencia al FileDialog
+@onready var export_dialog: FileDialog = $ExportDialog
+
 # --- EL CEREBRO DE LA PAGINACIÓN ---
 var paginator: EssencePaginator = EssencePaginator.new()
 
@@ -37,6 +44,12 @@ var _is_save_mode: bool = false
 var _current_style: int = 0 
 
 var _all_saves_meta: Dictionary = {}
+
+# Variable para saber si exportamos uno o todos
+var _export_all: bool = false
+var _current_slot_to_export: String = ""
+
+const EXPORT_MENU_SCENE = preload( EssencePaths.PATH_UI_OVERLAYS + "EssenceExportMenu.tscn")
 
 func _ready():
 	_conectar_botones_estaticos()
@@ -53,6 +66,15 @@ func _ready():
 	var open_as_save = SaveManager.intent_is_save_mode
 	_set_mode(open_as_save)
 	
+	on_export_dialog_config()
+	
+	
+func on_export_dialog_config():
+	if export_dialog:
+		export_dialog.dir_selected.connect(_on_export_dir_selected)
+	else:
+		print("export_dialog no fue encontrado")
+	
 func _conectar_botones_estaticos():
 	if btn_back:
 		btn_back.pressed.connect(func(): 
@@ -62,6 +84,9 @@ func _conectar_botones_estaticos():
 		)
 	if btn_mode_save: btn_mode_save.pressed.connect(func(): _set_mode(true))
 	if btn_mode_load: btn_mode_load.pressed.connect(func(): _set_mode(false))
+	
+	if btn_import: btn_import.pressed.connect(_on_import_file_pressed)
+	if btn_export: btn_export.pressed.connect(_on_export_file_pressed)
 
 func _set_mode(is_save: bool):
 	_is_save_mode = is_save
@@ -375,3 +400,120 @@ func _saltar_a_pagina_reciente():
 		paginator.set_page(0) # Página de Auto-saves
 	else:
 		paginator.set_page(1) # Valor por defecto si no hay nada
+		
+func _on_import_file_pressed():
+	var x = 1
+	
+func _on_export_file_pressed():
+	# 1. Verificamos que haya una partida seleccionada (si es necesario)
+	if _current_slot_to_export == "":
+		_mostrar_alerta("Aviso", "Selecciona una partida primero.")
+		return
+	print("Iniciando proceso de exportacion")
+		
+	# 2. Instanciamos tu nuevo menú personalizado
+	var export_menu = EXPORT_MENU_SCENE.instantiate()
+	add_child(export_menu)
+	
+	# 3. Esperamos su respuesta usando la señal que creamos
+	export_menu.on_option_selected.connect(func(opcion: String):
+		if opcion == "CANCEL":
+			return # No hacemos nada
+			
+		elif opcion == "CURRENT":
+			_export_all = false
+			_abrir_file_dialog_exportacion()
+			
+		elif opcion == "ALL":
+			_export_all = true
+			_abrir_file_dialog_exportacion()
+	)
+	
+func _abrir_file_dialog_exportacion():
+	# Aquí abres tu FileDialog nativo de Godot para que elija la carpeta de Windows/Linux
+	# export_dialog.popup_centered_ratio(0.5)
+	pass
+
+# Se conecta a la señal 'dir_selected' del FileDialog
+func _on_export_dialog_dir_selected(dir_path: String):
+	if _export_all:
+		_ejecutar_exportacion_masiva(dir_path)
+	else:
+		_ejecutar_exportacion_individual(dir_path)
+
+func _ejecutar_exportacion_individual(dest_path: String):
+	# Llamamos a tu clase utilitaria que creamos antes
+	var exito = EssenceExportUtils.export_slot(
+		_current_slot_to_export, 
+		SaveManager._save_dir, 
+		dest_path
+	)
+	
+	if exito:
+		AudioManager.play_ui_sfx() # Sonido de éxito
+		_mostrar_alerta("Éxito", "La partida se ha exportado correctamente a:\n" + dest_path)
+	else:
+		_mostrar_alerta("Error", "Hubo un problema al exportar la partida. Revisa la consola.")
+
+func _ejecutar_exportacion_masiva(dest_path: String):
+	# Aquí podrías iterar sobre todos los archivos en SaveManager._save_dir
+	# y copiarlos a una carpeta "Full_Backup"
+	pass
+	
+func _on_export_current_pressed():
+	AudioManager.play_ui_sfx()
+	export_dialog.popup_centered_ratio(0.6) # Abre la ventana de Windows/Linux
+	
+func _on_export_dir_selected(dir_path: String):
+	# Opcional: Si tienes tu nodo ColorRect de bloqueo (Overlay), puedes activarlo aquí
+	# para que el usuario no toque nada mientras el Athlon procesa.
+	
+	# PASO 1: Hacemos el "Snapshot" a la carpeta temporal
+	var nombre_unico = "export_" + str(Time.get_unix_time_from_system())
+	var snapshot_success = SaveManager.commit_save(nombre_unico, true)
+	
+	if snapshot_success:
+		# PASO 2: Usamos TU función estática, pero le decimos que busque en 'temp/'
+		var export_success = EssenceExportUtils.export_slot(
+			nombre_unico, 
+			"user://saves/temp/", # <--- Origen: La aduana temporal
+			dir_path              # <--- Destino: La carpeta que eligió el jugador
+		)
+		
+		if export_success:
+			AudioManager.play_ui_sfx()
+			_mostrar_alerta("Éxito", "Partida exportada correctamente a:\n" + dir_path)
+			
+			# eliminar los archivos imagen pero conservar los archivos exportados para poder recuperarlos despues
+			_limpiar_aduana_temporal(nombre_unico,false, true) 
+		else:
+			_mostrar_alerta("Error", "No se pudo copiar el archivo de respaldo al destino.")
+			
+	else:
+		_mostrar_alerta("Error", "Fallo al generar el archivo de guardado temporal.")
+
+# ==========================================
+# UTILIDAD DE LIMPIEZA
+# ==========================================
+func _limpiar_aduana_temporal(nombre_archivo: String, delete_file: bool, delete_img: bool):
+	var dir = DirAccess.open("user://saves/temp/")
+	if dir:
+		if delete_file && dir.file_exists(nombre_archivo + GameConstants.EXTENSION_SAVE_FILE):
+			dir.remove(nombre_archivo + GameConstants.EXTENSION_SAVE_FILE)
+		if delete_img && dir.file_exists(nombre_archivo + GameConstants.EXTENSION_IMAGE):
+			dir.remove(nombre_archivo + GameConstants.EXTENSION_IMAGE)
+
+# ==========================================
+# UTILIDAD DE UI: Mostrar alertas rápidas
+# ==========================================
+func _mostrar_alerta(titulo: String, mensaje: String):
+	var dialog = AcceptDialog.new()
+	dialog.title = titulo
+	dialog.dialog_text = mensaje
+	
+	# Lo añadimos a la escena actual
+	add_child(dialog)
+	dialog.popup_centered()
+	
+	# Cuando el usuario le da "OK", borramos el nodo para no ensuciar la RAM
+	dialog.confirmed.connect(func(): dialog.queue_free())

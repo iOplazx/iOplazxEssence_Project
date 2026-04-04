@@ -4,7 +4,7 @@ signal on_action_requested(action: String, slot_id: String)
 
 @export var img_screenshot: TextureRect
 @export var lbl_title: Label
-@export var lbl_description: Label # (Actualizado de location a description)
+#@export var lbl_description: Label # (Actualizado de location a description)
 @export var lbl_date: Label
 @export var lbl_play_time: Label 
 
@@ -32,7 +32,7 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 		_has_data = false
 		
 		if lbl_title: lbl_title.text = tr("SLOT_EMPTY")
-		if lbl_description: lbl_description.text = "---"
+		#if lbl_description: lbl_description.text = "---"
 		if lbl_date: lbl_date.text = "---"
 		if lbl_play_time: lbl_play_time.text = "--:--:--" 
 		if img_screenshot: img_screenshot.texture = null
@@ -46,7 +46,7 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 		_has_data = true
 		
 		if lbl_title: lbl_title.text = save_data.get("title", "Pre title")
-		if lbl_description: lbl_description.text = save_data.get("description", "Desconocido")
+		#if lbl_description: lbl_description.text = save_data.get("description", "Desconocido")
 		if lbl_date: lbl_date.text = save_data.get("date_string", "00/00/00 00:00:00")
 		if lbl_play_time: lbl_play_time.text = save_data.get("play_time", "00:00:00")
 		

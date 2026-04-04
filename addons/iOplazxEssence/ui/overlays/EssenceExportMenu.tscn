@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://oe83ag7wpl1e"]
+
+[ext_resource type="Script" uid="uid://3et4af1ptsgk" path="res://addons/iOplazxEssence/scriptsItems/EssenceExportMenu.gd" id="1_qt5ep"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a8shq"]
+bg_color = Color(0.38039216, 0.3647059, 0.34509805, 0.7882353)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 5
+expand_margin_left = 20.0
+expand_margin_top = 20.0
+expand_margin_right = 20.0
+expand_margin_bottom = 20.0
+
+[node name="EssenceExportMenu" type="Control" unique_id=1471866177]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qt5ep")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1986634203]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.58431375)
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=1870362181]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_a8shq")
+
+[node name="VBox" type="VBoxContainer" parent="Panel" unique_id=595882210]
+layout_mode = 2
+
+[node name="LblTitle" type="Label" parent="Panel/VBox" unique_id=710965086]
+layout_mode = 2
+text = "Opciones de Exportación"
+
+[node name="LblDesc" type="Label" parent="Panel/VBox" unique_id=33371235]
+layout_mode = 2
+text = "¿Qué deseas respaldar?"
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBox" unique_id=394088230]
+layout_mode = 2
+
+[node name="BtnCurrent" type="Button" parent="Panel/VBox" unique_id=448167309]
+layout_mode = 2
+text = "Solo la partida actual"
+
+[node name="BtnAll" type="Button" parent="Panel/VBox" unique_id=1165436575]
+layout_mode = 2
+text = "Todas las partidas"
+
+[node name="BtnCancel" type="Button" parent="Panel/VBox" unique_id=1596807991]
+layout_mode = 2
+text = "Cancelar"

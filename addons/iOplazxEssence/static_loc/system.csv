@@ -90,6 +90,8 @@ DELETE_SAVE_TITLE,Delete saved,Borrar guardado
 DELETE_SAVE_MSG,Are you sure you want to delete this save file permanently?,¿Estás seguro de querer borrar esta partida permanentemente?
 RENAME_SAVE_TITLE,Rename Save,Renombrar Partida
 RENAME_SAVE_MSG,Enter the new name:,Escribe el nuevo nombre:
+FILEDIALOG_TEXT_CANCEL,CANCEL,CANCELAR
+FILEDIALOG_TITLE,Select where to save your backup,Selecciona dónde guardar tu respaldo
 GLOBAL_YES,Yes,Sí
 GLOBAL_NO,No,No
 GLOBAL_OK,OK,Aceptar

@@ -1,0 +1,54 @@
+class_name EssenceExportUtils extends RefCounted
+
+# ==========================================
+# EXPORTACIÓN DE PARTIDAS
+# ==========================================
+
+## Exporta un slot de guardado y su captura a una carpeta seleccionada por el usuario.
+static func export_slot(slot_id: String, internal_dir: String, external_dest_dir: String) -> bool:
+	var source_ess = internal_dir.path_join(slot_id + ".ess")
+	var source_webp = internal_dir.path_join(slot_id + ".webp")
+	
+	# Creamos una subcarpeta bonita en el destino para no desordenar los archivos del usuario
+	var export_folder_name = "iOplazx_Backup_" + slot_id
+	var final_export_path = external_dest_dir.path_join(export_folder_name)
+	
+	if not DirAccess.dir_exists_absolute(final_export_path):
+		var err_dir = DirAccess.make_dir_recursive_absolute(final_export_path)
+		if err_dir != OK:
+			printerr("iOplazxEssence: No se pudo crear la carpeta de exportación. Error: ", err_dir)
+			return false
+	
+	var target_ess = final_export_path.path_join(slot_id + ".ess")
+	var target_webp = final_export_path.path_join(slot_id + ".webp")
+	
+	# Copiamos el archivo de datos (Obligatorio)
+	var err_ess = OK
+	if FileAccess.file_exists(source_ess):
+		err_ess = DirAccess.copy_absolute(source_ess, target_ess)
+	else:
+		printerr("iOplazxEssence: El archivo original no existe -> ", source_ess)
+		return false
+		
+	# Copiamos la foto (Opcional, si no existe no detenemos la exportación)
+	if FileAccess.file_exists(source_webp):
+		DirAccess.copy_absolute(source_webp, target_webp)
+		
+	if err_ess == OK:
+		# Archivo de advertencia para el usuario (Opcional, pero muy profesional)
+		_crear_archivo_leame(final_export_path)
+		print("iOplazxEssence: ¡Exportación exitosa a -> ", final_export_path, "!")
+		return true
+	else:
+		printerr("iOplazxEssence: Falló la exportación del archivo .ess. Código: ", err_ess)
+		return false
+
+# ==========================================
+# UTILIDADES INTERNAS
+# ==========================================
+static func _crear_archivo_leame(folder_path: String):
+	var txt_path = folder_path.path_join("LEAME.txt")
+	var file = FileAccess.open(txt_path, FileAccess.WRITE)
+	if file:
+		file.store_string("=== RESPALDO DE iOPLAZX ESSENCE ===\n\nPor favor, no modifiques ni renombres los archivos .ess y .webp de esta carpeta si deseas importarlos más adelante.")
+		file.close()

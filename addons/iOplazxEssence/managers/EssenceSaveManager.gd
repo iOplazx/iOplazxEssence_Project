@@ -21,7 +21,6 @@ func _ready():
 	_cargar_llave_secreta()
 	_configurar_directorio_usuario()
 	
-	
 func _verificar_config():
 	# cambio a EssenceMasterConfig
 	_config = load(EssencePaths.CARPET_STATIC+"EssenceMasterConfig.tres") as EssenceMasterConfig
@@ -47,9 +46,9 @@ func _cargar_llave_secreta():
 		file.close()
 
 func _configurar_directorio_usuario():
-	# 1. Llamada directa a la RAM. Cero retrasos, cero comprobaciones falsas.
 	var save_location: int = Preferences.get_setting("game", "save_location", 0)
 	
+	# 1. Definimos la ruta principal según la preferencia
 	if save_location == 1 and not OS.has_feature("editor"):
 		var exe_folder = OS.get_executable_path().get_base_dir()
 		_save_dir = exe_folder.path_join("saves/")
@@ -59,18 +58,29 @@ func _configurar_directorio_usuario():
 	if not DirAccess.dir_exists_absolute(_save_dir):
 		DirAccess.make_dir_recursive_absolute(_save_dir)
 		print("iOplazxEssence: Carpeta de guardados creada en ", _save_dir)
+
+	# 2. SIEMPRE creamos la ruta temporal en local (AppData) 
+	# para que los respaldos al vuelo no dependan del USB
+	var temp_dir = "user://saves/temp/"
+	if not DirAccess.dir_exists_absolute(temp_dir):
+		DirAccess.make_dir_recursive_absolute(temp_dir)
 		
 # ==========================================
 # RUTAS DINÁMICAS
 # ==========================================
-func get_file_path(slot_id: String) -> String:
-	return _save_dir + slot_id + GameConstants.EXTENSION_SAVE_FILE
+# Le agregamos un valor por defecto (false) para no romper el resto de tu código
+func get_file_path(slot_id: String, is_temp: bool = false) -> String:
+	if is_temp:
+		return "user://saves/temp/".path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
+	
+	# Si no es temporal, respeta la configuración global/remota
+	return _save_dir.path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
 
 # ==========================================
 # ESCRITURA Y CIFRADO
 # ==========================================
-func save_game(slot_id: String, save_object: EssenceSaveData) -> bool:
-	var path = get_file_path(slot_id)
+func save_game(slot_id: String, save_object: EssenceSaveData, is_temp: bool = false) -> bool:
+	var path = get_file_path(slot_id, is_temp)
 	
 	# -----------------------------------------------------------------
 	# ¡EL OBJETO HACE ALL EL TRABAJO PESADO!
@@ -97,17 +107,6 @@ func save_game(slot_id: String, save_object: EssenceSaveData) -> bool:
 	on_save_completed.emit(slot_id)
 	return true
 	
-func crear_nuevo_objeto_guardado() -> EssenceSaveData:
-	var config = load("res://addons/ioplazx_essence/MasterConfig.tres")
-	
-	if config and config.custom_save_script:
-		# ¡AQUÍ ESTÁ LA MAGIA! 
-		# .new() crea una instancia del script HIJO que el usuario asignó
-		return config.custom_save_script.new() 
-	else:
-		# Si el usuario no ha puesto nada, usamos la clase base por seguridad
-		return EssenceSaveData.new()
-
 # ==========================================
 # LECTURA Y DESCIFRADO
 # ==========================================
@@ -257,7 +256,7 @@ func take_and_save_screenshot(slot_id: String) -> void:
 	img.resize(320, 180, Image.INTERPOLATE_BILINEAR)
 	
 	# 4. Guardamos como .webp en la misma carpeta que el archivo .ess
-	var image_path = _save_dir + slot_id + ".webp"
+	var image_path =  _save_dir.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
 	var err = img.save_webp(image_path)
 	
 	if err == OK:
@@ -283,10 +282,10 @@ func take_temp_screenshot() -> void:
 	var img = get_viewport().get_texture().get_image()
 	if img and not img.is_empty():
 		img.resize(320, 180, Image.INTERPOLATE_BILINEAR)
-		img.save_webp(_save_dir + "temp_snap.webp")
+		img.save_webp(_save_dir + "temp_snap" + GameConstants.EXTENSION_IMAGE)
 
 # La UI llama a esto cuando el jugador elige un Slot
-func commit_save(slot_id: String) -> bool:
+func commit_save(slot_id: String, is_temp: bool = false) -> bool:
 	if _temp_game_data.is_empty() and _temp_meta_data.is_empty(): return false
 		
 	var path = get_file_path(slot_id)
@@ -308,12 +307,13 @@ func commit_save(slot_id: String) -> bool:
 			save_obj.slot_number = int(parts[2])
 	
 	# El Manager solo se encarga de guardar en disco
-	var success = save_game(slot_id, save_obj)
+	var success = save_game(slot_id, save_obj, is_temp)
 	
 	if success:
 		# 1. Definimos las rutas completas para no dejar dudas
-		var source_path = _save_dir + "temp_snap.webp"
-		var target_path = _save_dir + slot_id + ".webp"
+		var source_path = _save_dir.path_join("temp_snap" + GameConstants.EXTENSION_IMAGE)
+		var target_folder = "user://saves/temp/" if is_temp else _save_dir
+		var target_path = target_folder.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
 
 		# 2. Verificamos si la foto temporal realmente existe antes de copiar
 		if FileAccess.file_exists(source_path):
@@ -334,10 +334,10 @@ func commit_save(slot_id: String) -> bool:
 func delete_save(slot_id: String):
 	var dir = DirAccess.open(_save_dir)
 	if dir:
-		if dir.file_exists(slot_id + ".ess"):
-			dir.remove(slot_id + ".ess")
-		if dir.file_exists(slot_id + ".webp"):
-			dir.remove(slot_id + ".webp")
+		if dir.file_exists(slot_id + GameConstants.EXTENSION_SAVE_FILE):
+			dir.remove(slot_id + GameConstants.EXTENSION_SAVE_FILE)
+		if dir.file_exists(slot_id + GameConstants.EXTENSION_IMAGE):
+			dir.remove(slot_id + GameConstants.EXTENSION_IMAGE)
 			
 	_update_save_index(slot_id, true) # true = está borrando
 	print("iOplazxEssence: Partida borrada exitosamente -> ", slot_id)
@@ -382,8 +382,8 @@ func update_save_title(slot_id: String, new_title: String):
 # Borra SOLO la imagen temporal (Útil para liberar espacio en disco rápido)
 func delete_temp_screenshot():
 	var dir = DirAccess.open(_save_dir)
-	if dir and dir.file_exists("temp_snap.webp"):
-		dir.remove("temp_snap.webp")
+	if dir and dir.file_exists("temp_snap" + GameConstants.EXTENSION_IMAGE):
+		dir.remove("temp_snap" + GameConstants.EXTENSION_IMAGE)
 		print("iOplazxEssence: Foto temporal eliminada.")
 
 # Limpia SOLO los diccionarios de la RAM
