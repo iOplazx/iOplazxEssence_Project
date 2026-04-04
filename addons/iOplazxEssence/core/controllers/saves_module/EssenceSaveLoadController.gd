@@ -480,25 +480,62 @@ func _ejecutar_exportacion_individual(dest_path: String):
 	else:
 		_mostrar_alerta("Error", "Hubo un problema al exportar la partida. Revisa la consola.")
 
-func _ejecutar_exportacion_masiva(dest_path: String):
-	# Aquí podrías iterar sobre todos los archivos en SaveManager._save_dir
-	# y copiarlos a una carpeta "Full_Backup"
-	pass
+func _ejecutar_exportacion_masiva(dir_path: String):
+	var slots_validos = _all_saves_meta.keys()
+	
+	# 1. Verificación con texto traducido
+	if slots_validos.is_empty():
+		_mostrar_alerta(tr("DIALOG_WARNING_TITLE"), tr("UI_EXPORT_NO_SAVES"))
+		return
+	
+	# 2. Pantalla de carga con número dinámico
+	# Usamos .format() para inyectar cuántas partidas estamos moviendo
+	var loading_text = tr("UI_EXPORT_PROCESSING").format({"count": slots_validos.size()})
+	GlobalLoading.show_loading(loading_text)
+	
+	await get_tree().process_frame
+	
+	var export_success = EssenceExportUtils.export_all_slots(
+		slots_validos,
+		SaveManager._save_dir,
+		dir_path
+	)
+	
+	await get_tree().create_timer(0.5).timeout 
+	GlobalLoading.hide_loading()
+	
+	# 3. Mensajes finales localizados
+	if export_success:
+		AudioManager.play_ui_sfx()
+		var success_msg = tr("UI_EXPORT_SUCCESS_MSG").format({"path": dir_path})
+		_mostrar_alerta(tr("UI_EXPORT_SUCCESS_TITLE"), success_msg)
+	else:
+		_mostrar_alerta(tr("UI_EXPORT_ERROR_TITLE"), tr("UI_EXPORT_ERROR_MSG"))
 	
 func _on_export_current_pressed():
 	AudioManager.play_ui_sfx()
 	export_dialog.popup_centered_ratio(0.6) # Abre la ventana de Windows/Linux
 	
 func _on_export_dir_selected(dir_path: String):
-	# Opcional: Si tienes tu nodo ColorRect de bloqueo (Overlay), puedes activarlo aquí
-	# para que el usuario no toque nada mientras el Athlon procesa.
+	# Si el usuario eligió "ALL" en el menú, lo mandamos a la función masiva
+	if _export_all:
+		_ejecutar_exportacion_masiva(dir_path)
+		return # Salimos de aquí para que no ejecute lo de abajo
+		
+	# ========================================================
+	# LÓGICA DE EXPORTAR ACTUAL (CURRENT)
+	# ========================================================
+	
+	# Opcional: Ponemos el escudo de carga aquí también por si el Athlon tarda un poco
+	GlobalLoading.show_loading(tr("UI_EXPORT_PROCESSING").format({"count": 1}))
+	await get_tree().process_frame
 	
 	# PASO 1: Hacemos el "Snapshot" a la carpeta temporal
 	var nombre_unico = "export_" + str(Time.get_unix_time_from_system())
 	var snapshot_success = SaveManager.commit_save(nombre_unico, true)
 	
 	if snapshot_success:
-		# PASO 2: Usamos TU función estática, pero le decimos que busque en 'temp/'
+		# PASO 2: Le decimos a la utilidad que busque en 'temp/'
 		var export_success = EssenceExportUtils.export_slot(
 			nombre_unico, 
 			"user://saves/temp/", # <--- Origen: La aduana temporal
@@ -507,15 +544,22 @@ func _on_export_dir_selected(dir_path: String):
 		
 		if export_success:
 			AudioManager.play_ui_sfx()
-			_mostrar_alerta("Éxito", "Partida exportada correctamente a:\n" + dir_path)
+			# Traducción del éxito usando .format() para la ruta
+			var success_msg = tr("UI_EXPORT_SUCCESS_MSG").format({"path": dir_path})
+			_mostrar_alerta(tr("UI_EXPORT_SUCCESS_TITLE"), success_msg)
 			
-			# eliminar los archivos imagen pero conservar los archivos exportados para poder recuperarlos despues
-			_limpiar_aduana_temporal(nombre_unico,false, true) 
+			# Eliminar las imágenes pero conservar el .ess temporal
+			_limpiar_aduana_temporal(nombre_unico, false, true) 
 		else:
-			_mostrar_alerta("Error", "No se pudo copiar el archivo de respaldo al destino.")
+			# Traducción del error de copiado
+			_mostrar_alerta(tr("UI_EXPORT_ERROR_TITLE"), tr("UI_EXPORT_ERROR_MSG"))
 			
 	else:
-		_mostrar_alerta("Error", "Fallo al generar el archivo de guardado temporal.")
+		# ¡LA CORRECCIÓN ESTÁ AQUÍ! Usando tr() en ambas claves
+		_mostrar_alerta(tr("UI_EXPORT_TEMP_FAIL_TITLE"), tr("UI_EXPORT_TEMP_FAIL_MSG"))
+		
+	# Al final de todo el proceso (exitoso o fallido), quitamos el escudo de carga
+	GlobalLoading.hide_loading()
 
 # ==========================================
 # UTILIDAD DE LIMPIEZA

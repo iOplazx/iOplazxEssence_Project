@@ -97,6 +97,14 @@ DIALOG_SELECT_SLOT_MSG,Please select a save slot first.,Selecciona una partida p
 FILEDIALOG_TITLE,Select where to save your backup,Selecciona dónde guardar tu respaldo
 README_TITLE,iOPLAZX ESSENCE BACKUP,RESPALDO DE iOPLAZX ESSENCE
 README_DESC,"Please do not modify or rename the .ess and .webp files in this folder if you wish to import them later.","Por favor, no modifiques ni renombres los archivos .ess y .webp de esta carpeta si deseas importarlos más adelante."
+UI_EXPORT_TEMP_FAIL_TITLE,Error,Error
+UI_EXPORT_TEMP_FAIL_MSG,"Failed to generate temporary save file.","Fallo al generar el archivo de guardado temporal."
+UI_EXPORT_PROCESSING,"Exporting {count} saves...","Exportando {count} partidas..."
+UI_EXPORT_NO_SAVES,"No saves found to export.","No se encontraron partidas para exportar."
+UI_EXPORT_SUCCESS_TITLE,"Success","Éxito"
+UI_EXPORT_SUCCESS_MSG,"Mass backup completed at: {path}","Respaldo masivo completado en: {path}"
+UI_EXPORT_ERROR_TITLE,"Error","Error"
+UI_EXPORT_ERROR_MSG,"A problem occurred while processing the files.","Ocurrió un problema al procesar los archivos."
 GLOBAL_YES,Yes,Sí
 GLOBAL_NO,No,No
 GLOBAL_OK,OK,Aceptar

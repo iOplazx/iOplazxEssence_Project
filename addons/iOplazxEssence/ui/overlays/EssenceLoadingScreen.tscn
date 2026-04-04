@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://c56ktxpxnuj7j"]
+
+[ext_resource type="Script" uid="uid://dxt52v0noydt7" path="res://addons/iOplazxEssence/scriptsItems/GlobalLoading.gd" id="1_jbwmo"]
+
+[node name="GlobalLoading" type="CanvasLayer" unique_id=1154965486]
+visible = false
+script = ExtResource("1_jbwmo")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1639015536]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.74509805)
+
+[node name="CenterContainer" type="CenterContainer" parent="ColorRect" unique_id=2110901479]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -20.0
+offset_right = 52.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ColorRect/CenterContainer" unique_id=764285456]
+layout_mode = 2
+text = "Procesando..."

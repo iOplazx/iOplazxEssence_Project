@@ -47,6 +47,49 @@ static func export_slot(slot_id: String, internal_dir: String, external_dest_dir
 		printerr("iOplazxEssence: Falló la exportación del archivo .ess. Código: ", err_ess)
 		return false
 
+## Exporta múltiples slots a una única carpeta maestra de respaldo.
+static func export_all_slots(slot_ids: Array, internal_dir: String, external_dest_dir: String) -> bool:
+	var name_game = ProjectSettings.get_setting("application/config/name", "iOplazxEssence")
+	if name_game.is_empty():
+		name_game = "iOplazxEssence"
+	
+	# Creamos UNA SOLA carpeta maestra con la fecha y hora
+	var timestamp = str(Time.get_unix_time_from_system())
+	var export_folder_name = name_game + "_Full_Backup_" + timestamp
+	var final_export_path = external_dest_dir.path_join(export_folder_name)
+	
+	if not DirAccess.dir_exists_absolute(final_export_path):
+		var err_dir = DirAccess.make_dir_recursive_absolute(final_export_path)
+		if err_dir != OK:
+			return false
+	
+	var success_count = 0
+	
+	# Iteramos solo por las partidas válidas que el controlador nos envíe
+	for slot_id in slot_ids:
+		var source_ess = internal_dir.path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
+		var source_webp = internal_dir.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
+		
+		var target_ess = final_export_path.path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
+		var target_webp = final_export_path.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
+		
+		# Copiamos el archivo de datos
+		if FileAccess.file_exists(source_ess):
+			DirAccess.copy_absolute(source_ess, target_ess)
+			success_count += 1
+			
+		# Copiamos la imagen si existe
+		if FileAccess.file_exists(source_webp):
+			DirAccess.copy_absolute(source_webp, target_webp)
+
+	# Si al menos logramos copiar 1 partida, lo damos por bueno y creamos el README
+	if success_count > 0:
+		_crear_archivo_readme(final_export_path)
+		print("iOplazxEssence: Respaldo masivo exitoso. Se exportaron ", success_count, " partidas.")
+		return true
+		
+	return false
+
 # ==========================================
 # UTILIDADES INTERNAS
 # ==========================================
