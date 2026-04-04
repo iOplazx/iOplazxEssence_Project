@@ -6,11 +6,15 @@ class_name EssenceExportUtils extends RefCounted
 
 ## Exporta un slot de guardado y su captura a una carpeta seleccionada por el usuario.
 static func export_slot(slot_id: String, internal_dir: String, external_dest_dir: String) -> bool:
-	var source_ess = internal_dir.path_join(slot_id + ".ess")
-	var source_webp = internal_dir.path_join(slot_id + ".webp")
+	var source_ess = internal_dir.path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
+	var source_webp = internal_dir.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
+	
+	var name_game = ProjectSettings.get_setting("application/config/name", "iOplazxEssence")
+	if name_game.is_empty():
+		name_game = "iOplazxEssence"
 	
 	# Creamos una subcarpeta bonita en el destino para no desordenar los archivos del usuario
-	var export_folder_name = "iOplazx_Backup_" + slot_id
+	var export_folder_name = name_game + "_Backup_" + slot_id
 	var final_export_path = external_dest_dir.path_join(export_folder_name)
 	
 	if not DirAccess.dir_exists_absolute(final_export_path):
@@ -19,8 +23,8 @@ static func export_slot(slot_id: String, internal_dir: String, external_dest_dir
 			printerr("iOplazxEssence: No se pudo crear la carpeta de exportación. Error: ", err_dir)
 			return false
 	
-	var target_ess = final_export_path.path_join(slot_id + ".ess")
-	var target_webp = final_export_path.path_join(slot_id + ".webp")
+	var target_ess = final_export_path.path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
+	var target_webp = final_export_path.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
 	
 	# Copiamos el archivo de datos (Obligatorio)
 	var err_ess = OK
