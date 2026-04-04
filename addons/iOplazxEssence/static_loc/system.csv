@@ -92,6 +92,11 @@ RENAME_SAVE_TITLE,Rename Save,Renombrar Partida
 RENAME_SAVE_MSG,Enter the new name:,Escribe el nuevo nombre:
 FILEDIALOG_TEXT_CANCEL,CANCEL,CANCELAR
 FILEDIALOG_TITLE,Select where to save your backup,Selecciona dónde guardar tu respaldo
+DIALOG_WARNING_TITLE,Warning,Aviso
+DIALOG_SELECT_SLOT_MSG,Please select a save slot first.,Selecciona una partida primero.
+FILEDIALOG_TITLE,Select where to save your backup,Selecciona dónde guardar tu respaldo
+README_TITLE,iOPLAZX ESSENCE BACKUP,RESPALDO DE iOPLAZX ESSENCE
+README_DESC,"Please do not modify or rename the .ess and .webp files in this folder if you wish to import them later.","Por favor, no modifiques ni renombres los archivos .ess y .webp de esta carpeta si deseas importarlos más adelante."
 GLOBAL_YES,Yes,Sí
 GLOBAL_NO,No,No
 GLOBAL_OK,OK,Aceptar

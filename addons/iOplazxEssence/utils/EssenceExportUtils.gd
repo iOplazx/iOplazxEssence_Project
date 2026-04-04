@@ -36,7 +36,7 @@ static func export_slot(slot_id: String, internal_dir: String, external_dest_dir
 		
 	if err_ess == OK:
 		# Archivo de advertencia para el usuario (Opcional, pero muy profesional)
-		_crear_archivo_leame(final_export_path)
+		_crear_archivo_readme(final_export_path)
 		print("iOplazxEssence: ¡Exportación exitosa a -> ", final_export_path, "!")
 		return true
 	else:
@@ -46,9 +46,17 @@ static func export_slot(slot_id: String, internal_dir: String, external_dest_dir
 # ==========================================
 # UTILIDADES INTERNAS
 # ==========================================
-static func _crear_archivo_leame(folder_path: String):
-	var txt_path = folder_path.path_join("LEAME.txt")
+static func _crear_archivo_readme(folder_path: String):
+	var txt_path = folder_path.path_join("README.txt")
 	var file = FileAccess.open(txt_path, FileAccess.WRITE)
+	
 	if file:
-		file.store_string("=== RESPALDO DE iOPLAZX ESSENCE ===\n\nPor favor, no modifiques ni renombres los archivos .ess y .webp de esta carpeta si deseas importarlos más adelante.")
+		# En funciones estáticas, usamos TranslationServer para evitar errores de contexto
+		var title = TranslationServer.translate("README_TITLE")
+		var desc = TranslationServer.translate("README_DESC")
+		
+		# Formateamos el string final
+		var contenido_final = "=== " + title + " ===\n\n" + desc
+		
+		file.store_string(contenido_final)
 		file.close()

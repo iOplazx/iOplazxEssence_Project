@@ -403,24 +403,27 @@ func _saltar_a_pagina_reciente():
 		
 func _on_import_file_pressed():
 	var x = 1
-	
+
 func _on_export_file_pressed():
-	# 1. Verificamos que haya una partida seleccionada (si es necesario)
-	if _current_slot_to_export == "":
-		_mostrar_alerta("Aviso", "Selecciona una partida primero.")
-		return
-	print("Iniciando proceso de exportacion")
+	AudioManager.play_ui_sfx()
+	print("iOplazxEssence: Iniciando proceso de exportación...")
 		
-	# 2. Instanciamos tu nuevo menú personalizado
+	# Instanciamos tu menú personalizado SIN bloqueos previos
 	var export_menu = EXPORT_MENU_SCENE.instantiate()
 	add_child(export_menu)
 	
-	# 3. Esperamos su respuesta usando la señal que creamos
 	export_menu.on_option_selected.connect(func(opcion: String):
 		if opcion == "CANCEL":
-			return # No hacemos nada
+			return
 			
 		elif opcion == "CURRENT":
+			# LA MAGIA LOGICA AQUI:
+			# Si estamos en modo "Cargar" (Menú Principal) y NO seleccionó tarjeta -> Bloqueamos.
+			# Si estamos en modo "Guardar" (En partida en vivo) -> Dejamos pasar porque exportaremos el Snapshot.
+			if not SaveManager.intent_is_save_mode and _current_slot_to_export == "":
+				_mostrar_alerta(tr("DIALOG_WARNING_TITLE"), tr("DIALOG_SELECT_SLOT_MSG"))
+				return
+				
 			_export_all = false
 			_abrir_file_dialog_exportacion()
 			
@@ -430,9 +433,11 @@ func _on_export_file_pressed():
 	)
 	
 func _abrir_file_dialog_exportacion():
-	# Aquí abres tu FileDialog nativo de Godot para que elija la carpeta de Windows/Linux
-	# export_dialog.popup_centered_ratio(0.5)
-	pass
+	# 1. Asignamos el título traducido
+	export_dialog.title = tr("FILEDIALOG_TITLE")
+	
+	# 2. Mostramos el FileDialog de Windows/Linux
+	export_dialog.popup_centered_ratio(0.6)
 
 # Se conecta a la señal 'dir_selected' del FileDialog
 func _on_export_dialog_dir_selected(dir_path: String):
