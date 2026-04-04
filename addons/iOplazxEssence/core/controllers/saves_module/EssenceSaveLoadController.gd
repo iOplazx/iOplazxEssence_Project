@@ -328,7 +328,7 @@ func _mostrar_dialogo_edicion(slot_id: String, current_title: String):
 			
 		input_box.queue_free()
 	)
-
+	
 func _ejecutar_accion_real(action: String, slot_id: String):
 	if action == "SAVE":
 		var success = SaveManager.commit_save(slot_id)
@@ -338,12 +338,27 @@ func _ejecutar_accion_real(action: String, slot_id: String):
 	elif action == "LOAD":
 		var data = SaveManager.load_game(slot_id)
 		if not data.is_empty() and data.has("game_data"):
+			# 1. Cargamos los datos a la RAM
 			SaveManager.loaded_game_data = data["game_data"]
-			SceneManager.go_back()
 			
+			print("iOplazxEssence: Datos en RAM. Viajando a la escena principal...")
+			
+			# 2. Leemos la ruta maestra que el Dev configuró en su RouteConfig.tres
+			# (Asumo que tienes acceso a tu config a través del SceneManager)
+			var target_scene = SceneManager._config.continue_game_scene 
+			
+			# Fallback de seguridad por si el Dev olvidó llenarlo
+			if target_scene == "":
+				target_scene = SceneManager._config.main_menu_scene 
+			
+			# 3. Viajamos limpiando el historial para que el juego arranque fresco
+			SceneManager.goto_loaded_game(target_scene)
+			
+			# 4. Destruimos este menú para no dejar interfaces fantasma
+			self.queue_free()
 	elif action == "DELETE":
 		SaveManager.delete_save(slot_id)
-		_refresh_slots() # Recargamos la UI para que se vea vacío de nuevo)
+		_refresh_slots()
 
 # ==========================================
 # DELEGACIÓN DE UI (PAGINADOR)
@@ -418,9 +433,10 @@ func _on_export_file_pressed():
 			
 		elif opcion == "CURRENT":
 			# LA MAGIA LOGICA AQUI:
-			# Si estamos en modo "Cargar" (Menú Principal) y NO seleccionó tarjeta -> Bloqueamos.
-			# Si estamos en modo "Guardar" (En partida en vivo) -> Dejamos pasar porque exportaremos el Snapshot.
-			if not SaveManager.intent_is_save_mode and _current_slot_to_export == "":
+			# 1. Si hay una partida viva en RAM -> Exportamos el Snapshot (Pasa directo)
+			# 2. Si NO hay partida viva en RAM (ej: Menú principal) -> 
+			#    Exigimos que el usuario haya seleccionado una tarjeta del Grid.
+			if not SaveManager.has_live_session() and _current_slot_to_export == "":
 				_mostrar_alerta(tr("DIALOG_WARNING_TITLE"), tr("DIALOG_SELECT_SLOT_MSG"))
 				return
 				

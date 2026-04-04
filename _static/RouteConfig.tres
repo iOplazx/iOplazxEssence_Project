@@ -6,6 +6,7 @@
 script = ExtResource("1_nte1n")
 main_menu_scene = "uid://c5dv33v21frxr"
 new_game_scene = "uid://dbcs7828cew15"
+continue_game_scene = "uid://dbcs7828cew15"
 load_game_scene = "uid://c2yexvr2in0cr"
 settings_scene = "uid://c7suofv1q8fjt"
 credits_scene = "uid://ubl4nvaexi55"

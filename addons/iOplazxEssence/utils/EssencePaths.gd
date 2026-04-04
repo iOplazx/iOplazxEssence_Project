@@ -20,6 +20,11 @@ const PATH_UI_WIDGETS = BASE_RUTE + "ui/widgets/"
 const CARPET_STATIC = "res://_static/"
 
 # ==========================================
+# ARCHIVOS ESPECIFICOS
+# ==========================================
+const PATH_TEST_SAVE_SCENE = PATH_UI + "test/TestSaveScene.tscn"
+
+# ==========================================
 # CONSTANTES DIRECTAS (Para usar con preload en Audio/Escenas)
 # ==========================================
 const AUDIO_UI_SPACE = PATH_AUDIO + "spaceUiSound.wav"

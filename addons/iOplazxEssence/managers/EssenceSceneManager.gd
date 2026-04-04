@@ -74,6 +74,20 @@ func goto_custom(route_name: String, transition: TransitionType = TransitionType
 			_navigate(_config.custom_routes[route_name], transition)
 		else:
 			push_error("iOplazxEssence: La ruta custom '" + route_name + "' no existe.")
+			
+## Viaja a un nivel cargado y limpia el historial para evitar regresar al menú
+func goto_loaded_game(scene_path: String, transition: TransitionType = TransitionType.FADE_BLACK):
+	if scene_path == "" or not ResourceLoader.exists(scene_path):
+		push_error("iOplazxEssence: No se pudo viajar. La escena cargada no existe: " + scene_path)
+		return
+		
+	print("iOplazxEssence: Iniciando partida en -> ", scene_path)
+	
+	# Limpiamos el historial para que el botón "Atrás" empiece desde cero en este nivel
+	_history.clear() 
+	
+	# Usamos tu método privado seguro
+	_navigate(scene_path, transition)
 
 # ==========================================
 # MOTOR INTERNO DE NAVEGACIÓN Y ANIMACIÓN
@@ -101,14 +115,14 @@ func _navigate(path: String, transition: TransitionType) -> void:
 func _perform_fade_transition(path: String, transition: TransitionType):
 	_is_transitioning = true
 	
-	# NUEVO: Bloqueo absoluto de TODO el input (Mouse, Teclado, Mando)
+	# Bloqueo absoluto de TO-DO el input (Mouse, Teclado, Mando)
 	get_tree().root.set_disable_input(true)
 	
 	var target_color = Color.BLACK if transition == TransitionType.FADE_BLACK else Color.WHITE
 	_curtain.color = target_color
 	_curtain.color.a = 0.0
 	
-	# NUEVO: .set_pause_mode(...) asegura que la transición funcione aunque el juego esté pausado
+	# .set_pause_mode(...) asegura que la transición funcione aunque el juego esté pausado
 	var tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(_curtain, "color:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE)
 	await tween.finished
@@ -120,7 +134,7 @@ func _perform_fade_transition(path: String, transition: TransitionType):
 	tween.tween_property(_curtain, "color:a", 0.0, 0.4).set_trans(Tween.TRANS_SINE)
 	await tween.finished
 	
-	# NUEVO: Restauramos el input al terminar
+	#Restauramos el input al terminar
 	get_tree().root.set_disable_input(false)
 	_is_transitioning = false
 

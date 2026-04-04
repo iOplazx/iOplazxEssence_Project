@@ -375,6 +375,10 @@ func update_save_title(slot_id: String, new_title: String):
 				print("iOplazxEssence: Éxito. Título en disco cambiado a '", new_title, "'")
 			else:
 				printerr("iOplazxEssence: Error al reescribir archivo encriptado.")
+				
+## Retorna true si hay datos de una partida en vivo listos para procesarse
+func has_live_session() -> bool:
+	return not _temp_game_data.is_empty()
 
 # ==========================================
 # LIMPIEZA DE MEMORIA
