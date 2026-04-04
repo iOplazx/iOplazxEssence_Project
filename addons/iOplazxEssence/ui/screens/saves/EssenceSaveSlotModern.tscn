@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bagota4jhojsp" path="res://addons/iOplazxEssence/core/controllers/saves_module/EssenceSaveSlotModern.gd" id="1_54c42"]
 [ext_resource type="Texture2D" uid="uid://ch73u0mmdqcql" path="res://addons/iOplazxEssence/resources/images/icon_save.png" id="2_wyko5"]
 [ext_resource type="Texture2D" uid="uid://dcshskjm2pfdk" path="res://addons/iOplazxEssence/resources/images/icon_bg_image.png" id="2_xfdxw"]
+[ext_resource type="Texture2D" uid="uid://n10s7noau54s" path="res://addons/iOplazxEssence/resources/images/iconImageNoLoad.png" id="2_xqf6f"]
 [ext_resource type="Texture2D" uid="uid://bjnt0yywcrjv3" path="res://addons/iOplazxEssence/resources/images/icon_pencil.png" id="3_6uswm"]
 [ext_resource type="Texture2D" uid="uid://fwqudcao7suo" path="res://addons/iOplazxEssence/resources/images/icon_load.png" id="3_xfdxw"]
 [ext_resource type="Texture2D" uid="uid://cxyunorkubncg" path="res://addons/iOplazxEssence/resources/images/icon_trash.png" id="4_6uswm"]
@@ -18,6 +19,7 @@ btn_edit = NodePath("HBox/Actions/btnEdit")
 btn_save = NodePath("HBox/Actions/btnSave")
 btn_load = NodePath("HBox/Actions/btnLoad")
 btn_delete = NodePath("HBox/Actions/btnDelete")
+fallback_image = ExtResource("2_xqf6f")
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=2013721000]
 layout_mode = 2

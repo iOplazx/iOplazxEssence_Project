@@ -96,6 +96,8 @@ func _set_mode(is_save: bool):
 		final_title = tr("PAGE_TITLE_SAVES_MODERN") 
 	else:
 		final_title = tr("PAGE_TITLE_SAVE") if _is_save_mode else tr("PAGE_TITLE_LOAD")
+		btn_add_new_slot.disabled = true
+		btn_add_new_slot.visible = false
 		
 	if lbl_title:
 		lbl_title.text = final_title
@@ -210,6 +212,8 @@ func _generar_slots_modern():
 		var real_parent = btn_add_new_slot.get_parent()
 		if real_parent:
 			real_parent.move_child(btn_add_new_slot, -1)
+	else:
+		print("No se encontro el boton btn_add_new_slot como referencia")
 
 func _crear_instancia_slot(slot_id: String, container: Control, save_data: Dictionary = {}):
 	if _current_style == 0:
