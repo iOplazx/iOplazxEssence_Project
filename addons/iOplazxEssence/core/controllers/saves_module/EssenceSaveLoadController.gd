@@ -657,16 +657,12 @@ func _procesar_directorio_importacion(dir_path: String):
 			continue 
 			
 		elif accion_a_tomar == "NUEVO":
-			print("iOplazxEssence: Buscando slot libre en el Manager...")
 			slot_id_destino = SaveManager.get_next_free_slot(_all_saves_meta)
-			print("iOplazxEssence: Slot libre encontrado -> ", slot_id_destino)
 			
 			if slot_id_destino == "":
 				continue 
 				
-		print("iOplazxEssence: Iniciando copiado físico hacia -> ", slot_id_destino)
 		var copiado_ok = SaveManager.import_physical_file(archivo_externo["ruta_ess"], archivo_externo["ruta_webp"], slot_id_destino)
-		print("iOplazxEssence: ¿Copiado exitoso? -> ", copiado_ok)
 		
 		if copiado_ok:
 			slots_importados.append(slot_id_destino)
@@ -680,16 +676,13 @@ func _procesar_directorio_importacion(dir_path: String):
 		}
 		
 	# 4. FINALIZACIÓN Y GUARDADO
-	print("iOplazxEssence: Bucle terminado. Guardando Index...")
 	for slot in slots_importados:
 		SaveManager._update_save_index(slot)
 	
-	print("iOplazxEssence: Refrescando UI...")
 	_refresh_slots() 
 	
-	print("iOplazxEssence: UI Refrescada. Ocultando carga...")
 	GlobalLoading.hide_loading()
-	_mostrar_alerta("Éxito", "Importación completada.")
+	_mostrar_alerta(tr("UI_IMPORT_SUCCESS_TITLE"), tr("UI_IMPORT_SUCCESS_MSG"))
 		
 
 ## Pausa la ejecución y muestra la UI de conflicto. Retorna {accion, aplicar_a_todos}
