@@ -181,9 +181,13 @@ func _get_save_index() -> Dictionary:
 		var data = JSON.parse_string(file.get_as_text())
 		file.close()
 		if typeof(data) == TYPE_DICTIONARY:
+			# Parche de seguridad: Si el archivo viejo no tiene la llave, la inyectamos en RAM
+			if not data.has("last_export_path"):
+				data["last_export_path"] = ""
 			return data
 			
-	return {"latest_save": "", "used_slots": []}
+	# Diccionario base actualizado
+	return {"latest_save": "", "last_export_path": "", "used_slots": []}
 
 # Actualiza el archivo invisible después de guardar o borrar
 func _update_save_index(slot_id: String, is_deleting: bool = false):
@@ -192,7 +196,7 @@ func _update_save_index(slot_id: String, is_deleting: bool = false):
 	
 	if is_deleting:
 		index["used_slots"].erase(slot_id)
-		# Si borramos el más reciente, limpiamos el latest_save (o habría que buscar el anterior)
+		# Si borramos el más reciente, limpiamos el latest_save (o retrocedemos al anterior)
 		if index["latest_save"] == slot_id:
 			index["latest_save"] = index["used_slots"].back() if index["used_slots"].size() > 0 else ""
 	else:
@@ -235,6 +239,10 @@ func get_next_available_slot(slots_per_page: int = 6) -> String:
 # Retorna cuál fue el último archivo modificado (útil para el botón "Continuar" del Menú Principal)
 func get_latest_save_id() -> String:
 	return _get_save_index().get("latest_save", "")
+	
+# Obtiene la última ruta de exportación guardada
+func get_last_export_path() -> String:
+	return _get_save_index().get("last_export_path", "")
 	
 # ==========================================
 # SISTEMA DE SCREENSHOTS (SNAPSHOT)
@@ -409,6 +417,27 @@ func import_physical_file(source_ess: String, source_webp: String, target_slot_i
 		DirAccess.copy_absolute(source_webp, target_webp)
 		
 	return success
+	
+## NUEVO: Actualiza exclusivamente la ruta de exportación en el índice
+func update_last_export_path(dir_path: String):
+	var index = _get_save_index()
+	index["last_export_path"] = dir_path
+	
+	var path = _save_dir + INDEX_FILE
+	var file = FileAccess.open(path, FileAccess.WRITE)
+	file.store_string(JSON.stringify(index))
+	file.close()
+	
+func mark_save_as_latest_played(slot_id: String):
+	var index = _get_save_index()
+	# Solo actualizamos si realmente hay un cambio, para ahorrar escrituras en disco
+	if index["latest_save"] != slot_id:
+		index["latest_save"] = slot_id
+		
+		var path = _save_dir + INDEX_FILE
+		var file = FileAccess.open(path, FileAccess.WRITE)
+		file.store_string(JSON.stringify(index))
+		file.close()
 
 # ==========================================
 # LIMPIEZA DE MEMORIA
