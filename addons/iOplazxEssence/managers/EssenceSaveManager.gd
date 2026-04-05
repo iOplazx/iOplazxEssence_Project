@@ -379,6 +379,36 @@ func update_save_title(slot_id: String, new_title: String):
 ## Retorna true si hay datos de una partida en vivo listos para procesarse
 func has_live_session() -> bool:
 	return not _temp_game_data.is_empty()
+	
+## Busca el primer slot disponible en el índice
+func get_next_free_slot(current_meta: Dictionary) -> String:
+	var max_pages = 50 
+	var max_slots_per_page = 10 
+	
+	for page in range(1, max_pages + 1):
+		for slot in range(1, max_slots_per_page + 1):
+			var test_id = "save_" + str(page) + "_" + str(slot)
+			
+			if not current_meta.has(test_id):
+				return test_id
+				
+	push_error("iOplazxEssence: No hay slots libres disponibles.")
+	return ""
+
+## Ejecuta la copia física pura y dura (sin UI)
+func import_physical_file(source_ess: String, source_webp: String, target_slot_id: String) -> bool:
+	var target_ess = _save_dir.path_join(target_slot_id + GameConstants.EXTENSION_SAVE_FILE)
+	var target_webp = _save_dir.path_join(target_slot_id + GameConstants.EXTENSION_IMAGE)
+	
+	var success = false
+	if FileAccess.file_exists(source_ess):
+		DirAccess.copy_absolute(source_ess, target_ess)
+		success = true
+		
+	if FileAccess.file_exists(source_webp):
+		DirAccess.copy_absolute(source_webp, target_webp)
+		
+	return success
 
 # ==========================================
 # LIMPIEZA DE MEMORIA

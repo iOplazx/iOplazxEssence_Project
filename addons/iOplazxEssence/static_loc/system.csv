@@ -103,8 +103,20 @@ UI_EXPORT_PROCESSING,"Exporting {count} saves...","Exportando {count} partidas..
 UI_EXPORT_NO_SAVES,"No saves found to export.","No se encontraron partidas para exportar."
 UI_EXPORT_SUCCESS_TITLE,"Success","Éxito"
 UI_EXPORT_SUCCESS_MSG,"Mass backup completed at: {path}","Respaldo masivo completado en: {path}"
+UI_EXPORT_SINGLE_SUCCESS_MSG,"Save file exported successfully to: {path}","Partida exportada correctamente a: {path}"
 UI_EXPORT_ERROR_TITLE,"Error","Error"
 UI_EXPORT_ERROR_MSG,"A problem occurred while processing the files.","Ocurrió un problema al procesar los archivos."
+UI_IMPORT_DIALOG_TITLE,"Select backup folder to import","Seleccionar carpeta de respaldo a importar"
+UI_IMPORT_STARTING,"Scanning folder for save files...","Escaneando carpeta en busca de partidas..."
+UI_IMPORT_PROCESSING,"Importing file: {file}","Importando archivo: {file}"
+UI_IMPORT_CONFLICT_MSG,"The slot {slot} is already occupied. What do you want to do?","El espacio {slot} ya está ocupado. ¿Qué deseas hacer?"
+UI_IMPORT_APPLY_ALL,"Apply to all remaining conflicts","Aplicar a todos los conflictos restantes"
+UI_IMPORT_BTN_OMIT,"Omit","Omitir"
+UI_IMPORT_BTN_OVERWRITE,"Overwrite","Sobrescribir"
+UI_IMPORT_BTN_NEW,"Move to New","Mover a nuevo"
+UI_IMPORT_SUCCESS_TITLE,"Import Complete","Importación completa"
+UI_IMPORT_SUCCESS_MSG,"All files have been imported successfully.","Todos los archivos se han importado con éxito."
+UI_IMPORT_ERROR_DIR,"Could not open the selected folder.","No se pudo abrir la carpeta seleccionada."
 GLOBAL_YES,Yes,Sí
 GLOBAL_NO,No,No
 GLOBAL_OK,OK,Aceptar

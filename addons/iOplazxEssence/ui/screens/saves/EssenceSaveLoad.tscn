@@ -152,7 +152,7 @@ custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "SAVE_EXPORT_GAME"
 
-[node name="ExportDialog" type="FileDialog" parent="." unique_id=817513286]
+[node name="FolderDialog" type="FileDialog" parent="." unique_id=817513286]
 title = "FILEDIALOG_TITLE"
 cancel_button_text = "FILEDIALOG_TEXT_CANCEL"
 mode_overrides_title = false

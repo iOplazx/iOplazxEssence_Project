@@ -1,0 +1,74 @@
+[gd_scene format=3 uid="uid://dh2bwd6pwl2ug"]
+
+[ext_resource type="Script" uid="uid://dklboil4ojqcb" path="res://addons/iOplazxEssence/scriptsItems/EssenceImportConflictBox.gd" id="1_7mmy3"]
+
+[node name="EssenceImportConflictBox" type="CanvasLayer" unique_id=462659900 node_paths=PackedStringArray("label_msg", "chk_apply_all", "btn_omit", "btn_overwrite", "btn_new")]
+script = ExtResource("1_7mmy3")
+label_msg = NodePath("ColorRect/Panel/mcMargin/VBoxContainer/LabelMsg")
+chk_apply_all = NodePath("ColorRect/Panel/mcMargin/VBoxContainer/chkApplyAll")
+btn_omit = NodePath("ColorRect/Panel/mcMargin/VBoxContainer/HBoxContainer/BtnOmitir")
+btn_overwrite = NodePath("ColorRect/Panel/mcMargin/VBoxContainer/HBoxContainer/BtnSobrescribir")
+btn_new = NodePath("ColorRect/Panel/mcMargin/VBoxContainer/HBoxContainer/BtnNuevo")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=826561095]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.23137255, 0.23137255, 0.23137255, 0.69803923)
+
+[node name="Panel" type="PanelContainer" parent="ColorRect" unique_id=602353329]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="mcMargin" type="MarginContainer" parent="ColorRect/Panel" unique_id=2073336296]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/Panel/mcMargin" unique_id=1986253233]
+layout_mode = 2
+alignment = 1
+
+[node name="LabelMsg" type="Label" parent="ColorRect/Panel/mcMargin/VBoxContainer" unique_id=1106922535]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "MESSAGE"
+
+[node name="chkApplyAll" type="CheckBox" parent="ColorRect/Panel/mcMargin/VBoxContainer" unique_id=541013716]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Quieres aplicar los mismos cambios para los siguientes?"
+autowrap_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ColorRect/Panel/mcMargin/VBoxContainer" unique_id=1972959470]
+layout_mode = 2
+size_flags_vertical = 4
+alignment = 1
+
+[node name="BtnOmitir" type="Button" parent="ColorRect/Panel/mcMargin/VBoxContainer/HBoxContainer" unique_id=1813068106]
+layout_mode = 2
+text = "OMITIR"
+
+[node name="BtnSobrescribir" type="Button" parent="ColorRect/Panel/mcMargin/VBoxContainer/HBoxContainer" unique_id=325743039]
+layout_mode = 2
+text = "SOBRESCRIBIR"
+
+[node name="BtnNuevo" type="Button" parent="ColorRect/Panel/mcMargin/VBoxContainer/HBoxContainer" unique_id=962435213]
+layout_mode = 2
+text = "NUEVO"

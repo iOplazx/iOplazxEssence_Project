@@ -27,8 +27,7 @@ class_name EssenceSaveLoadController extends Control
 @export var btn_export: Button
 @export var btn_import: Button
 
-# Supongamos que tienes una referencia al FileDialog
-@onready var export_dialog: FileDialog = $ExportDialog
+@onready var folder_dialog: FileDialog = $FolderDialog
 
 # --- EL CEREBRO DE LA PAGINACIÓN ---
 var paginator: EssencePaginator = EssencePaginator.new()
@@ -70,10 +69,10 @@ func _ready():
 	
 	
 func on_export_dialog_config():
-	if export_dialog:
-		export_dialog.dir_selected.connect(_on_export_dir_selected)
+	if folder_dialog:
+		folder_dialog.dir_selected.connect(_on_export_dir_selected)
 	else:
-		print("export_dialog no fue encontrado")
+		print("folder_dialog no fue encontrado")
 	
 func _conectar_botones_estaticos():
 	if btn_back:
@@ -421,7 +420,20 @@ func _saltar_a_pagina_reciente():
 		paginator.set_page(1) # Valor por defecto si no hay nada
 		
 func _on_import_file_pressed():
-	var x = 1
+	AudioManager.play_ui_sfx()
+	
+	folder_dialog.file_mode = FileDialog.FILE_MODE_OPEN_DIR
+	folder_dialog.title = tr("UI_IMPORT_DIALOG_TITLE")
+	
+	# Desconectamos el de exportar por seguridad
+	if folder_dialog.dir_selected.is_connected(_on_export_dir_selected):
+		folder_dialog.dir_selected.disconnect(_on_export_dir_selected)
+		
+	# Conectamos el de importar
+	if not folder_dialog.dir_selected.is_connected(_procesar_directorio_importacion):
+		folder_dialog.dir_selected.connect(_procesar_directorio_importacion)
+		
+	folder_dialog.popup_centered(Vector2i(600, 400))
 
 func _on_export_file_pressed():
 	AudioManager.play_ui_sfx()
@@ -454,10 +466,10 @@ func _on_export_file_pressed():
 	
 func _abrir_file_dialog_exportacion():
 	# 1. Asignamos el título traducido
-	export_dialog.title = tr("FILEDIALOG_TITLE")
+	folder_dialog.title = tr("FILEDIALOG_TITLE")
 	
 	# 2. Mostramos el FileDialog de Windows/Linux
-	export_dialog.popup_centered_ratio(0.6)
+	folder_dialog.popup_centered_ratio(0.6)
 
 # Se conecta a la señal 'dir_selected' del FileDialog
 func _on_export_dialog_dir_selected(dir_path: String):
@@ -514,7 +526,7 @@ func _ejecutar_exportacion_masiva(dir_path: String):
 	
 func _on_export_current_pressed():
 	AudioManager.play_ui_sfx()
-	export_dialog.popup_centered_ratio(0.6) # Abre la ventana de Windows/Linux
+	folder_dialog.popup_centered_ratio(0.6) # Abre la ventana de Windows/Linux
 	
 func _on_export_dir_selected(dir_path: String):
 	# Si el usuario eligió "ALL" en el menú, lo mandamos a la función masiva
@@ -545,7 +557,7 @@ func _on_export_dir_selected(dir_path: String):
 		if export_success:
 			AudioManager.play_ui_sfx()
 			# Traducción del éxito usando .format() para la ruta
-			var success_msg = tr("UI_EXPORT_SUCCESS_MSG").format({"path": dir_path})
+			var success_msg = tr("UI_EXPORT_SINGLE_SUCCESS_MSG").format({"path": dir_path})
 			_mostrar_alerta(tr("UI_EXPORT_SUCCESS_TITLE"), success_msg)
 			
 			# Eliminar las imágenes pero conservar el .ess temporal
@@ -560,6 +572,139 @@ func _on_export_dir_selected(dir_path: String):
 		
 	# Al final de todo el proceso (exitoso o fallido), quitamos el escudo de carga
 	GlobalLoading.hide_loading()
+	
+## Escanea la carpeta y empareja los .ess con sus .webp correspondientes
+func _escanear_directorio_por_saves(dir_path: String) -> Array:
+	var saves_encontrados = []
+	var dir = DirAccess.open(dir_path)
+	
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		
+		while file_name != "":
+			# Ignoramos carpetas y buscamos solo la extensión de datos maestra (.ess)
+			if not dir.current_is_dir() and file_name.ends_with(GameConstants.EXTENSION_SAVE_FILE):
+				# Le quitamos el .ess para ver el nombre real ("save_1_1" o "export_12345")
+				var nombre_base = file_name.replace(GameConstants.EXTENSION_SAVE_FILE, "")
+				
+				var ruta_ess = dir_path.path_join(file_name)
+				var ruta_webp = dir_path.path_join(nombre_base + GameConstants.EXTENSION_IMAGE)
+				
+				# ¿Es un archivo de exportación manual o un slot que viene de un Backup Full?
+				var es_slot_formal = nombre_base.begins_with("save_")
+				
+				saves_encontrados.append({
+					"slot_id_original": nombre_base,
+					# Si no es formal (ej: export_), lo dejamos vacío para forzar que sea "NUEVO"
+					"slot_id_destino": nombre_base if es_slot_formal else "", 
+					"ruta_ess": ruta_ess,
+					"ruta_webp": ruta_webp
+				})
+				
+			file_name = dir.get_next()
+	else:
+		push_error("iOplazxEssence: Error al abrir la carpeta de importación.")
+		
+	return saves_encontrados
+	
+func _procesar_directorio_importacion(dir_path: String):
+	# Variables LOCALES: Viven y mueren dentro de este bloque.
+	var aplicar_a_todos: bool = false
+	var accion_masiva: String = "" 
+	
+	var slots_importados = []
+	
+	var archivos_encontrados = _escanear_directorio_por_saves(dir_path) 
+	
+	GlobalLoading.show_loading(tr("UI_IMPORT_STARTING"))
+	await get_tree().process_frame
+	
+	for archivo_externo in archivos_encontrados:
+		var slot_id_destino = archivo_externo["slot_id_destino"]
+		var nombre_archivo = archivo_externo["slot_id_original"] 
+		var accion_a_tomar = "SOBRESCRIBIR" 
+		
+		# 1. ACTUALIZACIÓN VISUAL (Forzamos a que siempre muestre qué archivo está procesando)
+		GlobalLoading.show_loading(tr("UI_IMPORT_PROCESSING").format({"file": nombre_archivo}))
+		await get_tree().process_frame
+		
+		# 2. VALIDACIÓN DE CONFLICTOS
+		if slot_id_destino == "":
+			accion_a_tomar = "NUEVO"
+			
+		elif _all_saves_meta.has(slot_id_destino):
+			if aplicar_a_todos:
+				accion_a_tomar = accion_masiva
+			else:
+				GlobalLoading.hide_loading()
+				
+				var respuesta = await _mostrar_dialogo_conflicto(slot_id_destino)
+				accion_a_tomar = respuesta.accion 
+				
+				if respuesta.aplicar_a_todos:
+					aplicar_a_todos = true
+					accion_masiva = accion_a_tomar
+					
+				# Restauramos la pantalla de carga tras el diálogo
+				GlobalLoading.show_loading(tr("UI_IMPORT_PROCESSING").format({"file": nombre_archivo}))
+				await get_tree().process_frame
+				
+		print("iOplazxEssence: [", nombre_archivo, "] Acción a tomar -> ", accion_a_tomar)
+		
+		# 3. EJECUCIÓN DE LA ACCIÓN
+		if accion_a_tomar == "OMITIR":
+			continue 
+			
+		elif accion_a_tomar == "NUEVO":
+			print("iOplazxEssence: Buscando slot libre en el Manager...")
+			slot_id_destino = SaveManager.get_next_free_slot(_all_saves_meta)
+			print("iOplazxEssence: Slot libre encontrado -> ", slot_id_destino)
+			
+			if slot_id_destino == "":
+				continue 
+				
+		print("iOplazxEssence: Iniciando copiado físico hacia -> ", slot_id_destino)
+		var copiado_ok = SaveManager.import_physical_file(archivo_externo["ruta_ess"], archivo_externo["ruta_webp"], slot_id_destino)
+		print("iOplazxEssence: ¿Copiado exitoso? -> ", copiado_ok)
+		
+		if copiado_ok:
+			slots_importados.append(slot_id_destino)
+		
+		# INYECCIÓN DE METADATOS SEGURA (Para que _refresh_slots no crashee)
+		_all_saves_meta[slot_id_destino] = {
+			"title": "Respaldo Importado",
+			"timestamp": Time.get_unix_time_from_system(),
+			"playtime": 0,
+			"location": "Desconocida"
+		}
+		
+	# 4. FINALIZACIÓN Y GUARDADO
+	print("iOplazxEssence: Bucle terminado. Guardando Index...")
+	for slot in slots_importados:
+		SaveManager._update_save_index(slot)
+	
+	print("iOplazxEssence: Refrescando UI...")
+	_refresh_slots() 
+	
+	print("iOplazxEssence: UI Refrescada. Ocultando carga...")
+	GlobalLoading.hide_loading()
+	_mostrar_alerta("Éxito", "Importación completada.")
+		
+
+## Pausa la ejecución y muestra la UI de conflicto. Retorna {accion, aplicar_a_todos}
+func _mostrar_dialogo_conflicto(slot_id: String) -> Dictionary:
+	# Asegúrate de que esta ruta apunte a tu nueva escena
+	var box = load(EssencePaths.PATH_UI_OVERLAYS + "EssenceImportConflictBox.tscn").instantiate()
+	get_tree().root.add_child(box)
+	
+	box.setup(slot_id)
+	
+	# ESPERAMOS a que el usuario presione un botón en la ventana
+	var respuesta = await box.on_conflict_resolved
+	
+	box.queue_free()
+	return respuesta
 
 # ==========================================
 # UTILIDAD DE LIMPIEZA
