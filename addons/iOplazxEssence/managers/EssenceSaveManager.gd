@@ -300,6 +300,11 @@ func take_temp_screenshot() -> void:
 
 # La UI llama a esto cuando el jugador elige un Slot
 func commit_save(slot_id: String, is_temp: bool = false) -> bool:
+	# === HOOK DE INTEGRACIÓN ===
+	# Le damos al dev una última oportunidad de modificar o inyectar datos 
+	# justo antes de que se congelen en el disco (ej: Tiempo de juego exacto).
+	_on_before_save_hook(_temp_game_data, _temp_meta_data)
+	
 	if _temp_game_data.is_empty() and _temp_meta_data.is_empty(): return false
 		
 	var path = get_file_path(slot_id)
@@ -335,11 +340,11 @@ func commit_save(slot_id: String, is_temp: bool = false) -> bool:
 			var err = DirAccess.copy_absolute(source_path, target_path)
 				
 			if err == OK:
-					print("iOplazxEssence: Foto copiada exitosamente a: ", target_path)
+				print("iOplazxEssence: Foto copiada exitosamente a: ", target_path)
 			else:
-					printerr("iOplazxEssence: Error al copiar la foto. Código: ", err)
+				printerr("iOplazxEssence: Error al copiar la foto. Código: ", err)
 		else:
-		# Si llegamos aquí, es que take_temp_screenshot() no ha terminado o no se llamó
+			# Si llegamos aquí, es que take_temp_screenshot() no ha terminado o no se llamó
 			push_warning("iOplazxEssence: No se pudo copiar porque " + source_path + " no existe aún.")
 			
 	return success
@@ -465,3 +470,13 @@ func clear_temp_data():
 func clear_all_temp():
 	delete_temp_screenshot()
 	clear_temp_data()
+
+# ==============================================================================
+# HOOKS DE INTEGRACIÓN (PARA EL DESARROLLADOR)
+# ==============================================================================
+
+## Se ejecuta un milisegundo antes de que los datos temporales se escriban en el archivo .ess.
+## Los diccionarios se pasan por referencia; cualquier llave que agregues o modifiques aquí
+## se guardará de forma permanente en el slot.
+func _on_before_save_hook(game_data: Dictionary, meta_data: Dictionary):
+	pass

@@ -117,6 +117,9 @@ func _on_new_game_pressed():
 	# 1. Limpia los diccionarios de variables (SaveManager)
 	SaveManager.clear_all_temp() 
 	
+	# === HOOK DE INTEGRACIÓN ===
+	_on_new_game_hook()
+	
 	# 2. Salta a la escena y limpia el historial de navegación (SceneManager)
 	SceneManager.goto_new_game()
 
@@ -138,6 +141,10 @@ func _on_continue_pressed():
 			
 			# 4. Marcamos que esta fue la última partida tocada
 			SaveManager.mark_save_as_latest_played(latest_save_id)
+			
+			# === HOOK DE INTEGRACIÓN ===
+			# Pasamos el diccionario completo por si el dev quiere leer la fecha o nivel
+			_on_continue_hook(data)
 			
 			# 5. Viajamos al juego (El SceneManager limpiará el historial si es necesario)
 			SceneManager.goto_continue_game()
@@ -195,3 +202,18 @@ func _animar_entrada_ui_botones():
 		
 	var botones = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
 	EssenceUIAnimator.cascade_fade_in(botones, 0.4, 0.15, cascade_start)
+	
+# ==============================================================================
+# HOOKS DE INTEGRACIÓN (PARA EL DESARROLLADOR)
+# ==============================================================================
+
+## Se ejecuta después de limpiar la memoria RAM pero ANTES de cambiar a la escena de juego.
+## Ideal para inicializar variables globales de una partida nueva (ej: HP = 100, Nivel = 1).
+func _on_new_game_hook():
+	pass
+
+## Se ejecuta después de inyectar los datos en SaveManager.loaded_game_data.
+## Recibe el diccionario completo de la partida por si se requiere extraer información 
+## adicional (metadatos, fecha, versión del archivo) antes de iniciar la escena.
+func _on_continue_hook(_save_data: Dictionary):
+	pass
