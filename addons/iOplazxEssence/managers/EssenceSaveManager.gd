@@ -207,6 +207,12 @@ func _update_save_index(slot_id: String, is_deleting: bool = false):
 	var file = FileAccess.open(path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(index))
 	file.close()
+	
+## Verifica de forma ultra-rápida si el archivo físico de un slot existe
+func save_exists(slot_id: String) -> bool:
+	if slot_id == "": return false
+	var path = _save_dir.path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
+	return FileAccess.file_exists(path)
 
 # ==========================================
 # AYUDANTES PARA LA UI MODERNA Y CLÁSICA

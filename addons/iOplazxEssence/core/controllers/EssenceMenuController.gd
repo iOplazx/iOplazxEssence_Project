@@ -73,13 +73,14 @@ func _conectar_botones():
 	if btn_exit: btn_exit.pressed.connect(_on_exit_pressed)
 
 func _verificar_estado_partida():
-	# TODO: Conectar esto con el EssenceSaveManager en el futuro.
-	var has_save_file = false 
+	var latest_save_id = SaveManager.get_latest_save_id()
+	
+	# Usamos la nueva verificación rápida
+	var has_recent_save = SaveManager.save_exists(latest_save_id)
 	
 	if btn_continue:
-		btn_continue.disabled = not has_save_file
-	#if btn_load:
-	#	btn_load.disabled = not has_save_file
+		btn_continue.disabled = not has_recent_save
+		btn_continue.focus_mode = Control.FOCUS_NONE if btn_continue.disabled else Control.FOCUS_ALL
 		
 func _iniciar_foco_teclado():
 	if first_focus_button:
@@ -113,10 +114,38 @@ func _play_click_ui():
 # ==========================================
 
 func _on_new_game_pressed():
+	# 1. Limpia los diccionarios de variables (SaveManager)
+	SaveManager.clear_all_temp() 
+	
+	# 2. Salta a la escena y limpia el historial de navegación (SceneManager)
 	SceneManager.goto_new_game()
 
 func _on_continue_pressed():
-	SceneManager.goto_continue_game()
+	AudioManager.play_ui_sfx()
+	
+	var latest_save_id = SaveManager.get_latest_save_id()
+	
+	if latest_save_id != "":
+		# 1. Extraemos el diccionario completo del archivo
+		var data = SaveManager.load_game(latest_save_id)
+		
+		# 2. Verificamos que no esté corrupto y tenga la llave correcta
+		if not data.is_empty() and data.has("game_data"):
+			
+			# 3. ¡LA MAGIA! Inyectamos los datos en la RAM
+			SaveManager.loaded_game_data = data["game_data"]
+			print("iOplazxEssence: Datos de " + latest_save_id + " inyectados en RAM.")
+			
+			# 4. Marcamos que esta fue la última partida tocada
+			SaveManager.mark_save_as_latest_played(latest_save_id)
+			
+			# 5. Viajamos al juego (El SceneManager limpiará el historial si es necesario)
+			SceneManager.goto_continue_game()
+			
+		else:
+			push_error("iOplazxEssence: El archivo de guardado está vacío o corrupto.")
+	else:
+		push_error("iOplazxEssence: Se intentó continuar, pero no hay un ID válido.")
 	
 func _on_load_pressed():
 	SaveManager.clear_all_temp() # Destruimos datos residuales
