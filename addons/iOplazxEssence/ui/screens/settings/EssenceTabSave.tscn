@@ -1,0 +1,99 @@
+[gd_scene format=3 uid="uid://cdwn7mpkhb76b"]
+
+[ext_resource type="Script" uid="uid://c20mbgumvdoii" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabSave.gd" id="1_kwxbe"]
+[ext_resource type="Theme" uid="uid://7qlrwukoknkb" path="res://addons/iOplazxEssence/resources/file/HSeparationChkButton.tres" id="2_7huwh"]
+
+[node name="mgSave" type="MarginContainer" unique_id=518972696 node_paths=PackedStringArray("dpd_autosave", "dpd_save_style", "dpd_save_location", "chk_confirm_save", "chk_confirm_load", "chk_confirm_delete", "btn_apply") groups=["settings_tabs"]]
+script = ExtResource("1_kwxbe")
+dpd_autosave = NodePath("mcBodySave/VBoxContainer/RowAutosave/dpdAutosave")
+dpd_save_style = NodePath("mcBodySave/VBoxContainer/RowSaveStyle/dpdSaveStyle")
+dpd_save_location = NodePath("mcBodySave/VBoxContainer/RowSaveLocation/dpdSaveLocation")
+chk_confirm_save = NodePath("mcBodySave/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkOverwrite")
+chk_confirm_load = NodePath("mcBodySave/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkLoad")
+chk_confirm_delete = NodePath("mcBodySave/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkDelete")
+btn_apply = NodePath("mcBotonSaveChange/btnSaveChangeGame")
+metadata/_tab_index = 0
+metadata/_tab_name = "SETTINGS_GAME"
+
+[node name="mcBodySave" type="MarginContainer" parent="." unique_id=1607302097]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="mcBodySave" unique_id=1433339629]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="RowAutosave" type="HBoxContainer" parent="mcBodySave/VBoxContainer" unique_id=994463621]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="mcBodySave/VBoxContainer/RowAutosave" unique_id=1832644457]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_AUTOSAVE"
+
+[node name="dpdAutosave" type="OptionButton" parent="mcBodySave/VBoxContainer/RowAutosave" unique_id=374716378]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="RowSaveStyle" type="HBoxContainer" parent="mcBodySave/VBoxContainer" unique_id=1199924126]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="mcBodySave/VBoxContainer/RowSaveStyle" unique_id=285014952]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_SAVE_STYLE"
+
+[node name="dpdSaveStyle" type="OptionButton" parent="mcBodySave/VBoxContainer/RowSaveStyle" unique_id=998403771]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="RowSaveLocation" type="HBoxContainer" parent="mcBodySave/VBoxContainer" unique_id=1687776811]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="mcBodySave/VBoxContainer/RowSaveLocation" unique_id=1932834157]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "SETTINGS_GAME_SAVE_STYLE"
+
+[node name="dpdSaveLocation" type="OptionButton" parent="mcBodySave/VBoxContainer/RowSaveLocation" unique_id=986262909]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="mcBodySave/VBoxContainer" unique_id=1830619748]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VBchkConfirmPreferences" type="VBoxContainer" parent="mcBodySave/VBoxContainer/MarginContainer" unique_id=598362043]
+layout_mode = 2
+
+[node name="chkOverwrite" type="CheckButton" parent="mcBodySave/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=255994715]
+layout_mode = 2
+theme = ExtResource("2_7huwh")
+text = "Overwrite"
+
+[node name="chkLoad" type="CheckButton" parent="mcBodySave/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=713950173]
+layout_mode = 2
+theme = ExtResource("2_7huwh")
+text = "Load"
+
+[node name="chkDelete" type="CheckButton" parent="mcBodySave/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=1353209289]
+layout_mode = 2
+theme = ExtResource("2_7huwh")
+text = "Delete"
+
+[node name="mcBotonSaveChange" type="MarginContainer" parent="." unique_id=80042797]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="btnSaveChangeGame" type="Button" parent="mcBotonSaveChange" unique_id=1576415762]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "SETTINGS_GAME_SAVE_CHANGE"

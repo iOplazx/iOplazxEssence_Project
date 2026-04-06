@@ -32,6 +32,7 @@ SETTINGS_GAME_NSFW,Enable Explicit Content (NSFW):,Activar Contenido Explícito 
 SETTINGS_GAME_TEXT_SPEED,Auto Text Speed:,Velocidad de Texto Auto:
 SETTINGS_GAME_AUTOSAVE,Auto-Save Interval:,Intervalo de Autoguardado:
 SETTINGS_GAME_SAVE_STYLE,Save Menu Style:,Estilo del Menú de Guardado:
+SETTINGS_SAVED,Saved,Guardado
 DIFF_NORMAL,Normal,Normal
 STYLE_GRID,Grid (Classic),Cuadrícula (Clásico)
 STYLE_LIST,List (Modern),Lista (Moderno)

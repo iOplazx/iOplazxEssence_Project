@@ -9,12 +9,12 @@ script = ExtResource("1_hcnkt")
 dpd_difficulty = NodePath("mcBodyGame/VBoxContainer/RowDifficulty/dpdDifficulty")
 chk_nsfw = NodePath("mcBodyGame/VBoxContainer/chkbNFSW")
 slider_text_speed = NodePath("mcBodyGame/VBoxContainer/SliderTextSpeed")
-dpd_autosave = NodePath("mcBodyGame/VBoxContainer/RowAutosave/dpdAutosave")
-dpd_save_style = NodePath("mcBodyGame/VBoxContainer/RowSaveStyle/dpdSaveStyle")
-dpd_save_location = NodePath("mcBodyGame/VBoxContainer/RowSaveLocation/dpdSaveLocation")
-chk_confirm_save = NodePath("mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkOverwrite")
-chk_confirm_load = NodePath("mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkLoad")
-chk_confirm_delete = NodePath("mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences/chkDelete")
+dpd_autosave = NodePath("")
+dpd_save_style = NodePath("")
+dpd_save_location = NodePath("")
+chk_confirm_save = NodePath("")
+chk_confirm_load = NodePath("")
+chk_confirm_delete = NodePath("")
 btn_apply = NodePath("mcBotonSaveChange/btnSaveChangeGame")
 metadata/_tab_index = 0
 metadata/_tab_name = "SETTINGS_GAME"
@@ -59,67 +59,6 @@ visual_multiplier = 1.0
 decimal_places = 1
 value_prefix = "x"
 value_suffix = ""
-
-[node name="RowAutosave" type="HBoxContainer" parent="mcBodyGame/VBoxContainer" unique_id=994463621]
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="Label" type="Label" parent="mcBodyGame/VBoxContainer/RowAutosave" unique_id=1832644457]
-custom_minimum_size = Vector2(250, 0)
-layout_mode = 2
-text = "SETTINGS_GAME_AUTOSAVE"
-
-[node name="dpdAutosave" type="OptionButton" parent="mcBodyGame/VBoxContainer/RowAutosave" unique_id=374716378]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-
-[node name="RowSaveStyle" type="HBoxContainer" parent="mcBodyGame/VBoxContainer" unique_id=1199924126]
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="Label" type="Label" parent="mcBodyGame/VBoxContainer/RowSaveStyle" unique_id=285014952]
-custom_minimum_size = Vector2(250, 0)
-layout_mode = 2
-text = "SETTINGS_GAME_SAVE_STYLE"
-
-[node name="dpdSaveStyle" type="OptionButton" parent="mcBodyGame/VBoxContainer/RowSaveStyle" unique_id=998403771]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-
-[node name="RowSaveLocation" type="HBoxContainer" parent="mcBodyGame/VBoxContainer" unique_id=1687776811]
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="Label" type="Label" parent="mcBodyGame/VBoxContainer/RowSaveLocation" unique_id=1932834157]
-custom_minimum_size = Vector2(250, 0)
-layout_mode = 2
-text = "SETTINGS_GAME_SAVE_STYLE"
-
-[node name="dpdSaveLocation" type="OptionButton" parent="mcBodyGame/VBoxContainer/RowSaveLocation" unique_id=986262909]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="mcBodyGame/VBoxContainer" unique_id=1830619748]
-layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="VBchkConfirmPreferences" type="VBoxContainer" parent="mcBodyGame/VBoxContainer/MarginContainer" unique_id=598362043]
-layout_mode = 2
-
-[node name="chkOverwrite" type="CheckButton" parent="mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=255994715]
-layout_mode = 2
-theme = ExtResource("3_01fne")
-text = "Overwrite"
-
-[node name="chkLoad" type="CheckButton" parent="mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=713950173]
-layout_mode = 2
-theme = ExtResource("3_01fne")
-text = "Load"
-
-[node name="chkDelete" type="CheckButton" parent="mcBodyGame/VBoxContainer/MarginContainer/VBchkConfirmPreferences" unique_id=1353209289]
-layout_mode = 2
-theme = ExtResource("3_01fne")
-text = "Delete"
 
 [node name="mcBotonSaveChange" type="MarginContainer" parent="." unique_id=80042797]
 layout_mode = 2

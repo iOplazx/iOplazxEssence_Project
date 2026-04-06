@@ -11,9 +11,10 @@ const PATH = EssencePaths.PATH_UI_SCREEN + "settings/"
 # 2. Diccionario con el "molde" de tus escenas separadas
 var tab_scenes: Dictionary = {
 	0: preload(PATH + "EssenceTabGame.tscn"),
-	1: preload(PATH + "EssenceTabVideo.tscn"),
-	2: preload(PATH + "EssenceTabAudio.tscn"),
-	3: preload(PATH + "EssenceTabLanguage.tscn"),
+	1: preload(PATH + "EssenceTabSave.tscn"),
+	2: preload(PATH + "EssenceTabVideo.tscn"),
+	3: preload(PATH + "EssenceTabAudio.tscn"),
+	4: preload(PATH + "EssenceTabLanguage.tscn"),
 }
 
 func _ready():
