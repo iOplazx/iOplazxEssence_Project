@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cuoap8nnd676c"
-path="res://.godot/imported/icon_flag.png-45e43efcaf735620688e832deaed4491.ctex"
+uid="uid://b2simftia5jgr"
+path="res://.godot/imported/icon_flag.png-86c23d7363ce4cabece71684467dd698.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/iOplazxEssence/static_loc/en/icon_flag.png"
-dest_files=["res://.godot/imported/icon_flag.png-45e43efcaf735620688e832deaed4491.ctex"]
+source_file="res://game_data/persistent/languages/en/icon_flag.png"
+dest_files=["res://.godot/imported/icon_flag.png-86c23d7363ce4cabece71684467dd698.ctex"]
 
 [params]
 

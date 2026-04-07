@@ -5,9 +5,12 @@ extends Node
 var _available_languages: Dictionary = {}
 var _core_default_locale: String = "en"
 
+var path_addon = ""
+var path_game = ""
+
 func _ready():
 	pass # Lo inicializaremos desde el BootBase después de los archivos
-
+	
 # ==========================================
 # 1. ESCÁNER MULTICAPA
 # ==========================================
@@ -18,29 +21,31 @@ func scan_all_languages():
 	if not config:
 		push_error("Essence: LanguageManager no pudo acceder a la configuración del FileManager.")
 		return
-	
-	# 1. Core (El motor base)
-	if config.load_framework_loc:
-		print("Essence: Buscando idiomas base en -> ", config.path_static_loc)
-		_scan_directory(config.path_static_loc)
-	
-	# 2. Remote (Los mods/archivos del usuario final)
-	var path_remote = FileManager.path_remote_actual + "/languages/"
-	
-	# --- PARCHE DE SEGURIDAD ---
-	if not DirAccess.dir_exists_absolute(path_remote):
-		DirAccess.make_dir_recursive_absolute(path_remote)
-	# ---------------------------
 		
-	print("Essence: Buscando idiomas remotos en -> ", path_remote)
-	_scan_directory(path_remote)
+	# --- 1. RUTA ADDON (El motor base) ---
+	var path_addon = config.path_static_loc + "languages/"
 	
-	print("Essence: Idiomas únicos detectados: ", _available_languages.keys())
+	if config.load_framework_loc:
+		print("Essence: Buscando idiomas base en -> ", path_addon)
+		_scan_directory(path_addon, "addon") 
+	
+	# --- 2. RUTA JUEGO (La carpeta del usuario junto al .exe) ---
+	# Usamos path_remote_actual, que el FileManager ya preparó por nosotros.
+	var path_game = FileManager.path_remote_actual + "/languages/"
+	
+	# Solo por si el usuario borró la carpeta con el juego abierto
+	if not DirAccess.dir_exists_absolute(path_game):
+		DirAccess.make_dir_recursive_absolute(path_game)
+		
+	print("Essence: Buscando idiomas remotos (usuario) en -> ", path_game)
+	_scan_directory(path_game, "game") 
+	
+	print("Essence: Idiomas finales detectados: ", _available_languages.keys())
 
 # ==========================================
 # 2. LECTOR DE CARPETAS Y BANDERAS
 # ==========================================
-func _scan_directory(base_path: String):
+func _scan_directory(base_path: String, scan_type: String): # <-- Añadimos scan_type
 	if not base_path.ends_with("/"):
 		base_path += "/"
 		
@@ -55,43 +60,132 @@ func _scan_directory(base_path: String):
 	while folder_name != "":
 		if dir.current_is_dir() and folder_name != "." and folder_name != "..":
 			var lang_path = base_path + folder_name + "/"
-			_parse_language_folder(folder_name, lang_path)
+			_parse_language_folder(folder_name, lang_path, scan_type) # <-- Pasamos el scan_type
 			
 		folder_name = dir.get_next()
 
 # ==========================================
 # 3. EXTRACTOR DE METADATOS (meta.cfg)
 # ==========================================
-func _parse_language_folder(lang_code: String, folder_path: String):
+func _parse_language_folder(lang_code: String, folder_path: String, scan_type: String):
 	var meta_path = folder_path + "meta.cfg"
 	var flag_path = folder_path + "icon_flag.png"
 	
-	var lang_data = _available_languages.get(lang_code, {"folder": lang_code})
+	if not _available_languages.has(lang_code):
+		_available_languages[lang_code] = {
+			"folder": lang_code,
+			"name": lang_code,
+			"flag_path": "",
+			"game_supported": false,
+			"addon_supported": false,
+			"game_data": {},
+			"addon_data": {}
+		}
+	
+	var lang_data = _available_languages[lang_code]
 	
 	if FileAccess.file_exists(meta_path):
 		var config = ConfigFile.new()
 		var err = config.load(meta_path)
+		
 		if err == OK:
-			lang_data["name"] = config.get_value("info", "name", lang_code)
-			lang_data["author"] = config.get_value("info", "author", "Unknown")
-			lang_data["is_ai"] = config.get_value("info", "is_ai", false)
+			lang_data["name"] = config.get_value("info", "name", lang_data["name"])
 			
-			lang_data["version"] = config.get_value("info", "version", "1.0.0")
-			lang_data["description"] = config.get_value("info", "description", "")
-			
-			if "static_loc" in folder_path and config.get_value("info", "is_default", false):
+			if scan_type == "addon" and config.get_value("info", "is_default", false):
 				_core_default_locale = lang_code
-	
+				
+			var specific_data = {
+				"author": config.get_value("info", "author", "Unknown"),
+				"description": config.get_value("info", "description", ""),
+				"is_ai": config.get_value("info", "is_ai", false),
+				"version": config.get_value("info", "version", "1.0.0"),
+				"target_version": config.get_value("info", "target_version", "1.0.0"),
+				"number_target_version": config.get_value("info", "number_target_version", 0)
+			}
+			
+			if scan_type == "addon":
+				lang_data["addon_data"] = specific_data
+				lang_data["addon_supported"] = true
+			else:
+				# --- ES EL JUEGO ---
+				lang_data["game_data"] = specific_data
+				lang_data["game_supported"] = true
+				
+				# LÓGICA DE FALLBACK (Búsqueda de Addon alternativo)
+				# Si el juego no tiene soporte de addon directo, buscamos si pidió uno prestado
+				if not lang_data["addon_supported"]:
+					var search_1 = config.get_value("info", "addon_search_1", "")
+					var search_2 = config.get_value("info", "addon_search_2", "")
+					
+					if search_1 != "" and _available_languages.has(search_1):
+						lang_data["addon_data"] = _available_languages[search_1]["addon_data"]
+						lang_data["addon_supported"] = true
+						print("Essence: Fallback aplicado. '", lang_code, "' está usando el addon '", search_1, "'")
+					elif search_2 != "" and _available_languages.has(search_2):
+						lang_data["addon_data"] = _available_languages[search_2]["addon_data"]
+						lang_data["addon_supported"] = true
+						print("Essence: Fallback aplicado. '", lang_code, "' está usando el addon '", search_2, "'")
+
+	# PRIORIDAD DE BANDERA (La del juego siempre gana)
 	if FileAccess.file_exists(flag_path):
 		lang_data["flag_path"] = flag_path
-		
-	_available_languages[lang_code] = lang_data
 
 # ==========================================
-# 4. API PARA LA INTERFAZ
+# 4. API PARA LA INTERFAZ (FILTRADO AVANZADO)
 # ==========================================
+
+## Método maestro para obtener idiomas con filtros opcionales.
+func get_languages(filters: Dictionary = {}) -> Array:
+	var result = []
+	
+	for lang in _available_languages.values():
+		var passes_filters = true
+		
+		# Filtro 1: Excluir IA del Juego
+		if filters.get("exclude_game_ai", false):
+			var is_game_ai = lang.get("game_data", {}).get("is_ai", false)
+			# Solo ocultamos si existe la data del juego Y además es de IA
+			if lang["game_supported"] and is_game_ai:
+				passes_filters = false
+
+		# Filtro 2: Excluir IA del Addon/Framework
+		if filters.get("exclude_addon_ai", false):
+			var is_addon_ai = lang.get("addon_data", {}).get("is_ai", false)
+			if lang["addon_supported"] and is_addon_ai:
+				passes_filters = false
+				
+		# Filtro 3: "Exclude All AI" (El modo estricto)
+		# Solo oculta el idioma si AMBAS partes son de IA. Si al menos una es humana, se salva.
+		if filters.get("exclude_all_ai", false):
+			var is_game_ai = lang.get("game_data", {}).get("is_ai", false)
+			var is_addon_ai = lang.get("addon_data", {}).get("is_ai", false)
+			
+			if is_game_ai and is_addon_ai:
+				passes_filters = false
+				
+		# Filtro 4: Solo los que tengan traducción del juego
+		if filters.get("only_game", false) and not lang["game_supported"]:
+			passes_filters = false
+			
+		# Filtro 5: Solo los que tengan traducción del framework (addon)
+		if filters.get("only_addon", false) and not lang["addon_supported"]:
+			passes_filters = false
+			
+		# Filtro 5: Compatibilidad de versión (number_target_version)
+		if filters.has("min_game_version"):
+			var current_ver = lang.get("game_data", {}).get("number_target_version", 0)
+			if current_ver < filters["min_game_version"]:
+				passes_filters = false
+
+		# Si sobrevivió a todos los filtros, lo añadimos a la lista final
+		if passes_filters:
+			result.append(lang)
+			
+	return result
+
+## Método de compatibilidad para devolver la lista completa
 func get_language_list() -> Array:
-	return _available_languages.values()
+	return get_languages() # Llama al maestro sin filtros()
 
 # ==========================================
 # 5. INYECCIÓN DE TRADUCCIONES AL MOTOR
@@ -101,11 +195,29 @@ func inject_translations():
 	var config = FileManager.config
 	if not config: return
 	
+	# 1. Inyectamos las del Addon
 	if config.load_framework_loc:
-		_load_translations_from_dir(config.path_static_loc)
+		var path_addon = config.path_static_loc + "languages/"
+		_scan_and_inject_folders(path_addon)
 		
-	var path_remote = FileManager.path_remote_actual + "/languages/"
-	_load_translations_from_dir(path_remote)
+	# 2. Inyectamos las del Juego (Remote)
+	var path_game = FileManager.path_remote_actual + "/languages/"
+	_scan_and_inject_folders(path_game)
+
+func _scan_and_inject_folders(base_path: String):
+	var dir = DirAccess.open(base_path)
+	if not dir: return
+	
+	dir.list_dir_begin()
+	var folder_name = dir.get_next()
+	
+	while folder_name != "":
+		# Si es una carpeta de idioma (ej. "en", "es"), entramos a buscar traducciones
+		if dir.current_is_dir() and folder_name != "." and folder_name != "..":
+			var lang_folder_path = base_path + folder_name + "/"
+			_load_translations_from_dir(lang_folder_path)
+			
+		folder_name = dir.get_next()
 
 func _load_translations_from_dir(path: String):
 	var dir = DirAccess.open(path)

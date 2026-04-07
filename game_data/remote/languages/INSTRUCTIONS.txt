@@ -1,0 +1,87 @@
+====================================================================
+               iOPLAZX ESSENCE - LANGUAGE FOLDER GUIDE
+====================================================================
+
+Welcome! This folder contains the localization (translation) files 
+for the game and the Essence framework. 
+
+If you want to modify a word, fix a typo, or create a brand new 
+fan-translation for your native language, you are in the right place.
+
+--------------------------------------------------------------------
+1. FOLDER STRUCTURE
+--------------------------------------------------------------------
+Every language must have its own unique folder (e.g., "en", "es", 
+"es_arg", "jp"). Inside each folder, the system expects to find:
+  - meta.cfg        (The configuration file - REQUIRED)
+  - icon_flag.png   (The visual flag for the menu - OPTIONAL)
+  - *.csv / *.translation (The actual text files)
+
+To create a new language, the easiest way is to duplicate the "en" 
+(English) folder, rename it to your language code, and edit the 
+files inside.
+
+--------------------------------------------------------------------
+2. MODIFYING TRANSLATIONS (.CSV)
+--------------------------------------------------------------------
+The text of the game is stored in .csv (Comma Separated Values) files.
+You can open these files using any spreadsheet software (Excel, Calc) 
+or a simple text editor.
+- Column A usually contains the KEY (Do not translate this!)
+- Column B (and onwards) contains the translated text.
+
+Note: If you mess up or delete this folder, don't panic! The game 
+keeps a secure backup of the original English files and will restore 
+them automatically on the next launch.
+
+--------------------------------------------------------------------
+3. THE "meta.cfg" FILE (CRITICAL)
+--------------------------------------------------------------------
+This file tells the game how to display your language in the menus. 
+Open it with any text editor. It should look like this:
+
+[info]
+name="Español (Argentina)"
+author="YourName"
+version="1.0.0"
+target_version="0.0.1"
+number_target_version=1
+description="Fan translation for Argentina."
+is_ai=false
+is_default=false
+addon_search_1="es_latam"
+addon_search_2="es"
+
+* EXPLANATION OF SPECIAL VARIABLES:
+- is_ai: Set to "true" if you used Machine Learning/AI to translate.
+- addon_search_1 & addon_search_2: (The Fallback System)
+  Sometimes you translate the Game, but you don't want to translate 
+  the System/Menu UI. The game will look for System UI translations 
+  in the framework based on your folder name. 
+  If your folder is "es_arg" but the framework only has "es" and 
+  "es_latam", you can tell the engine to use those instead of defaulting 
+  to English.
+
+--------------------------------------------------------------------
+4. CUSTOM FLAGS (icon_flag.png)
+--------------------------------------------------------------------
+You can add a custom flag to represent your language in the menus.
+- Name must be exactly: icon_flag.png
+- Recommended resolution: 64x44 pixels (or similar small ratio).
+- Priority: If you put a flag here, the game will ALWAYS use it, 
+  ignoring any default flag the framework might have for that language.
+
+--------------------------------------------------------------------
+5. FRAMEWORK LANGUAGE CARPET
+--------------------------------------------------------------------
+en - English
+es - Spanish
+ru - Russian (FUTURE)
+fr - French (FUTURE)
+pt - Portuguese (FUTURE)
+ja - Japanese (FUTURE)
+zh - Chinese (FUTURE)
+
+====================================================================
+Happy translating! - iOplazx Productions
+====================================================================

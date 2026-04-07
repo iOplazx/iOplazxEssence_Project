@@ -47,6 +47,13 @@ func initialize_file_system():
 	if config.path_remote_template != "":
 		_clone_directory(config.path_remote_template, path_remote_actual)
 		
+		# --- AUTO-CREAR .gdignore en modo editor ---
+		#if OS.has_feature("editor"):
+		#	var ignore_path = path_remote_actual + "/.gdignore"
+		#	if not FileAccess.file_exists(ignore_path):
+		#		var file = FileAccess.open(ignore_path, FileAccess.WRITE)
+		#		file.store_string("")
+		
 	# 2. Crear y clonar la carpeta GLOBAL (AppData)
 	if config.path_global_template != "":
 		# Godot ya entiende "user://" nativamente
