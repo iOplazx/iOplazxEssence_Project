@@ -92,7 +92,7 @@ layout_mode = 2
 
 [node name="GridGameInfo" type="GridContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer" unique_id=314642884]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
 columns = 2
 
 [node name="lblFixedAuthor" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/GridGameInfo" unique_id=1276513884]
@@ -153,7 +153,7 @@ layout_mode = 2
 
 [node name="GridAddonInfo" type="GridContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer" unique_id=1212018319]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
 columns = 2
 
 [node name="lblFixedAuthor" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/GridAddonInfo" unique_id=2117531816]

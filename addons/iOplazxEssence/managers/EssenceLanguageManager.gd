@@ -22,18 +22,22 @@ func scan_all_languages():
 		push_error("Essence: LanguageManager no pudo acceder a la configuración del FileManager.")
 		return
 		
-	# --- 1. RUTA ADDON (El motor base) ---
+	# --- RUTAS ---
 	var path_addon = config.path_static_loc + "languages/"
+	var path_persistent = config.path_persistent + "languages/"
+	var path_game = FileManager.path_remote_actual + "/languages/"
 	
+	# 1. CAPA ADDON (El motor base)
 	if config.load_framework_loc:
 		print("Essence: Buscando idiomas base en -> ", path_addon)
 		_scan_directory(path_addon, "addon") 
-	
-	# --- 2. RUTA JUEGO (La carpeta del usuario junto al .exe) ---
-	# Usamos path_remote_actual, que el FileManager ya preparó por nosotros.
-	var path_game = FileManager.path_remote_actual + "/languages/"
-	
-	# Solo por si el usuario borró la carpeta con el juego abierto
+		
+	# 2. CAPA PERSISTENT (El Búnker / Seguridad)
+	if DirAccess.dir_exists_absolute(path_persistent):
+		print("Essence: Buscando idiomas de seguridad en -> ", path_persistent)
+		_scan_directory(path_persistent, "game")
+
+	# 3. CAPA REMOTE (Modificaciones del usuario)
 	if not DirAccess.dir_exists_absolute(path_game):
 		DirAccess.make_dir_recursive_absolute(path_game)
 		
@@ -195,15 +199,16 @@ func inject_translations():
 	var config = FileManager.config
 	if not config: return
 	
-	# 1. Inyectamos las del Addon
+	# 1. Inyectamos Addon
 	if config.load_framework_loc:
-		var path_addon = config.path_static_loc + "languages/"
-		_scan_and_inject_folders(path_addon)
+		_scan_and_inject_folders(config.path_static_loc + "languages/")
 		
-	# 2. Inyectamos las del Juego (Remote)
-	var path_game = FileManager.path_remote_actual + "/languages/"
-	_scan_and_inject_folders(path_game)
-
+	# 2. Inyectamos Persistent (Búnker)
+	_scan_and_inject_folders(config.path_persistent + "languages/")
+	
+	# 3. Inyectamos Remote (Usuario)
+	_scan_and_inject_folders(FileManager.path_remote_actual + "/languages/")
+	
 func _scan_and_inject_folders(base_path: String):
 	var dir = DirAccess.open(base_path)
 	if not dir: return

@@ -15,3 +15,6 @@ Thumbs.db
 Desktop.ini
 
 .env
+
+# Essence Framework - Carpeta de simulación de archivos remotos
+_remote_debug/
