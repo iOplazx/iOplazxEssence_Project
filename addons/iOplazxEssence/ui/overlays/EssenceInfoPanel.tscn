@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://eoxnxw3ulco1"]
 
 [ext_resource type="Script" uid="uid://cd38mrpths1jv" path="res://addons/iOplazxEssence/scriptsItems/EssenceInfoPanel.gd" id="1_lmdm1"]
+[ext_resource type="StyleBox" uid="uid://dqpk15j40jc0t" path="res://addons/iOplazxEssence/resources/file/lbl_description_border1.tres" id="2_lw3q0"]
 
-[node name="EssenceInfoPanel" type="Control" unique_id=1495579492 node_paths=PackedStringArray("lbl_title", "lbl_author", "lbl_version", "lbl_description", "lbl_ai_warning", "btn_close", "window_panel")]
+[node name="EssenceInfoPanel" type="Control" unique_id=293511402 node_paths=PackedStringArray("lbl_title", "btn_close", "window_panel", "game_data_node", "game_missing_node", "lbl_game_author", "lbl_game_version", "lbl_game_desc", "lbl_game_ai_warning", "lbl_game_missing_msg", "addon_data_node", "addon_missing_node", "lbl_addon_author", "lbl_addon_version", "lbl_addon_desc", "lbl_addon_ai_warning", "lbl_addon_missing_msg")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,15 +11,25 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_lmdm1")
-lbl_title = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/lblTitle")
-lbl_author = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/lblAuthor")
-lbl_version = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/lblVersion")
-lbl_description = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/MarginContainer2/lblDescription")
-lbl_ai_warning = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/lblAiWarning")
-btn_close = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxContainer/MarginContainer/btnClose")
+lbl_title = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/lblMainTitle")
+btn_close = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/MarginContainer/btnClose")
 window_panel = NodePath("CenterContainer/WindowPanel")
+game_data_node = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer")
+game_missing_node = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameMissingContainer")
+lbl_game_author = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/GridGameInfo/lblGameAuthor")
+lbl_game_version = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/GridGameInfo/lblGameVersion")
+lbl_game_desc = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/lblGameDesc")
+lbl_game_ai_warning = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/lblAiWarning")
+lbl_game_missing_msg = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameMissingContainer/lblGameMissingMsg")
+addon_data_node = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer")
+addon_missing_node = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonMissingContainer")
+lbl_addon_author = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/GridAddonInfo/lblAddonAuthor")
+lbl_addon_version = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/GridAddonInfo/lblAddonVersion")
+lbl_addon_desc = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/lblAddonDesc")
+lbl_addon_ai_warning = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/lblAddonAiWarning")
+lbl_addon_missing_msg = NodePath("CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonMissingContainer/lblAddonMissingMsg")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=1469601836]
+[node name="DimBackground" type="ColorRect" parent="." unique_id=1343353050]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,7 +38,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.05, 0.05, 0.85)
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=175299780]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1581482764]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,67 +46,165 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="WindowPanel" type="PanelContainer" parent="CenterContainer" unique_id=1246552082]
+[node name="WindowPanel" type="PanelContainer" parent="CenterContainer" unique_id=1850741302]
 custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/WindowPanel" unique_id=1771981392]
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/WindowPanel" unique_id=613584623]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer" unique_id=817235229]
+[node name="VBoxMain" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer" unique_id=654799414]
 layout_mode = 2
-theme_override_constants/separation = 10
 
-[node name="lblTitle" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=1084940538]
+[node name="lblMainTitle" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain" unique_id=647538460]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "LANGUAGE NAME"
 horizontal_alignment = 1
 
-[node name="lblVersion" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=465435045]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.662745, 0.662745, 0.662745, 1)
-theme_override_font_sizes/font_size = 14
-text = "v1.0.0"
-horizontal_alignment = 1
-
-[node name="HSeparator" type="HSeparator" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=579948110]
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain" unique_id=1656985688]
 layout_mode = 2
 
-[node name="lblAuthor" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=250442104]
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain" unique_id=2145330494]
+custom_minimum_size = Vector2(0, 250)
 layout_mode = 2
-text = "Author: iOplazx"
-horizontal_alignment = 1
 
-[node name="lblAiWarning" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=1012412922]
+[node name="VBoxContent" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer" unique_id=753370801]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+
+[node name="GameSection" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent" unique_id=719528207]
+layout_mode = 2
+
+[node name="lblHeaderGame" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection" unique_id=983981362]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "INFO_HEADER_GAME"
+
+[node name="GameDataContainer" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection" unique_id=1884487554]
+layout_mode = 2
+
+[node name="GridGameInfo" type="GridContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer" unique_id=314642884]
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 2
+
+[node name="lblFixedAuthor" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/GridGameInfo" unique_id=1276513884]
+layout_mode = 2
+text = "GLOBAL_AUTHOR_P"
+
+[node name="lblGameAuthor" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/GridGameInfo" unique_id=341238000]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Creator"
+
+[node name="lblFixedVersion" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/GridGameInfo" unique_id=1836253407]
+layout_mode = 2
+text = "GLOBAL_VERSION_P"
+
+[node name="lblGameVersion" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer/GridGameInfo" unique_id=929944653]
+layout_mode = 2
+text = "v0.0.0"
+
+[node name="lblGameDesc" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer" unique_id=2129279780]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = ExtResource("2_lw3q0")
+text = "Description"
+autowrap_mode = 3
+
+[node name="lblAiWarning" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameDataContainer" unique_id=837026313]
 modulate = Color(1, 0.784314, 0.254902, 1)
 layout_mode = 2
+size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 14
 text = "Translated by AI"
 horizontal_alignment = 1
 
-[node name="MarginContainer2" type="MarginContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=1898950522]
+[node name="GameMissingContainer" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection" unique_id=1239734779]
 layout_mode = 2
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_bottom = 5
 
-[node name="lblDescription" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer/MarginContainer2" unique_id=1216554565]
-custom_minimum_size = Vector2(310, 0)
+[node name="lblGameMissingMsg" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/GameSection/GameMissingContainer" unique_id=466060997]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Descripción de la traducción."
-horizontal_alignment = 1
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.7484028, 0.09743377, 0.085478716, 1)
+text = "Game translation not found"
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent" unique_id=279876391]
+layout_mode = 2
+
+[node name="AddonSection" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent" unique_id=527814395]
+layout_mode = 2
+
+[node name="lblHeaderAddon" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection" unique_id=1720801648]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "INFO_HEADER_SYSTEM"
+
+[node name="AddonDataContainer" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection" unique_id=1067228391]
+layout_mode = 2
+
+[node name="GridAddonInfo" type="GridContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer" unique_id=1212018319]
+layout_mode = 2
+size_flags_horizontal = 4
+columns = 2
+
+[node name="lblFixedAuthor" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/GridAddonInfo" unique_id=2117531816]
+layout_mode = 2
+text = "Author: "
+
+[node name="lblAddonAuthor" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/GridAddonInfo" unique_id=1197754067]
+layout_mode = 2
+text = "Author"
+
+[node name="lblFixedVersion" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/GridAddonInfo" unique_id=407407636]
+layout_mode = 2
+text = "Version: "
+
+[node name="lblAddonVersion" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer/GridAddonInfo" unique_id=1546047476]
+layout_mode = 2
+text = "v.0.0.0"
+
+[node name="lblAddonDesc" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer" unique_id=1419795999]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = ExtResource("2_lw3q0")
+text = "Description"
 autowrap_mode = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer" unique_id=958027650]
+[node name="lblAddonAiWarning" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonDataContainer" unique_id=1557438152]
+modulate = Color(1, 0.784314, 0.254902, 1)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 14
+text = "Translated by AI"
+horizontal_alignment = 1
+
+[node name="AddonMissingContainer" type="VBoxContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection" unique_id=1766955458]
+layout_mode = 2
+
+[node name="lblAddonMissingMsg" type="Label" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/ScrollContainer/VBoxContent/AddonSection/AddonMissingContainer" unique_id=439562538]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.7484028, 0.09743377, 0.085478716, 1)
+text = "Framework translation not found"
+
+[node name="HSeparator3" type="HSeparator" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain" unique_id=75250184]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain" unique_id=169325715]
 layout_mode = 2
 theme_override_constants/margin_top = 10
 
-[node name="btnClose" type="Button" parent="CenterContainer/WindowPanel/MarginContainer/VBoxContainer/MarginContainer" unique_id=184247802]
+[node name="btnClose" type="Button" parent="CenterContainer/WindowPanel/MarginContainer/VBoxMain/MarginContainer" unique_id=1497499878]
 custom_minimum_size = Vector2(150, 35)
 layout_mode = 2
 size_flags_horizontal = 4

@@ -35,15 +35,39 @@ func _populate():
 	for c in list_languages.get_children(): 
 		c.queue_free()
 	
-	var data = LanguageManager.get_language_list()
+	# 1. Obtenemos la data real que el Manager ya sabe leer (Addons)
+	var raw_data = LanguageManager.get_language_list()
 	var current = TranslationServer.get_locale()
 	
-	for d in data:
+	var formatted_data = []
+	
+	# 2. Envolvemos la data vieja en la nueva estructura híbrida
+	for raw_item in raw_data:
+		var new_item = {
+			# Estos datos van en la raíz porque la Tarjeta y el Título los necesitan
+			"name": raw_item.get("name", "Unknown Language"),
+			"folder": raw_item.get("folder", "en"),
+			"flag_path": raw_item.get("flag_path", ""),
+			
+			# Lógica de iconos para la tarjeta (Addon sí, Juego aún no)
+			"game_supported": false, 
+			"addon_supported": true,
+			
+			# Lógica para el InfoPanel
+			"game_data": {},       # Lo dejamos vacío para que salte el error "No encontrado"
+			"addon_data": raw_item # Metemos todos los datos leídos directamente aquí
+		}
+		formatted_data.append(new_item)
+	
+	# 3. Creamos las tarjetas usando la data ya formateada
+	for d in formatted_data:
 		var card = card_prefab.instantiate()
 		list_languages.add_child(card)
+		
+		# Le pasamos el 'd' formateado
 		card.setup_card(d, current)
 		
-		# Como estas tarjetas nacen de cero, sus conexiones son seguras
+		# Conexiones seguras
 		card.on_apply_requested.connect(_on_apply)
 		card.on_info_requested.connect(_on_info)
 
