@@ -34,10 +34,17 @@ func setup_card(data: Dictionary, current_locale: String):
 	
 	if tex_flag and data.has("flag_path"):
 		var path = data["flag_path"]
-		if path.begins_with("res://"):
+		
+		# Si es nativo y NO está ignorado por el debug
+		if path.begins_with("res://") and not "_remote_debug" in path:
 			tex_flag.texture = load(path)
 		else:
-			tex_flag.texture = EssenceLoader.get_externImage(path)
+			# TRADUCCIÓN A RUTA REAL (C:/...)
+			# Esto convierte "res://_remote_debug/..." o "user://..." a la ruta de tu PC
+			var real_path = ProjectSettings.globalize_path(path)
+			
+			# Ahora sí, tu loader externo puede buscar el archivo en el disco duro
+			tex_flag.texture = EssenceLoader.get_externImage(real_path)
 			
 	# === LÓGICA DE ICONOS DE ESTADO ===
 	# Si el diccionario dice que está soportado, pintamos el icono de verde. Si no, gris oscuro.

@@ -10,7 +10,6 @@ extends MarginContainer
 
 func _ready():
 	_connect_signals()
-	_setup_texts()
 	_populate()
 
 # ==========================================
@@ -21,15 +20,7 @@ func _connect_signals():
 		btn_reimport.pressed.connect(_on_reimport)
 
 # ==========================================
-# 2. ACTUALIZACIÓN DE TEXTOS
-# ==========================================
-func _setup_texts():
-	# Si tienes llave para este botón en tu CSV, ponla aquí (ej. LANG_BTN_REIMPORT)
-	if btn_reimport:
-		btn_reimport.text = tr("LANG_REIMPORT_TITLE") 
-
-# ==========================================
-# 3. POBLAR Y SINCRONIZAR
+# 2. POBLAR Y SINCRONIZAR
 # ==========================================
 func _populate():
 	for c in list_languages.get_children(): 
@@ -63,7 +54,6 @@ func _sync_active_card():
 # ==========================================
 func _notification(what):
 	if what == NOTIFICATION_TRANSLATION_CHANGED:
-		_setup_texts()
 		_sync_active_card() 
 
 # ==========================================
