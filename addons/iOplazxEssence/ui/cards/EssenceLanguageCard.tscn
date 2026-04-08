@@ -2,6 +2,13 @@
 
 [ext_resource type="Script" uid="uid://c05c17igci7a8" path="res://addons/iOplazxEssence/scriptsItems/EssenceLanguageCard.gd" id="1_ih1k2"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_StatusStrip"]
+bg_color = Color(0.08, 0.08, 0.08, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [sub_resource type="FontVariation" id="FontVariation_NameBold"]
 variation_embolden = 0.6
 
@@ -14,62 +21,92 @@ font_size = 18
 [sub_resource type="LabelSettings" id="LabelSettings_p0ue0"]
 font = SubResource("FontVariation_ih1k2")
 font_size = 14
-font_color = Color(0.3372549, 0.3372549, 0.3372549, 0.7764706)
+font_color = Color(0.5, 0.5, 0.5, 1)
 
-[node name="LanguageCard" type="PanelContainer" unique_id=364303819 node_paths=PackedStringArray("tex_flag", "lbl_name", "lbl_author", "btn_info", "btn_apply")]
+[node name="LanguageCard" type="PanelContainer" unique_id=525663057 node_paths=PackedStringArray("tex_flag", "lbl_name", "lbl_author", "btn_info", "btn_apply", "icon_game_status", "icon_addon_status")]
 script = ExtResource("1_ih1k2")
 tex_flag = NodePath("MarginContainer/HBoxContainer/FlagIcon")
 lbl_name = NodePath("MarginContainer/HBoxContainer/TextInfo/lblName")
 lbl_author = NodePath("MarginContainer/HBoxContainer/TextInfo/lblAuthor")
 btn_info = NodePath("MarginContainer/HBoxContainer/ButtonsActions/btnInfo")
 btn_apply = NodePath("MarginContainer/HBoxContainer/ButtonsActions/btnApply")
+icon_game_status = NodePath("MarginContainer/HBoxContainer/StatusStrip/Margin/VBoxIcons/IconGame")
+icon_addon_status = NodePath("MarginContainer/HBoxContainer/StatusStrip/Margin/VBoxIcons/IconAddon")
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1164903510]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=917171316]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1285925565]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=197694418]
 layout_mode = 2
 theme_override_constants/separation = 15
 
-[node name="FlagIcon" type="TextureRect" parent="MarginContainer/HBoxContainer" unique_id=623597276]
+[node name="FlagIcon" type="TextureRect" parent="MarginContainer/HBoxContainer" unique_id=803944713]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TextInfo" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1352616882]
+[node name="StatusStrip" type="PanelContainer" parent="MarginContainer/HBoxContainer" unique_id=1472485397]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_StatusStrip")
+
+[node name="Margin" type="MarginContainer" parent="MarginContainer/HBoxContainer/StatusStrip" unique_id=2101202543]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxIcons" type="VBoxContainer" parent="MarginContainer/HBoxContainer/StatusStrip/Margin" unique_id=2005455121]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="IconGame" type="TextureRect" parent="MarginContainer/HBoxContainer/StatusStrip/Margin/VBoxIcons" unique_id=1548815931]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="IconAddon" type="TextureRect" parent="MarginContainer/HBoxContainer/StatusStrip/Margin/VBoxIcons" unique_id=120156550]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextInfo" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1756640358]
 layout_mode = 2
 alignment = 1
 
-[node name="lblName" type="Label" parent="MarginContainer/HBoxContainer/TextInfo" unique_id=1675959854]
+[node name="lblName" type="Label" parent="MarginContainer/HBoxContainer/TextInfo" unique_id=194039363]
 layout_mode = 2
 text = "Name"
 label_settings = SubResource("LabelSettings_5lrc5")
 
-[node name="lblAuthor" type="Label" parent="MarginContainer/HBoxContainer/TextInfo" unique_id=282070567]
+[node name="lblAuthor" type="Label" parent="MarginContainer/HBoxContainer/TextInfo" unique_id=802810851]
 layout_mode = 2
 text = "Author"
 label_settings = SubResource("LabelSettings_p0ue0")
 
-[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer" unique_id=481805760]
+[node name="Spacer" type="Control" parent="MarginContainer/HBoxContainer" unique_id=549965834]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ButtonsActions" type="HBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=2114101190]
+[node name="ButtonsActions" type="HBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1476350643]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="btnInfo" type="Button" parent="MarginContainer/HBoxContainer/ButtonsActions" unique_id=1219082812]
+[node name="btnInfo" type="Button" parent="MarginContainer/HBoxContainer/ButtonsActions" unique_id=141317014]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "i"
 expand_icon = true
 
-[node name="btnApply" type="Button" parent="MarginContainer/HBoxContainer/ButtonsActions" unique_id=602472919]
+[node name="btnApply" type="Button" parent="MarginContainer/HBoxContainer/ButtonsActions" unique_id=1356312674]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Apply"
