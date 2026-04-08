@@ -124,6 +124,11 @@ INFO_GAME_LANG_MISSING,"Game Translation: Not Available","Traducción del Juego:
 INFO_HEADER_SYSTEM,SYSTEM TRANSLATION,TRADUCCIÓN DEL SISTEMA
 INFO_ADDON_LANG_OK,"System/Menus: Complete","Sistema/Menús: Completa"
 INFO_ADDON_LANG_MISSING,"System/Menus: Not Available","Sistema/Menús: No Disponible"
+UI_SEARCH_PLACEHOLDER,Search language...,Buscar idioma...
+FILTER_IA_GAME,Hide AI (Game),Ocultar IA (Juego)
+FILTER_IA_ADDON,Hide AI (Addon),Ocultar IA (Addon)
+FILTER_COMPATIBLE,Compatible version,Versión compatible
+FILTER_CLEAR,Clear filters,Limpiar filtros
 GLOBAL_YES,Yes,Sí
 GLOBAL_NO,No,No
 GLOBAL_OK,OK,Aceptar

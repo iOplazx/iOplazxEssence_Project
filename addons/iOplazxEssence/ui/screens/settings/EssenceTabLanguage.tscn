@@ -1,14 +1,13 @@
 [gd_scene format=3 uid="uid://cjbaeq4172s5c"]
 
 [ext_resource type="Script" uid="uid://cafo3qn5a1ocy" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabLanguage.gd" id="1_3ak3w"]
-[ext_resource type="PackedScene" uid="uid://b20lw8s6c0q6u" path="res://addons/iOplazxEssence/ui/cards/EssenceLanguageCard.tscn" id="2_0ghxj"]
+[ext_resource type="PackedScene" uid="uid://dcyx65lo0n76x" path="res://addons/iOplazxEssence/ui/overlays/EssenceLanguageBrowser.tscn" id="3_3ak3w"]
 [ext_resource type="PackedScene" uid="uid://eoxnxw3ulco1" path="res://addons/iOplazxEssence/ui/overlays/EssenceInfoPanel.tscn" id="3_owm48"]
 
-[node name="mcLanguage" type="MarginContainer" unique_id=1425097914 node_paths=PackedStringArray("list_languages", "btn_reimport")]
+[node name="mcLanguage" type="MarginContainer" unique_id=1425097914 node_paths=PackedStringArray("language_browser", "btn_reimport")]
 script = ExtResource("1_3ak3w")
-list_languages = NodePath("mcBodyLanguage/VBoxContainer/mcSelectWindow/ScrollLanguages/ListLanguages")
+language_browser = NodePath("mcBodyLanguage/VBoxContainer/mcSelectWindow/EssenceLanguageBrowser")
 btn_reimport = NodePath("mcBodyLanguage/VBoxContainer/mcReimportButton/btnReimport")
-card_prefab = ExtResource("2_0ghxj")
 info_prefab = ExtResource("3_owm48")
 metadata/_tab_index = 3
 metadata/_tab_name = "SETTINGS_LANGUAGE"
@@ -25,17 +24,13 @@ layout_mode = 2
 
 [node name="mcSelectWindow" type="MarginContainer" parent="mcBodyLanguage/VBoxContainer" unique_id=626707850]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_right = 6
 
-[node name="ScrollLanguages" type="ScrollContainer" parent="mcBodyLanguage/VBoxContainer/mcSelectWindow" unique_id=2004302154]
-custom_minimum_size = Vector2(0, 300)
+[node name="EssenceLanguageBrowser" parent="mcBodyLanguage/VBoxContainer/mcSelectWindow" unique_id=1723418970 instance=ExtResource("3_3ak3w")]
+custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
-
-[node name="ListLanguages" type="VBoxContainer" parent="mcBodyLanguage/VBoxContainer/mcSelectWindow/ScrollLanguages" unique_id=1618141203]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 10
 
 [node name="mcReimportButton" type="MarginContainer" parent="mcBodyLanguage/VBoxContainer" unique_id=1410982162]
 layout_mode = 2

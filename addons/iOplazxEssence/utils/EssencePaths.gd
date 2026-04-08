@@ -43,7 +43,9 @@ enum KeyImage {
 	ERROR_FALLBACK,
 	ICON_PLAY,  
 	ICON_PAUSE,
-	ICON_INFO
+	ICON_INFO,
+	ICON_FILTER,
+	ICON_FILTER_X
 }
 
 const INTERNAL_IMAGES = {
@@ -55,5 +57,7 @@ const INTERNAL_IMAGES = {
 	KeyImage.ERROR_FALLBACK: PATH_IMAGES + "iconImageNoLoad.png",
 	KeyImage.ICON_PLAY: PATH_IMAGES + "icon_play.png",
 	KeyImage.ICON_PAUSE: PATH_IMAGES + "icon_pause.png",
-	KeyImage.ICON_INFO: PATH_IMAGES + "icon_info.png"
+	KeyImage.ICON_INFO: PATH_IMAGES + "icon_info.png",
+	KeyImage.ICON_FILTER: PATH_IMAGES + "icon_filter.png",
+	KeyImage.ICON_FILTER_X: PATH_IMAGES + "icon_filter-x.png",
 }

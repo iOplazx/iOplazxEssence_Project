@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://7kcdho6h17pp" path="res://addons/iOplazxEssence/scriptsItems/EssenceLanguageBrowser.gd" id="1_drjo8"]
 [ext_resource type="PackedScene" uid="uid://b20lw8s6c0q6u" path="res://addons/iOplazxEssence/ui/cards/EssenceLanguageCard.tscn" id="2_tg3u4"]
+[ext_resource type="Texture2D" uid="uid://c2vbidg1xw8vi" path="res://addons/iOplazxEssence/resources/images/icon_find.png" id="3_k7o01"]
+[ext_resource type="Texture2D" uid="uid://bxvgmslntubjl" path="res://addons/iOplazxEssence/resources/images/icon_filter.png" id="4_dimgy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
 bg_color = Color(0.12, 0.12, 0.12, 1)
@@ -20,7 +22,7 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[node name="EssenceLanguageBrowser" type="VBoxContainer"]
+[node name="EssenceLanguageBrowser" type="VBoxContainer" unique_id=1723418970]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -32,36 +34,40 @@ theme_override_constants/separation = 5
 script = ExtResource("1_drjo8")
 card_prefab = ExtResource("2_tg3u4")
 
-[node name="Header" type="PanelContainer" parent="."]
+[node name="Header" type="PanelContainer" parent="." unique_id=1367341382]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_header")
 
-[node name="MarginContainer" type="MarginContainer" parent="Header"]
+[node name="MarginContainer" type="MarginContainer" parent="Header" unique_id=1598310702]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Header/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Header/MarginContainer" unique_id=1119148688]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SearchInput" type="LineEdit" parent="Header/MarginContainer/HBoxContainer"]
+[node name="SearchInput" type="LineEdit" parent="Header/MarginContainer/HBoxContainer" unique_id=2120223657]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxFlat_input")
 placeholder_text = "Buscar idioma..."
 clear_button_enabled = true
 
-[node name="BtnSearch" type="Button" parent="Header/MarginContainer/HBoxContainer"]
+[node name="BtnSearch" type="Button" parent="Header/MarginContainer/HBoxContainer" unique_id=1638201685]
+custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
-text = " Buscar "
+icon = ExtResource("3_k7o01")
+expand_icon = true
 
-[node name="BtnFilters" type="MenuButton" parent="Header/MarginContainer/HBoxContainer"]
+[node name="BtnFilters" type="MenuButton" parent="Header/MarginContainer/HBoxContainer" unique_id=1129632815]
+custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
-text = " Filtros "
+icon = ExtResource("4_dimgy")
 flat = false
+expand_icon = true
 item_count = 3
 popup/item_0/text = "Ocultar IA (Juego)"
 popup/item_0/checkable = 1
@@ -73,12 +79,16 @@ popup/item_2/text = "Solo compatibles"
 popup/item_2/checkable = 1
 popup/item_2/id = 2
 
-[node name="ScrollLanguages" type="ScrollContainer" parent="."]
+[node name="ScrollLanguages" type="ScrollContainer" parent="." unique_id=1140219249]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="ListLanguages" type="VBoxContainer" parent="ScrollLanguages"]
+[node name="ListLanguages" type="VBoxContainer" parent="ScrollLanguages" unique_id=2073041737]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
+
+[node name="SearchTimer" type="Timer" parent="." unique_id=520166032]
+wait_time = 0.3
+one_shot = true

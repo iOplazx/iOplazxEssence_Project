@@ -120,15 +120,21 @@ func _parse_language_folder(lang_code: String, folder_path: String, scan_type: S
 				if not lang_data["addon_supported"]:
 					var search_1 = config.get_value("info", "addon_search_1", "")
 					var search_2 = config.get_value("info", "addon_search_2", "")
-					
-					if search_1 != "" and _available_languages.has(search_1):
-						lang_data["addon_data"] = _available_languages[search_1]["addon_data"]
+
+					var found = false
+					for s in [search_1, search_2]:
+						if s != "" and _available_languages.has(s):
+							lang_data["addon_data"] = _available_languages[s]["addon_data"]
+							lang_data["addon_supported"] = true
+							lang_data["addon_is_fallback"] = false # Se encontró lo que pidió
+							found = true
+							break
+
+					if not found:
+						# NO se encontró lo pedido. Usamos el Core (Inglés) pero marcamos la alerta
+						lang_data["addon_data"] = _available_languages[_core_default_locale]["addon_data"]
 						lang_data["addon_supported"] = true
-						print("Essence: Fallback aplicado. '", lang_code, "' está usando el addon '", search_1, "'")
-					elif search_2 != "" and _available_languages.has(search_2):
-						lang_data["addon_data"] = _available_languages[search_2]["addon_data"]
-						lang_data["addon_supported"] = true
-						print("Essence: Fallback aplicado. '", lang_code, "' está usando el addon '", search_2, "'")
+						lang_data["addon_is_fallback"] = true # <--- ¡ALERTA!
 
 	# PRIORIDAD DE BANDERA (La del juego siempre gana)
 	if FileAccess.file_exists(flag_path):
