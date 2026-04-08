@@ -19,7 +19,7 @@ var _my_folder_code: String = ""
 
 func _ready():
 	if btn_info:
-		btn_info.icon = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_INFO)
+		btn_info.icon = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_INFO_MED)
 		btn_info.text = "" 
 	
 	if btn_info: btn_info.pressed.connect(_on_info_pressed)

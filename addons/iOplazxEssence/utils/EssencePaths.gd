@@ -44,6 +44,7 @@ enum KeyImage {
 	ICON_PLAY,  
 	ICON_PAUSE,
 	ICON_INFO,
+	ICON_INFO_MED,
 	ICON_FILTER,
 	ICON_FILTER_X
 }
@@ -58,6 +59,7 @@ const INTERNAL_IMAGES = {
 	KeyImage.ICON_PLAY: PATH_IMAGES + "icon_play.png",
 	KeyImage.ICON_PAUSE: PATH_IMAGES + "icon_pause.png",
 	KeyImage.ICON_INFO: PATH_IMAGES + "icon_info.png",
+	KeyImage.ICON_INFO_MED: PATH_IMAGES + "icon_info_med.png",
 	KeyImage.ICON_FILTER: PATH_IMAGES + "icon_filter.png",
 	KeyImage.ICON_FILTER_X: PATH_IMAGES + "icon_filter-x.png",
 }
