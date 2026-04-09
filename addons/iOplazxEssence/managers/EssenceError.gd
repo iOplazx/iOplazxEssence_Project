@@ -8,7 +8,7 @@ signal on_error_reported(error_data: Dictionary)
 var silent_mode: bool = false 
 
 func report(title: String, msg: String, severity: int = Severity.CRITICAL):
-	var stack = get_stack() # Captura dónde falló exactamente
+	var stack = get_stack()
 	var error_data = {
 		"title": title,
 		"message": msg,
@@ -17,9 +17,13 @@ func report(title: String, msg: String, severity: int = Severity.CRITICAL):
 		"timestamp": Time.get_datetime_string_from_system()
 	}
 	
-	# 1. Siempre registrar en el Log (para el archivo .log)
-	# Descomentar cuando tengamos el Logger listo:
-	# EssenceLogger.write_log(error_data)
+	# 1. Registro en el Log de Sesión (session.log)
+	# Convertimos el error en una sola línea de texto para el log general
+	var type_label = "CRITICAL" if severity == Severity.CRITICAL else "WARNING"
+	var log_line = "[%s] %s: %s" % [type_label, title, msg]
+	
+	# Usamos el método real del Logger
+	EssenceLogger.system_info(log_line)
 	
 	# 2. Reaccionar según la gravedad
 	match severity:
