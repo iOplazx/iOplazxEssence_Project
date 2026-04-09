@@ -18,6 +18,7 @@ extends CanvasLayer
 @export var btn_quit: Button
 
 var _is_details_open: bool = false
+var _current_log_path
 
 func _ready():
 	# Nos aseguramos de que este nodo corra aunque el juego esté pausado
@@ -60,6 +61,7 @@ func setup(data: Dictionary):
 				stack_text += "[Nivel %d] %s -> %s() (Línea %d)\n" % [i, file, func_name, line]
 				
 		txt_details.text = stack_text
+	_current_log_path = data.get("log_path", "")
 
 # ==========================================
 # EVENTOS DE BOTONES
@@ -81,10 +83,10 @@ func _on_back_pressed():
 	queue_free()
 
 func _on_open_log_pressed():
-	# Más adelante, cuando tengas el EssenceLogger, esta ruta apuntará al archivo exacto
-	# Por ahora, intentamos abrir la carpeta de usuario
-	var path = ProjectSettings.globalize_path("user://")
-	OS.shell_open(path)
+	if _current_log_path != "":
+		OS.shell_open(ProjectSettings.globalize_path(_current_log_path))
+	else:
+		_on_open_folder_pressed() # Si no hay log específico, abre la carpeta
 
 func _on_open_folder_pressed():
 	# Abre la carpeta 'user://' del juego en el explorador de Windows/Linux

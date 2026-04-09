@@ -69,22 +69,16 @@ func _show_warning_icon(data: Dictionary):
 	push_warning("Essence WARNING: [" + data["title"] + "] " + data["message"])
 
 func _trigger_crash_screen(data: Dictionary):
-	# 1. Pausamos el juego INMEDIATAMENTE para evitar que siga ejecutando código roto
 	get_tree().paused = true
 	
-	# 2. Avisamos por consola al desarrollador
-	push_error("Essence CRASH: [" + data["title"] + "] " + data["message"])
+	# 1. Generar el archivo físico del log y guardar la ruta
+	var log_path = EssenceLogger.create_crash_report(data)
+	data["log_path"] = log_path # Metemos la ruta en el diccionario
 	
-	# 3. Instanciamos la pantalla de error "Low-Cost"
-	var crash_path = EssencePaths.PATH_UI_SCREEN +"/EssenceCrashScreen.tscn"
-	
+	# 2. Instanciar pantalla
+	var crash_path = EssencePaths.PATH_UI_SCREEN + "/EssenceCrashScreen.tscn"
 	if ResourceLoader.exists(crash_path):
 		var screen = load(crash_path).instantiate()
-		# Lo agregamos directo a 'root' para asegurarnos de que quede por encima de todas las ventanas
 		get_tree().root.add_child(screen)
-		
-		# Le pasamos los datos para que muestre el título y mensaje
 		if screen.has_method("setup"):
-			screen.setup(data)
-	else:
-		push_error("CRITICAL FALLBACK: No se encontró la interfaz gráfica de error.")
+			screen.setup(data) # Ahora 'data' lleva la ruta del log

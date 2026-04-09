@@ -25,6 +25,14 @@ const CARPET_STATIC = "res://_static/"
 const PATH_TEST_SAVE_SCENE = PATH_UI + "test/TestSaveScene.tscn"
 
 # ==========================================
+# RUTAS LOGS
+# ==========================================
+const DIR_LOGS = "user://logs/"
+const DIR_SYSTEM = "user://logs/system/"
+const DIR_ERRORS = "user://logs/errors/"
+const DIR_GAME = "user://logs/game/"
+
+# ==========================================
 # CONSTANTES DIRECTAS (Para usar con preload en Audio/Escenas)
 # ==========================================
 const AUDIO_UI_SPACE = PATH_AUDIO + "spaceUiSound.wav"
