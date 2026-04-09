@@ -134,6 +134,29 @@ LANG_COMMUNITY,Community,Comunidad
 LANG_GAME,Game,Juego
 LANG_ADDON,System,Sistema
 LANG_BY,By,Por
+CRASH_HEADER,SYSTEM ERROR,¡HUBO UN PROBLEMA!
+CRASH_DEFAULT_TITLE,Unexpected Error,Error Inesperado
+CRASH_DEFAULT_DESC,An inconsistency was detected.,Se detectó una inconsistencia.
+CRASH_STACK_HEADER,=== ERROR TRACE ===,=== TRAZA DE ERROR ===
+CRASH_STACK_EMPTY,No stack trace available.,No hay detalles de la pila.
+CRASH_BTN_SHOW_DETAILS,► Show technical details,► Ver detalles técnicos
+CRASH_BTN_HIDE_DETAILS,▼ Hide technical details,▼ Ocultar detalles técnicos
+CRASH_BTN_BACK,Go Back,Retroceder
+CRASH_BTN_OPEN_LOG,Open Log,Abrir Log
+CRASH_BTN_OPEN_FOLDER,Open Folder,Ver Carpeta
+CRASH_BTN_IGNORE,Ignore,Ignorar
+CRASH_BTN_QUIT,Quit Game,Salir
+CRASH_TOOLTIP_BACK,Attempts to reload the current scene.,Intenta recargar la escena actual para recuperarse.
+CRASH_TOOLTIP_OPEN_LOG,Opens the log file for the current session.,Abre el archivo de registro de la sesión actual.
+CRASH_TOOLTIP_OPEN_FOLDER,Opens the folder containing all logs.,Abre la carpeta que contiene todos los archivos de registro.
+CRASH_TOOLTIP_IGNORE,Attempts to ignore the error (Risky!).,Intenta ignorar el error y continuar. (¡Arriesgado!)
+CRASH_TOOLTIP_QUIT,Safely closes the game.,Cierra el juego de forma segura.
+ERR_TITLE_NOT_IMPLEMENTED,NOT IMPLEMENTED,MÉTODO NO IMPLEMENTADO
+ERR_DESC_NOT_IMPLEMENTED,The method '%s' has not been programmed yet in %s (Line %s).,El método '%s' aún no ha sido programado en %s (Línea %s).
+ERR_TITLE_NULL_OBJECT,Null Object,Objeto Nulo
+ERR_DESC_NULL_OBJECT,Attempted to call %s on an object that does not exist.,Se intentó llamar a %s en un objeto que no existe.
+ERR_TITLE_METHOD_NOT_FOUND,Method Not Found,Método no encontrado
+ERR_DESC_METHOD_NOT_FOUND,The script does not contain the function: %s,El script no tiene la función: %s
 GLOBAL_YES,Yes,Sí
 GLOBAL_NO,No,No
 GLOBAL_OK,OK,Aceptar

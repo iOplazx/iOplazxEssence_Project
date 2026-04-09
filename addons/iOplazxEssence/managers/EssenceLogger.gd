@@ -6,7 +6,7 @@ var _last_crash_path: String = ""
 
 func _ready():
 	_ensure_directories()
-	system_info("Sesión de Essence iniciada.")
+	system_info("Essence session started.")
 	# Limpiamos el log de la sesión anterior para que no crezca infinitamente
 	var file_path = EssencePaths.DIR_SYSTEM + "session.log"
 	var file = FileAccess.open(file_path, FileAccess.WRITE)
@@ -58,21 +58,22 @@ func create_crash_report(error_data: Dictionary) -> String:
 	var file = FileAccess.open(file_path, FileAccess.WRITE)
 	if file:
 		file.store_line("=== ESSENCE CRASH REPORT ===")
-		file.store_line("Fecha: " + error_data.get("timestamp", "N/A"))
-		file.store_line("Título: " + error_data.get("title", "N/A"))
-		file.store_line("Mensaje: " + error_data.get("message", "N/A"))
+		file.store_line("Date: " + error_data.get("timestamp", "N/A"))
+		file.store_line("Title: " + error_data.get("title", "N/A"))
+		file.store_line("Message: " + error_data.get("message", "N/A"))
 		file.store_line("\n=== STACK TRACE ===")
 		
 		var stack = error_data.get("stack", [])
 		for frame in stack:
-			file.store_line("[%s] -> %s() (Línea %d)" % [frame.get("source", ""), frame.get("function", ""), frame.get("line", 0)])
+			# Cambiamos "Línea" por "Line"
+			file.store_line("[%s] -> %s() (Line %d)" % [frame.get("source", ""), frame.get("function", ""), frame.get("line", 0)])
 		
 		# Agregamos también lo que estaba haciendo el jugador antes del crash
-		file.store_line("\n=== LOGS DE JUEGO PREVIOS ===")
+		file.store_line("\n=== PREVIOUS GAME LOGS ===")
 		for line in _game_buffer:
 			file.store_line(line)
 		
-		file.store_line("\n=== LOGS DE SISTEMA PREVIOS ===")
+		file.store_line("\n=== PREVIOUS SYSTEM LOGS ===")
 		for line in _system_buffer:
 			file.store_line(line)
 			

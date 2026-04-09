@@ -11,6 +11,9 @@ const INDEX_FILE = "save_index.json"
 const KEY_META = "essence_meta"
 var _config: EssenceMasterConfig
 
+var _action_points: int = 0
+var _points_to_save: int = 5 # Cuántos puntos detonarán el guardado
+
 # Señales para comunicar al UI o al juego que algo terminó
 signal on_save_completed(slot_id: String)
 signal on_load_completed(slot_id: String, data: Dictionary)
@@ -429,7 +432,7 @@ func import_physical_file(source_ess: String, source_webp: String, target_slot_i
 		
 	return success
 	
-## NUEVO: Actualiza exclusivamente la ruta de exportación en el índice
+## Actualiza exclusivamente la ruta de exportación en el índice
 func update_last_export_path(dir_path: String):
 	var index = _get_save_index()
 	index["last_export_path"] = dir_path
@@ -453,30 +456,86 @@ func mark_save_as_latest_played(slot_id: String):
 # ==========================================
 # LIMPIEZA DE MEMORIA
 # ==========================================
-# Borra SOLO la imagen temporal (Útil para liberar espacio en disco rápido)
 func delete_temp_screenshot():
 	var dir = DirAccess.open(_save_dir)
 	if dir and dir.file_exists("temp_snap" + GameConstants.EXTENSION_IMAGE):
 		dir.remove("temp_snap" + GameConstants.EXTENSION_IMAGE)
 		print("iOplazxEssence: Foto temporal eliminada.")
 
-# Limpia SOLO los diccionarios de la RAM
 func clear_temp_data():
 	_temp_game_data.clear()
 	_temp_meta_data.clear()
 	print("iOplazxEssence: Diccionarios de caché vaciados.")
 
-# El "Botón de Pánico": Limpia todo al cerrar el sistema de guardado
 func clear_all_temp():
 	delete_temp_screenshot()
 	clear_temp_data()
+
+# ==========================================
+# CHECKPOINTS INVISIBLES (BACKGROUND SAVING)
+# ==========================================
+var _action_threshold: int = 5 # Puntos para detonar guardado
+const SLOT_CP_ACTION = "checkpoint_action"
+const SLOT_CP_SCENE = "checkpoint_scene"
+
+# 1. Guardado por acciones (Ej: moverse 5 veces en el MoveMapControl)
+func save_action_checkpoint(weight: int = 1):
+	_action_points += weight
+	
+	if _action_points >= _action_threshold:
+		_action_points = 0 # Reiniciamos el contador
+		_create_checkpoint(SLOT_CP_ACTION, "Punto de Control (Acción)")
+		# Descomentar si usas el logger: 
+		# EssenceLogger.system_info("Checkpoint de Acción generado.")
+
+# 2. Guardado por cambio de escena (Se llamará desde tu futuro SceneManager)
+func save_scene_checkpoint():
+	_create_checkpoint(SLOT_CP_SCENE, "Punto de Control (Escena)")
+
+func _create_checkpoint(slot_id: String, cp_title: String):
+	var temp_meta = {
+		"title": cp_title,
+		"description": "Auto-save de seguridad",
+		"is_auto": true,
+		"is_checkpoint": true
+	}
+	var temp_game = {}
+	
+	_on_before_save_hook(temp_game, temp_meta) 
+	
+	var save_obj = EssenceSaveFactory.create_save_instance(_config)
+	save_obj.prepare_as_new(temp_meta, temp_game)
+	save_obj.slot_number = 0
+	
+	save_game(slot_id, save_obj, false)
+
+# ==========================================
+# MÉTODOS PARA LA PANTALLA DE ERROR (BACK)
+# ==========================================
+
+func has_action_checkpoint() -> bool:
+	return save_exists(SLOT_CP_ACTION)
+
+func load_action_checkpoint() -> Dictionary:
+	return load_game(SLOT_CP_ACTION)
+
+func has_scene_checkpoint() -> bool:
+	return save_exists(SLOT_CP_SCENE)
+
+func load_scene_checkpoint() -> Dictionary:
+	return load_game(SLOT_CP_SCENE)
 
 # ==============================================================================
 # HOOKS DE INTEGRACIÓN (PARA EL DESARROLLADOR)
 # ==============================================================================
 
+## El framework usará este método para recolectar datos en segundo plano
+func gather_all_game_data() -> Dictionary:
+	var collected_data = {}
+	# Aquí es donde pedirás al SceneTree que te dé los datos.
+	# Ejemplo: get_tree().call_group("Persist", "save_data", collected_data)
+	return collected_data
+
 ## Se ejecuta un milisegundo antes de que los datos temporales se escriban en el archivo .ess.
-## Los diccionarios se pasan por referencia; cualquier llave que agregues o modifiques aquí
-## se guardará de forma permanente en el slot.
 func _on_before_save_hook(game_data: Dictionary, meta_data: Dictionary):
 	pass

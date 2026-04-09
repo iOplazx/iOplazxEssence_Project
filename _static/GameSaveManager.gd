@@ -2,46 +2,45 @@ extends EssenceSaveManager
 
 # ==============================================================================
 # GAME SAVE MANAGER (AUTOLOAD)
-# This script extends the core iOplazxEssence framework.
-# Replace the default 'SaveManager' in Project -> Autoloads with this file.
 # ==============================================================================
 
 func _ready():
-	# Always call the parent class _ready() so the framework initializes properly
 	super._ready()
-	print("Demo: GameSaveManager initialized, wrapping EssenceSaveManager.")
+	# Aquí es donde el Addon confirma que está listo para recibir datos
+	print("GameSaveManager: Sistema de persistencia listo para la Demo.")
 
 # ==============================================================================
-# INTEGRATION HOOKS (GAME LOGIC OVERRIDES)
+# INTEGRATION HOOKS
 # ==============================================================================
 
 func _on_before_save_hook(game_data: Dictionary, meta_data: Dictionary):
-	# OVERRIDE: This hook is triggered exactly one millisecond before the 
-	# temporary dictionaries are written to the physical .ess file.
+	# Este método se dispara tanto en guardados manuales como en Checkpoints.
+	# Es el lugar ideal para "empaquetar" el estado del juego.
 	
-	print("Demo: Before Save Hook triggered. Injecting live game data...")
+	# Ejemplo de Metadata para que el menú de carga se vea profesional:
+	meta_data["location"] = "Pantalla de Inicio"
+	meta_data["playtime"] = "00:00:00" # Aquí iría el tiempo real de juego
+	meta_data["player_level"] = 1
 	
-	# --------------------------------------------------------------------------
-	# 1. INJECT GAME DATA
-	# Add your live game variables here. Because dictionaries are passed by reference,
-	# anything you add here will be saved permanently.
-	# --------------------------------------------------------------------------
+	# Ejemplo de datos de juego (simulados para la demo):
+	game_data["demo_progress"] = "Visto el menú principal"
+	game_data["unlocked_gallery"] = false
 	
-	# Examples (Uncomment and adapt to your actual global singletons/variables):
-	# game_data["player_hp"] = PlayerStats.current_hp
-	# game_data["inventory"] = InventorySystem.get_all_items()
-	# game_data["current_chapter"] = GameRuntime.chapter
-	# game_data["has_met_kiwi"] = GameRuntime.met_kiwi
+	# Si hubiera gameplay, aquí recolectarías los grupos:
+	# var persist_nodes = get_tree().get_nodes_in_group("Persist")
+	# ... lógica de recolección ...
+
+func _on_after_load_hook(game_data: Dictionary):
+	# Este método se dispara después de que los datos físicos se leen del disco.
+	# Es el lugar para "desempaquetar" y aplicar los datos al juego.
 	
-	# --------------------------------------------------------------------------
-	# 2. INJECT METADATA
-	# Metadata is what the UI (Load Menu) reads to display the save slot beautifully.
-	# Add things like the current location name, playtime, or player level.
-	# --------------------------------------------------------------------------
+	if game_data.has("demo_progress"):
+		print("Carga completa: El progreso detectado es: ", game_data["demo_progress"])
 	
-	# Examples:
-	# meta_data["location"] = "Kumi's Castle" 
-	# meta_data["playtime"] = GlobalTimer.get_total_playtime_string()
-	# meta_data["level"] = PlayerStats.level
+	# Si el Checkpoint o el Back cargan una partida, aquí restaurarías:
+	# 1. Posición del jugador
+	# 2. Estado de la historia
+	# 3. Inventario
 	
-	pass
+	# Emitir señal para avisar al resto del juego que la carga terminó
+	# on_load_completed.emit("slot_id", game_data)

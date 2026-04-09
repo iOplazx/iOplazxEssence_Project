@@ -43,20 +43,19 @@ func ExceptionNotImplement(method_name: String = "Desconocido"):
 	var script = stack[1]["source"] if stack.size() > 1 else "Script desconocido"
 	var line = stack[1]["line"] if stack.size() > 1 else 0
 	
-	var msg = "El método '" + method_name + "' aún no ha sido programado en " + script + " (Línea " + str(line) + ")."
-	report("MÉTODO NO IMPLEMENTADO", msg, Severity.CRITICAL)
+	# Usamos %s para inyectar las variables en el texto traducido
+	var msg = tr("ERR_DESC_NOT_IMPLEMENTED") % [method_name, script, str(line)]
+	report(tr("ERR_TITLE_NOT_IMPLEMENTED"), msg, Severity.CRITICAL)
 
-# Envuelve funciones peligrosas para que no rompan el juego
 func safe_execute(object: Object, method: String, args: Array = [], default_value = null):
 	if not is_instance_valid(object):
-		report("Objeto Nulo", "Se intentó llamar a " + method + " en un objeto que no existe.", Severity.CRITICAL)
+		report(tr("ERR_TITLE_NULL_OBJECT"), tr("ERR_DESC_NULL_OBJECT") % method, Severity.CRITICAL)
 		return default_value
 		
 	if not object.has_method(method):
-		report("Método no encontrado", "El script no tiene la función: " + method, Severity.CRITICAL)
+		report(tr("ERR_TITLE_METHOD_NOT_FOUND"), tr("ERR_DESC_METHOD_NOT_FOUND") % method, Severity.CRITICAL)
 		return default_value
 
-	# Llamamos al método de forma segura y devolvemos su resultado
 	return object.callv(method, args)
 
 # ==========================================
