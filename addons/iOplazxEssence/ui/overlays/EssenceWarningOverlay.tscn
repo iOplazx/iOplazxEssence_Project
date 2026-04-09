@@ -1,0 +1,118 @@
+[gd_scene format=3 uid="uid://cyidwruwavaao"]
+
+[ext_resource type="Texture2D" uid="uid://dghx0okrwlnrv" path="res://addons/iOplazxEssence/resources/images/icon_warning.png" id="1_ffojj"]
+[ext_resource type="Script" uid="uid://rmrfvh3sfqsn" path="res://addons/iOplazxEssence/scriptsItems/EssenceWarningOverlay.gd" id="1_p1p13"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark"]
+bg_color = Color(0.0784314, 0.0784314, 0.0784314, 0.901961)
+border_width_left = 2
+border_color = Color(1, 0.8, 0.2, 0.5)
+corner_radius_top_left = 10
+corner_radius_bottom_left = 10
+expand_margin_left = 5.0
+
+[node name="EssenceWarningOverlay" type="CanvasLayer" unique_id=215950999]
+process_mode = 3
+layer = 120
+script = ExtResource("1_p1p13")
+
+[node name="MainControl" type="Control" parent="." unique_id=546072879]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BtnWarningTrigger" type="Button" parent="MainControl" unique_id=845641681]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -60.0
+offset_top = -60.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+icon = ExtResource("1_ffojj")
+flat = true
+expand_icon = true
+
+[node name="WarningPanel" type="PanelContainer" parent="MainControl" unique_id=1559295483]
+visible = false
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -400.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dark")
+
+[node name="Layout" type="VBoxContainer" parent="MainControl/WarningPanel" unique_id=199649765]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="MainControl/WarningPanel/Layout" unique_id=1679936362]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="Margin" type="Control" parent="MainControl/WarningPanel/Layout/Header" unique_id=1041064898]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+
+[node name="lblTitle" type="Label" parent="MainControl/WarningPanel/Layout/Header" unique_id=793341267]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = "SYSTEM WARNINGS"
+vertical_alignment = 1
+
+[node name="BtnClose" type="Button" parent="MainControl/WarningPanel/Layout/Header" unique_id=2112665633]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+focus_mode = 0
+text = "✕"
+flat = true
+
+[node name="HSeparator" type="HSeparator" parent="MainControl/WarningPanel/Layout" unique_id=687284995]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Scroll" type="ScrollContainer" parent="MainControl/WarningPanel/Layout" unique_id=871694361]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="MainControl/WarningPanel/Layout/Scroll" unique_id=1436212850]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="WarningList" type="VBoxContainer" parent="MainControl/WarningPanel/Layout/Scroll/Margin" unique_id=54784319]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Footer" type="HBoxContainer" parent="MainControl/WarningPanel/Layout" unique_id=724560635]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+alignment = 1
+
+[node name="BtnClear" type="Button" parent="MainControl/WarningPanel/Layout/Footer" unique_id=167753435]
+custom_minimum_size = Vector2(180, 35)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 14
+text = "Clear History"

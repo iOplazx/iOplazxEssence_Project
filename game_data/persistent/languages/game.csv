@@ -1,3 +1,5 @@
 id,en
 TEST,TEST
-GREETINGS,Hi! My name es Alex
+GREETINGS,Hi! My name is Alex
+BTN_NOT_IMPLEMENTED,Not implemented yet
+BTN_PRINT_WARNING,PRINT WARNING

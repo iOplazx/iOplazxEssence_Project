@@ -9,7 +9,7 @@ content_margin_right = 10.0
 content_margin_bottom = 10.0
 bg_color = Color(0.69082296, 0.32464555, 0.48005122, 1)
 
-[node name="TestSaveScene" type="Control" unique_id=1888341287 node_paths=PackedStringArray("btn_save", "btn_load", "btn_return", "lbl_output", "test_element", "btn_no_implement")]
+[node name="TestSaveScene" type="Control" unique_id=1888341287 node_paths=PackedStringArray("btn_save", "btn_load", "btn_return", "lbl_output", "test_element", "btn_no_implement", "btn_warning")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_qd6tp")
@@ -19,6 +19,7 @@ btn_return = NodePath("VBC/VBoxContainer/HBoxContainer/btnReturn")
 lbl_output = NodePath("VBC/VBoxContainer/ScrollContainer/lblOutput")
 test_element = NodePath("VBC/TestElement")
 btn_no_implement = NodePath("VBC/VBoxContainer/btnNotImplement")
+btn_warning = NodePath("VBC/VBoxContainer/btnPrintWarning")
 
 [node name="Background" type="ColorRect" parent="." unique_id=660247948]
 layout_mode = 0
@@ -71,4 +72,8 @@ autowrap_mode = 3
 
 [node name="btnNotImplement" type="Button" parent="VBC/VBoxContainer" unique_id=1488939905]
 layout_mode = 2
-text = "NOT IMPLEMENT"
+text = "BTN_NOT_IMPLEMENTED"
+
+[node name="btnPrintWarning" type="Button" parent="VBC/VBoxContainer" unique_id=124048534]
+layout_mode = 2
+text = "BTN_PRINT_WARNING"

@@ -29,6 +29,7 @@ LanguageManager="*uid://dsq88kypeo403"
 FileManager="*uid://d3bd41whggi54"
 SaveManager="*uid://c16bjx4qffpgx"
 GlobalLoading="*uid://c56ktxpxnuj7j"
+EssenceWarningUI="*uid://cyidwruwavaao"
 
 [display]
 

@@ -47,6 +47,20 @@ func _ready():
 	_conectar_botones()
 	_verificar_estado_partida()
 	
+	# =======================================================
+	# NUEVA LÓGICA: Desactivar Continuar si no hay partidas
+	# =======================================================
+	var latest_save = SaveManager.get_latest_save_id()
+	
+	if btn_continue:
+		if latest_save == "":
+			btn_continue.disabled = true
+			# Opcional: Si quieres que el texto cambie para que sea más obvio
+			# btn_continue.text = tr("MENU_NO_SAVES") 
+		else:
+			btn_continue.disabled = false
+	# =======================================================
+	
 	if animate_buttons_entrance:
 		if buttons_panel:
 			buttons_panel.modulate.a = 0.0
@@ -126,6 +140,7 @@ func _on_new_game_pressed():
 func _on_continue_pressed():
 	AudioManager.play_ui_sfx()
 	
+	# Esto ya te devuelve el Checkpoint si es el más reciente, o el Manual si es más nuevo.
 	var latest_save_id = SaveManager.get_latest_save_id()
 	
 	if latest_save_id != "":
@@ -137,14 +152,20 @@ func _on_continue_pressed():
 			
 			# 3. ¡LA MAGIA! Inyectamos los datos en la RAM
 			SaveManager.loaded_game_data = data["game_data"]
-			print("iOplazxEssence: Datos de " + latest_save_id + " inyectados en RAM.")
+			
+			# Imprimimos en consola qué tipo de archivo nos salvó la vida
+			if latest_save_id.begins_with("checkpoint"):
+				print("iOplazxEssence: Continuando desde Checkpoint de Seguridad (" + latest_save_id + ")")
+			else:
+				print("iOplazxEssence: Continuando desde Guardado Normal (" + latest_save_id + ")")
 			
 			# 4. Marcamos que esta fue la última partida tocada
 			SaveManager.mark_save_as_latest_played(latest_save_id)
 			
 			# === HOOK DE INTEGRACIÓN ===
 			# Pasamos el diccionario completo por si el dev quiere leer la fecha o nivel
-			_on_continue_hook(data)
+			if has_method("_on_continue_hook"):
+				_on_continue_hook(data)
 			
 			# 5. Viajamos al juego (El SceneManager limpiará el historial si es necesario)
 			SceneManager.goto_continue_game()
