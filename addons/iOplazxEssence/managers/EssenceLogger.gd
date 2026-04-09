@@ -1,12 +1,17 @@
 extends Node
 
-
+var _game_buffer: PackedStringArray = []
 var _system_buffer: PackedStringArray = []
 var _last_crash_path: String = ""
 
 func _ready():
 	_ensure_directories()
 	system_info("Sesión de Essence iniciada.")
+	# Limpiamos el log de la sesión anterior para que no crezca infinitamente
+	var file_path = EssencePaths.DIR_SYSTEM + "session.log"
+	var file = FileAccess.open(file_path, FileAccess.WRITE)
+	if file:
+		file.close() # Abrir en modo WRITE sin escribir nada vacía el archivo
 
 func _ensure_directories():
 	for path in [EssencePaths.DIR_SYSTEM, EssencePaths.DIR_ERRORS, EssencePaths.DIR_GAME]:
@@ -25,9 +30,22 @@ func system_info(msg: String):
 		flush_system_logs()
 
 func game_log(msg: String):
-	# Para que el desarrollador guarde sus propios eventos
 	var line = "[GAME][%s] %s" % [_get_timestamp(), msg]
-	print(line) # Opcional: mantener el print en consola solo para game_log
+	print(line) # Mantenemos el print para que lo veas en la consola de Godot
+	_game_buffer.append(line)
+	
+	if _game_buffer.size() > 50:
+		flush_game_logs()
+		
+func flush_game_logs():
+	var file_path = EssencePaths.DIR_GAME + "game_events.log"
+	var file = FileAccess.open(file_path, FileAccess.WRITE if not FileAccess.file_exists(file_path) else FileAccess.READ_WRITE)
+	if file:
+		file.seek_end()
+		for line in _game_buffer:
+			file.store_line(line)
+		file.close()
+		_game_buffer.clear()
 
 # ==========================================
 # GESTIÓN DE CRASH DUMPS
@@ -49,12 +67,22 @@ func create_crash_report(error_data: Dictionary) -> String:
 		for frame in stack:
 			file.store_line("[%s] -> %s() (Línea %d)" % [frame.get("source", ""), frame.get("function", ""), frame.get("line", 0)])
 		
+		# Agregamos también lo que estaba haciendo el jugador antes del crash
+		file.store_line("\n=== LOGS DE JUEGO PREVIOS ===")
+		for line in _game_buffer:
+			file.store_line(line)
+		
 		file.store_line("\n=== LOGS DE SISTEMA PREVIOS ===")
 		for line in _system_buffer:
 			file.store_line(line)
 			
 		file.close()
 		_last_crash_path = file_path
+		
+		# volcamos a los archivos normales y limpiamos la RAM
+		flush_system_logs()
+		flush_game_logs()
+		
 		return file_path
 	return ""
 
@@ -83,3 +111,4 @@ func _notification(what):
 	# Al cerrar el juego de forma normal, guardamos lo que quede en memoria
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		flush_system_logs()
+		flush_game_logs()
