@@ -10,17 +10,26 @@ static func get_internImage(key: EssencePaths.KeyImage) -> Texture2D:
 
 ## Carga imágenes del usuario (fuera del addon)
 static func get_externImage(ruta: String, usar_imagen_error: bool = true) -> Texture2D:
-	# FileAccess mira el disco duro real, no el registro interno de Godot
-	if ruta != "" and FileAccess.file_exists(ruta):
+	if ruta == "":
+		pass # Salta directo al fallback
+	
+	# === EL PARCHE ===
+	# Si la ruta es interna del motor, usamos el cargador nativo y evitamos el error al exportar
+	elif ruta.begins_with("res://"):
+		if ResourceLoader.exists(ruta):
+			return load(ruta) as Texture2D
+			
+	# Si es una ruta externa real (user:// o C:/)
+	elif FileAccess.file_exists(ruta):
 		var img = Image.new()
-		var err = img.load(ruta) # Cargamos los bytes puros de la imagen
+		var err = img.load(ruta) # Cargamos los bytes puros
 		
 		if err == OK:
-			# Convertimos esos bytes en una Textura que la UI puede usar
 			return ImageTexture.create_from_image(img)
 	
-	push_error("iOplazxEssence Error: No se encontró la imagen externa en -> " + ruta)
+	push_error("iOplazxEssence Error: No se pudo cargar la imagen en -> " + ruta)
 	
+	# === FALLBACK ===
 	if usar_imagen_error:
 		return load(EssencePaths.INTERNAL_IMAGES[EssencePaths.KeyImage.ERROR_FALLBACK])
 	
