@@ -19,6 +19,7 @@ config/icon="uid://dvp7ydrt6x37m"
 
 [autoload]
 
+EssenceError="*uid://cgpc3ff7u2woa"
 Preferences="*uid://curuvct7tadry"
 AudioManager="*uid://cvagoya4eyiag"
 SceneManager="*uid://exttdiqc5tx4"

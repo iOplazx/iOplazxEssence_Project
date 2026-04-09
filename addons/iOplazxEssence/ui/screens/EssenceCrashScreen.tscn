@@ -1,0 +1,154 @@
+[gd_scene format=3 uid="uid://b7mf7uki5rbir"]
+
+[ext_resource type="Script" uid="uid://ps8gvcgkco6w" path="res://addons/iOplazxEssence/scriptsItems/EssenceCrashScreen.gd" id="1_fdgaj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Bg"]
+bg_color = Color(0.0588235, 0.0588235, 0.0588235, 0.941176)
+
+[sub_resource type="LabelSettings" id="LabelSettings_Header"]
+font_size = 32
+font_color = Color(0.8, 0.2, 0.2, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_Title"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_Desc"]
+font_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_DetailsBg"]
+bg_color = Color(0.0392157, 0.0392157, 0.0392157, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.2, 0.2, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="EssenceCrashScreen" type="CanvasLayer" unique_id=55944399 node_paths=PackedStringArray("lbl_header", "lbl_title", "lbl_description", "btn_toggle_details", "details_container", "txt_details", "btn_back", "btn_open_log", "btn_open_folder", "btn_ignore", "btn_quit")]
+process_mode = 3
+layer = 128
+script = ExtResource("1_fdgaj")
+lbl_header = NodePath("Background/Margin/MainLayout/HeaderInfo/lblHeader")
+lbl_title = NodePath("Background/Margin/MainLayout/HeaderInfo/lblTitle")
+lbl_description = NodePath("Background/Margin/MainLayout/HeaderInfo/lblDescription")
+btn_toggle_details = NodePath("Background/Margin/MainLayout/DetailsSection/btnToggleDetails")
+details_container = NodePath("Background/Margin/MainLayout/DetailsSection/DetailsContainer")
+txt_details = NodePath("Background/Margin/MainLayout/DetailsSection/DetailsContainer/txtDetails")
+btn_back = NodePath("Background/Margin/MainLayout/BottomActions/btnBack")
+btn_open_log = NodePath("Background/Margin/MainLayout/BottomActions/btnOpenLog")
+btn_open_folder = NodePath("Background/Margin/MainLayout/BottomActions/btnOpenFolder")
+btn_ignore = NodePath("Background/Margin/MainLayout/BottomActions/btnIgnore")
+btn_quit = NodePath("Background/Margin/MainLayout/BottomActions/btnQuit")
+
+[node name="Background" type="PanelContainer" parent="." unique_id=1327019300]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_Bg")
+
+[node name="Margin" type="MarginContainer" parent="Background" unique_id=1464605516]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 20
+
+[node name="MainLayout" type="VBoxContainer" parent="Background/Margin" unique_id=1478198655]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HeaderInfo" type="VBoxContainer" parent="Background/Margin/MainLayout" unique_id=641047541]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="lblHeader" type="Label" parent="Background/Margin/MainLayout/HeaderInfo" unique_id=1106374188]
+layout_mode = 2
+text = "¡HUBO UN PROBLEMA!"
+label_settings = SubResource("LabelSettings_Header")
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Background/Margin/MainLayout/HeaderInfo" unique_id=1182033972]
+layout_mode = 2
+
+[node name="lblTitle" type="Label" parent="Background/Margin/MainLayout/HeaderInfo" unique_id=1856019759]
+layout_mode = 2
+text = "Título del Error"
+label_settings = SubResource("LabelSettings_Title")
+
+[node name="lblDescription" type="Label" parent="Background/Margin/MainLayout/HeaderInfo" unique_id=448689973]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Descripción detallada del error que pudo haber causado este inconveniente. Esto es autowrap para que no se corte."
+label_settings = SubResource("LabelSettings_Desc")
+autowrap_mode = 3
+
+[node name="DetailsSection" type="VBoxContainer" parent="Background/Margin/MainLayout" unique_id=28820726]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="btnToggleDetails" type="Button" parent="Background/Margin/MainLayout/DetailsSection" unique_id=1974513160]
+layout_mode = 2
+size_flags_horizontal = 0
+focus_mode = 0
+text = "► Ver detalles técnicos"
+flat = true
+alignment = 0
+
+[node name="DetailsContainer" type="PanelContainer" parent="Background/Margin/MainLayout/DetailsSection" unique_id=1733875858]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_DetailsBg")
+
+[node name="txtDetails" type="TextEdit" parent="Background/Margin/MainLayout/DetailsSection/DetailsContainer" unique_id=947934078]
+layout_mode = 2
+theme_override_colors/font_readonly_color = Color(0.6, 0.8, 0.6, 1)
+text = "STACT TRACE...
+[res://ejemplo.gd:Línea 10] - Método Desconocido
+[res://root.gd:Línea 5] - _ready"
+editable = false
+wrap_mode = 1
+
+[node name="BottomActions" type="HBoxContainer" parent="Background/Margin/MainLayout" unique_id=1337083522]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="btnBack" type="Button" parent="Background/Margin/MainLayout/BottomActions" unique_id=86016912]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+tooltip_text = "Intenta recargar la escena actual para recuperarse del error."
+text = "Retroceder"
+
+[node name="btnOpenLog" type="Button" parent="Background/Margin/MainLayout/BottomActions" unique_id=1382411153]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+tooltip_text = "Abre el archivo de registro de la sesión actual."
+text = "Abrir Log"
+
+[node name="btnOpenFolder" type="Button" parent="Background/Margin/MainLayout/BottomActions" unique_id=537706723]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+tooltip_text = "Abre la carpeta que contiene todos los archivos de registro."
+text = "Ver Carpeta"
+
+[node name="VSeparator" type="VSeparator" parent="Background/Margin/MainLayout/BottomActions" unique_id=2111614547]
+layout_mode = 2
+
+[node name="btnIgnore" type="Button" parent="Background/Margin/MainLayout/BottomActions" unique_id=139694307]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+tooltip_text = "Intenta ignorar el error y continuar. (¡Arriesgado!)"
+text = "Ignorar"
+
+[node name="btnQuit" type="Button" parent="Background/Margin/MainLayout/BottomActions" unique_id=1560030354]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+tooltip_text = "Cierra el juego de forma segura."
+text = "Salir"

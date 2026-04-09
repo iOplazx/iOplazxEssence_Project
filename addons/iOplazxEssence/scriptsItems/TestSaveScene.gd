@@ -5,6 +5,7 @@ extends Control
 @export var btn_return: Button
 @export var lbl_output: Label
 @export var test_element: ColorRect
+@export var btn_no_implement: Button
 
 const ROUTES_PATH = EssencePaths.CARPET_STATIC + "RouteConfig.tres"
 var routes: EssenceRouteConfig
@@ -13,6 +14,8 @@ func _ready():
 	btn_save.pressed.connect(_on_btn_save_game_pressed)
 	btn_load.pressed.connect(_on_btn_load_game_pressed)
 	btn_return.pressed.connect(_on_return_pressed)
+	
+	btn_no_implement.pressed.connect(_on_no_implement_pressed)
 	
 	if ResourceLoader.exists(ROUTES_PATH):
 		routes = load(ROUTES_PATH) as EssenceRouteConfig
@@ -85,3 +88,6 @@ func _on_btn_load_game_pressed():
 
 func _on_return_pressed():
 	SceneManager.goto_main_menu()
+
+func _on_no_implement_pressed():
+	EssenceError.ExceptionNotImplement("Prueba")
