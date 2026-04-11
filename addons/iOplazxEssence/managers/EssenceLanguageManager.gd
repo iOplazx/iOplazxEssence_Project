@@ -22,7 +22,6 @@ func scan_all_languages():
 	
 	var config = FileManager.config
 	if not config:
-		#push_error("Essence: LanguageManager no pudo acceder a la configuración del FileManager.")
 		EssenceError.report( 
 			"LanguageManager Error Scan All Languages",
 			"LanguageManager could not access the FileManager settings.",
@@ -37,31 +36,27 @@ func scan_all_languages():
 	
 	# 1. CAPA ADDON (El motor base)
 	if config.load_framework_loc:
-		#print("Essence: Buscando idiomas base en -> ", path_addon)
 		log_msg = "[%s/scan_all_languages] Looking for base languages in: %s" % [ES_NAME_CLASS, path_addon]
 		EssenceLogger.system_info(log_msg)
 		_scan_directory(path_addon, "addon") 
 		
 	# 2. CAPA PERSISTENT (El Búnker / Seguridad)
 	if DirAccess.dir_exists_absolute(path_persistent):
-		#print("Essence: Buscando idiomas de seguridad en -> ", path_persistent)
 		log_msg = "[%s/scan_all_languages] Looking for backup languages in: %s" % [ES_NAME_CLASS, path_persistent]
 		EssenceLogger.system_info(log_msg)
-		_scan_directory(path_persistent, "game")
+		_scan_directory(path_persistent, "game_base") # <-- CAMBIO A game_base
 
 	# 3. CAPA REMOTE (Modificaciones del usuario)
 	if not DirAccess.dir_exists_absolute(path_game):
 		DirAccess.make_dir_recursive_absolute(path_game)
 		
-	#print("Essence: Buscando idiomas remotos (usuario) en -> ", path_game)
 	log_msg = "[%s/scan_all_languages] Looking for remote user languages in: %s" % [ES_NAME_CLASS, path_game]
 	EssenceLogger.system_info(log_msg)
-	_scan_directory(path_game, "game") 
+	_scan_directory(path_game, "game_remote") # <-- CAMBIO A game_remote
 	
-	#print("Essence: Idiomas finales detectados: ", _available_languages.keys())
 	log_msg = "[%s/scan_all_languages] Final detected languages: %s" % [ES_NAME_CLASS, _available_languages.keys()]
 	EssenceLogger.system_info(log_msg)
-
+	
 # ==========================================
 # 2. LECTOR DE CARPETAS Y BANDERAS
 # ==========================================
@@ -116,7 +111,8 @@ func _parse_language_folder(lang_code: String, folder_path: String, scan_type: S
 		if err == OK:
 			lang_data["name"] = config.get_value("info", "name", lang_data["name"])
 			
-			if scan_type == "addon" and config.get_value("info", "is_default", false):
+			# BLINDAJE DE SEGURIDAD: Solo archivos oficiales pueden definir el idioma default.
+			if (scan_type == "addon" or scan_type == "game_base") and config.get_value("info", "is_default", false):
 				_core_default_locale = lang_code
 				
 			var specific_data = {
@@ -132,12 +128,11 @@ func _parse_language_folder(lang_code: String, folder_path: String, scan_type: S
 				lang_data["addon_data"] = specific_data
 				lang_data["addon_supported"] = true
 			else:
-				# --- ES EL JUEGO ---
+				# --- ES EL JUEGO (Aplica tanto para game_base como game_remote) ---
 				lang_data["game_data"] = specific_data
 				lang_data["game_supported"] = true
 				
 				# LÓGICA DE FALLBACK (Búsqueda de Addon alternativo)
-				# Si el juego no tiene soporte de addon directo, buscamos si pidió uno prestado
 				if not lang_data["addon_supported"]:
 					var search_1 = config.get_value("info", "addon_search_1", "")
 					var search_2 = config.get_value("info", "addon_search_2", "")
@@ -147,15 +142,14 @@ func _parse_language_folder(lang_code: String, folder_path: String, scan_type: S
 						if s != "" and _available_languages.has(s):
 							lang_data["addon_data"] = _available_languages[s]["addon_data"]
 							lang_data["addon_supported"] = true
-							lang_data["addon_is_fallback"] = false # Se encontró lo que pidió
+							lang_data["addon_is_fallback"] = false 
 							found = true
 							break
 
 					if not found:
-						# NO se encontró lo pedido. Usamos el Core (Inglés) pero marcamos la alerta
 						lang_data["addon_data"] = _available_languages[_core_default_locale]["addon_data"]
 						lang_data["addon_supported"] = true
-						lang_data["addon_is_fallback"] = true # <--- ¡ALERTA!
+						lang_data["addon_is_fallback"] = true 
 
 	# PRIORIDAD DE BANDERA (La del juego siempre gana)
 	if FileAccess.file_exists(flag_path):
@@ -280,19 +274,18 @@ func apply_initial_language():
 		EssenceLogger.system_info("[%s/apply_initial_language] Loaded language from preferences: %s" % [ES_NAME_CLASS, pref_lang])
 		return
 	
-	# 2. SEGUNDA PRIORIDAD: El idioma "is_default" de tu Framework (Generalmente "en")
-	# Esto asegura que si no hay partida previa, empiece en inglés aunque tu PC sea español.
+	# 2. SEGUNDA PRIORIDAD: El idioma "is_default" de tu Framework/Búnker (Ignora el OS y Mods)
 	if _available_languages.has(_core_default_locale):
 		TranslationServer.set_locale(_core_default_locale)
 		EssenceLogger.system_info("[%s/apply_initial_language] Defaulting to core language: %s" % [ES_NAME_CLASS, _core_default_locale])
 		return
 
-	# 3. ÚLTIMO RECURSO: Idioma del Sistema (Opcional, podrías incluso borrar esto)
+	# 3. ÚLTIMO RECURSO: Idioma del Sistema
 	var os_lang = OS.get_locale_language()
 	if _available_languages.has(os_lang):
 		TranslationServer.set_locale(os_lang)
 		EssenceLogger.system_info("[%s/apply_initial_language] Auto-detected OS language: %s" % [ES_NAME_CLASS, os_lang])
-	
+
 func save_language_preference(code: String):
 	Preferences.set_setting("game", "language", code)
 
