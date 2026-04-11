@@ -270,24 +270,29 @@ func _load_translations_from_dir(path: String):
 # 6. ARRANQUE INICIAL DEL IDIOMA
 # ==========================================
 func apply_initial_language():
-	#print("Essence: Determinando idioma inicial...")
 	var log_msg = "[%s/apply_initial_language] Determining initial language..." % ES_NAME_CLASS
 	EssenceLogger.system_info(log_msg)
 	
+	# 1. PRIORIDAD MÁXIMA: La elección previa del usuario (Persistencia)
 	var pref_lang = Preferences.get_setting("game", "language", "")
-	if pref_lang != "":
+	if pref_lang != "" and _available_languages.has(pref_lang):
 		TranslationServer.set_locale(pref_lang)
 		EssenceLogger.system_info("[%s/apply_initial_language] Loaded language from preferences: %s" % [ES_NAME_CLASS, pref_lang])
 		return
-		
+	
+	# 2. SEGUNDA PRIORIDAD: El idioma "is_default" de tu Framework (Generalmente "en")
+	# Esto asegura que si no hay partida previa, empiece en inglés aunque tu PC sea español.
+	if _available_languages.has(_core_default_locale):
+		TranslationServer.set_locale(_core_default_locale)
+		EssenceLogger.system_info("[%s/apply_initial_language] Defaulting to core language: %s" % [ES_NAME_CLASS, _core_default_locale])
+		return
+
+	# 3. ÚLTIMO RECURSO: Idioma del Sistema (Opcional, podrías incluso borrar esto)
 	var os_lang = OS.get_locale_language()
 	if _available_languages.has(os_lang):
 		TranslationServer.set_locale(os_lang)
 		EssenceLogger.system_info("[%s/apply_initial_language] Auto-detected OS language: %s" % [ES_NAME_CLASS, os_lang])
-	else:
-		TranslationServer.set_locale(_core_default_locale)
-		EssenceLogger.system_info("[%s/apply_initial_language] Defaulting to core language: %s" % [ES_NAME_CLASS, _core_default_locale])
-
+	
 func save_language_preference(code: String):
 	Preferences.set_setting("game", "language", code)
 
