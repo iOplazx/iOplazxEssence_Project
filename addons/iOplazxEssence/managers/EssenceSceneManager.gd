@@ -1,5 +1,6 @@
 extends Node
 # Singleton: EssenceSceneManager (Autoload)
+const ES_NAME_CLASS = "EssenceSceneManager"
 
 enum TransitionType { INSTANT, FADE_BLACK, FADE_WHITE }
 
@@ -22,9 +23,17 @@ func _ready():
 	var config_path = "res://_static/RouteConfig.tres"
 	if ResourceLoader.exists(config_path):
 		_config = load(config_path) as EssenceRouteConfig
-		print("iOplazxEssence: RouteConfig cargado exitosamente.")
+		
+		# Éxito: Lo mandamos al diario en silencio
+		var log_msg = "[%s/_ready] RouteConfig loaded successfully." % ES_NAME_CLASS 
+		EssenceLogger.system_info(log_msg)
 	else:
-		push_error("iOplazxEssence: Falta el archivo RouteConfig.tres en res://_static/")
+		# Fallo Crítico: Si no hay rutas, el juego no puede navegar. Disparamos la pantalla roja.
+		EssenceError.report(
+			"Missing Route Config",
+			"RouteConfig.tres could not be found in res://_static/",
+			EssenceError.Severity.CRITICAL
+		)
 
 func _setup_curtain():
 	_curtain_layer = CanvasLayer.new()
@@ -178,24 +187,32 @@ func request_quit():
 	
 	box.on_choice.connect(func(accepted):
 		if accepted:
-			print("iOplazxEssence: Iniciando secuencia de cierre total...")
+			var log_msg = "[%s/request_quit] Initiating shutdown sequence..." % ES_NAME_CLASS
+			EssenceLogger.system_info(log_msg)
 			box.hide() 
 			
 			_is_transitioning = true
 			
-			# NUEVO: Apagamos controles para que no puedan interactuar mientras se cierra
+			# Apagamos controles
 			get_tree().root.set_disable_input(true) 
 			
 			_curtain.color = Color.BLACK
 			_curtain.color.a = 0.0
 			
-			# NUEVO: Tween blindado contra la pausa
+			# Tween blindado
 			var tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 			tween.tween_property(_curtain, "color:a", 1.0, 1.5).set_trans(Tween.TRANS_SINE)
 			
 			await AudioManager.fade_out_and_stop(1.5)
 			
-			print("iOplazxEssence: Cerrando el motor...")
+			EssenceLogger.system_info("SceneManager: Closing engine...")
+			
+			# ¡EL PARCHE MAESTRO!
+			# Obligamos al Logger a volcar la RAM al disco duro ANTES de apagar el motor
+			if is_instance_valid(EssenceLogger):
+				EssenceLogger.flush_system_logs()
+				EssenceLogger.flush_game_logs()
+			
 			get_tree().quit()
 	)
 

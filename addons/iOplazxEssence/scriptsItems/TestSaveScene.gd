@@ -116,4 +116,14 @@ func _on_no_implement_pressed():
 	EssenceError.ExceptionNotImplement("Prueba")
 
 func _on_print_warning_pressed():
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
+	EssenceLogger.system_info("prueba")
 	EssenceError.report("Hardware Check", "La GPU está trabajando a temperatura alta.", EssenceError.Severity.WARNING)
