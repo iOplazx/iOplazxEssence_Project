@@ -1,4 +1,5 @@
 extends Node
+const ES_NAME_CLASS = "EssenceLanguageManager"
 
 # Diccionario maestro para evitar duplicados. 
 # Estructura: {"en": {"name": "English", "author": "...", "flag_path": "...", "folder": "en"}}
@@ -16,10 +17,16 @@ func _ready():
 # ==========================================
 func scan_all_languages():
 	_available_languages.clear()
+	var log_msg = ""
 	
 	var config = FileManager.config
 	if not config:
-		push_error("Essence: LanguageManager no pudo acceder a la configuración del FileManager.")
+		#push_error("Essence: LanguageManager no pudo acceder a la configuración del FileManager.")
+		EssenceError.report( 
+			"LanguageManager Error Scan All Languages",
+			"LanguageManager could not access the FileManager settings.",
+			EssenceError.severity.CRITICAL
+		)
 		return
 		
 	# --- RUTAS ---
@@ -29,33 +36,46 @@ func scan_all_languages():
 	
 	# 1. CAPA ADDON (El motor base)
 	if config.load_framework_loc:
-		print("Essence: Buscando idiomas base en -> ", path_addon)
+		#print("Essence: Buscando idiomas base en -> ", path_addon)
+		log_msg = "[%s/scan_all_languages] Looking for base languages in: %s" % [ES_NAME_CLASS, path_addon]
+		EssenceLogger.system_info(log_msg)
 		_scan_directory(path_addon, "addon") 
 		
 	# 2. CAPA PERSISTENT (El Búnker / Seguridad)
 	if DirAccess.dir_exists_absolute(path_persistent):
-		print("Essence: Buscando idiomas de seguridad en -> ", path_persistent)
+		#print("Essence: Buscando idiomas de seguridad en -> ", path_persistent)
+		log_msg = "[%s/scan_all_languages] Looking for backup languages in: %s" % [ES_NAME_CLASS, path_persistent]
+		EssenceLogger.system_info(log_msg)
 		_scan_directory(path_persistent, "game")
 
 	# 3. CAPA REMOTE (Modificaciones del usuario)
 	if not DirAccess.dir_exists_absolute(path_game):
 		DirAccess.make_dir_recursive_absolute(path_game)
 		
-	print("Essence: Buscando idiomas remotos (usuario) en -> ", path_game)
+	#print("Essence: Buscando idiomas remotos (usuario) en -> ", path_game)
+	log_msg = "[%s/scan_all_languages] Looking for remote user languages in: %s" % [ES_NAME_CLASS, path_game]
+	EssenceLogger.system_info(log_msg)
 	_scan_directory(path_game, "game") 
 	
 	print("Essence: Idiomas finales detectados: ", _available_languages.keys())
+	log_msg = "[%s/scan_all_languages] Final detected languages: %s" % [ES_NAME_CLASS, _available_languages.keys()]
+	EssenceLogger.system_info(log_msg)
 
 # ==========================================
 # 2. LECTOR DE CARPETAS Y BANDERAS
 # ==========================================
-func _scan_directory(base_path: String, scan_type: String): # <-- Añadimos scan_type
+func _scan_directory(base_path: String, scan_type: String): 
 	if not base_path.ends_with("/"):
 		base_path += "/"
 		
 	var dir = DirAccess.open(base_path)
 	if not dir: 
-		print("Essence WARNING: La carpeta no existe o está vacía: ", base_path)
+		#print("Essence WARNING: La carpeta no existe o está vacía: ", base_path)
+		EssenceError.report( 
+			"LanguageManager Warning Scan Directory",
+			"The directory does not exist or is empty: %s" % base_path,
+			EssenceError.severity.WARNING
+		)
 		return
 	
 	dir.list_dir_begin()
@@ -64,7 +84,7 @@ func _scan_directory(base_path: String, scan_type: String): # <-- Añadimos scan
 	while folder_name != "":
 		if dir.current_is_dir() and folder_name != "." and folder_name != "..":
 			var lang_path = base_path + folder_name + "/"
-			_parse_language_folder(folder_name, lang_path, scan_type) # <-- Pasamos el scan_type
+			_parse_language_folder(folder_name, lang_path, scan_type) 
 			
 		folder_name = dir.get_next()
 
@@ -201,7 +221,9 @@ func get_language_list() -> Array:
 # 5. INYECCIÓN DE TRADUCCIONES AL MOTOR
 # ==========================================
 func inject_translations():
-	print("Essence: Inyectando diccionarios de texto en la memoria...")
+	#print("Essence: Inyectando diccionarios de texto en la memoria...")
+	var log_msg = "[%s/inject_translations] Injecting translations into memory..." % ES_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 	var config = FileManager.config
 	if not config: return
 	
@@ -244,7 +266,9 @@ func _load_translations_from_dir(path: String):
 			
 			if trans is Translation:
 				TranslationServer.add_translation(trans)
-				print(" -> Inyectado con éxito: ", file_name)
+				#print(" -> Inyectado con éxito: ", file_name)
+				var log_msg = "[%s/_load_translations_from_dir] Successfully injected: %s" % [ES_NAME_CLASS, file_name]
+				EssenceLogger.system_info(log_msg)
 				
 		file_name = dir.get_next()
 
@@ -252,16 +276,22 @@ func _load_translations_from_dir(path: String):
 # 6. ARRANQUE INICIAL DEL IDIOMA
 # ==========================================
 func apply_initial_language():
-	print("Essence: Determinando idioma inicial...")
+	#print("Essence: Determinando idioma inicial...")
+	var log_msg = "[%s/apply_initial_language] Determining initial language..." % ES_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 	
 	# Usamos el cerebro centralizado para pedir el idioma
 	var saved_language = Preferences.get_setting("language", "locale", "") 
 	
 	if saved_language != "":
-		print(" -> Idioma cargado desde preferencias: ", saved_language)
+		log_msg = "[%s/apply_initial_language] Loaded language from preferences: %s" % [ES_NAME_CLASS, saved_language]
+		#print(" -> Idioma cargado desde preferencias: ", saved_language)
+		EssenceLogger.system_info(log_msg)
 		TranslationServer.set_locale(saved_language)
 	else:
-		print(" -> Primera vez jugando. Forzando idioma por defecto del Core: ", _core_default_locale)
+		#print(" -> Primera vez jugando. Forzando idioma por defecto del Core: ", _core_default_locale)
+		log_msg = "[%s/apply_initial_language] First time playing. Forcing core default language: %s" % [ES_NAME_CLASS, _core_default_locale]
+		EssenceLogger.system_info(log_msg)
 		TranslationServer.set_locale(_core_default_locale)
 		
 # ==========================================
@@ -272,4 +302,6 @@ func save_language_preference(lang_code: String):
 	Preferences.set_setting("language", "locale", lang_code)
 	Preferences.save_to_disk()
 	
-	print("Essence: Idioma guardado en disco -> ", lang_code)
+	#print("Essence: Idioma guardado en disco -> ", lang_code)
+	var log_msg = "[%s/save_language_preference] Language saved to disk: %s" % [ES_NAME_CLASS, lang_code]
+	EssenceLogger.system_info(log_msg)
