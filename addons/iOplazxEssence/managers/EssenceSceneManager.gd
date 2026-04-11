@@ -82,15 +82,27 @@ func goto_custom(route_name: String, transition: TransitionType = TransitionType
 		if _config.custom_routes.has(route_name):
 			_navigate(_config.custom_routes[route_name], transition)
 		else:
-			push_error("iOplazxEssence: La ruta custom '" + route_name + "' no existe.")
+			#push_error("iOplazxEssence: La ruta custom '" + route_name + "' no existe.")
+			EssenceError.report(
+				"Invalid Custom Route",
+				"Attempted to navigate to a custom route that does not exist: %s" % route_name,
+				EssenceError.Severity.WARNING
+			)
 			
 ## Viaja a un nivel cargado y limpia el historial para evitar regresar al menú
 func goto_loaded_game(scene_path: String, transition: TransitionType = TransitionType.FADE_BLACK):
 	if scene_path == "" or not ResourceLoader.exists(scene_path):
-		push_error("iOplazxEssence: No se pudo viajar. La escena cargada no existe: " + scene_path)
+		#push_error("iOplazxEssence: No se pudo viajar. La escena cargada no existe: " + scene_path)
+		EssenceError.report(
+			"Invalid Scene Path",
+			"Attempted to navigate to an invalid or empty scene path: %s" % scene_path,
+			EssenceError.Severity.CRITICAL
+		)
 		return
 		
-	print("iOplazxEssence: Iniciando partida en -> ", scene_path)
+	#print("iOplazxEssence: Iniciando partida en -> ", scene_path)
+	var log_msg = "[%s/goto_loaded_game] Starting loaded game at -> %s" % [ES_NAME_CLASS, scene_path]
+	EssenceLogger.system_info(log_msg)
 	
 	# Limpiamos el historial para que el botón "Atrás" empiece desde cero en este nivel
 	_history.clear() 
@@ -104,11 +116,18 @@ func goto_loaded_game(scene_path: String, transition: TransitionType = Transitio
 
 func _navigate(path: String, transition: TransitionType) -> void:
 	if path == "" or not ResourceLoader.exists(path):
-		push_error("iOplazxEssence: Ruta inválida o vacía: " + str(path))
+		#push_error("iOplazxEssence: Ruta inválida o vacía: " + str(path))
+		EssenceError.report(
+			"Invalid Scene Path",
+			"Attempted to navigate to an invalid or empty scene path: %s" % path,
+			EssenceError.Severity.CRITICAL
+		)
 		return
 		
 	if _is_transitioning:
-		print("iOplazxEssence: Ya hay una transición en curso. Ignorando...")
+		#print("iOplazxEssence: Ya hay una transición en curso. Ignorando...")
+		var log_msg ="[%s/_navigate] Already transitioning. Ignoring navigation to -> %s" % [ES_NAME_CLASS, path]
+		EssenceLogger.system_info(log_msg)
 		return
 		
 	var current_scene_path = get_tree().current_scene.scene_file_path
@@ -116,7 +135,9 @@ func _navigate(path: String, transition: TransitionType) -> void:
 		_history.append(current_scene_path)
 		
 	if transition == TransitionType.INSTANT:
-		print("Viajando a -> ", path)
+		#print("Viajando a -> ", path)
+		var log_msg = "[%s/_navigate] Traveling to -> %s" % [ES_NAME_CLASS, path]
+		EssenceLogger.system_info(log_msg)
 		get_tree().change_scene_to_file(path)
 	else:
 		_perform_fade_transition(path, transition)
@@ -136,7 +157,9 @@ func _perform_fade_transition(path: String, transition: TransitionType):
 	tween.tween_property(_curtain, "color:a", 1.0, 0.4).set_trans(Tween.TRANS_SINE)
 	await tween.finished
 	
-	print("Viajando a -> ", path)
+	#print("Viajando a -> ", path)
+	var log_msg = "[%s/_perform_fade_transition] Traveling to -> %s" % [ES_NAME_CLASS, path]
+	EssenceLogger.system_info(log_msg)
 	get_tree().change_scene_to_file(path)
 	
 	tween = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
@@ -148,14 +171,19 @@ func _perform_fade_transition(path: String, transition: TransitionType):
 	_is_transitioning = false
 
 func go_back(transition: TransitionType = TransitionType.FADE_BLACK) -> void:
+	var log_msg = ""
 	if _history.is_empty(): 
-		print("Historial vacío, no hay a dónde volver.")
+		#print("Historial vacío, no hay a dónde volver.")
+		log_msg = "[%s/go_back] History is empty, no scene to return to." % ES_NAME_CLASS
+		EssenceLogger.system_info(log_msg)
 		return
 		
 	if _is_transitioning: return
 		
 	var previous_scene = _history.pop_back()
-	print("Regresando a -> ", previous_scene)
+	log_msg = "[%s/go_back] Returning to -> %s" % [ES_NAME_CLASS, previous_scene]
+	EssenceLogger.system_info(log_msg)
+	#print("Regresando a -> ", previous_scene)
 	
 	if transition == TransitionType.INSTANT:
 		get_tree().change_scene_to_file(previous_scene)
@@ -167,7 +195,12 @@ func clear_history() -> void:
 
 func _verificar_config() -> bool:
 	if _config == null:
-		push_error("iOplazxEssence: No se puede navegar porque RouteConfig.tres no está cargado.")
+		#push_error("iOplazxEssence: No se puede navegar porque RouteConfig.tres no está cargado.")
+		EssenceError.report(
+			"Route Config Missing",
+			"Cannot navigate because RouteConfig.tres is not loaded.",
+			EssenceError.Severity.CRITICAL
+		)
 		return false
 	return true
 

@@ -48,10 +48,6 @@ func game_log(msg: String):
 # DISK WRITING (FLUSH)
 # ==========================================
 		
-# ==========================================
-# DISK WRITING (FLUSH)
-# ==========================================
-		
 func flush_system_logs():
 	if _system_buffer.is_empty(): return
 	var file_path = EssencePaths.DIR_SYSTEM + "session.log"
