@@ -54,6 +54,7 @@ func setup_card(data: Dictionary, current_locale: String):
 	# === 2. LÓGICA DE LA BANDERA ===
 	if tex_flag and data.has("flag_path"):
 		var path = data["flag_path"]
+		#print("Idioma: ", _my_folder_code, " | Ruta de bandera: ", path)
 		if path.begins_with("res://") and not "_remote_debug" in path:
 			tex_flag.texture = load(path)
 		else:

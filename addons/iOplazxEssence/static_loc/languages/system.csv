@@ -27,6 +27,7 @@ MENU_AUTHOR,Author,Autor
 MENU_AI_WARNING,Translated by AI,Traducido por IA
 MENU_CLOSE,CLOSE,CERRAR
 MENU_RESCAN_LANGUAGES,Rescan Languages,Recargar Idiomas
+MENU_RESTORE_LANGUAGES,Restore Languages,Restaurar Idiomas
 SETTINGS_GAME_DIFFICULTY,Difficulty:,Dificultad:
 SETTINGS_GAME_NSFW,Enable Explicit Content (NSFW):,Activar Contenido Explícito (NSFW):
 SETTINGS_GAME_TEXT_SPEED,Auto Text Speed:,Velocidad de Texto Auto:
@@ -57,6 +58,8 @@ APP_QUIT_TITLE,Quit Game,Salir del Juego
 APP_QUIT_MSG,Are you sure you want to quit?,¿Estás seguro de que quieres salir?
 LANG_REIMPORT_TITLE,Reimport Languages,Reimportar Idiomas
 LANG_REIMPORT_MSG,Are you sure you want to scan and reload all language files?,¿Estás seguro de que deseas escanear y recargar todos los archivos de idioma?
+LANG_RESTORE_TITLE,Restore Languages,Restaurar Idiomas
+LANG_RESTORE_MSG,Are you sure you want to restore the default language files?,¿Estás seguro de que deseas restaurar los archivos de idioma predeterminados?
 SETTINGS_VIDEO_SAVE_CHANGE,APPLY CHANGES,APLICAR CAMBIOS
 SETTINGS_GAME_SAVE_CHANGE,APPLY CHANGES,APLICAR CAMBIOS
 SETTINGS_DISCARD_TITLE,Unsaved Changes,Cambios sin guardar

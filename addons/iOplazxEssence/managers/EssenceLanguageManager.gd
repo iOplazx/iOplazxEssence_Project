@@ -1,7 +1,8 @@
 extends Node
+
 const ES_NAME_CLASS = "EssenceLanguageManager"
 
-# Diccionario maestro para evitar duplicados. 
+# Diccionario maestro para evitar duplicados.
 # Estructura: {"en": {"name": "English", "author": "...", "flag_path": "...", "folder": "en"}}
 var _available_languages: Dictionary = {}
 var _core_default_locale: String = "en"
@@ -25,7 +26,7 @@ func scan_all_languages():
 		EssenceError.report( 
 			"LanguageManager Error Scan All Languages",
 			"LanguageManager could not access the FileManager settings.",
-			EssenceError.severity.CRITICAL
+			EssenceError.Severity.CRITICAL
 		)
 		return
 		
@@ -57,7 +58,7 @@ func scan_all_languages():
 	EssenceLogger.system_info(log_msg)
 	_scan_directory(path_game, "game") 
 	
-	print("Essence: Idiomas finales detectados: ", _available_languages.keys())
+	#print("Essence: Idiomas finales detectados: ", _available_languages.keys())
 	log_msg = "[%s/scan_all_languages] Final detected languages: %s" % [ES_NAME_CLASS, _available_languages.keys()]
 	EssenceLogger.system_info(log_msg)
 
@@ -74,7 +75,7 @@ func _scan_directory(base_path: String, scan_type: String):
 		EssenceError.report( 
 			"LanguageManager Warning Scan Directory",
 			"The directory does not exist or is empty: %s" % base_path,
-			EssenceError.severity.WARNING
+			EssenceError.Severity.WARNING
 		)
 		return
 	
@@ -240,36 +241,29 @@ func inject_translations():
 func _scan_and_inject_folders(base_path: String):
 	var dir = DirAccess.open(base_path)
 	if not dir: return
-	
 	dir.list_dir_begin()
 	var folder_name = dir.get_next()
-	
 	while folder_name != "":
 		# Si es una carpeta de idioma (ej. "en", "es"), entramos a buscar traducciones
 		if dir.current_is_dir() and folder_name != "." and folder_name != "..":
 			var lang_folder_path = base_path + folder_name + "/"
 			_load_translations_from_dir(lang_folder_path)
-			
 		folder_name = dir.get_next()
 
 func _load_translations_from_dir(path: String):
 	var dir = DirAccess.open(path)
 	if not dir: return
-	
 	dir.list_dir_begin()
 	var file_name = dir.get_next()
-	
 	while file_name != "":
 		if not dir.current_is_dir() and file_name.ends_with(".translation"):
 			var full_path = path + "/" + file_name
 			var trans = load(full_path)
-			
 			if trans is Translation:
 				TranslationServer.add_translation(trans)
 				#print(" -> Inyectado con éxito: ", file_name)
-				var log_msg = "[%s/_load_translations_from_dir] Successfully injected: %s" % [ES_NAME_CLASS, file_name]
-				EssenceLogger.system_info(log_msg)
-				
+			var log_msg = "[%s/_load_translations_from_dir] Successfully injected: %s" % [ES_NAME_CLASS, file_name]
+			EssenceLogger.system_info(log_msg)
 		file_name = dir.get_next()
 
 # ==========================================
@@ -280,28 +274,108 @@ func apply_initial_language():
 	var log_msg = "[%s/apply_initial_language] Determining initial language..." % ES_NAME_CLASS
 	EssenceLogger.system_info(log_msg)
 	
-	# Usamos el cerebro centralizado para pedir el idioma
-	var saved_language = Preferences.get_setting("language", "locale", "") 
-	
-	if saved_language != "":
-		log_msg = "[%s/apply_initial_language] Loaded language from preferences: %s" % [ES_NAME_CLASS, saved_language]
-		#print(" -> Idioma cargado desde preferencias: ", saved_language)
-		EssenceLogger.system_info(log_msg)
-		TranslationServer.set_locale(saved_language)
-	else:
-		#print(" -> Primera vez jugando. Forzando idioma por defecto del Core: ", _core_default_locale)
-		log_msg = "[%s/apply_initial_language] First time playing. Forcing core default language: %s" % [ES_NAME_CLASS, _core_default_locale]
-		EssenceLogger.system_info(log_msg)
-		TranslationServer.set_locale(_core_default_locale)
+	var pref_lang = Preferences.get_setting("game", "language", "")
+	if pref_lang != "":
+		TranslationServer.set_locale(pref_lang)
+		EssenceLogger.system_info("[%s/apply_initial_language] Loaded language from preferences: %s" % [ES_NAME_CLASS, pref_lang])
+		return
 		
+	var os_lang = OS.get_locale_language()
+	if _available_languages.has(os_lang):
+		TranslationServer.set_locale(os_lang)
+		EssenceLogger.system_info("[%s/apply_initial_language] Auto-detected OS language: %s" % [ES_NAME_CLASS, os_lang])
+	else:
+		TranslationServer.set_locale(_core_default_locale)
+		EssenceLogger.system_info("[%s/apply_initial_language] Defaulting to core language: %s" % [ES_NAME_CLASS, _core_default_locale])
+
+func save_language_preference(code: String):
+	Preferences.set_setting("game", "language", code)
+
 # ==========================================
-# 7. GUARDADO Y CARGA DE PREFERENCIAS
+# 7. RESTAURACIÓN DE ARCHIVOS OFICIALES
 # ==========================================
-func save_language_preference(lang_code: String):
-	# Delegamos todo el trabajo pesado al Autoload central
-	Preferences.set_setting("language", "locale", lang_code)
-	Preferences.save_to_disk()
+
+func restore_official_languages():
+	var config = FileManager.config 
+	if not config: return
 	
-	#print("Essence: Idioma guardado en disco -> ", lang_code)
-	var log_msg = "[%s/save_language_preference] Language saved to disk: %s" % [ES_NAME_CLASS, lang_code]
-	EssenceLogger.system_info(log_msg)
+	var path_remote = FileManager.path_remote_actual + "/languages/"
+	EssenceLogger.system_info("[%s/restore] Starting factory reset of official languages..." % ES_NAME_CLASS)
+	
+	# Lista de los "Búnkeres" que vamos a restaurar
+	var bunkers = []
+	
+	# 1. Búnker del Framework (Donde probablemente está tu 'es' base)
+	if config.load_framework_loc:
+		bunkers.append(config.path_static_loc + "languages/")
+		
+	# 2. Búnker del Juego (Donde está tu 'en')
+	bunkers.append(config.path_persistent + "languages/")
+	
+	# Recorremos cada búnker y copiamos su contenido
+	for bunker_path in bunkers:
+		if not DirAccess.dir_exists_absolute(bunker_path): 
+			continue
+			
+		var dir = DirAccess.open(bunker_path)
+		if dir:
+			dir.list_dir_begin()
+			var folder_name = dir.get_next()
+			while folder_name != "":
+				if dir.current_is_dir() and not folder_name.begins_with("."):
+					var src_path = bunker_path + folder_name
+					var dest_path = path_remote + folder_name
+					
+					_copy_folder_recursive(src_path, dest_path)
+					EssenceLogger.system_info("[%s] Restored official folder: %s from %s" % [ES_NAME_CLASS, folder_name, bunker_path])
+					
+				folder_name = dir.get_next()
+			dir.list_dir_end()
+			
+	# Después de restaurar los archivos físicos, forzamos recarga
+	scan_all_languages()
+	inject_translations()
+
+# Función ultra-rápida y blindada para copiar carpetas
+func _copy_folder_recursive(from_path: String, to_path: String):
+	# 1. Aseguramos que la carpeta de destino exista
+	if not DirAccess.dir_exists_absolute(to_path):
+		var err_dir = DirAccess.make_dir_recursive_absolute(to_path)
+		if err_dir != OK:
+			var log_msg = "[%s/CRITICAL] Could not create directory %s. Code: %s" % [ES_NAME_CLASS, to_path, err_dir]
+			EssenceLogger.system_info(log_msg)
+			return
+		
+	var dir = DirAccess.open(from_path)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if not file_name.begins_with("."):
+				var src = from_path + "/" + file_name
+				var dest = to_path + "/" + file_name
+				
+				if dir.current_is_dir():
+					# Si es carpeta, entramos recursivamente
+					_copy_folder_recursive(src, dest)
+				else:
+					# ES UN ARCHIVO: Procedemos a copiar
+					
+					# TRUCO PRO: Si el archivo ya existe en _remote, lo borramos primero 
+					# para evitar conflictos de bloqueo de Windows.
+					if FileAccess.file_exists(dest):
+						DirAccess.remove_absolute(dest)
+					
+					# Copiamos de res:// al disco duro
+					var err = DirAccess.copy_absolute(src, dest)
+					
+					if err == OK:
+						EssenceLogger.system_info("[%s] Copied file: %s" % [ES_NAME_CLASS, file_name])
+					else:
+						# Si falla, esto nos dirá exactamente por qué
+						EssenceLogger.system_info("[%s/FAILED] FAILED to copy %s. Code: %s" % [ES_NAME_CLASS, file_name, err])
+					
+			file_name = dir.get_next()
+		dir.list_dir_end()
+	else:
+		EssenceLogger.system_info("[%s/FAILED] FAILED to open source directory: %s" % [ES_NAME_CLASS, from_path])
