@@ -1,4 +1,5 @@
 extends Node
+const ES_NAME_CLASS = "EssenceAudioManager"
 
 # Reproductores dedicados
 var music_player_1: AudioStreamPlayer
@@ -136,7 +137,9 @@ func play_music(stream: AudioStream, crossfade_duration: float = 1.0):
 
 # --- La función que reacciona al grito de Preferences ---
 func _on_settings_restored():
-	print("AudioManager: Ajustes restaurados. Recalculando volúmenes...")
+	#print("AudioManager: Ajustes restaurados. Recalculando volúmenes...")
+	var log_msg = "[%s/_on_settings_restored] Settings restored. Recalculating volumes..." % ES_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 	load_audio_settings() # Re-ejecutamos tu propia función para actualizar los buses
 
 func _on_quit_pressed():
@@ -153,7 +156,12 @@ func cache_audio(key: String, path: String):
 	if ResourceLoader.exists(path):
 		_audio_cache[key] = load(path) 
 	else:
-		push_error("AudioManager: No se encontró el audio en " + path)
+		#push_error("AudioManager: No se encontró el audio en " + path)
+		EssenceError.report(
+			"Audio Not Found",
+			"The specified audio file was not found at %s." % path,
+			EssenceError.Severity.WARNING
+		)
 
 func get_cached_audio(key: String) -> AudioStream:
 	if _audio_cache.has(key):
@@ -220,11 +228,15 @@ func _notification(what):
 			# Guardamos si el usuario ya lo tenía silenciado manualmente
 			_was_muted_manually = AudioServer.is_bus_mute(master_idx)
 			AudioServer.set_bus_mute(master_idx, true) 
-			print("Essence: Foco de aplicación perdido - Silenciando")
+			#print("Essence: Foco de aplicación perdido - Silenciando")
+			var log_msg = "[%s/_notification] Foco de aplicación perdido - Silenciando" % ES_NAME_CLASS
+			EssenceLogger.system_info(log_msg)
 			
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
 		if mute_on_focus_loss:
 			var master_idx = AudioServer.get_bus_index("Master")
 			# Solo restauramos el sonido si NO estaba silenciado manualmente antes de salir
 			AudioServer.set_bus_mute(master_idx, _was_muted_manually)
-			print("Essence: Foco de aplicación recuperado - Restaurando audio")
+			#print("Essence: Foco de aplicación recuperado - Restaurando audio")
+			var log_msg = "[%s/_notification] Foco de aplicación recuperado - Restaurando audio" % ES_NAME_CLASS
+			EssenceLogger.system_info(log_msg)
