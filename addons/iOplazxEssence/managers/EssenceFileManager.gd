@@ -1,4 +1,5 @@
 extends Node
+const ES_NAME_CLASS = "EssenceFileManager"
 
 var config: EssenceMasterConfig
 var path_remote_actual: String = ""
@@ -16,14 +17,28 @@ func _load_config():
 	
 	if ResourceLoader.exists(custom_path):
 		config = load(custom_path) as EssenceMasterConfig
-		print("Essence: Cargando configuración personalizada desde _static.")
+		#print("Essence: Cargando configuración personalizada desde _static.")
+		var log_msg = "[%s/_load_config] Loading custom configuration from _static." % ES_NAME_CLASS
+		EssenceLogger.system_info(log_msg)
 		
 	elif ResourceLoader.exists(default_path):
 		config = load(default_path) as EssenceMasterConfig
-		print("Essence: Cargando configuración por defecto del addon.")
+		#print("Essence: Cargando configuración por defecto del addon.")
+		var log_msg = "[%s/_load_config] Loading default configuration from addon." % ES_NAME_CLASS
+		EssenceLogger.system_info(log_msg)
+		EssenceError.report(
+			"EssenceMasterConfig not found in _static", 
+			"EssenceMasterConfig.tres was not found in res://_static/. Loaded default config from addon instead.",
+			EssenceError.Severity.WARNING
+		)
 		
 	else:
-		push_error("Essence CRITICAL: No se encontró EssenceMasterConfig.tres en ninguna ruta válida.")
+		#push_error("Essence CRITICAL: No se encontró EssenceMasterConfig.tres en ninguna ruta válida.")
+		EssenceError.report(
+			"EssenceMasterConfig not found", 
+			"EssenceMasterConfig.tres could not be found in any valid path",
+			EssenceError.Severity.CRITICAL
+		)
 
 
 func _determine_system_paths():
@@ -41,7 +56,9 @@ func _determine_system_paths():
 func initialize_file_system():
 	if not config: return
 	
-	print("Essence: Inicializando Sistema de Archivos...")
+	#print("Essence: Inicializando Sistema de Archivos...")
+	var log_msg = "[%s/initialize_file_system] Initializing File System..." % ES_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 	
 	# 1. Crear y clonar la carpeta REMOTE (Junto al .exe)
 	if config.path_remote_template != "":
@@ -60,7 +77,9 @@ func initialize_file_system():
 		var user_real_path = ProjectSettings.globalize_path("user://")
 		_clone_directory(config.path_global_template, user_real_path)
 		
-	print("Essence: Sistema de Archivos Listo.")
+	#print("Essence: Sistema de Archivos Listo.")
+	log_msg = "[%s/initialize_file_system] File System Ready." % ES_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 
 # ==========================================
 # MOTOR DE CLONACIÓN RECURSIVA
