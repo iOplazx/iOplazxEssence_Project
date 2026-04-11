@@ -1,4 +1,5 @@
 class_name EssenceMenuController extends Control
+const ES_NAME_CLASS = "EssenceMenuController"
 
 # Enums para los tipos de animación (Crea casillas seleccionables en el Inspector)
 enum EntranceAnimation { NONE, FADE_IN, SLIDE_FROM_TOP }
@@ -41,7 +42,9 @@ enum IdleAnimation { NONE, BREATHING }
 var _idle_tween: Tween
 
 func _ready():
-	print("EssenceMenuController: Inicializando menú principal...")
+	#print("EssenceMenuController: Inicializando menú principal...")
+	var log_msg ="[%s/ready] Initializing main menu..." % ES_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 	# ¡Limpiamos la RAM de cualquier partida anterior!
 	SaveManager.clear_all_temp()
 	_conectar_botones()
@@ -140,40 +143,50 @@ func _on_new_game_pressed():
 func _on_continue_pressed():
 	AudioManager.play_ui_sfx()
 	
-	# Esto ya te devuelve el Checkpoint si es el más reciente, o el Manual si es más nuevo.
 	var latest_save_id = SaveManager.get_latest_save_id()
 	
-	if latest_save_id != "":
-		# 1. Extraemos el diccionario completo del archivo
-		var data = SaveManager.load_game(latest_save_id)
+	# === GUARD CLAUSE 1: ¿Hay un ID válido? ===
+	if latest_save_id == "":
+		EssenceError.report(
+			"Invalid Continue State",
+			"Attempted to continue, but no valid save ID was found.",
+			EssenceError.Severity.WARNING
+		)
+		return # Detenemos la función aquí mismo
 		
-		# 2. Verificamos que no esté corrupto y tenga la llave correcta
-		if not data.is_empty() and data.has("game_data"):
-			
-			# 3. ¡LA MAGIA! Inyectamos los datos en la RAM
-			SaveManager.loaded_game_data = data["game_data"]
-			
-			# Imprimimos en consola qué tipo de archivo nos salvó la vida
-			if latest_save_id.begins_with("checkpoint"):
-				print("iOplazxEssence: Continuando desde Checkpoint de Seguridad (" + latest_save_id + ")")
-			else:
-				print("iOplazxEssence: Continuando desde Guardado Normal (" + latest_save_id + ")")
-			
-			# 4. Marcamos que esta fue la última partida tocada
-			SaveManager.mark_save_as_latest_played(latest_save_id)
-			
-			# === HOOK DE INTEGRACIÓN ===
-			# Pasamos el diccionario completo por si el dev quiere leer la fecha o nivel
-			if has_method("_on_continue_hook"):
-				_on_continue_hook(data)
-			
-			# 5. Viajamos al juego (El SceneManager limpiará el historial si es necesario)
-			SceneManager.goto_continue_game()
-			
-		else:
-			push_error("iOplazxEssence: El archivo de guardado está vacío o corrupto.")
-	else:
-		push_error("iOplazxEssence: Se intentó continuar, pero no hay un ID válido.")
+	var data = SaveManager.load_game(latest_save_id)
+	
+	# === GUARD CLAUSE 2: ¿El archivo está corrupto? ===
+	if data.is_empty() or not data.has("game_data"):
+		EssenceError.report(
+			"Corrupt Save File",
+			"The save file '%s' is empty or corrupt." % latest_save_id,
+			EssenceError.Severity.CRITICAL
+		)
+		return # Detenemos la función aquí mismo
+
+	# ==========================================
+	# === EL CAMINO FELIZ (Happy Path) ===
+	# Si el código llegó hasta aquí, sabemos que todo está perfecto.
+	# Cero anidaciones, máxima velocidad.
+	# ==========================================
+	
+	# 1. Inyectamos en RAM
+	SaveManager.loaded_game_data = data["game_data"]
+	
+	# 2. Trazabilidad simplificada y elegante
+	var save_type = "Checkpoint" if latest_save_id.begins_with("checkpoint") else "Manual"
+	EssenceLogger.system_info("[%s/_on_continue_pressed] Continuing from %s save (%s)" % [ES_NAME_CLASS, save_type, latest_save_id])
+	
+	# 3. Marcamos como última partida tocada
+	SaveManager.mark_save_as_latest_played(latest_save_id)
+	
+	# 4. Hook de Integración
+	if has_method("_on_continue_hook"):
+		_on_continue_hook(data)
+		
+	# 5. Viajamos al juego
+	SceneManager.goto_continue_game()
 	
 func _on_load_pressed():
 	SaveManager.clear_all_temp() # Destruimos datos residuales
