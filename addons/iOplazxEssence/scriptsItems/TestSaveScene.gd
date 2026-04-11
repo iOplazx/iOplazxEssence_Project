@@ -12,13 +12,7 @@ const ROUTES_PATH = EssencePaths.CARPET_STATIC + "RouteConfig.tres"
 var routes: EssenceRouteConfig
 
 func _ready():
-	btn_save.pressed.connect(_on_btn_save_game_pressed)
-	btn_load.pressed.connect(_on_btn_load_game_pressed)
-	btn_return.pressed.connect(_on_return_pressed)
-	
-	btn_no_implement.pressed.connect(_on_no_implement_pressed)
-	btn_warning.pressed.connect(_on_print_warning_pressed)
-	
+	_config_button()
 	if ResourceLoader.exists(ROUTES_PATH):
 		routes = load(ROUTES_PATH) as EssenceRouteConfig
 		
@@ -31,6 +25,33 @@ func _ready():
 	if not SaveManager.loaded_game_data.is_empty():
 		_restaurar_partida_cargada()
 		
+			
+func _config_button():
+	var buttons_to_setup = [
+		[btn_save, _on_btn_save_game_pressed, "btn_save"],
+		[btn_load, _on_btn_load_game_pressed, "btn_load"],
+		[btn_return, _on_return_pressed, "btn_return"],
+		[btn_no_implement, _on_no_implement_pressed, "btn_no_implement"],
+		[btn_warning, _on_print_warning_pressed, "btn_warning"]
+	]
+
+	for data in buttons_to_setup:
+		var btn_node = data[0]
+		var btn_func = data[1]
+		var btn_name = data[2]
+
+		# Validamos que el nodo sea una instancia válida antes de conectar [cite: 31]
+		if is_instance_valid(btn_node):
+			if not btn_node.pressed.is_connected(btn_func):
+				btn_node.pressed.connect(btn_func)
+		else:
+			# Si el botón no existe, mandamos un warning al nuevo sistema [cite: 31]
+			EssenceError.report(
+			"UI Reference Lost", 
+			"The button '%s' is missing in the inspector." % btn_name, 
+			EssenceError.Severity.WARNING
+			)
+			
 func _preparar_datos_para_menu():
 	lbl_output.text = "Capturando pantalla..."
 	
