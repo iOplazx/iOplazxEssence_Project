@@ -1,4 +1,5 @@
 class_name EssenceSaveManager extends Node
+const ES_NAME_CLASS = "EssenceSaveManager"
 
 # ==========================================
 # CONFIGURACIÓN DINÁMICA DEL FRAMEWORK
@@ -60,7 +61,9 @@ func _configurar_directorio_usuario():
 		
 	if not DirAccess.dir_exists_absolute(_save_dir):
 		DirAccess.make_dir_recursive_absolute(_save_dir)
-		print("iOplazxEssence: Carpeta de guardados creada en ", _save_dir)
+		#print("iOplazxEssence: Carpeta de guardados creada en ", _save_dir)
+		var log_msg = "[%s/commit_save] Save folder created at %s" % [ES_NAME_CLASS, _save_dir]
+		EssenceLogger.system_info(log_msg)
 
 	# 2. SIEMPRE creamos la ruta temporal en local (AppData) 
 	# para que los respaldos al vuelo no dependan del USB
@@ -96,7 +99,12 @@ func save_game(slot_id: String, save_object: EssenceSaveData, is_temp: bool = fa
 	var file = FileAccess.open_encrypted_with_pass(path, FileAccess.WRITE, _encryption_key)
 	if file == null:
 		var err = FileAccess.get_open_error()
-		printerr("iOplazxEssence: Error al crear archivo de guardado -> ", err)
+		#printerr("iOplazxEssence: Error al crear archivo de guardado -> ", err)
+		EssenceError.report(
+			"Save Error",
+			"Could not create save file. Code: %s" % err, 
+			EssenceError.Severity.CRITICAL
+		)
 		on_save_error.emit(slot_id, "No se pudo escribir en el disco")
 		return false
 		
@@ -106,7 +114,9 @@ func save_game(slot_id: String, save_object: EssenceSaveData, is_temp: bool = fa
 	# Actualizamos el archivo invisible
 	_update_save_index(slot_id, false)
 	
-	print("iOplazxEssence: Partida guardada con éxito en ", path)
+	#print("iOplazxEssence: Partida guardada con éxito en ", path)
+	var log_msg = "[%s/commit_save] Game saved successfully at %s" % [ES_NAME_CLASS, path]
+	EssenceLogger.system_info(log_msg)
 	on_save_completed.emit(slot_id)
 	return true
 	
@@ -121,7 +131,12 @@ func load_game(slot_id: String) -> Dictionary:
 		
 	var file = FileAccess.open_encrypted_with_pass(path, FileAccess.READ, _encryption_key)
 	if file == null:
-		printerr("iOplazxEssence: Error al abrir archivo. ¿Llave incorrecta o archivo corrupto?")
+		#printerr("iOplazxEssence: Error al abrir archivo. ¿Llave incorrecta o archivo corrupto?")
+		EssenceError.report(
+			"Load Game Error",
+			"Could not open save file. Possible causes: wrong key or corrupt file.", 
+			EssenceError.Severity.CRITICAL
+		)
 		return {}
 		
 	var json_string = file.get_as_text()
@@ -129,7 +144,8 @@ func load_game(slot_id: String) -> Dictionary:
 	
 	var parsed_data = JSON.parse_string(json_string)
 	if typeof(parsed_data) != TYPE_DICTIONARY:
-		printerr("iOplazxEssence: El archivo no tiene un formato válido.")
+		#printerr("iOplazxEssence: El archivo no tiene un formato válido.")
+		EssenceError.report("Load Game Error","The save file is corrupt or not in the correct format.", EssenceError.Severity.WARNING)
 		return {}
 		
 	var final_data = _run_migrations(parsed_data)
@@ -166,7 +182,9 @@ func _run_migrations(package: Dictionary) -> Dictionary:
 	var game_data = package.get("game_data", {})
 	
 	if file_version < GameConstants.CURRENT_SAVE_VERSION:
-		print("iOplazxEssence: Migrando partida de v", file_version, " a v", GameConstants.CURRENT_SAVE_VERSION)
+		#print("iOplazxEssence: Migrando partida de v", file_version, " a v", GameConstants.CURRENT_SAVE_VERSION)
+		var log_msg = "[%s/run_migrations] Migrating save from v%d to v%d" % [ES_NAME_CLASS, file_version, GameConstants.CURRENT_SAVE_VERSION]
+		EssenceLogger.system_info(log_msg)
 		meta["version"] = GameConstants.CURRENT_SAVE_VERSION
 		
 	package["game_data"] = game_data
@@ -265,7 +283,8 @@ func take_and_save_screenshot(slot_id: String) -> void:
 	var img = viewport.get_texture().get_image()
 	
 	if img == null or img.is_empty():
-		printerr("iOplazxEssence: Error al capturar la pantalla.")
+		#printerr("iOplazxEssence: Error al capturar la pantalla.")
+		EssenceError.report("Snapshot capture error.","Error capturing the screen.", EssenceError.Severity.WARNING)
 		return
 		
 	# 3. OPTIMIZACIÓN: Achicamos la imagen para no saturar el disco duro
@@ -277,9 +296,16 @@ func take_and_save_screenshot(slot_id: String) -> void:
 	var err = img.save_webp(image_path)
 	
 	if err == OK:
-		print("iOplazxEssence: Snapshot guardado exitosamente en ", image_path)
+		#print("iOplazxEssence: Snapshot guardado exitosamente en ", image_path)
+		var log_msg = "[%s/take_and_save_screenshot] Snapshot saved successfully at %s" % [ES_NAME_CLASS, image_path]
+		EssenceLogger.system_info(log_msg)
 	else:
-		printerr("iOplazxEssence: Falló el guardado del snapshot. Código: ", err)
+		#printerr("iOplazxEssence: Falló el guardado del snapshot. Código: ", err)
+		EssenceError.report(
+			"Snapshot Save Failed",
+			"Failed to save the snapshot image. Code: %s" % err, 
+			EssenceError.Severity.WARNING
+		)
 
 # ==========================================
 # CACHÉ TEMPORAL (Para transiciones de escena)
@@ -343,12 +369,24 @@ func commit_save(slot_id: String, is_temp: bool = false) -> bool:
 			var err = DirAccess.copy_absolute(source_path, target_path)
 				
 			if err == OK:
-				print("iOplazxEssence: Foto copiada exitosamente a: ", target_path)
+				#print("iOplazxEssence: Foto copiada exitosamente a: ", target_path)
+				var log_msg = "[%s/commit_save] Photo successfully copied to: %s" % [ES_NAME_CLASS, target_path]
+				EssenceLogger.system_info(log_msg)
 			else:
-				printerr("iOplazxEssence: Error al copiar la foto. Código: ", err)
+				#printerr("iOplazxEssence: Error al copiar la foto. Código: ", err)
+				EssenceError.report(
+					"Screenshot Failed",
+					"Error copying the photo to slot. Code: %s" % err, 
+					EssenceError.Severity.WARNING
+				)
 		else:
 			# Si llegamos aquí, es que take_temp_screenshot() no ha terminado o no se llamó
-			push_warning("iOplazxEssence: No se pudo copiar porque " + source_path + " no existe aún.")
+			#push_warning("iOplazxEssence: No se pudo copiar porque " + source_path + " no existe aún.")
+			EssenceError.report(
+				"Missing Snapshot",
+				"Could not copy the photo because %s does not exist yet." % source_path, 
+				EssenceError.Severity.WARNING
+			)
 			
 	return success
 
@@ -362,7 +400,9 @@ func delete_save(slot_id: String):
 			dir.remove(slot_id + GameConstants.EXTENSION_IMAGE)
 			
 	_update_save_index(slot_id, true) # true = está borrando
-	print("iOplazxEssence: Partida borrada exitosamente -> ", slot_id)
+	#print("iOplazxEssence: Partida borrada exitosamente -> ", slot_id)
+	var log_msg = "[%s/delete_save] Game successfully deleted -> %s" % [ES_NAME_CLASS, slot_id]
+	EssenceLogger.system_info(log_msg)
 
 # Actualiza solo el título en la metadata sin afectar los datos del juego
 func update_save_title(slot_id: String, new_title: String):
@@ -373,7 +413,12 @@ func update_save_title(slot_id: String, new_title: String):
 		# 1. ABRIR CON CONTRASEÑA (Igual que en load_game)
 		var file_read = FileAccess.open_encrypted_with_pass(path, FileAccess.READ, _encryption_key)
 		if file_read == null: 
-			printerr("iOplazxEssence: Error al abrir archivo para editar título (¿Llave incorrecta?)")
+			#printerr("iOplazxEssence: Error al abrir archivo para editar título (¿Llave incorrecta?)")
+			EssenceError.report(
+				"Title Update Failed",
+				"Could not open save file to edit title. Possible cause: wrong key.", 
+				EssenceError.Severity.WARNING
+			)
 			return
 			
 		var json_string = file_read.get_as_text()
@@ -394,9 +439,16 @@ func update_save_title(slot_id: String, new_title: String):
 			if file_write:
 				file_write.store_string(JSON.stringify(save_data))
 				file_write.close()
-				print("iOplazxEssence: Éxito. Título en disco cambiado a '", new_title, "'")
+				#print("iOplazxEssence: Éxito. Título en disco cambiado a '", new_title, "'")
+				var log_msg = "[%s/update_save_title] Success. Title on disk changed to '%s'" % [ES_NAME_CLASS, new_title]
+				EssenceLogger.system_info(log_msg)
 			else:
-				printerr("iOplazxEssence: Error al reescribir archivo encriptado.")
+				#printerr("iOplazxEssence: Error al reescribir archivo encriptado.")
+				EssenceError.report(
+					"Title Update Failed",
+					"Error rewriting encrypted file after title change.", 
+					EssenceError.Severity.WARNING
+				)
 				
 ## Retorna true si hay datos de una partida en vivo listos para procesarse
 func has_live_session() -> bool:
@@ -460,12 +512,16 @@ func delete_temp_screenshot():
 	var dir = DirAccess.open(_save_dir)
 	if dir and dir.file_exists("temp_snap" + GameConstants.EXTENSION_IMAGE):
 		dir.remove("temp_snap" + GameConstants.EXTENSION_IMAGE)
-		print("iOplazxEssence: Foto temporal eliminada.")
+		#print("iOplazxEssence: Foto temporal eliminada.")
+		var log_msg = "[%s/delete_temp_screenshot] Temporary photo deleted." % ES_NAME_CLASS
+		EssenceLogger.system_info(log_msg)
 
 func clear_temp_data():
 	_temp_game_data.clear()
 	_temp_meta_data.clear()
-	print("iOplazxEssence: Diccionarios de caché vaciados.")
+	#print("iOplazxEssence: Diccionarios de caché vaciados.")
+	var log_msg = "[%s/clear_temp_data] Cache dictionaries cleared." % ES_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 
 func clear_all_temp():
 	delete_temp_screenshot()
@@ -485,8 +541,9 @@ func save_action_checkpoint(weight: int = 1):
 	if _action_points >= _action_threshold:
 		_action_points = 0 # Reiniciamos el contador
 		_create_checkpoint(SLOT_CP_ACTION, "Punto de Control (Acción)")
-		# Descomentar si usas el logger: 
 		# EssenceLogger.system_info("Checkpoint de Acción generado.")
+		var log_msg = "[%s/save_action_checkpoint] Action checkpoint generated." % ES_NAME_CLASS
+		EssenceLogger.system_info(log_msg)
 
 # 2. Guardado por cambio de escena (Se llamará desde tu futuro SceneManager)
 func save_scene_checkpoint():
