@@ -8,7 +8,7 @@ const GAME_NAME_CLASS = "GameSaveManager-USER"
 func _ready():
 	super._ready()
 	# This is where the addon confirms it is ready to receive save data
-	print("GameSaveManager: Persistence system ready for the Demo.")
+	#print("GameSaveManager: Persistence system ready for the Demo.")
 	var log_msg = "[%s/_ready] GameSaveManager initialized, wrapping EssenceSaveManager." % GAME_NAME_CLASS
 	EssenceLogger.system_info(log_msg)
 
