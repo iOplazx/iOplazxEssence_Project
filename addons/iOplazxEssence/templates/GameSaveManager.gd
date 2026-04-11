@@ -1,4 +1,5 @@
 extends EssenceSaveManager
+const GAME_NAME_CLASS = "GameSaveManager-TEMPLATE"
 
 # ==============================================================================
 # GAME SAVE MANAGER (AUTOLOAD)
@@ -9,7 +10,9 @@ extends EssenceSaveManager
 func _ready():
 	# Always call the parent class _ready() so the framework initializes properly
 	super._ready()
-	print("Demo: GameSaveManager initialized, wrapping EssenceSaveManager.")
+	#print("Demo: GameSaveManager initialized, wrapping EssenceSaveManager.")
+	var log_msg = "[%s/_ready] GameSaveManager initialized, wrapping EssenceSaveManager." % GAME_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 
 # ==============================================================================
 # INTEGRATION HOOKS (GAME LOGIC OVERRIDES)
@@ -19,7 +22,9 @@ func _on_before_save_hook(game_data: Dictionary, meta_data: Dictionary):
 	# OVERRIDE: This hook is triggered exactly one millisecond before the 
 	# temporary dictionaries are written to the physical .ess file.
 	
-	print("Demo: Before Save Hook triggered. Injecting live game data...")
+	#print("Demo: Before Save Hook triggered. Injecting live game data...")
+	var log_msg = "[%s/_on_before_save_hook] Before Save Hook triggered. Injecting live game data..." % GAME_NAME_CLASS
+	EssenceLogger.system_info(log_msg)
 	
 	# --------------------------------------------------------------------------
 	# 1. INJECT GAME DATA
