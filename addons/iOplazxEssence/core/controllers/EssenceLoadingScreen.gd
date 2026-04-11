@@ -62,10 +62,16 @@ func _build_ui():
 		logo_carga.custom_minimum_size = Vector2(200, 200)
 		
 		match config.loading_logo_type:
-			0: logo_carga.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.GODOT)
-			1: logo_carga.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.IOPLAZX) 
-			2: logo_carga.texture = EssenceLoader.get_externImage(config.custom_loading_logo_path, true)
-		
+			0: 
+				logo_carga.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.GODOT)
+			1: 
+				logo_carga.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.IOPLAZX) 
+			2: 
+				# Usamos el cargador inteligente. 
+				# Si config.custom_loading_logo_path tiene un "res://", 
+				# smart_load_texture usará load() y evitará el warning.
+				logo_carga.texture = EssenceLoader.smart_load_texture(config.custom_loading_logo_path, true)
+				
 		contenedor.add_child(logo_carga)
 
 	if config.show_progress_bar:
