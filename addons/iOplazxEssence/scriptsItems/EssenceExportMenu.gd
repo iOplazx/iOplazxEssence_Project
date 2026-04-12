@@ -3,10 +3,9 @@ class_name EssenceExportMenu extends Control
 const ES_NAME_CLASS = "EssenceExportMenu"
 signal on_option_selected(option: String)
 
-# Usamos % en lugar de rutas largas. Si mueves el botón en el árbol, el código no se rompe.
-@onready var btn_current = %BtnCurrent
-@onready var btn_all = %BtnAll
-@onready var btn_cancel = %BtnCancel
+@export var btn_current : Button
+@export var btn_all : Button
+@export var btn_cancel : Button
 
 func _ready():
 	# Mantenemos un blindaje mínimo silencioso por si el usuario borra un nodo por accidente

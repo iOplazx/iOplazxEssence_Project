@@ -13,7 +13,7 @@ expand_margin_top = 20.0
 expand_margin_right = 20.0
 expand_margin_bottom = 20.0
 
-[node name="EssenceExportMenu" type="Control" unique_id=1471866177]
+[node name="EssenceExportMenu" type="Control" unique_id=1471866177 node_paths=PackedStringArray("btn_current", "btn_all", "btn_cancel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,6 +21,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_qt5ep")
+btn_current = NodePath("Panel/VBox/BtnCurrent")
+btn_all = NodePath("Panel/VBox/BtnAll")
+btn_cancel = NodePath("Panel/VBox/BtnCancel")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1986634203]
 layout_mode = 1
