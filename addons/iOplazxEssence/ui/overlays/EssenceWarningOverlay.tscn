@@ -11,10 +11,16 @@ corner_radius_top_left = 10
 corner_radius_bottom_left = 10
 expand_margin_left = 5.0
 
-[node name="EssenceWarningOverlay" type="CanvasLayer" unique_id=215950999]
+[node name="EssenceWarningOverlay" type="CanvasLayer" unique_id=215950999 node_paths=PackedStringArray("btn_trigger", "warning_panel", "btn_close", "warning_list", "lbl_title", "btn_clear")]
 process_mode = 3
 layer = 120
 script = ExtResource("1_p1p13")
+btn_trigger = NodePath("MainControl/BtnWarningTrigger")
+warning_panel = NodePath("MainControl/WarningPanel")
+btn_close = NodePath("MainControl/WarningPanel/Layout/Header/BtnClose")
+warning_list = NodePath("MainControl/WarningPanel/Layout/Scroll/Margin/WarningList")
+lbl_title = NodePath("MainControl/WarningPanel/Layout/Header/lblTitle")
+btn_clear = NodePath("MainControl/WarningPanel/Layout/Footer/BtnClear")
 
 [node name="MainControl" type="Control" parent="." unique_id=546072879]
 layout_mode = 3

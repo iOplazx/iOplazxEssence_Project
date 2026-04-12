@@ -2,9 +2,11 @@
 
 [ext_resource type="Script" uid="uid://dxt52v0noydt7" path="res://addons/iOplazxEssence/scriptsItems/GlobalLoading.gd" id="1_jbwmo"]
 
-[node name="GlobalLoading" type="CanvasLayer" unique_id=1154965486]
+[node name="GlobalLoading" type="CanvasLayer" unique_id=1154965486 node_paths=PackedStringArray("label", "background")]
 visible = false
 script = ExtResource("1_jbwmo")
+label = NodePath("ColorRect/CenterContainer/Label")
+background = NodePath("ColorRect")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1639015536]
 anchors_preset = 15

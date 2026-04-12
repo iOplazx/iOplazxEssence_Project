@@ -1,23 +1,26 @@
 class_name EssenceExportMenu extends Control
 
-signal on_option_selected(option: String) # Avisará al controlador qué elegimos
+const ES_NAME_CLASS = "EssenceExportMenu"
+signal on_option_selected(option: String)
 
-@onready var btn_current = $Panel/VBox/BtnCurrent
-@onready var btn_all = $Panel/VBox/BtnAll
-@onready var btn_cancel = $Panel/VBox/BtnCancel
+# Usamos % en lugar de rutas largas. Si mueves el botón en el árbol, el código no se rompe.
+@onready var btn_current = %BtnCurrent
+@onready var btn_all = %BtnAll
+@onready var btn_cancel = %BtnCancel
 
 func _ready():
-	# Conectamos los botones a la función de cierre
-	btn_current.pressed.connect(func(): _seleccionar("CURRENT"))
-	btn_all.pressed.connect(func(): _seleccionar("ALL"))
-	btn_cancel.pressed.connect(func(): _seleccionar("CANCEL"))
+	# Mantenemos un blindaje mínimo silencioso por si el usuario borra un nodo por accidente
+	if btn_current: btn_current.pressed.connect(func(): _seleccionar("CURRENT"))
+	if btn_all: btn_all.pressed.connect(func(): _seleccionar("ALL"))
+	if btn_cancel: btn_cancel.pressed.connect(func(): _seleccionar("CANCEL"))
 	
-	# Efecto visual sencillo al aparecer (opcional, pero se ve bien)
 	modulate.a = 0
 	var tween = create_tween()
 	tween.tween_property(self, "modulate:a", 1.0, 0.15)
 
 func _seleccionar(opcion: String):
-	AudioManager.play_ui_sfx()
+	if AudioManager and AudioManager.has_method("play_ui_sfx"):
+		AudioManager.play_ui_sfx()
+		
 	on_option_selected.emit(opcion)
-	queue_free() # Nos destruimos para liberar RAM
+	queue_free()

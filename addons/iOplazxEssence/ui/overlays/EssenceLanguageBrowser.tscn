@@ -22,7 +22,7 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[node name="EssenceLanguageBrowser" type="VBoxContainer" unique_id=1723418970]
+[node name="EssenceLanguageBrowser" type="VBoxContainer" unique_id=1723418970 node_paths=PackedStringArray("search_input", "btn_search", "btn_filters", "list_languages", "search_timer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -32,6 +32,11 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 5
 script = ExtResource("1_drjo8")
+search_input = NodePath("Header/MarginContainer/HBoxContainer/SearchInput")
+btn_search = NodePath("Header/MarginContainer/HBoxContainer/BtnSearch")
+btn_filters = NodePath("Header/MarginContainer/HBoxContainer/BtnFilters")
+list_languages = NodePath("ScrollLanguages/ListLanguages")
+search_timer = NodePath("SearchTimer")
 card_prefab = ExtResource("2_tg3u4")
 
 [node name="Header" type="PanelContainer" parent="." unique_id=1367341382]

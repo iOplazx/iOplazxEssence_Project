@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d053a0lsx0idk" path="res://addons/iOplazxEssence/scriptsItems/EssenceRowSlider.gd" id="1_4gdn4"]
 
-[node name="RowSlider" type="MarginContainer" unique_id=1890518606]
+[node name="RowSlider" type="MarginContainer" unique_id=1890518606 node_paths=PackedStringArray("icon_rect", "lbl_name", "slider", "lbl_value", "btn_mute")]
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 44.0
@@ -13,6 +13,11 @@ theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 6
 script = ExtResource("1_4gdn4")
+icon_rect = NodePath("HBoxContainer/IconRect")
+lbl_name = NodePath("HBoxContainer/lblName")
+slider = NodePath("HBoxContainer/Slider")
+lbl_value = NodePath("HBoxContainer/lblValue")
+btn_mute = NodePath("HBoxContainer/CheckButton")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=2111147187]
 custom_minimum_size = Vector2(300, 0)

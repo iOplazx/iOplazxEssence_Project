@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const ES_NAME_CLASS = "EssenceCrashScreen"
+
 @export_category("Textos")
 @export var lbl_header: Label
 @export var lbl_title: Label
@@ -21,10 +23,13 @@ var _is_details_open: bool = false
 var _current_log_path
 
 func _ready():
-	# Nos aseguramos de que este nodo corra aunque el juego esté pausado
+	# 1. Blindaje silencioso (Sin llamar a EssenceError)
+	_check_security_nodes()
+	
+	# Nos aseguramos de que este nodo corra aunque el juego esté pausado por el crash
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	# Conectar botones a sus funciones
+	# 2. Conexiones seguras
 	if btn_toggle_details: btn_toggle_details.pressed.connect(_on_toggle_details_pressed)
 	if btn_back: btn_back.pressed.connect(_on_back_pressed)
 	if btn_open_log: btn_open_log.pressed.connect(_on_open_log_pressed)
@@ -32,12 +37,35 @@ func _ready():
 	if btn_ignore: btn_ignore.pressed.connect(_on_ignore_pressed)
 	if btn_quit: btn_quit.pressed.connect(_on_quit_pressed)
 	
-	# Ocultar detalles por defecto
+	# 3. Estado inicial seguro
 	if details_container: details_container.visible = false
 	
-	# Traducimos la UI al iniciar la pantalla
 	_update_ui_texts()
+
+# ==========================================
+# 0. BLINDAJE DE EMERGENCIA (Bucle-Free)
+# ==========================================
+func _check_security_nodes():
+	var missing = []
+	if not lbl_header: missing.append("lbl_header")
+	if not lbl_title: missing.append("lbl_title")
+	if not lbl_description: missing.append("lbl_description")
+	if not btn_toggle_details: missing.append("btn_toggle_details")
+	if not details_container: missing.append("details_container")
+	if not txt_details: missing.append("txt_details")
+	if not btn_back: missing.append("btn_back")
+	if not btn_open_log: missing.append("btn_open_log")
+	if not btn_open_folder: missing.append("btn_open_folder")
+	if not btn_ignore: missing.append("btn_ignore")
+	if not btn_quit: missing.append("btn_quit")
 	
+	if missing.size() > 0:
+		# ¡OJO! Usamos push_error nativo de Godot para no causar bucles con nuestro propio sistema
+		push_error("[%s] CRITICAL: Missing exported nodes: %s" % [ES_NAME_CLASS, ", ".join(missing)])
+
+# ==========================================
+# 1. CONFIGURACIÓN DE LA INTERFAZ
+# ==========================================
 func _update_ui_texts():
 	if lbl_header: lbl_header.text = tr("CRASH_HEADER")
 	if btn_toggle_details: btn_toggle_details.text = tr("CRASH_BTN_SHOW_DETAILS")
@@ -92,22 +120,33 @@ func setup(data: Dictionary):
 # ==========================================
 func _on_toggle_details_pressed():
 	_is_details_open = not _is_details_open
-	details_container.visible = _is_details_open
-	btn_toggle_details.text = tr("CRASH_BTN_HIDE_DETAILS") if _is_details_open else tr("CRASH_BTN_SHOW_DETAILS")
+	
+	# Parche: Verificar nodos antes de tocarlos
+	if details_container:
+		details_container.visible = _is_details_open
+	if btn_toggle_details:
+		btn_toggle_details.text = tr("CRASH_BTN_HIDE_DETAILS") if _is_details_open else tr("CRASH_BTN_SHOW_DETAILS")
 	
 
 func _on_back_pressed():
 	get_tree().paused = false
 	
-	# Fíjate que aquí ya no dice "_recent_"
-	if SaveManager.has_action_checkpoint():
-		SaveManager.load_action_checkpoint()
-		
-	elif SaveManager.has_scene_checkpoint():
-		SaveManager.load_scene_checkpoint()
-		
+	if is_instance_valid(SaveManager) and SaveManager.has_method("has_action_checkpoint"):
+		if SaveManager.has_action_checkpoint():
+			EssenceLogger.system_info("[%s/_on_back_pressed] Recovering via Action Checkpoint." % ES_NAME_CLASS)
+			SaveManager.load_action_checkpoint()
+			
+		elif SaveManager.has_scene_checkpoint():
+			EssenceLogger.system_info("[%s/_on_back_pressed] Recovering via Scene Checkpoint." % ES_NAME_CLASS)
+			SaveManager.load_scene_checkpoint()
+			
+		else:
+			EssenceLogger.system_info("[%s/_on_back_pressed] No checkpoints available. Reloading current scene." % ES_NAME_CLASS)
+			get_tree().reload_current_scene() 
 	else:
-		get_tree().reload_current_scene() 
+		# Plan C: Si el SaveManager está roto, dejamos evidencia en el log antes de reiniciar
+		EssenceLogger.system_info("[%s/_on_back_pressed] WARNING: SaveManager invalid or missing. Forcing scene reload." % ES_NAME_CLASS)
+		get_tree().reload_current_scene()
 		
 	queue_free()
 	
