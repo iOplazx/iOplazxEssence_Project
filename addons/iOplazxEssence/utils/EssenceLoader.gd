@@ -75,8 +75,6 @@ static func smart_load_texture(path: String, use_fallback: bool = true) -> Textu
 # UTILIDADES PRIVADAS
 # ==========================================
 
-## Genera el reemplazo si algo falla. 
-## ¡INCLUYE UN SEGURO DE VIDA GENERADO EN RAM!
 static func _get_fallback(usar_imagen_error: bool) -> Texture2D:
 	if not usar_imagen_error:
 		return null
@@ -87,7 +85,6 @@ static func _get_fallback(usar_imagen_error: bool) -> Texture2D:
 		var tex = load(fallback_path) as Texture2D
 		if tex: return tex
 		
-	# TRUCO AAA (Seguro de Vida):
 	# Si por alguna razón el desarrollador borró la imagen ERROR_FALLBACK.png de las carpetas,
 	# Godot creará un cuadrado magenta (Placeholder) directamente en la memoria RAM 
 	# para evitar que el juego explote por falta de textura.

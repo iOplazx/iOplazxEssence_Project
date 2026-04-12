@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://biiqsymbr6bbx" path="res://addons/iOplazxEssence/ui/screens/saves/EssenceSaveSlotClassic.tscn" id="2_0ovsk"]
 [ext_resource type="PackedScene" uid="uid://v6c6fpdc1myv" path="res://addons/iOplazxEssence/ui/screens/saves/EssenceSaveSlotModern.tscn" id="3_g861x"]
 
-[node name="EssenceSaveLoad" type="Control" unique_id=1025781134 node_paths=PackedStringArray("grid_classic", "list_modern", "lbl_title", "mode_toggle_container", "pagination_container", "btn_add_new_slot", "box_pagination", "btn_mode_save", "btn_mode_load", "btn_back", "btn_export", "btn_import")]
+[node name="EssenceSaveLoad" type="Control" unique_id=1025781134 node_paths=PackedStringArray("grid_classic", "list_modern", "lbl_title", "mode_toggle_container", "pagination_container", "btn_add_new_slot", "box_pagination", "btn_mode_save", "btn_mode_load", "btn_page_prev", "btn_page_next", "btn_back", "btn_export", "btn_import")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,6 +21,8 @@ btn_add_new_slot = NodePath("MainMargin/MainLayout/ContentArea/btnAddNewSlot")
 box_pagination = NodePath("MainMargin/MainLayout/Pagination/PageNumbers")
 btn_mode_save = NodePath("MainMargin/MainLayout/Header/HBoxContainer/btnModeSave")
 btn_mode_load = NodePath("MainMargin/MainLayout/Header/HBoxContainer/btnModeLoad")
+btn_page_prev = NodePath("MainMargin/MainLayout/Pagination/btnPrevPage")
+btn_page_next = NodePath("MainMargin/MainLayout/Pagination/btnNextPage")
 btn_back = NodePath("MainMargin/MainLayout/Footer/btnBack")
 prefab_classic = ExtResource("2_0ovsk")
 prefab_modern = ExtResource("3_g861x")

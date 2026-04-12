@@ -1,4 +1,5 @@
 class_name EssenceSaveLoadController extends Control
+const ES_NAME_CLASS = "EssenceSaveLoadController"
 
 # ==========================================
 # REFERENCIAS UI
@@ -17,6 +18,8 @@ class_name EssenceSaveLoadController extends Control
 @export var box_pagination: HBoxContainer
 @export var btn_mode_save: Button
 @export var btn_mode_load: Button
+@export var btn_page_prev: Button
+@export var btn_page_next: Button
 @export var btn_back: Button
 
 @export_category("Prefabs de Slots")
@@ -87,6 +90,9 @@ func _conectar_botones_estaticos():
 	
 	if btn_import: btn_import.pressed.connect(_on_import_file_pressed)
 	if btn_export: btn_export.pressed.connect(_on_export_file_pressed)
+	
+	if btn_page_prev: btn_page_prev.pressed.connect(_on_prev_page_pressed)
+	if btn_page_next: btn_page_next.pressed.connect(_on_next_page_pressed)
 
 func _set_mode(is_save: bool):
 	_is_save_mode = is_save
@@ -368,22 +374,38 @@ func _ejecutar_accion_real(action: String, slot_id: String):
 # DELEGACIÓN DE UI (PAGINADOR)
 # ==========================================
 func _generar_botones_paginacion():
+	if not box_pagination: return
+	
+	# 1. Limpieza total
 	for c in box_pagination.get_children(): c.queue_free()
 	
-	var p_state = paginator.get_ui_state(9)
+	# 2. Obtenemos el estado (usamos 7 o 9 según el espacio de tu UI)
+	var p_state = paginator.get_ui_state(7)
 	
+	# 3. Actualizamos el estado de las flechas externas
+	if btn_page_prev: btn_page_prev.disabled = not p_state.can_go_left
+	if btn_page_next: btn_page_next.disabled = not p_state.can_go_right
+	
+	# 4. Dibujamos los botones numéricos
 	for btn_data in p_state.buttons_to_draw:
 		var btn = Button.new()
 		btn.text = btn_data.label
+		
+		# Si es la página activa, lo desactivamos para que resalte visualmente
 		btn.disabled = btn_data.is_active
+		
+		# Conectamos la señal
 		btn.pressed.connect(func(): _cambiar_pagina(btn_data.page_num))
 		
 		box_pagination.add_child(btn)
 
-func _cambiar_pagina(page_num: int):
-	if paginator.set_page(page_num):
-		AudioManager.play_ui_sfx()
-		_generar_botones_paginacion() 
+func _cambiar_pagina(num: int):
+	if paginator.set_page(num):
+		EssenceLogger.system_info("[%s] Saltando a página: %d" % [ES_NAME_CLASS, num])
+		_reproducir_sfx_interfaz()
+		
+		# ¡VITAL! Redibujamos la UI y recargamos los archivos de esa página
+		_generar_botones_paginacion()
 		_refresh_slots()
 		
 # ==========================================
@@ -666,3 +688,25 @@ func _mostrar_alerta(titulo: String, mensaje: String):
 	
 	# Cuando el usuario le da "OK", borramos el nodo para no ensuciar la RAM
 	dialog.confirmed.connect(func(): dialog.queue_free())
+
+
+# ==========================================
+# EVENTOS DE FLECHAS
+# ==========================================
+
+func _on_prev_page_pressed():
+	paginator.prev_page() # Ahora el paginador sabe que debe retroceder un bloque o ir a Auto
+	_actualizar_todo()
+
+func _on_next_page_pressed():
+	paginator.next_page() # Salta al siguiente bloque (+9)
+	_actualizar_todo()
+
+func _actualizar_todo():
+	_generar_botones_paginacion()
+	_refresh_slots()
+	_reproducir_sfx_interfaz()
+
+func _reproducir_sfx_interfaz():
+	if is_instance_valid(AudioManager) and AudioManager.has_method("play_ui_sfx"):
+		AudioManager.play_ui_sfx()
