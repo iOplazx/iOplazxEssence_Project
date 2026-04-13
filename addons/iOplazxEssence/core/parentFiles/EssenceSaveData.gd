@@ -1,4 +1,5 @@
 class_name EssenceSaveData extends RefCounted
+const ES_NAME_CLASS = "EssenceSaveData"
 
 # ==========================================
 # DATOS OBLIGATORIOS DEL FRAMEWORK
@@ -73,10 +74,29 @@ func to_dict() -> Dictionary:
 	}
 
 func from_dict(data: Dictionary):
+	if data.is_empty():
+		EssenceLogger.system_info("[%s] Advertencia: Intentando cargar un diccionario vacío en from_dict." % [ES_NAME_CLASS])
+		return
+
+	# 1. Obtenemos la meta-información del framework
 	var meta = data.get("essence_meta", {})
-	version = meta.get("version", 1)
-	# ... (tus demás asignaciones se quedan igual) ...
+	
+	# Mapeo completo de variables obligatorias
+	version     = meta.get("version", 1)
+	timestamp   = meta.get("timestamp", 0.0)
+	date_string = meta.get("date_string", "")
+	title       = meta.get("title", "Auto-Save")
+	description = meta.get("description", "")
+	play_time   = meta.get("play_time", "00:00:00")
+	slot_number = meta.get("slot_number", 1)
+	page        = meta.get("page", 1)
+	is_auto     = meta.get("is_auto", false)
+
+	# 2. Cargamos los datos específicos del juego (los que define el desarrollador)
+	# Esto llama al método virtual que el usuario debe sobrescribir.
 	_load_child_data(data.get("game_data", {}))
+	
+	EssenceLogger.system_info("[%s] Datos deserializados correctamente para el slot %d" % [ES_NAME_CLASS, slot_number])
 
 # ==========================================
 # MÉTODOS VIRTUALES (Para que el Dev los sobrescriba)
