@@ -163,10 +163,13 @@ func _on_continue_pressed():
 	if data.is_empty() or not data.has("game_data"):
 		EssenceError.report(
 			"Corrupt Save File",
-			"The save file '%s' is empty or corrupt." % latest_save_id,
-			EssenceError.Severity.CRITICAL
+			"La partida '%s' no existe o está corrupta. Por favor, carga desde el menú." % latest_save_id,
+			EssenceError.Severity.WARNING # <--- ¡Cambiado de CRITICAL a WARNING!
 		)
-		return # Detenemos la función aquí mismo
+		
+		# Forzamos a que el botón se apague ya que descubrimos que es inválido
+		_validar_boton_continue() 
+		return
 
 	# ==========================================
 	# === EL CAMINO FELIZ (Happy Path) ===

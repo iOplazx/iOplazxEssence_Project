@@ -131,7 +131,6 @@ func load_game(slot_id: String) -> Dictionary:
 		
 	var file = FileAccess.open_encrypted_with_pass(path, FileAccess.READ, _encryption_key)
 	if file == null:
-		#printerr("iOplazxEssence: Error al abrir archivo. ¿Llave incorrecta o archivo corrupto?")
 		EssenceError.report(
 			"Load Game Error",
 			"Could not open save file. Possible causes: wrong key or corrupt file.", 
@@ -144,11 +143,17 @@ func load_game(slot_id: String) -> Dictionary:
 	
 	var parsed_data = JSON.parse_string(json_string)
 	if typeof(parsed_data) != TYPE_DICTIONARY:
-		#printerr("iOplazxEssence: El archivo no tiene un formato válido.")
 		EssenceError.report("Load Game Error","The save file is corrupt or not in the correct format.", EssenceError.Severity.WARNING)
 		return {}
 		
 	var final_data = _run_migrations(parsed_data)
+	
+	# === NUEVO PARCHE: Actualizar la Línea Temporal ===
+	# Hacemos que esta partida sea la nueva dueña del botón "Continuar"
+	_marcar_como_ultimo_jugado(slot_id)
+	
+	var log_msg = "[%s/load_game] Game loaded successfully from %s" % [ES_NAME_CLASS, path]
+	EssenceLogger.system_info(log_msg)
 	
 	on_load_completed.emit(slot_id, final_data)
 	return final_data
@@ -579,6 +584,26 @@ func _create_checkpoint(slot_id: String, cp_title: String):
 	save_obj.slot_number = 0
 	
 	save_game(slot_id, save_obj, false)
+	
+
+# ==========================================
+# Metodo Auxiliar
+# ==========================================
+# Actualiza únicamente el puntero de "Continuar" sin alterar las fechas de las partidas
+func _marcar_como_ultimo_jugado(slot_id: String):
+	var index = _get_save_index()
+	
+	# Solo actualizamos si realmente es diferente, para ahorrar escrituras en disco
+	if index.get("latest_save", "") != slot_id:
+		index["latest_save"] = slot_id
+		
+		# Guardamos el índice modificado en el disco
+		var file = FileAccess.open("user://saves/save_index.json", FileAccess.WRITE)
+		if file:
+			file.store_string(JSON.stringify(index))
+			file.close()
+			EssenceLogger.system_info("[%s] El puntero de 'Continue' ahora apunta a: %s" % [ES_NAME_CLASS, slot_id])
+			
 
 # ==========================================
 # MÉTODOS PARA LA PANTALLA DE ERROR (BACK)
