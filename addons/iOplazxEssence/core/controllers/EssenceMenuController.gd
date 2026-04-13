@@ -50,18 +50,7 @@ func _ready():
 	_conectar_botones()
 	_verificar_estado_partida()
 	
-	# =======================================================
-	# NUEVA LÓGICA: Desactivar Continuar si no hay partidas
-	# =======================================================
-	var latest_save = SaveManager.get_latest_save_id()
-	
-	if btn_continue:
-		if latest_save == "":
-			btn_continue.disabled = true
-			# Opcional: Si quieres que el texto cambie para que sea más obvio
-			# btn_continue.text = tr("MENU_NO_SAVES") 
-		else:
-			btn_continue.disabled = false
+	_validar_boton_continue()
 	# =======================================================
 	
 	if animate_buttons_entrance:
@@ -88,6 +77,20 @@ func _conectar_botones():
 	if btn_settings: btn_settings.pressed.connect(_on_settings_pressed)
 	if btn_credits: btn_credits.pressed.connect(_on_credits_pressed)
 	if btn_exit: btn_exit.pressed.connect(_on_exit_pressed)
+
+func _validar_boton_continue():
+	if not btn_continue: return
+	
+	# Ahora esta función es segura gracias al parche 1
+	var latest_save_id = SaveManager.get_latest_save_id()
+	
+	if latest_save_id == "":
+		btn_continue.disabled = true
+		btn_continue.modulate.a = 0.5 # Efecto visual de apagado
+		# btn_continue.hide() # Descomenta esto si prefieres que el botón desaparezca
+	else:
+		btn_continue.disabled = false
+		btn_continue.modulate.a = 1.0
 
 func _verificar_estado_partida():
 	var latest_save_id = SaveManager.get_latest_save_id()

@@ -265,7 +265,21 @@ func get_next_available_slot(slots_per_page: int = 6) -> String:
 
 # Retorna cuál fue el último archivo modificado (útil para el botón "Continuar" del Menú Principal)
 func get_latest_save_id() -> String:
-	return _get_save_index().get("latest_save", "")
+	var latest_id = _get_save_index().get("latest_save", "")
+	
+	if latest_id == "":
+		return ""
+		
+	# BLINDAJE: Verificamos físicamente en el disco si el archivo "fantasma" aún existe
+	var save_path = "user://saves/".path_join(latest_id + GameConstants.EXTENSION_SAVE_FILE) # Ajusta la ruta a tu constante real
+	
+	if not FileAccess.file_exists(save_path):
+		EssenceLogger.system_info("[%s] Referencia fantasma detectada: El archivo %s ya no existe." % [ES_NAME_CLASS, latest_id])
+		# Idealmente, aquí podrías llamar a una función que recalcule el último guardado,
+		# pero devolver "" es el parche seguro inmediato.
+		return ""
+		
+	return latest_id
 	
 # Obtiene la última ruta de exportación guardada
 func get_last_export_path() -> String:
