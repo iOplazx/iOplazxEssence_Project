@@ -7,5 +7,6 @@ static func create_save_instance(config: EssenceMasterConfig) -> EssenceSaveData
 	
 	# 2. Si no hay configuración o la dejó vacía, usamos al Padre directamente.
 	# ¡Cero rutas de archivos propensas a romperse!
-	print("iOplazxEssence: Usando EssenceSaveData base (No se detectó script personalizado).")
+	#print("iOplazxEssence: Usando EssenceSaveData base (No se detectó script personalizado).")
+	EssenceLogger.system_info("EssenceSaveFactory: No custom save script detected. Using base EssenceSaveData.")
 	return EssenceSaveData.new()
