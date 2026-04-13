@@ -93,6 +93,36 @@ func _conectar_botones_estaticos():
 	
 	if btn_page_prev: btn_page_prev.pressed.connect(_on_prev_page_pressed)
 	if btn_page_next: btn_page_next.pressed.connect(_on_next_page_pressed)
+	
+	if btn_add_new_slot and not btn_add_new_slot.pressed.is_connected(_on_add_new_pressed):
+		btn_add_new_slot.pressed.connect(_on_add_new_pressed)
+	
+	_bloquear_guardado_desde_menu()
+	
+func _bloquear_guardado_desde_menu():
+	var has_live_data = not SaveManager._temp_game_data.is_empty()
+	
+	if not has_live_data:
+		if btn_mode_save:
+			btn_mode_save.disabled = true
+			# Al ponerlo en IGNORE, el botón no procesa hover ni clics en absoluto
+			btn_mode_save.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			# Limpiamos cualquier texto de ayuda para que no salga el "globo" de texto
+			btn_mode_save.tooltip_text = "" 
+			btn_mode_save.modulate.a = 0.5
+			
+		if btn_add_new_slot:
+			btn_add_new_slot.visible = false
+			
+		# Forzamos que la UI esté en modo LOAD
+		_set_mode(false) 
+		if btn_mode_load:
+			btn_mode_load.button_pressed = true
+	else:
+		# Si hay datos, nos aseguramos de que el botón sea interactuable de nuevo
+		if btn_mode_save:
+			btn_mode_save.disabled = false
+			btn_mode_save.mouse_filter = Control.MOUSE_FILTER_STOP
 
 func _set_mode(is_save: bool):
 	_is_save_mode = is_save
@@ -204,22 +234,6 @@ func _generar_slots_modern():
 			if search_index >= EssenceSlotMapper.SLOTS_PER_PAGE:
 				search_index = 0
 				search_page += 1
-
-	# 4. Configurar el botón "Crear Nuevo" al final de la lista
-	if btn_add_new_slot:
-		var has_live_data = not SaveManager._temp_game_data.is_empty()
-		
-		btn_add_new_slot.visible = has_live_data
-		
-		if btn_add_new_slot.pressed.is_connected(_on_add_new_pressed):
-			btn_add_new_slot.pressed.disconnect(_on_add_new_pressed)
-		btn_add_new_slot.pressed.connect(_on_add_new_pressed)
-		
-		var real_parent = btn_add_new_slot.get_parent()
-		if real_parent:
-			real_parent.move_child(btn_add_new_slot, -1)
-	else:
-		print("No se encontro el boton btn_add_new_slot como referencia")
 
 func _crear_instancia_slot(slot_id: String, container: Control, save_data: Dictionary = {}):
 	if _current_style == 0:
@@ -376,37 +390,36 @@ func _ejecutar_accion_real(action: String, slot_id: String):
 func _generar_botones_paginacion():
 	if not box_pagination: return
 	
-	# 1. Limpieza total
+	# IMPORTANTE: Aseguramos que el contenedor reciba clics
+	box_pagination.mouse_filter = Control.MOUSE_FILTER_PASS
+	
 	for c in box_pagination.get_children(): c.queue_free()
 	
-	# 2. Obtenemos el estado (usamos 7 o 9 según el espacio de tu UI)
-	var p_state = paginator.get_ui_state(7)
+	var p_state = paginator.get_ui_state()
 	
-	# 3. Actualizamos el estado de las flechas externas
+	# Sincronizamos las flechas con la nueva lógica del bloque 1
 	if btn_page_prev: btn_page_prev.disabled = not p_state.can_go_left
 	if btn_page_next: btn_page_next.disabled = not p_state.can_go_right
 	
-	# 4. Dibujamos los botones numéricos
 	for btn_data in p_state.buttons_to_draw:
 		var btn = Button.new()
 		btn.text = btn_data.label
 		
-		# Si es la página activa, lo desactivamos para que resalte visualmente
-		btn.disabled = btn_data.is_active
+		# OPTIMIZACIÓN DE CLIC:
+		# Damos un tamaño mínimo para que el dedo o mouse no falle el clic
+		btn.custom_minimum_size = Vector2(40, 40)
+		btn.mouse_filter = Control.MOUSE_FILTER_STOP # Detiene el evento para que el botón lo atrape
 		
-		# Conectamos la señal
+		btn.disabled = btn_data.is_active
 		btn.pressed.connect(func(): _cambiar_pagina(btn_data.page_num))
 		
 		box_pagination.add_child(btn)
 
 func _cambiar_pagina(num: int):
+	# Si set_page devuelve true, significa que sí hubo un cambio real
 	if paginator.set_page(num):
 		EssenceLogger.system_info("[%s] Saltando a página: %d" % [ES_NAME_CLASS, num])
-		_reproducir_sfx_interfaz()
-		
-		# ¡VITAL! Redibujamos la UI y recargamos los archivos de esa página
-		_generar_botones_paginacion()
-		_refresh_slots()
+		_actualizar_todo()
 		
 # ==========================================
 # UX: SALTO INTELIGENTE A LA ÚLTIMA PARTIDA
@@ -691,21 +704,32 @@ func _mostrar_alerta(titulo: String, mensaje: String):
 
 
 # ==========================================
-# EVENTOS DE FLECHAS
+# EVENTOS DE FLECHAS (NAVEGACIÓN POR BLOQUES)
 # ==========================================
 
 func _on_prev_page_pressed():
-	paginator.prev_page() # Ahora el paginador sabe que debe retroceder un bloque o ir a Auto
+	# El paginador resta 9, o si está en el primer bloque, vuelve a 0 ("A")
+	paginator.prev_page() 
+	EssenceLogger.system_info("[%s] Flecha Atrás -> Bloque actual: %d" % [ES_NAME_CLASS, paginator.current_page])
 	_actualizar_todo()
 
 func _on_next_page_pressed():
-	paginator.next_page() # Salta al siguiente bloque (+9)
+	# El paginador suma 9 páginas
+	paginator.next_page() 
+	EssenceLogger.system_info("[%s] Flecha Adelante -> Bloque actual: %d" % [ES_NAME_CLASS, paginator.current_page])
 	_actualizar_todo()
 
+# ==========================================
+# FLUJO UNIFICADO DE ACTUALIZACIÓN VISUAL
+# ==========================================
 func _actualizar_todo():
-	_generar_botones_paginacion()
-	_refresh_slots()
 	_reproducir_sfx_interfaz()
+	
+	# 1. Redibujamos los números y estados de las flechas
+	_generar_botones_paginacion()
+	
+	# 2. Refrescamos los "slots" (cuadritos de guardado) para que muestren la info de la nueva página
+	_refresh_slots()
 
 func _reproducir_sfx_interfaz():
 	if is_instance_valid(AudioManager) and AudioManager.has_method("play_ui_sfx"):

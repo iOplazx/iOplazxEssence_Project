@@ -2,70 +2,62 @@ class_name EssencePaginator extends RefCounted
 
 const ES_NAME_CLASS = "EssencePaginator"
 
-var current_page: int = 0 # 0 es Auto
-var total_pages: int = 99
+var current_page: int = 0 
 
 # ==========================================
-# INICIALIZACIÓN
-# ==========================================
-
-## Configura el paginador basándose en la cantidad real de páginas del juego
-func setup(real_total_pages: int, starting_page: int = 0):
-	# Validamos que nunca haya menos de 1 página (evita errores de división por cero)
-	total_pages = maxi(1, real_total_pages)
-	# clampi asegura que si le pasas un número loco (ej. página 50 de 10), lo limite al máximo real
-	current_page = clampi(starting_page, 0, total_pages)
-	
-	EssenceLogger.system_info("[%s] Configurado: %d páginas en total. Empezando en pág. %d" % [ES_NAME_CLASS, total_pages, current_page])
-
-# ==========================================
-# CONTROL DE ESTADO
+# CONTROL DE ESTADO (BLOQUES DE 9)
 # ==========================================
 
 func next_page():
-	# Si estamos en Auto (0), saltamos a la 1
+	# Si estamos en Auto (0), saltamos al inicio del segundo bloque (10)
 	if current_page == 0:
-		current_page = 1
+		current_page = 10
 	else:
-		# Saltamos al siguiente bloque (si estamos en el 1, vamos al 10)
-		current_page += 9
+		# Buscamos dónde empieza nuestro bloque actual y sumamos 9
+		var block_start = _get_block_start(current_page)
+		current_page = block_start + 9
 	_clamp_page()
 
 func prev_page():
-	if current_page > 9:
-		current_page -= 9
-	elif current_page <= 9 and current_page > 0:
-		current_page = 0 # Regresamos a Auto
+	var block_start = _get_block_start(current_page)
+	# Si estamos en el bloque 10-18, el previo es 0 (Auto)
+	if block_start == 10:
+		current_page = 0
+	elif block_start > 10:
+		current_page = block_start - 9
+	else:
+		current_page = 0
 	_clamp_page()
+
+func _get_block_start(page: int) -> int:
+	if page <= 0: return 1
+	# Fórmula estricta para bloques: 1-9, 10-18, 19-27...
+	return (floori((page - 1) / 9.0) * 9) + 1
 
 func _clamp_page():
 	current_page = maxi(0, current_page)
 
-func set_page(page: int):
-	current_page = page
-	EssenceLogger.system_info("[%s] Página cambiada a: %d" % [ES_NAME_CLASS, current_page])
+func set_page(page: int) -> bool:
+	if current_page != page:
+		current_page = page
+		return true
+	return false
 
 # ==========================================
-# LÓGICA DE DIBUJO (ESTILO REN'PY)
+# LÓGICA DE DIBUJO (COMPORTAMIENTO REN'PY)
 # ==========================================
 
 func get_ui_state(_unused = 0) -> Dictionary:
 	var buttons = []
 	
-	# 1. El botón "Auto" siempre está al principio
+	# La "A" siempre es el primer botón
 	buttons.append({
 		"label": "Auto" if current_page == 0 else "A",
 		"page_num": 0,
 		"is_active": current_page == 0
 	})
 	
-	# 2. Cálculo del bloque actual (1-9, 10-18, 19-27...)
-	# Si estamos en 0, mostramos el primer bloque (1-9)
-	var base_page = current_page
-	if current_page == 0: base_page = 1
-	
-	# Fórmula para encontrar el inicio del bloque de 9
-	var block_start = (floori((base_page - 1) / 9.0) * 9) + 1
+	var block_start = _get_block_start(current_page)
 	
 	for i in range(block_start, block_start + 9):
 		buttons.append({
@@ -74,9 +66,8 @@ func get_ui_state(_unused = 0) -> Dictionary:
 			"is_active": current_page == i
 		})
 	
-	# 3. Lógica de flechas
 	return {
 		"buttons_to_draw": buttons,
-		"can_go_left": current_page > 0, # Solo desactivada si estamos en Auto
-		"can_go_right": true # Siempre activo para esa sensación de infinidad
+		"can_go_left": current_page >= 10, # Deshabilitada en bloque 1 (0-9)
+		"can_go_right": true 
 	}
