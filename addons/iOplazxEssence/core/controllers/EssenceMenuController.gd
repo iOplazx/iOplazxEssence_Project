@@ -1,11 +1,12 @@
 class_name EssenceMenuController extends Control
+
 const ES_NAME_CLASS = "EssenceMenuController"
 
-# Enums para los tipos de animación (Crea casillas seleccionables en el Inspector)
+# Enums for animation types (Inspector-friendly)
 enum EntranceAnimation { NONE, FADE_IN, SLIDE_FROM_TOP }
 enum IdleAnimation { NONE, BREATHING }
 
-@export_category("Conexión de Botones (UI)")
+@export_category("UI Connections")
 @export var btn_new_game: Button
 @export var btn_continue: Button
 @export var btn_load: Button
@@ -13,206 +14,196 @@ enum IdleAnimation { NONE, BREATHING }
 @export var btn_credits: Button
 @export var btn_exit: Button
 
-@export_subgroup("Configuración de Navegación")
-## El botón que estará seleccionado por defecto para el teclado/mando
+@export_subgroup("Navigation Settings")
+## The button that will grab focus by default for keyboard/gamepad
 @export var first_focus_button: Control
 
-@export_category("Efectos Visuales (Juice)")
-@export_subgroup("Configuración de Botones") 
-## Activa una aparición coordinada de los botones al iniciar
+@export_category("Visual Effects (Juice)")
+@export_subgroup("Button Animation") 
+## Enables a coordinated entrance for buttons
 @export var animate_buttons_entrance: bool = true
-## (Opcional) El panel que contiene los botones. Si se asigna, aparecerá antes que los botones.
+## (Optional) The panel containing buttons. Appears before the buttons.
 @export var buttons_panel: Control 
 
-@export_subgroup("Configuración del Título")
-## Asigna el nodo del Título aquí (TextureRect, Label, etc.)
+@export_subgroup("Title Settings")
 @export var title_container: Control 
-## Tipo de animación de entrada para el título
 @export var entrance_anim_type: EntranceAnimation = EntranceAnimation.FADE_IN
-## Duración de la animación de entrada (segundos)
 @export var entrance_duration: float = 0.5
-## Distancia para la animación de 'Slide From Top'
 @export var slide_distance: float = 100.0
-## Tipo de animación idle (bucle) para el título
 @export var idle_anim_type: IdleAnimation = IdleAnimation.BREATHING
-## Duración de un ciclo de la animación idle (segundos)
 @export var idle_duration: float = 1.5
 
-# Variable interna para gestionar el tween idle
+# Internal state
 var _idle_tween: Tween
 
-func _ready():
-	#print("EssenceMenuController: Inicializando menú principal...")
-	var log_msg ="[%s/ready] Initializing main menu..." % ES_NAME_CLASS
-	EssenceLogger.system_info(log_msg)
-	# ¡Limpiamos la RAM de cualquier partida anterior!
-	SaveManager.clear_all_temp()
-	_conectar_botones()
-	_verificar_estado_partida()
-	
-	_validar_boton_continue()
-	# =======================================================
-	
-	if animate_buttons_entrance:
-		if buttons_panel:
-			buttons_panel.modulate.a = 0.0
-		var botones = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
-		for btn in botones:
-			if btn:
-				btn.modulate.a = 0.0
-	
-	if title_container:
-		_iniciar_animaciones_titulo()
-
-	if animate_buttons_entrance:
-		_animar_entrada_ui_botones()
+func _ready() -> void:
+	if _validate_requirements():
+		EssenceLogger.system_info("[%s] Initializing main menu..." % ES_NAME_CLASS)
 		
-	_setup_ui_sounds()
-	_iniciar_foco_teclado()
-
-func _conectar_botones():
-	if btn_new_game: btn_new_game.pressed.connect(_on_new_game_pressed)
-	if btn_continue: btn_continue.pressed.connect(_on_continue_pressed)
-	if btn_load: btn_load.pressed.connect(_on_load_pressed) 
-	if btn_settings: btn_settings.pressed.connect(_on_settings_pressed)
-	if btn_credits: btn_credits.pressed.connect(_on_credits_pressed)
-	if btn_exit: btn_exit.pressed.connect(_on_exit_pressed)
-
-func _validar_boton_continue():
-	if not btn_continue: return
-	
-	# Ahora esta función es segura gracias al parche 1
-	var latest_save_id = SaveManager.get_latest_save_id()
-	
-	if latest_save_id == "":
-		btn_continue.disabled = true
-		btn_continue.modulate.a = 0.5 # Efecto visual de apagado
-		# btn_continue.hide() # Descomenta esto si prefieres que el botón desaparezca
-	else:
-		btn_continue.disabled = false
-		btn_continue.modulate.a = 1.0
-
-func _verificar_estado_partida():
-	var latest_save_id = SaveManager.get_latest_save_id()
-	
-	# Usamos la nueva verificación rápida
-	var has_recent_save = SaveManager.save_exists(latest_save_id)
-	
-	if btn_continue:
-		btn_continue.disabled = not has_recent_save
-		btn_continue.focus_mode = Control.FOCUS_NONE if btn_continue.disabled else Control.FOCUS_ALL
+		# Clean RAM from previous sessions
+		SaveManager.clear_all_temp()
 		
-func _iniciar_foco_teclado():
-	if first_focus_button:
+		_conectar_botones()
+		_update_continue_button_state()
+		
+		# Setup initial visual state
+		if animate_buttons_entrance:
+			_prepare_button_entrance()
+		
+		if title_container:
+			_iniciar_animaciones_titulo()
+
+		if animate_buttons_entrance:
+			_animar_entrada_ui_botones()
+			
+		_setup_ui_sounds()
+		_iniciar_foco_teclado()
+
+## Validates that all exported nodes are correctly assigned
+func _validate_requirements() -> bool:
+	var buttons = {
+		"New Game": btn_new_game,
+		"Load": btn_load,
+		"Settings": btn_settings,
+		"Credits": btn_credits,
+		"Exit": btn_exit
+	}
+	
+	var is_valid = true
+	for btn_name in buttons:
+		if buttons[btn_name] == null:
+			EssenceError.report("Missing Button", "Button '%s' is not assigned in %s." % [btn_name, name], EssenceError.Severity.CRITICAL)
+			is_valid = false
+			
+	return is_valid
+
+func _conectar_botones() -> void:
+	# Using 'is_instance_valid' and connection checks for maximum safety
+	var connections = {
+		btn_new_game: _on_new_game_pressed,
+		btn_continue: _on_continue_pressed,
+		btn_load: _on_load_pressed,
+		btn_settings: _on_settings_pressed,
+		btn_credits: _on_credits_pressed,
+		btn_exit: _on_exit_pressed
+	}
+	
+	for btn in connections:
+		if is_instance_valid(btn) and not btn.pressed.is_connected(connections[btn]):
+			btn.pressed.connect(connections[btn])
+
+## Merged logic for the Continue button state
+func _update_continue_button_state() -> void:
+	if not is_instance_valid(btn_continue): return
+	
+	var latest_id = SaveManager.get_latest_save_id()
+	var can_continue = latest_id != "" and SaveManager.save_exists(latest_id)
+	
+	btn_continue.disabled = not can_continue
+	btn_continue.modulate.a = 1.0 if can_continue else 0.5
+	btn_continue.focus_mode = Control.FOCUS_ALL if can_continue else Control.FOCUS_NONE
+	
+	EssenceLogger.system_info("[%s] Continue state: %s (ID: %s)" % [ES_NAME_CLASS, "Enabled" if can_continue else "Disabled", latest_id])
+
+func _iniciar_foco_teclado() -> void:
+	if is_instance_valid(first_focus_button):
 		first_focus_button.grab_focus()
-		
+
 # ==========================================
-# LÓGICA DE AUDIO DE INTERFAZ (OPTIMIZADA)
+# INTERFACE AUDIO
 # ==========================================
-func _setup_ui_sounds():
+func _setup_ui_sounds() -> void:
 	var group_buttons = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
 	
 	for btn in group_buttons:
-		if btn:
-			btn.mouse_entered.connect(_play_hover_ui)
-			btn.focus_entered.connect(_play_hover_ui)
-			btn.pressed.connect(_play_click_ui)
+		if is_instance_valid(btn):
+			if not btn.mouse_entered.is_connected(_play_hover_ui):
+				btn.mouse_entered.connect(_play_hover_ui)
+			if not btn.focus_entered.is_connected(_play_hover_ui):
+				btn.focus_entered.connect(_play_hover_ui)
+			# Note: pressed is already connected in _conectar_botones, 
+			# we call play_ui_sfx directly inside action handlers or here.
 
-func _play_hover_ui():
+func _play_hover_ui() -> void:
 	var pitch = randf_range(0.95, 1.05)
-	# Le pasamos null al principio para que el AudioManager decida el tema,
-	# y luego le pasamos nuestro pitch dinámico.
 	AudioManager.play_ui_sfx(null, pitch)
 
-func _play_click_ui():
-	# Llamamos a la función global. El AudioManager sabrá qué tema usar basándose
-	# en los ajustes guardados por el jugador.
+func _play_click_ui() -> void:
 	AudioManager.play_ui_sfx()
 
 # ==========================================
-# FUNCIONES DE ACCIÓN
+# ACTION HANDLERS
 # ==========================================
 
-func _on_new_game_pressed():
-	# 1. Limpia los diccionarios de variables (SaveManager)
+func _on_new_game_pressed() -> void:
+	_play_click_ui()
 	SaveManager.clear_all_temp() 
-	
-	# === HOOK DE INTEGRACIÓN ===
 	_on_new_game_hook()
-	
-	# 2. Salta a la escena y limpia el historial de navegación (SceneManager)
 	SceneManager.goto_new_game()
 
-func _on_continue_pressed():
-	AudioManager.play_ui_sfx()
-	
+func _on_continue_pressed() -> void:
+	_play_click_ui()
 	var latest_save_id = SaveManager.get_latest_save_id()
 	
-	# === GUARD CLAUSE 1: ¿Hay un ID válido? ===
 	if latest_save_id == "":
-		EssenceError.report(
-			"Invalid Continue State",
-			"Attempted to continue, but no valid save ID was found.",
-			EssenceError.Severity.WARNING
-		)
-		return # Detenemos la función aquí mismo
+		EssenceError.report("Invalid Continue State", "No valid save ID found.", EssenceError.Severity.WARNING)
+		return 
 		
 	var data = SaveManager.load_game(latest_save_id)
 	
-	# === GUARD CLAUSE 2: ¿El archivo está corrupto? ===
 	if data.is_empty() or not data.has("game_data"):
 		EssenceError.report(
 			"Corrupt Save File",
-			"La partida '%s' no existe o está corrupta. Por favor, carga desde el menú." % latest_save_id,
-			EssenceError.Severity.WARNING # <--- ¡Cambiado de CRITICAL a WARNING!
+			"Save file '%s' is missing or corrupt. Please load from menu." % latest_save_id,
+			EssenceError.Severity.WARNING
 		)
-		
-		# Forzamos a que el botón se apague ya que descubrimos que es inválido
-		_validar_boton_continue() 
+		_update_continue_button_state() 
 		return
 
-	# ==========================================
-	# === EL CAMINO FELIZ (Happy Path) ===
-	# Si el código llegó hasta aquí, sabemos que todo está perfecto.
-	# Cero anidaciones, máxima velocidad.
-	# ==========================================
-	
-	# 1. Inyectamos en RAM
+	# Happy Path
 	SaveManager.loaded_game_data = data["game_data"]
 	
-	# 2. Trazabilidad simplificada y elegante
 	var save_type = "Checkpoint" if latest_save_id.begins_with("checkpoint") else "Manual"
-	EssenceLogger.system_info("[%s/_on_continue_pressed] Continuing from %s save (%s)" % [ES_NAME_CLASS, save_type, latest_save_id])
+	EssenceLogger.system_info("[%s] Continuing from %s save (%s)" % [ES_NAME_CLASS, save_type, latest_save_id])
 	
-	# 3. Marcamos como última partida tocada
 	SaveManager.mark_save_as_latest_played(latest_save_id)
 	
-	# 4. Hook de Integración
 	if has_method("_on_continue_hook"):
 		_on_continue_hook(data)
 		
-	# 5. Viajamos al juego
 	SceneManager.goto_continue_game()
 	
-func _on_load_pressed():
-	SaveManager.clear_all_temp() # Destruimos datos residuales
+func _on_load_pressed() -> void:
+	_play_click_ui()
+	SaveManager.clear_all_temp()
 	SceneManager.goto_load_game()
 
-func _on_settings_pressed():
+func _on_settings_pressed() -> void:
+	_play_click_ui()
 	SceneManager.goto_settings()
 	
-func _on_credits_pressed():
+func _on_credits_pressed() -> void:
+	_play_click_ui()
 	SceneManager.goto_credits()
 
-func _on_exit_pressed():
-	AudioManager.play_ui_sfx()
-	SceneManager.request_quit() # Que llame al diálogo normal
-	
+func _on_exit_pressed() -> void:
+	_play_click_ui()
+	SceneManager.request_quit()
+
 # ==========================================
-# EFECTOS VISUALES (Usando nuestra biblioteca global)
+# VISUAL EFFECTS
 # ==========================================
 
-func _iniciar_animaciones_titulo():
+func _prepare_button_entrance() -> void:
+	if is_instance_valid(buttons_panel):
+		buttons_panel.modulate.a = 0.0
+	
+	var buttons = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
+	for btn in buttons:
+		if is_instance_valid(btn):
+			btn.modulate.a = 0.0
+
+func _iniciar_animaciones_titulo() -> void:
 	var tween_entrada: Tween
 	
 	match entrance_anim_type:
@@ -224,36 +215,33 @@ func _iniciar_animaciones_titulo():
 		EntranceAnimation.SLIDE_FROM_TOP:
 			tween_entrada = EssenceUIAnimator.slide_from_top(title_container, slide_distance, entrance_duration)
 			
-	# Si hubo animación de entrada, conectamos el idle al terminar
 	if tween_entrada:
 		tween_entrada.finished.connect(_iniciar_animacion_idle)
 
-func _iniciar_animacion_idle():
+func _iniciar_animacion_idle() -> void:
 	if idle_anim_type == IdleAnimation.BREATHING:
-		# Guardamos la referencia por si necesitamos matarla al cambiar de menú
 		_idle_tween = EssenceUIAnimator.breathing(title_container, idle_duration)
 
-func _animar_entrada_ui_botones():
+func _animar_entrada_ui_botones() -> void:
 	var cascade_start = 0.0
 	
-	if buttons_panel:
+	if is_instance_valid(buttons_panel):
 		EssenceUIAnimator.fade_in(buttons_panel, 0.4)
-		cascade_start = 0.5 # Le damos tiempo al panel para aparecer
+		cascade_start = 0.5 
 		
-	var botones = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
-	EssenceUIAnimator.cascade_fade_in(botones, 0.4, 0.15, cascade_start)
-	
+	var buttons = [btn_new_game, btn_continue, btn_load, btn_settings, btn_credits, btn_exit]
+	EssenceUIAnimator.cascade_fade_in(buttons, 0.4, 0.15, cascade_start)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED:
+		_update_continue_button_state()
+
 # ==============================================================================
-# HOOKS DE INTEGRACIÓN (PARA EL DESARROLLADOR)
+# INTEGRATION HOOKS
 # ==============================================================================
 
-## Se ejecuta después de limpiar la memoria RAM pero ANTES de cambiar a la escena de juego.
-## Ideal para inicializar variables globales de una partida nueva (ej: HP = 100, Nivel = 1).
-func _on_new_game_hook():
+func _on_new_game_hook() -> void:
 	pass
 
-## Se ejecuta después de inyectar los datos en SaveManager.loaded_game_data.
-## Recibe el diccionario completo de la partida por si se requiere extraer información 
-## adicional (metadatos, fecha, versión del archivo) antes de iniciar la escena.
-func _on_continue_hook(_save_data: Dictionary):
+func _on_continue_hook(_save_data: Dictionary) -> void:
 	pass
