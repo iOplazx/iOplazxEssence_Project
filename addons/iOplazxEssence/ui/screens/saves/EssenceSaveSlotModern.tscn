@@ -20,6 +20,7 @@ btn_save = NodePath("HBox/Actions/btnSave")
 btn_load = NodePath("HBox/Actions/btnLoad")
 btn_delete = NodePath("HBox/Actions/btnDelete")
 fallback_image = ExtResource("2_xqf6f")
+empty_slot_image = ExtResource("2_xfdxw")
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=2013721000]
 layout_mode = 2
