@@ -1,4 +1,5 @@
 extends PanelContainer 
+const ES_NAME_CLASS = "EssenceSaveSlotClassic"
 
 signal on_slot_clicked(action: String, slot_id: String)
 
@@ -47,13 +48,18 @@ func setup(slot_id: String, save_data: Dictionary, is_save_mode: bool):
 		_cargar_imagen_screenshot(slot_id)
 
 func _on_ghost_button_pressed():
+	var log_msg = ""
 	# Si estamos en modo Cargar y está vacío, no hacemos nada
 	if not _is_save_mode and not _has_data:
-		print("iOplazxEssence: Slot vacío. No se puede cargar.")
+		#print("iOplazxEssence: Slot vacío. No se puede cargar.")
+		log_msg = "You tried to load from an empty slot (%s). Make sure the player can only interact with full slots in Load mode." % _my_slot_id
+		EssenceLogger.system_info(log_msg)
 		return
 		
 	var action = "SAVE" if _is_save_mode else "LOAD"
-	print("iOplazxEssence: Emitiendo señal -> ", action, " en ", _my_slot_id)
+	#print("iOplazxEssence: Emitiendo señal -> ", action, " en ", _my_slot_id)
+	log_msg = "Player clicked on slot %s with action %s." % [_my_slot_id, action]
+	EssenceLogger.system_info(log_msg)
 	on_slot_clicked.emit(action, _my_slot_id)
 
 func _cargar_imagen_screenshot(slot_id: String):
@@ -72,7 +78,12 @@ func _cargar_imagen_screenshot(slot_id: String):
 			img_screenshot.modulate = Color.WHITE
 			loaded_successfully = true
 		else:
-			push_warning("iOplazxEssence: La foto de " + slot_id + " está corrupta. Usando fallback.")
+			#push_warning("iOplazxEssence: La foto de " + slot_id + " está corrupta. Usando fallback.")
+			EssenceError.report(
+				"Corrupt Image",
+				"The screenshot for slot %s is corrupt." % slot_id,
+				EssenceError.Severity.WARNING
+			)
 			
 	# Si no existe o hubo un error al cargarla, usamos la imagen por defecto
 	if not loaded_successfully:
