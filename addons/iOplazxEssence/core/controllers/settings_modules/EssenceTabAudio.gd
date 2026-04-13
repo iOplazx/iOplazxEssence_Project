@@ -1,4 +1,6 @@
-extends MarginContainer
+class_name EssenceTabAudio extends MarginContainer
+
+const ES_NAME_CLASS = "EssenceTabAudio"
 
 @export_category("Tab: Audio")
 @export_subgroup("Volume Sliders")
@@ -19,82 +21,125 @@ extends MarginContainer
 var _tex_play: Texture2D
 var _tex_pause: Texture2D
 
-func _ready():
-	_tex_play = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_PLAY)
-	_tex_pause = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_PAUSE)
-	
-	_connect_signals() # <--- 1. Conectamos los cables una sola vez
-	_setup_audio_tab() # <--- 2. Llenamos los textos
-	_sync_audio()      # <--- 3. Ajustamos las posiciones visuales
+func _ready() -> void:
+	if _validate_requirements():
+		_tex_play = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_PLAY)
+		_tex_pause = EssenceLoader.get_internImage(EssencePaths.KeyImage.ICON_PAUSE)
+		
+		_connect_signals() 
+		_setup_audio_tab() 
+		_sync_audio()
+		EssenceLogger.system_info("[%s] Audio Tab initialized and synced." % ES_NAME_CLASS)
 
-func _setup_audio_tab():
+## Check for missing nodes in the Inspector
+func _validate_requirements() -> bool:
+	var essential_rows = [row_master, row_music, row_sfx, row_ui, row_voices]
+	for row in essential_rows:
+		if row == null:
+			EssenceError.report(
+				"Missing Audio Row",
+				"One or more EssenceRowSliders are not assigned in %s." % name,
+				EssenceError.Severity.CRITICAL
+			)
+			return false
+			
+	if not is_instance_valid(AudioManager):
+		EssenceError.report("Missing Autoload", "AudioManager not found in SceneTree.", EssenceError.Severity.CRITICAL)
+		return false
+		
+	return true
+
+func _setup_audio_tab() -> void:
 	if dpd_theme:
 		var current = dpd_theme.selected
 		dpd_theme.clear()
-		# Opcional: Si en el futuro agregas esto al CSV, puedes poner tr("THEME_SPACE")
+		
+		# These could be moved to your CSV as UI_THEME_0, etc.
 		dpd_theme.add_item("Sci-Fi (Space)") 
 		dpd_theme.add_item("Bubble Effect")
-		dpd_theme.add_item("Silencio")
+		dpd_theme.add_item("Silent / Off")
 		
-		# Restauramos lo que estaba seleccionado para que no se regrese al índice 0
 		if current != -1: 
 			dpd_theme.select(current)
 			
 	if btn_preview:
 		btn_preview.texture_normal = _tex_play
 
-func _connect_row(row, bus_name, test = false):
-	if row and row.slider:
+func _connect_row(row: EssenceRowSlider, bus_name: String, test: bool = false) -> void:
+	if is_instance_valid(row) and is_instance_valid(row.slider):
 		row.slider.value_changed.connect(func(v): AudioManager.set_bus_volume(bus_name, v))
-		row.slider.drag_ended.connect(func(_c): _save_audio(); if test: AudioManager.play_ui_sfx())
+		row.slider.drag_ended.connect(func(_c): 
+			_save_audio()
+			if test: AudioManager.play_ui_sfx()
+		)
 
-func _on_mute_focus_toggled(on):
+func _on_mute_focus_toggled(on: bool) -> void:
 	AudioManager.mute_on_focus_loss = on
 	_save_audio()
 	AudioManager.play_ui_sfx()
 
-func _save_audio():
+func _save_audio() -> void:
+	# Blindaje: Solo guardamos si los nodos están vivos
+	if not is_instance_valid(row_master): return
+	
 	AudioManager.save_audio_settings(
 		row_master.slider.value, row_music.slider.value, 
 		row_sfx.slider.value, row_ui.slider.value, row_voices.slider.value
 	)
+	EssenceLogger.system_info("[%s] Audio settings saved to disk." % ES_NAME_CLASS)
 
-func _sync_audio():
+func _sync_audio() -> void:
 	var v = AudioManager.load_audio_settings()
-	row_master.slider.value = v["Master"]
-	row_music.slider.value = v["Music"]
-	row_sfx.slider.value = v["SFX"]
-	row_ui.slider.value = v["UI"]
-	row_voices.slider.value = v["Voices"]
+	
+	# Sincronización segura de valores
+	var mapping = {
+		"Master": row_master,
+		"Music": row_music,
+		"SFX": row_sfx,
+		"UI": row_ui,
+		"Voices": row_voices
+	}
+	
+	for bus in mapping:
+		var row = mapping[bus]
+		if is_instance_valid(row) and is_instance_valid(row.slider):
+			row.slider.value = v.get(bus, 80.0)
 	
 	if dpd_theme: dpd_theme.selected = AudioManager.current_ui_theme
+	
 	if chk_mute_focus:
 		chk_mute_focus.set_block_signals(true)
 		chk_mute_focus.button_pressed = AudioManager.mute_on_focus_loss
 		chk_mute_focus.set_block_signals(false)
 
-func _on_theme_selected(idx):
+func _on_theme_selected(idx: int) -> void:
 	AudioManager.set_ui_theme(idx)
-	if preview_player.playing: preview_player.stop()
+	if is_instance_valid(preview_player) and preview_player.playing: 
+		preview_player.stop()
 
-func _on_preview_pressed():
+func _on_preview_pressed() -> void:
+	if not is_instance_valid(preview_player): return
+	
 	if preview_player.playing:
 		preview_player.stop()
 		btn_preview.texture_normal = _tex_play
 		return
 		
 	var theme = AudioManager.current_ui_theme
-	if theme == 2: return
+	if theme == 2: return # Theme 'Silent'
 	
 	preview_player.stream = AudioManager.get_cached_audio("ui_space" if theme == 0 else "ui_bubble")
-	btn_preview.texture_normal = _tex_pause
-	preview_player.play()
 	
+	if preview_player.stream:
+		btn_preview.texture_normal = _tex_pause
+		preview_player.play()
+	else:
+		EssenceError.report("Audio Preview Error", "Audio stream for theme %d not found." % theme, EssenceError.Severity.WARNING)
+
 # ==========================================
-# CONEXIONES ÚNICAS (Anti-Fugas de Memoria)
+# CONEXIONES ÚNICAS
 # ==========================================
-func _connect_signals():
-	# Conectamos las filas (sus lambdas solo se crearán 1 vez)
+func _connect_signals() -> void:
 	_connect_row(row_master, "Master")
 	_connect_row(row_music, "Music")
 	_connect_row(row_sfx, "SFX")
@@ -110,11 +155,14 @@ func _connect_signals():
 	if btn_preview and not btn_preview.pressed.is_connected(_on_preview_pressed):
 		btn_preview.pressed.connect(_on_preview_pressed)
 	
-	# Revisamos que el lambda no se haya conectado antes
-	if preview_player and preview_player.finished.get_connections().size() == 0:
-		preview_player.finished.connect(func(): btn_preview.texture_normal = _tex_play)
+	if is_instance_valid(preview_player):
+		if not preview_player.finished.is_connected(self._on_preview_finished):
+			preview_player.finished.connect(self._on_preview_finished)
 
-func _notification(what):
+func _on_preview_finished() -> void:
+	if btn_preview: btn_preview.texture_normal = _tex_play
+
+func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED:
 		_setup_audio_tab()
 		_sync_audio()

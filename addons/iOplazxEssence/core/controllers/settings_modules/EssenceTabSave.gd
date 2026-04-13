@@ -1,27 +1,60 @@
-extends MarginContainer
+class_name EssenceTabSave extends MarginContainer
 
-@export_category("Tab: Game")
+const ES_NAME_CLASS = "EssenceTabSave"
+
+@export_category("Tab: Save & Style")
 @export var dpd_autosave: OptionButton
 @export var dpd_save_style: OptionButton
 @export var dpd_save_location: OptionButton
 
-@export_category("Confirmaciones")
+@export_category("Confirmations")
 @export var chk_confirm_save: CheckButton
 @export var chk_confirm_load: CheckButton
 @export var chk_confirm_delete: CheckButton
 
-var _pending_changes: bool = false
+@export_category("Global Actions")
 @export var btn_apply: Button 
 
-func _ready():
-	_connect_signals()  # 1. Conectamos los cables
-	_setup_texts()      # 2. Ponemos los textos en el idioma correcto
-	_sync_values()      # 3. Leemos los valores guardados
+var _pending_changes: bool = false
+
+func _ready() -> void:
+	if _validate_requirements():
+		_connect_signals()
+		_setup_texts()
+		_sync_values()
+		EssenceLogger.system_info("[%s] Save & Style tab initialized." % ES_NAME_CLASS)
+
+## Inspector validation to ensure all nodes are assigned
+func _validate_requirements() -> bool:
+	var nodes = {
+		"Autosave Dropdown": dpd_autosave,
+		"Save Style Dropdown": dpd_save_style,
+		"Save Location Dropdown": dpd_save_location,
+		"Confirm Save Toggle": chk_confirm_save,
+		"Confirm Load Toggle": chk_confirm_load,
+		"Confirm Delete Toggle": chk_confirm_delete,
+		"Apply Button": btn_apply
+	}
+	
+	for node_name in nodes:
+		if nodes[node_name] == null:
+			EssenceError.report(
+				"Missing UI Reference",
+				"Node '%s' is not assigned in the Inspector for %s." % [node_name, name],
+				EssenceError.Severity.CRITICAL
+			)
+			return false
+			
+	if not is_instance_valid(Preferences):
+		EssenceError.report("Missing Autoload", "Preferences manager not found.", EssenceError.Severity.CRITICAL)
+		return false
+		
+	return true
 
 # ==========================================
 # 1. CONEXIONES ÚNICAS
 # ==========================================
-func _connect_signals():
+func _connect_signals() -> void:
 	if btn_apply and not btn_apply.pressed.is_connected(_on_apply_pressed):
 		btn_apply.pressed.connect(_on_apply_pressed)
 		
@@ -46,25 +79,31 @@ func _connect_signals():
 # ==========================================
 # 2. ACTUALIZACIÓN DE TEXTOS
 # ==========================================
-func _setup_texts():
+func _setup_texts() -> void:
 	if dpd_autosave:
+		var current = dpd_autosave.selected
 		dpd_autosave.clear()
 		var autosave_options = ["TIME_NEVER", "TIME_5M", "TIME_15M", "TIME_30M", "TIME_1H", "TIME_2H", "TIME_5H", "TIME_12H", "TIME_1D", "TIME_1W"]
 		for i in range(autosave_options.size()):
 			dpd_autosave.add_item(tr(autosave_options[i]), i)
+		if current != -1: dpd_autosave.select(current)
 
 	if dpd_save_style:
+		var current = dpd_save_style.selected
 		dpd_save_style.clear()
 		dpd_save_style.add_item(tr("STYLE_GRID"), 0)
 		dpd_save_style.add_item(tr("STYLE_LIST"), 1)
-		
-	if btn_apply:
-		btn_apply.text = tr("SETTINGS_VIDEO_SAVE_CHANGE") 
+		if current != -1: dpd_save_style.select(current)
 		
 	if dpd_save_location:
+		var current = dpd_save_location.selected
 		dpd_save_location.clear()
 		dpd_save_location.add_item(tr("SETTINGS_SAVE_LOC_GLOBAL"), 0)
 		dpd_save_location.add_item(tr("SETTINGS_SAVE_LOC_VERSION"), 1)
+		if current != -1: dpd_save_location.select(current)
+		
+	if btn_apply:
+		btn_apply.text = tr("SETTINGS_VIDEO_SAVE_CHANGE") 
 		
 	if chk_confirm_save: chk_confirm_save.text = tr("SETTINGS_CONFIRM_SAVE")
 	if chk_confirm_load: chk_confirm_load.text = tr("SETTINGS_CONFIRM_LOAD")
@@ -73,12 +112,10 @@ func _setup_texts():
 # ==========================================
 # 3. SINCRONIZACIÓN VISUAL
 # ==========================================
-func _sync_values():
+func _sync_values() -> void:
 	if dpd_autosave: dpd_autosave.select(Preferences.get_setting("game", "autosave_interval", 0))
 	if dpd_save_style: dpd_save_style.select(Preferences.get_setting("game", "save_style", 1))
-	
-	if dpd_save_location:
-		dpd_save_location.select(Preferences.get_setting("game", "save_location", 0))
+	if dpd_save_location: dpd_save_location.select(Preferences.get_setting("game", "save_location", 0))
 	
 	if chk_confirm_save:
 		chk_confirm_save.set_pressed_no_signal(Preferences.get_setting("game", "confirm_save", true))
@@ -86,56 +123,56 @@ func _sync_values():
 		chk_confirm_load.set_pressed_no_signal(Preferences.get_setting("game", "confirm_load", true))
 	if chk_confirm_delete:
 		chk_confirm_delete.set_pressed_no_signal(Preferences.get_setting("game", "confirm_delete", true))
-
+	
+	_pending_changes = false
 
 # ==========================================
 # REACCIÓN A EVENTOS GLOBALES
 # ==========================================
-func _notification(what):
+func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED:
 		_setup_texts()
 		_sync_values()
-		_pending_changes = false 
 
 # ==========================================
 # SEÑALES DE USUARIO
 # ==========================================
 
-func _on_autosave_selected(idx):
+func _on_autosave_selected(idx: int) -> void:
 	Preferences.set_setting("game", "autosave_interval", idx)
 	_pending_changes = true
 	AudioManager.play_ui_sfx()
 
-func _on_save_style_selected(idx):
+func _on_save_style_selected(idx: int) -> void:
 	Preferences.set_setting("game", "save_style", idx)
 	_pending_changes = true
 	AudioManager.play_ui_sfx()
 	
-func _on_save_location_selected(idx):
+func _on_save_location_selected(idx: int) -> void:
 	Preferences.set_setting("game", "save_location", idx)
 	_pending_changes = true
 	AudioManager.play_ui_sfx()
 	
-func _on_confirm_save_toggled(button_pressed: bool):
+func _on_confirm_save_toggled(button_pressed: bool) -> void:
 	Preferences.set_setting("game", "confirm_save", button_pressed)
 	_pending_changes = true
 	AudioManager.play_ui_sfx()
 
-func _on_confirm_load_toggled(button_pressed: bool):
+func _on_confirm_load_toggled(button_pressed: bool) -> void:
 	Preferences.set_setting("game", "confirm_load", button_pressed)
 	_pending_changes = true
 	AudioManager.play_ui_sfx()
 
-func _on_confirm_delete_toggled(button_pressed: bool):
+func _on_confirm_delete_toggled(button_pressed: bool) -> void:
 	Preferences.set_setting("game", "confirm_delete", button_pressed)
 	_pending_changes = true
 	AudioManager.play_ui_sfx()
 
-func _on_apply_pressed():
+func _on_apply_pressed() -> void:
 	Preferences.save_to_disk()
 	_pending_changes = false 
 	AudioManager.play_ui_sfx()
-	print("iOplazxEssence: Cambios de juego guardados.")
+	EssenceLogger.system_info("[%s] Save & style preferences committed to disk." % ES_NAME_CLASS)
 
 func has_unsaved_changes() -> bool:
 	return _pending_changes
