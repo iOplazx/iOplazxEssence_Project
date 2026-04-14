@@ -12,6 +12,8 @@ const PATH_TEMPLATES = "res://addons/iOplazxEssence/templates/"
 const USER_STATIC = "res://_static/"
 const USER_SAVE_MANAGER = USER_STATIC + "GameSaveManager.gd"
 
+const USER_BUS_LAYOUT = USER_STATIC + "essence_bus_layout.tres"
+
 # --- AUTOLOADS DICTIONARY (Layered by Dependency) ---
 const AUTOLOADS = {
 	# LAYER 0: Foundations (No dependencies)
@@ -65,22 +67,31 @@ func _exit_tree() -> void:
 
 ## Creates necessary folders and copies base template files if they don't exist.
 func _deploy_user_scaffolding() -> void:
-	# Create the _static directory if it's missing
+	# 1. Crear carpeta _static si falta
 	if not DirAccess.dir_exists_absolute(USER_STATIC):
 		var err = DirAccess.make_dir_absolute(USER_STATIC)
 		if err != OK:
 			push_error("iOplazxEssence: Failed to create _static folder. Error code: " + str(err))
-		
-	# Deploy the SaveManager template if the user doesn't have one yet
+	
+	# 2. Desplegar GameSaveManager
 	if not FileAccess.file_exists(USER_SAVE_MANAGER):
 		var template_path = PATH_TEMPLATES + "GameSaveManager.gd"
-		
 		if FileAccess.file_exists(template_path):
 			var err = DirAccess.copy_absolute(template_path, USER_SAVE_MANAGER)
 			if err == OK:
 				print("iOplazxEssence: Deployed GameSaveManager.gd template to _static/")
 			else:
 				push_error("iOplazxEssence: Failed to copy GameSaveManager template. Error code: " + str(err))
+
+	# 3. Desplegar Bus Layout de Audio (NUEVO)
+	if not FileAccess.file_exists(USER_BUS_LAYOUT):
+		var template_bus = PATH_TEMPLATES + "default_bus_layout.tres"
+		if FileAccess.file_exists(template_bus):
+			var err = DirAccess.copy_absolute(template_bus, USER_BUS_LAYOUT)
+			if err == OK:
+				print("iOplazxEssence: Deployed essence_bus_layout.tres template to _static/")
+			else:
+				push_error("iOplazxEssence: Failed to copy Audio Bus template. Error code: " + str(err))
 
 ## Forces base project configurations (Resolution, Rendering, etc.)
 func _setup_project_settings() -> void:
@@ -96,6 +107,10 @@ func _setup_project_settings() -> void:
 	
 	# V-Sync: Disabled by default for maximum FPS on low-end hardware
 	ProjectSettings.set_setting("display/window/vsync/vsync_mode", 0)
+
+	# Force the use of the audio layout from the _static folder
+	if FileAccess.file_exists(USER_BUS_LAYOUT):
+		ProjectSettings.set_setting("audio/buses/default_bus_layout", USER_BUS_LAYOUT)
 	
 	# Save changes to project.godot
 	ProjectSettings.save()
