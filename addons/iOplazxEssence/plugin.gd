@@ -12,45 +12,54 @@ const PATH_TEMPLATES = "res://addons/iOplazxEssence/templates/"
 const USER_STATIC = "res://_static/"
 const USER_SAVE_MANAGER = USER_STATIC + "GameSaveManager.gd"
 
-# --- AUTOLOADS DICTIONARY ---
-# Defines the Singletons required by the framework and their paths.
+# --- AUTOLOADS DICTIONARY (Layered by Dependency) ---
 const AUTOLOADS = {
+	# LAYER 0: Foundations (No dependencies)
 	"EssenceLogger": PATH_MANAGERS + "EssenceLogger.gd",
 	"EssenceError": PATH_MANAGERS + "EssenceError.gd",
-	"Preferences": PATH_MANAGERS + "Preferences.gd",
-	"AudioManager": PATH_MANAGERS + "AudioManager.gd",
-	"SceneManager": PATH_MANAGERS + "SceneManager.gd",
-	"DisplayManager": PATH_MANAGERS + "DisplayManager.gd",
-	"LanguageManager": PATH_MANAGERS + "LanguageManager.gd",
+	
+	# LAYER 1: Core Systems (Depend on Layer 0)
 	"FileManager": PATH_MANAGERS + "FileManager.gd",
+	"Preferences": PATH_MANAGERS + "Preferences.gd",
 	
-	# Important: We point the SaveManager to the User Workspace, not the addon folder.
-	# This prevents user logic from being overwritten during framework updates.
+	# LAYER 2: Complex Logic (Depend on Layer 1)
+	"LanguageManager": PATH_MANAGERS + "LanguageManager.gd",
 	"SaveManager": USER_SAVE_MANAGER,
+	"AudioManager": PATH_MANAGERS + "AudioManager.gd",
+	"DisplayManager": PATH_MANAGERS + "DisplayManager.gd",
 	
+	# LAYER 3: Master Controllers (Depend on Layer 2)
+	"SceneManager": PATH_MANAGERS + "SceneManager.gd",
+	
+	# LAYER 4: Visual Overlays (.tscn)
 	"GlobalLoading": PATH_UI + "overlays/EssenceLoadingScreen.tscn",
 	"EssenceWarningUI": PATH_UI + "overlays/EssenceWarningScreen.tscn"
 }
 
 func _enter_tree() -> void:
-	# 1. Setup User Workspace (Folders and Templates)
+	# 1. Prepare User Workspace (Folders and Templates)
 	_deploy_user_scaffolding()
 	
-	# 2. Automatic Autoload Registration
+	# 2. Secure Autoload Registration
 	for autoload_name in AUTOLOADS:
-		add_autoload_singleton(autoload_name, AUTOLOADS[autoload_name])
+		var path = AUTOLOADS[autoload_name]
+		
+		# Optimization: Only register if the file actually exists to avoid compiler hangs
+		if FileAccess.file_exists(path):
+			add_autoload_singleton(autoload_name, path)
+		else:
+			push_warning("iOplazxEssence: Could not find " + autoload_name + " at " + path)
 	
 	# 3. Apply Optimal Project Settings
 	_setup_project_settings()
 	
-	# Note: We use standard 'print' instead of EssenceLogger because 
-	# this script runs in the Editor context (@tool), not the game runtime.
 	print("iOplazxEssence: Framework v0.1.1 activated and deployed successfully.")
 
 func _exit_tree() -> void:
-	# Cleanup Autoloads when the plugin is disabled
+	# Safe Cleanup: Only remove settings that actually exist
 	for autoload_name in AUTOLOADS:
-		remove_autoload_singleton(autoload_name)
+		if ProjectSettings.has_setting("autoload/" + autoload_name):
+			remove_autoload_singleton(autoload_name)
 		
 	print("iOplazxEssence: Framework deactivated.")
 
@@ -72,19 +81,21 @@ func _deploy_user_scaffolding() -> void:
 				print("iOplazxEssence: Deployed GameSaveManager.gd template to _static/")
 			else:
 				push_error("iOplazxEssence: Failed to copy GameSaveManager template. Error code: " + str(err))
-		else:
-			push_warning("iOplazxEssence: Template not found at " + template_path)
 
 ## Forces base project configurations (Resolution, Rendering, etc.)
 func _setup_project_settings() -> void:
-	# Display configuration
+	# UI Optimization: Stretch mode is vital for the integrated GPU performance
 	ProjectSettings.set_setting("display/window/size/viewport_width", 1280)
 	ProjectSettings.set_setting("display/window/size/viewport_height", 720)
 	ProjectSettings.set_setting("display/window/stretch/mode", "canvas_items")
+	ProjectSettings.set_setting("display/window/stretch/aspect", "expand")
 	
-	# Force GL Compatibility mode (Crucial for integrated graphics performance)
+	# Hardware Optimization: Force GL Compatibility (Essential for Athlon Silver 3050U)
 	ProjectSettings.set_setting("rendering/renderer/rendering_method", "gl_compatibility")
 	ProjectSettings.set_setting("rendering/renderer/rendering_method.mobile", "gl_compatibility")
 	
-	# Save changes to the user's project.godot file
+	# V-Sync: Disabled by default for maximum FPS on low-end hardware
+	ProjectSettings.set_setting("display/window/vsync/vsync_mode", 0)
+	
+	# Save changes to project.godot
 	ProjectSettings.save()

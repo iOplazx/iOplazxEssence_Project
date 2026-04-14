@@ -12,23 +12,23 @@ const ES_NAME_CLASS = "EssenceWarningUI"
 
 var _unread_count: int = 0
 
-func _ready():
+func _ready() -> void:
 	# 1. Blindaje Inicial
 	_check_security_nodes()
 	
-	# 2. Empezamos con la pantalla limpia de forma segura
+	# 2. Empezamos invisibles y desactivados para ahorrar recursos
+	self.hide() 
 	if warning_panel: warning_panel.visible = false
 	if btn_trigger: btn_trigger.visible = false
 	
-	# 3. Conexiones
+	# 3. Conexiones Locales
 	if btn_trigger: btn_trigger.pressed.connect(_on_trigger_pressed)
 	if btn_close: btn_close.pressed.connect(_on_close_pressed)
 	if btn_clear: btn_clear.pressed.connect(_clear_history)
 	
-	# 4. Escuchamos globalmente al sistema de errores
-	if is_instance_valid(EssenceError) and EssenceError.has_signal("on_error_reported"):
-		EssenceError.on_error_reported.connect(_on_new_error)
-
+	# 4. Conexión Externa Segura (Late Binding)
+	_safe_connect_error_signal()
+	
 # ==========================================
 # BLINDAJE DE SEGURIDAD
 # ==========================================
@@ -49,13 +49,16 @@ func _check_security_nodes():
 # ==========================================
 # FLUJO AUTOMÁTICO
 # ==========================================
-func _on_new_error(data: Dictionary):
-	# Si es un Warning, despertamos al sistema
-	if data.get("severity", 0) == EssenceError.Severity.WARNING:
+func _on_new_error(data: Dictionary) -> void:
+	# Usamos el valor crudo 1 (WARNING) para evitar dependencias de clase
+	var severity = data.get("severity", 0)
+	
+	if severity == 1: # 1 = WARNING
 		_add_warning_to_list(data)
 		_unread_count += 1
 		
-		# ¡Aparición!
+		# ¡Despertamos la UI!
+		self.show() 
 		if btn_trigger:
 			btn_trigger.visible = true
 			btn_trigger.modulate = Color(1.0, 0.8, 0.2) # Brillo amarillo
@@ -73,14 +76,15 @@ func _on_trigger_pressed():
 		if title_base == "UI_WARNING_TITLE": title_base = "SYSTEM WARNINGS" # Fallback temporal
 		lbl_title.text = title_base + " (" + str(warning_list.get_child_count()) + ")"
 
-func _on_close_pressed():
+func _on_close_pressed() -> void:
 	_play_sfx()
-	
 	if warning_panel: warning_panel.visible = false
-	if btn_trigger: btn_trigger.visible = false # El icono desaparece hasta el próximo warning
+	if btn_trigger: btn_trigger.visible = false 
 	
-	# Usamos nuestro Logger oficial en lugar de print()
-	EssenceLogger.system_info("[%s] Interface hidden by user." % ES_NAME_CLASS)
+	_safe_log("[%s] Interface hidden by user." % ES_NAME_CLASS)
+	
+	# Si no hay más botones visibles, podemos volver a ocultar el CanvasLayer completo
+	self.hide()
 
 # ==========================================
 # UTILIDADES
@@ -108,7 +112,27 @@ func _clear_history():
 			
 	_on_close_pressed()
 
-func _play_sfx():
-	# Centralizamos la llamada al audio para no repetirla
-	if is_instance_valid(AudioManager) and AudioManager.has_method("play_ui_sfx"):
-		AudioManager.play_ui_sfx()
+func _play_sfx() -> void:
+	_safe_audio_ui()
+		
+# ==============================================================================
+# WRAPPERS DE SEGURIDAD (Desacoplamiento Total)
+# ==============================================================================
+
+func _safe_log(msg: String) -> void:
+	var logger = get_tree().root.get_node_or_null("EssenceLogger")
+	if is_instance_valid(logger) and logger.has_method("system_info"):
+		logger.system_info(msg)
+	else:
+		print("Fallback Log: ", msg)
+
+func _safe_audio_ui() -> void:
+	var audio_mgr = get_tree().root.get_node_or_null("AudioManager")
+	if is_instance_valid(audio_mgr) and audio_mgr.has_method("play_ui_sfx"):
+		audio_mgr.play_ui_sfx()
+
+func _safe_connect_error_signal() -> void:
+	var err_node = get_tree().root.get_node_or_null("EssenceError")
+	if is_instance_valid(err_node) and err_node.has_signal("on_error_reported"):
+		if not err_node.on_error_reported.is_connected(_on_new_error):
+			err_node.on_error_reported.connect(_on_new_error)
