@@ -19,21 +19,21 @@ const AUTOLOADS = {
 	"EssenceError": PATH_MANAGERS + "EssenceError.gd",
 	
 	# LAYER 1: Core Systems (Depend on Layer 0)
-	"FileManager": PATH_MANAGERS + "FileManager.gd",
-	"Preferences": PATH_MANAGERS + "Preferences.gd",
+	"FileManager": PATH_MANAGERS + "EssenceFileManager.gd",
+	"Preferences": PATH_MANAGERS + "EssencePreferences.gd",
 	
 	# LAYER 2: Complex Logic (Depend on Layer 1)
-	"LanguageManager": PATH_MANAGERS + "LanguageManager.gd",
+	"LanguageManager": PATH_MANAGERS + "EssenceLanguageManager.gd",
 	"SaveManager": USER_SAVE_MANAGER,
-	"AudioManager": PATH_MANAGERS + "AudioManager.gd",
-	"DisplayManager": PATH_MANAGERS + "DisplayManager.gd",
+	"AudioManager": PATH_MANAGERS + "EssenceAudioManager.gd",
+	"DisplayManager": PATH_MANAGERS + "EssenceDisplayManager.gd",
 	
 	# LAYER 3: Master Controllers (Depend on Layer 2)
-	"SceneManager": PATH_MANAGERS + "SceneManager.gd",
+	"SceneManager": PATH_MANAGERS + "EssenceSceneManager.gd",
 	
 	# LAYER 4: Visual Overlays (.tscn)
 	"GlobalLoading": PATH_UI + "overlays/EssenceLoadingScreen.tscn",
-	"EssenceWarningUI": PATH_UI + "overlays/EssenceWarningScreen.tscn"
+	"EssenceWarningUI": PATH_UI + "overlays/EssenceWarningOverlay.tscn"
 }
 
 func _enter_tree() -> void:
