@@ -1,15 +1,16 @@
 extends Node
+
 const ES_NAME_CLASS = "EssenceFileManager"
 
 var config: EssenceMasterConfig
 var path_remote_actual: String = ""
 var path_global_actual: String = "user://"
 
-func _ready():
+func _ready() -> void:
 	_load_config()
 	_determine_system_paths()
 	
-func _load_config():
+func _load_config() -> void:
 	# 1. Ruta personalizada del desarrollador (Prioridad Máxima)
 	var custom_path = "res://_static/EssenceMasterConfig.tres"
 	# 2. Ruta de plantilla del framework (Respaldo/Fallback)
@@ -17,31 +18,28 @@ func _load_config():
 	
 	if ResourceLoader.exists(custom_path):
 		config = load(custom_path) as EssenceMasterConfig
-		#print("Essence: Cargando configuración personalizada desde _static.")
-		var log_msg = "[%s/_load_config] Loading custom configuration from _static." % ES_NAME_CLASS
-		EssenceLogger.system_info(log_msg)
+		_safe_log("[%s/_load_config] Loading custom configuration from _static." % ES_NAME_CLASS)
 		
 	elif ResourceLoader.exists(default_path):
 		config = load(default_path) as EssenceMasterConfig
-		#print("Essence: Cargando configuración por defecto del addon.")
-		var log_msg = "[%s/_load_config] Loading default configuration from addon." % ES_NAME_CLASS
-		EssenceLogger.system_info(log_msg)
-		EssenceError.report(
+		_safe_log("[%s/_load_config] Loading default configuration from addon." % ES_NAME_CLASS)
+		
+		# severity 1 = WARNING
+		_safe_error(
 			"EssenceMasterConfig not found in _static", 
 			"EssenceMasterConfig.tres was not found in res://_static/. Loaded default config from addon instead.",
-			EssenceError.Severity.WARNING
+			1 
 		)
 		
 	else:
-		#push_error("Essence CRITICAL: No se encontró EssenceMasterConfig.tres en ninguna ruta válida.")
-		EssenceError.report(
+		# severity 2 = CRITICAL
+		_safe_error(
 			"EssenceMasterConfig not found", 
 			"EssenceMasterConfig.tres could not be found in any valid path",
-			EssenceError.Severity.CRITICAL
+			2 
 		)
 
-
-func _determine_system_paths():
+func _determine_system_paths() -> void:
 	# Si estamos probando en el editor, simulamos la ruta externa para no ensuciar tu PC
 	if OS.has_feature("editor"):
 		path_remote_actual = ProjectSettings.globalize_path("res://_remote_debug")
@@ -53,12 +51,10 @@ func _determine_system_paths():
 # INICIALIZACIÓN (Llamar desde el BootBase)
 # ==========================================
 
-func initialize_file_system():
-	if not config: return
+func initialize_file_system() -> void:
+	if not is_instance_valid(config): return
 	
-	#print("Essence: Inicializando Sistema de Archivos...")
-	var log_msg = "[%s/initialize_file_system] Initializing File System..." % ES_NAME_CLASS
-	EssenceLogger.system_info(log_msg)
+	_safe_log("[%s/initialize_file_system] Initializing File System..." % ES_NAME_CLASS)
 	
 	# 1. Crear y clonar la carpeta REMOTE (Junto al .exe)
 	if config.path_remote_template != "":
@@ -69,7 +65,9 @@ func initialize_file_system():
 			var ignore_path = path_remote_actual + "/.gdignore"
 			if not FileAccess.file_exists(ignore_path):
 				var file = FileAccess.open(ignore_path, FileAccess.WRITE)
-				file.store_string("")
+				if file:
+					file.store_string("")
+					file.close() # ¡Optimización: Liberar memoria!
 		
 	# 2. Crear y clonar la carpeta GLOBAL (AppData)
 	if config.path_global_template != "":
@@ -77,19 +75,16 @@ func initialize_file_system():
 		var user_real_path = ProjectSettings.globalize_path("user://")
 		_clone_directory(config.path_global_template, user_real_path)
 		
-	#print("Essence: Sistema de Archivos Listo.")
-	log_msg = "[%s/initialize_file_system] File System Ready." % ES_NAME_CLASS
-	EssenceLogger.system_info(log_msg)
+	_safe_log("[%s/initialize_file_system] File System Ready." % ES_NAME_CLASS)
 
 # ==========================================
 # MOTOR DE CLONACIÓN RECURSIVA
 # ==========================================
 
-func _clone_directory(source_dir: String, target_dir: String):
+func _clone_directory(source_dir: String, target_dir: String) -> void:
 	var dir = DirAccess.open(source_dir)
 	if not dir:
-		# Si el dev no creó la carpeta de plantilla en res://, no hacemos nada
-		return 
+		return # Si el dev no creó la carpeta de plantilla en res://, no hacemos nada
 
 	# Si la carpeta destino no existe en la PC del jugador, la creamos
 	if not DirAccess.dir_exists_absolute(target_dir):
@@ -104,7 +99,7 @@ func _clone_directory(source_dir: String, target_dir: String):
 				# Es una sub-carpeta, hacemos recursividad
 				_clone_directory(source_dir + "/" + file_name, target_dir + "/" + file_name)
 		else:
-			# Es un archivo. Copiamos SOLO SI NO EXISTE. 
+			# Es un archivo. Copiamos SOLO SI NO EXISTE. [cite: 7]
 			# Así no le borramos al jugador los archivos que ya tradujo/modificó.
 			var src_file = source_dir + "/" + file_name
 			var dst_file = target_dir + "/" + file_name
@@ -115,3 +110,23 @@ func _clone_directory(source_dir: String, target_dir: String):
 					DirAccess.copy_absolute(src_file, dst_file)
 					
 		file_name = dir.get_next()
+		
+	dir.list_dir_end() # ¡Optimización: Cerramos la lectura del directorio!
+
+# ==============================================================================
+# WRAPPERS DE SEGURIDAD (Desacoplamiento Total)
+# ==============================================================================
+
+func _safe_log(msg: String) -> void:
+	var logger = get_tree().root.get_node_or_null("EssenceLogger")
+	if is_instance_valid(logger) and logger.has_method("system_info"):
+		logger.system_info(msg)
+	else:
+		print("Fallback Log: ", msg)
+
+func _safe_error(title: String, msg: String, severity: int = 1) -> void:
+	var err_handler = get_tree().root.get_node_or_null("EssenceError")
+	if is_instance_valid(err_handler) and err_handler.has_method("report"):
+		err_handler.report(title, msg, severity) 
+	else:
+		push_warning("Fallback Error [" + title + "]: " + msg)
