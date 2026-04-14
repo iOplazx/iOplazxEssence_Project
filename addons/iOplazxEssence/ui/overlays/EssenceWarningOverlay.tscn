@@ -14,6 +14,7 @@ expand_margin_left = 5.0
 [node name="EssenceWarningOverlay" type="CanvasLayer" unique_id=215950999 node_paths=PackedStringArray("btn_trigger", "warning_panel", "btn_close", "warning_list", "lbl_title", "btn_clear")]
 process_mode = 3
 layer = 120
+visible = false
 script = ExtResource("1_p1p13")
 btn_trigger = NodePath("MainControl/BtnWarningTrigger")
 warning_panel = NodePath("MainControl/WarningPanel")

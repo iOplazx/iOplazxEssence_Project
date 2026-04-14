@@ -10,7 +10,7 @@ func _ready():
 	# This is where the addon confirms it is ready to receive save data
 	#print("GameSaveManager: Persistence system ready for the Demo.")
 	var log_msg = "[%s/_ready] GameSaveManager initialized, wrapping EssenceSaveManager." % GAME_NAME_CLASS
-	EssenceLogger.system_info(log_msg)
+	_safe_log(log_msg)
 
 # ==============================================================================
 # INTEGRATION HOOKS
@@ -37,13 +37,13 @@ func _on_after_load_hook(game_data: Dictionary):
 	# This method runs after the physical save data is read from disk.
 	# It is the place to "unpack" and apply loaded data to the game.
 	
+	var log_msg = ""
 	if game_data.has("demo_progress"):
-		#print("Load complete: Detected progress is: ", game_data["demo_progress"])
-		var log_msg = "[%s/_on_after_load_hook] Load complete: Detected progress is: %s" % [GAME_NAME_CLASS, game_data["demo_progress"]]
-		EssenceLogger.system_info(log_msg)
+		log_msg = "[%s/_on_after_load_hook] Load complete: Detected progress is: %s" % [GAME_NAME_CLASS, game_data["demo_progress"]]
 	else:
-		var log_msg = "[%s/_on_after_load_hook] Load complete: No previous progress detected. Starting fresh." % GAME_NAME_CLASS
-		EssenceLogger.system_info(log_msg)
+		log_msg = "[%s/_on_after_load_hook] Load complete: No previous progress detected. Starting fresh." % GAME_NAME_CLASS
+		
+	_safe_log(log_msg)
 	
 	# If a checkpoint or continue load is performed, restore here:
 	# 1. Player position
