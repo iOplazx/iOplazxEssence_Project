@@ -4,3 +4,4 @@
 
 [resource]
 script = ExtResource("1_3yjpx")
+path_static_loc = "res://addons/iOplazxEssence/static_loc/"
