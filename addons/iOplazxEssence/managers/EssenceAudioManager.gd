@@ -181,7 +181,6 @@ func save_audio_settings(
 	_safe_set_pref("audio", "UI", vol_ui)
 	_safe_set_pref("audio", "Voices", vol_voices)
 	
-	# Guardamos Estados de Mute
 	_safe_set_pref("audio", "Master_mute", mute_master)
 	_safe_set_pref("audio", "Music_mute", mute_music)
 	_safe_set_pref("audio", "SFX_mute", mute_sfx)
@@ -192,7 +191,6 @@ func save_audio_settings(
 	
 	_safe_save_prefs()
 
-# Agrega esta función si no la tenías ya:
 func set_bus_mute(bus_name: String, is_muted: bool) -> void:
 	var bus_index = AudioServer.get_bus_index(bus_name)
 	if bus_index >= 0:
@@ -223,7 +221,6 @@ func load_audio_settings() -> Dictionary:
 	set_bus_volume("UI", vols["UI"])
 	set_bus_volume("Voices", vols["Voices"])
 	
-	# ¡NUEVO!: Aplicamos los mutes físicos al AudioServer de Godot
 	set_bus_mute("Master", vols["Master_mute"])
 	set_bus_mute("Music", vols["Music_mute"])
 	set_bus_mute("SFX", vols["SFX_mute"])

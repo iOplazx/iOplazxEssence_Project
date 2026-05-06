@@ -83,6 +83,17 @@ func _conectar_botones_estaticos():
 		btn_back.pressed.connect(func(): 
 			AudioManager.play_ui_sfx()
 			SaveManager.delete_temp_screenshot()
+			
+			# --- EL PUENTE ---
+			# Verificamos si hay una sesión en vivo usando tu función 'has_live_session()'
+			if SaveManager.has_live_session():
+				# Pasamos lo que estaba en el caché temporal a la RAM de carga
+				# para que game.gd lo detecte al volver.
+				SaveManager.loaded_game_data = SaveManager._temp_game_data.duplicate()
+				
+				# Opcional: Limpiamos el temporal para que no se quede duplicado
+				SaveManager.clear_temp_data()
+			
 			SceneManager.go_back()
 		)
 	if btn_mode_save: btn_mode_save.pressed.connect(func(): _set_mode(true))
