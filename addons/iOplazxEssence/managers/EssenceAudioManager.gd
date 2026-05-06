@@ -168,16 +168,35 @@ func set_bus_volume(bus_name: String, value: float) -> void:
 	if bus_idx >= 0:
 		AudioServer.set_bus_volume_db(bus_idx, linear_to_db(value))
 
-func save_audio_settings(vol_master: float, vol_music: float, vol_sfx: float, vol_ui: float, vol_voices: float) -> void:
+func save_audio_settings(
+		vol_master: float, vol_music: float, vol_sfx: float, vol_ui: float, vol_voices: float,
+		mute_master: bool, mute_music: bool, mute_sfx: bool, mute_ui: bool, mute_voices: bool,
+		focus_mute: bool
+	) -> void:
+		
+	# Guardamos Volúmenes
 	_safe_set_pref("audio", "Master", vol_master)
 	_safe_set_pref("audio", "Music", vol_music)
 	_safe_set_pref("audio", "SFX", vol_sfx)
 	_safe_set_pref("audio", "UI", vol_ui)
 	_safe_set_pref("audio", "Voices", vol_voices)
-	_safe_set_pref("audio", "mute_on_focus", mute_on_focus_loss)
 	
-	# Disparamos el guardado al disco
+	# Guardamos Estados de Mute
+	_safe_set_pref("audio", "Master_mute", mute_master)
+	_safe_set_pref("audio", "Music_mute", mute_music)
+	_safe_set_pref("audio", "SFX_mute", mute_sfx)
+	_safe_set_pref("audio", "UI_mute", mute_ui)
+	_safe_set_pref("audio", "Voices_mute", mute_voices)
+	
+	_safe_set_pref("audio", "mute_on_focus", focus_mute)
+	
 	_safe_save_prefs()
+
+# Agrega esta función si no la tenías ya:
+func set_bus_mute(bus_name: String, is_muted: bool) -> void:
+	var bus_index = AudioServer.get_bus_index(bus_name)
+	if bus_index >= 0:
+		AudioServer.set_bus_mute(bus_index, is_muted)
 
 func load_audio_settings() -> Dictionary:
 	var vols = {
@@ -185,17 +204,31 @@ func load_audio_settings() -> Dictionary:
 		"Music": _safe_get_pref("audio", "Music", 1.0),
 		"SFX": _safe_get_pref("audio", "SFX", 1.0),
 		"UI": _safe_get_pref("audio", "UI", 1.0),
-		"Voices": _safe_get_pref("audio", "Voices", 1.0)
+		"Voices": _safe_get_pref("audio", "Voices", 1.0),
+		
+		"Master_mute": _safe_get_pref("audio", "Master_mute", false),
+		"Music_mute": _safe_get_pref("audio", "Music_mute", false),
+		"SFX_mute": _safe_get_pref("audio", "SFX_mute", false),
+		"UI_mute": _safe_get_pref("audio", "UI_mute", false),
+		"Voices_mute": _safe_get_pref("audio", "Voices_mute", false)
 	}
 	
 	current_ui_theme = _safe_get_pref("audio", "ui_theme", 0)
 	mute_on_focus_loss = _safe_get_pref("audio", "mute_on_focus", false)
 	
+	# Aplicamos los volúmenes
 	set_bus_volume("Master", vols["Master"])
 	set_bus_volume("Music", vols["Music"])
 	set_bus_volume("SFX", vols["SFX"])
 	set_bus_volume("UI", vols["UI"])
 	set_bus_volume("Voices", vols["Voices"])
+	
+	# ¡NUEVO!: Aplicamos los mutes físicos al AudioServer de Godot
+	set_bus_mute("Master", vols["Master_mute"])
+	set_bus_mute("Music", vols["Music_mute"])
+	set_bus_mute("SFX", vols["SFX_mute"])
+	set_bus_mute("UI", vols["UI_mute"])
+	set_bus_mute("Voices", vols["Voices_mute"])
 	
 	return vols
 	

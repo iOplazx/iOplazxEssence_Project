@@ -29,6 +29,8 @@ const ES_NAME_CLASS = "EssenceRowSlider"
 var _volumen_previo: float = 1.0 
 var _cambio_automatico: bool = false 
 
+signal mute_toggled(is_muted: bool)
+
 func _ready():
 	_check_security_nodes()
 	
@@ -40,8 +42,6 @@ func _ready():
 		slider.max_value = max_value
 		slider.step = step
 		slider.value_changed.connect(_on_slider_changed)
-		
-		# UX Senior: Reproducir sonido solo al soltar el slider, no mientras se arrastra (evita spam de audio)
 		slider.drag_ended.connect(_on_slider_drag_ended)
 	
 	if icon_rect:
@@ -53,7 +53,8 @@ func _ready():
 			
 	if btn_mute:
 		btn_mute.visible = show_mute_button
-		btn_mute.toggled.connect(_on_mute_toggled)
+		# Conectamos el botón a nuestra nueva función
+		btn_mute.toggled.connect(_on_btn_mute_toggled)
 		
 	if slider:
 		_update_value_label(slider.value)
@@ -91,9 +92,13 @@ func _notification(what):
 func _on_slider_changed(val: float):
 	_update_value_label(val)
 	
+	# AUTO-UNMUTE: Si mueven el slider y estaba en mute, lo quitamos
 	if btn_mute and slider:
-		if val > slider.min_value and btn_mute.button_pressed and not _cambio_automatico:
-			btn_mute.set_pressed_no_signal(false) 
+		if btn_mute.button_pressed and not _cambio_automatico:
+			_cambio_automatico = true 
+			btn_mute.button_pressed = false # Desmarca la casilla visualmente
+			mute_toggled.emit(false) # Le avisa al AudioManager que quite el mute
+			_cambio_automatico = false
 
 func _on_slider_drag_ended(value_changed: bool):
 	# Solo hace ruido si realmente moviste el valor, no si solo le hiciste clic
@@ -109,22 +114,13 @@ func _update_value_label(val: float):
 	
 	lbl_value.text = value_prefix + formatted_number + value_suffix
 
-func _on_mute_toggled(is_muted: bool):
-	# Feedback de audio
+func _on_btn_mute_toggled(is_muted: bool):
+	# Feedback de audio (solo si no es un cambio por código)
 	if not _cambio_automatico and is_instance_valid(AudioManager) and AudioManager.has_method("play_ui_sfx"):
 		AudioManager.play_ui_sfx()
 		
-	_cambio_automatico = true 
+	# YA NO bajamos el slider a 0.
+	# Simplemente emitimos la señal para que el TabAudio haga el Mute nativo.
+	if not _cambio_automatico:
+		mute_toggled.emit(is_muted)
 	
-	if slider:
-		if is_muted:
-			if slider.value > slider.min_value:
-				_volumen_previo = slider.value
-			else:
-				_volumen_previo = (slider.max_value - slider.min_value) / 2.0 
-				
-			slider.value = slider.min_value
-		else:
-			slider.value = _volumen_previo
-		
-	_cambio_automatico = false

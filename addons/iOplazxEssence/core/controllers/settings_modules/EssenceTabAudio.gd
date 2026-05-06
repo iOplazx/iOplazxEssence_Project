@@ -66,12 +66,27 @@ func _setup_audio_tab() -> void:
 		btn_preview.texture_normal = _tex_play
 
 func _connect_row(row: EssenceRowSlider, bus_name: String, test: bool = false) -> void:
-	if is_instance_valid(row) and is_instance_valid(row.slider):
-		row.slider.value_changed.connect(func(v): AudioManager.set_bus_volume(bus_name, v))
-		row.slider.drag_ended.connect(func(_c): 
-			_save_audio()
-			if test: AudioManager.play_ui_sfx()
-		)
+	if is_instance_valid(row):
+		# Manejar el cambio de volumen
+		if is_instance_valid(row.slider):
+			row.slider.value_changed.connect(func(v): AudioManager.set_bus_volume(bus_name, v))
+			row.slider.drag_ended.connect(func(_c): 
+				_save_audio()
+				if test: AudioManager.play_ui_sfx()
+			)
+		
+		# ¡NUEVO!: Manejar el click en el CheckButton de mute
+		# Asumiendo que tu checkButton en RowSlider es accesible (ej: row.check_mute)
+		if row.has_signal("mute_toggled"):
+			row.mute_toggled.connect(func(is_muted):
+				AudioManager.set_bus_mute(bus_name, is_muted) # Usa el mute nativo de Godot
+				_save_audio() # Ahora sí guardamos al hacer clic
+			)
+		else:
+			EssenceError.report(
+				"mute_toggled not found",
+				"The 'mute_toggled' method was not found in the EssenceRowSlidder; perhaps the method name has been changed.",
+				EssenceError.Severity.WARNING)
 
 func _on_mute_focus_toggled(on: bool) -> void:
 	AudioManager.mute_on_focus_loss = on
@@ -79,19 +94,28 @@ func _on_mute_focus_toggled(on: bool) -> void:
 	AudioManager.play_ui_sfx()
 
 func _save_audio() -> void:
-	# Blindaje: Solo guardamos si los nodos están vivos
 	if not is_instance_valid(row_master): return
 	
+	var focus_mute = chk_mute_focus.button_pressed if chk_mute_focus else false
+	
 	AudioManager.save_audio_settings(
-		row_master.slider.value, row_music.slider.value, 
-		row_sfx.slider.value, row_ui.slider.value, row_voices.slider.value
+		row_master.slider.value, 
+		row_music.slider.value, 
+		row_sfx.slider.value, 
+		row_ui.slider.value, 
+		row_voices.slider.value,
+		row_master.btn_mute.button_pressed, 
+		row_music.btn_mute.button_pressed, 
+		row_sfx.btn_mute.button_pressed, 
+		row_ui.btn_mute.button_pressed, 
+		row_voices.btn_mute.button_pressed,
+		focus_mute
 	)
-	EssenceLogger.system_info("[%s] Audio settings saved to disk." % ES_NAME_CLASS)
-
+	EssenceLogger.system_info("[%s] Audio settings saved to disk (including mutes)." % ES_NAME_CLASS)
+	
 func _sync_audio() -> void:
 	var v = AudioManager.load_audio_settings()
 	
-	# Sincronización segura de valores
 	var mapping = {
 		"Master": row_master,
 		"Music": row_music,
@@ -102,8 +126,19 @@ func _sync_audio() -> void:
 	
 	for bus in mapping:
 		var row = mapping[bus]
-		if is_instance_valid(row) and is_instance_valid(row.slider):
-			row.slider.value = v.get(bus, 80.0)
+		if is_instance_valid(row):
+			# Sincronizamos el Slider
+			if is_instance_valid(row.slider):
+				row.slider.value = v.get(bus, 80.0)
+			
+			# Sincronizamos el CheckButton (Mute)
+			if is_instance_valid(row.btn_mute): 
+				row.btn_mute.set_block_signals(true) 
+				row.btn_mute.button_pressed = v.get(bus + "_mute", false) 
+				row.btn_mute.set_block_signals(false) 
+				
+				# Aplicamos el mute nativo al cargar la pestaña
+				AudioManager.set_bus_mute(bus, row.btn_mute.button_pressed)
 	
 	if dpd_theme: dpd_theme.selected = AudioManager.current_ui_theme
 	
