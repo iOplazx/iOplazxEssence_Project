@@ -1,11 +1,12 @@
 [gd_resource type="Resource" script_class="EssenceConfig" format=3 uid="uid://brymtyo7debjs"]
 
 [ext_resource type="Script" uid="uid://cbvfno3r005jc" path="res://addons/iOplazxEssence/core/configs/EssenceConfig.gd" id="1_5pgjl"]
+[ext_resource type="Texture2D" uid="uid://dvp7ydrt6x37m" path="res://addons/iOplazxEssence/resources/images/iconFramework_512.png" id="1_ka431"]
 
 [resource]
 script = ExtResource("1_5pgjl")
 show_warning_icon = true
 button_type = 1
 loading_logo_type = 2
-custom_loading_logo_path = "uid://dvp7ydrt6x37m"
+custom_loading_logo = ExtResource("1_ka431")
 metadata/_custom_type_script = "uid://cbvfno3r005jc"

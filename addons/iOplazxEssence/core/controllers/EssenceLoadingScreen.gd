@@ -76,7 +76,12 @@ func _build_ui() -> void:
 		match config.loading_logo_type:
 			0: logo_carga.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.GODOT)
 			1: logo_carga.texture = EssenceLoader.get_internImage(EssencePaths.KeyImage.IOPLAZX) 
-			2: logo_carga.texture = EssenceLoader.smart_load_texture(config.custom_loading_logo_path, true)
+			2: 
+				if config.custom_loading_logo != null:
+					logo_carga.texture = config.custom_loading_logo
+				else:
+					EssenceError.report("Logo Custom Mising", "Se seleccionó Custom pero no hay imagen", EssenceError.Severity.WARNING)
+					# Aquí puedes poner tu fallback
 				
 		contenedor.add_child(logo_carga)
 

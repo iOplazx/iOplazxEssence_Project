@@ -31,6 +31,6 @@ class_name EssenceConfig extends Resource
 
 @export_group("Loading Visuals")
 @export_enum("Godot", "Creator (iOplazx)", "Custom", "None") var loading_logo_type: int = 1
-@export_file("*.png", "*.jpg", "*.webp") var custom_loading_logo_path: String = ""
+@export var custom_loading_logo: Texture2D
 @export var show_progress_bar: bool = true
 @export var show_progress_text: bool = true # Para mostrar "Cargando... 45%"
