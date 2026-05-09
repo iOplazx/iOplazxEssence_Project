@@ -1,20 +1,19 @@
-# Godot 4+ specific ignores
+
 .godot/
 /android/
 
-# Exportaciones (¡Muy importante para tu privacidad!)
 export_presets.cfg
 
-# Archivos temporales
+
 *.tmp
 *~
+.vscode/
 
-# Archivos de sistema operativo (evita rastros de tu PC)
 .DS_Store
 Thumbs.db
 Desktop.ini
 
 .env
 
-# Essence Framework - Carpeta de simulación de archivos remotos
+
 _remote_debug/
