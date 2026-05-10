@@ -1,5 +1,46 @@
 [gd_scene format=3 uid="uid://7lbtoybnlsus"]
 
-[node name="EssenceTutorialPanelUi" type="Control" unique_id=690940897]
-layout_mode = 3
-anchors_preset = 0
+[ext_resource type="PackedScene" uid="uid://m2obut6r5np8" path="res://addons/iOplazxEssence/modules/base/ui/EssenceSimpleLateralPanelUI.tscn" id="1_ahv5y"]
+[ext_resource type="Script" uid="uid://dq3okcwuc4h65" path="res://addons/iOplazxEssence/modules/base/script/EssenceTutorialPanel.gd" id="2_xapdg"]
+
+[node name="TutorialPanelUI" unique_id=806485748 instance=ExtResource("1_ahv5y")]
+script = ExtResource("2_xapdg")
+tutorial_pages = Array[String]([])
+
+[node name="CajonDeslizante" parent="." index="0" unique_id=2097396663]
+custom_minimum_size = Vector2(250, 80)
+offset_top = 153.0
+offset_right = 250.0
+offset_bottom = -201.0
+
+[node name="TituloTutorial" type="Label" parent="CajonDeslizante/ContenedorFondo/MargenInterno/ContenedorContenido" parent_id_path=PackedInt32Array(1937369828) index="0" unique_id=752837838]
+layout_mode = 2
+text = "ESS_PANEL_TUTORIAL_TITLE"
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="CajonDeslizante/ContenedorFondo/MargenInterno/ContenedorContenido" parent_id_path=PackedInt32Array(1937369828) index="1" unique_id=1795290671]
+layout_mode = 2
+
+[node name="TextoExplicativo" type="RichTextLabel" parent="CajonDeslizante/ContenedorFondo/MargenInterno/ContenedorContenido" parent_id_path=PackedInt32Array(1937369828) index="2" unique_id=1451832487]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "ESS_PANEL_TUTORIAL_BODY"
+
+[node name="ContenedorBotones" type="HBoxContainer" parent="CajonDeslizante/ContenedorFondo/MargenInterno/ContenedorContenido" parent_id_path=PackedInt32Array(1937369828) index="3" unique_id=1558179355]
+layout_mode = 2
+alignment = 1
+
+[node name="BtnAnterior" type="Button" parent="CajonDeslizante/ContenedorFondo/MargenInterno/ContenedorContenido/ContenedorBotones" index="0" unique_id=603269169]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "ESS_BUTTON_PREV_TUTORIAL"
+
+[node name="BtnSiguiente" type="Button" parent="CajonDeslizante/ContenedorFondo/MargenInterno/ContenedorContenido/ContenedorBotones" index="1" unique_id=593608441]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+text = "ESS_BUTTON_NEXT_TUTORIAL"

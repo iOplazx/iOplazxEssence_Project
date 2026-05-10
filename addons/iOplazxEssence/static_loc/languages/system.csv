@@ -178,3 +178,8 @@ GLOBAL_AUTHOR,Author,Autor
 GLOBAL_VERSION,Version,Versión
 GLOBAL_AUTHOR_P,Author: ,Autor
 GLOBAL_VERSION_P,Version: ,Versión
+ESS_BUTTON_NEXT_TUTORIAL,Next >,Siguiente >
+ESS_BUTTON_PREV_TUTORIAL,< Previous,< Anterior
+ESS_BUTTON_UNDERSTOOD,Understood!,Entendido!
+ESS_PANEL_TUTORIAL_TITLE,Tutorial, Tutorial
+ESS_PANEL_TUTORIAL_BODY, This is a test message., Esto es un texto de prueba.
