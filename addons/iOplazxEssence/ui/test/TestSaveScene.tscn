@@ -91,4 +91,6 @@ side = 1
 
 [node name="TutorialPanelUI" parent="." unique_id=720158829 instance=ExtResource("3_50g51")]
 layout_mode = 1
+top_margin = 0.25
+bottom_margin = 0.7
 side = 1

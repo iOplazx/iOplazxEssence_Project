@@ -25,10 +25,26 @@ signal page_changed(page: int)
 # ==========================================
 # VARIABLES
 # ==========================================
+@export_group("Layout Customization")
+@export_range(0.0, 0.5) var top_margin: float = 0.2:
+	set(value):
+		top_margin = value
+		if is_node_ready(): _update_custom_layout()
+
+@export_range(0.5, 1.0) var bottom_margin: float = 0.8:
+	set(value):
+		bottom_margin = value
+		if is_node_ready(): _update_custom_layout()
+
+@export_group("Content")
 @export var tutorial_pages: Array[String] = []
+
+# ==========================================
+# VARIABLES Y NODOS
+# ==========================================
 var _current_page: int = 0
 
-# Referencias a la UI (Asegúrate de marcar estos nodos con % en la escena)
+# Referencias a la UI (Asegúrate de tener el % en la escena)
 @onready var rich_text_tutorial: RichTextLabel = %TextoExplicativo
 @onready var btn_prev: Button = %BtnAnterior
 @onready var btn_next: Button = %BtnSiguiente
@@ -37,7 +53,10 @@ var _current_page: int = 0
 # INICIALIZACIÓN
 # ==========================================
 func _ready() -> void:
-	super._ready() 
+	super._ready() # Importante: inicializa la base primero
+	
+	# Aplicar los anclajes verticales personalizados al iniciar
+	_update_custom_layout()
 	
 	# Borrar texto de prueba del editor
 	if rich_text_tutorial: 
@@ -57,15 +76,12 @@ func _ready() -> void:
 # ==========================================
 # MÉTODOS PÚBLICOS (API del Tutorial)
 # ==========================================
-
-# Opción 1: Carga los mensajes y abre el panel automáticamente
 func load_and_show_tutorial(messages: Array[String]) -> void:
 	_setup_new_tutorial(messages)
 	show() # Asegura que el control principal sea visible
 	if not is_open:
 		toggle() # Llama a la función de la clase base para abrirlo con animación
 
-# Opción 2: Carga los mensajes pero espera a que el jugador abra el panel
 func load_tutorial_silently(messages: Array[String]) -> void:
 	_setup_new_tutorial(messages)
 
@@ -75,7 +91,7 @@ func next_page() -> void:
 		_update_ui()
 	else:
 		tutorial_finished.emit()
-		# Opcional: Cerrar el panel automáticamente al terminar
+		# Cierra el panel automáticamente al terminar
 		if is_open:
 			toggle()
 
@@ -87,8 +103,16 @@ func prev_page() -> void:
 # ==========================================
 # MÉTODOS PRIVADOS
 # ==========================================
+func _update_custom_layout() -> void:
+	if cajon:
+		cajon.anchor_top = top_margin
+		cajon.anchor_bottom = bottom_margin
+		
+		# ¡ESTE ES EL SECRETO PARA QUE SE ESTIRE!
+		# Al poner los offsets en 0, el cajón obedece 100% a los anclajes.
+		cajon.offset_top = 0.0
+		cajon.offset_bottom = 0.0
 
-# Método central que hace el trabajo de carga de datos
 func _setup_new_tutorial(messages: Array[String]) -> void:
 	tutorial_pages = messages
 	_current_page = 0
