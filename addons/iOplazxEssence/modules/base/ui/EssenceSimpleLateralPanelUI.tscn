@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://m2obut6r5np8"]
+
+[ext_resource type="Script" uid="uid://di64dw4mkvteb" path="res://addons/iOplazxEssence/modules/base/script/EssenceSimpleLateralPanel.gd" id="1_gsaur"]
+
+[node name="SimpleLateralPanelUi" type="Control" unique_id=806485748]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_gsaur")
+
+[node name="CajonDeslizante" type="Control" parent="." unique_id=2097396663]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 350.0
+grow_vertical = 2
+
+[node name="ContenedorFondo" type="Panel" parent="CajonDeslizante" unique_id=58437342]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MargenInterno" type="MarginContainer" parent="CajonDeslizante/ContenedorFondo" unique_id=463017444]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="ContenedorContenido" type="VBoxContainer" parent="CajonDeslizante/ContenedorFondo/MargenInterno" unique_id=1937369828]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BtnAlternar" type="Button" parent="CajonDeslizante" unique_id=1989927226]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 80)
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+grow_vertical = 2
+text = ">"
