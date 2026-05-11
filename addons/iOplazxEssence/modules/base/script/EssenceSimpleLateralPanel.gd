@@ -46,7 +46,7 @@ func toggle() -> void:
 		_tween.kill()
 		
 	var target = _get_target_x()
-	print("[UI] Tween hacia position.x: ", target)
+	#print("[UI] Tween hacia position.x: ", target)
 	
 	_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_tween.tween_property(cajon, "position:x", target, anim_duration)
@@ -85,9 +85,9 @@ func _get_target_x() -> float:
 	var ancho_pantalla = get_viewport_rect().size.x
 	var ancho_cajon = cajon.size.x
 	
-	print("--- DEBUG PANEL ---")
-	print("Lado: ", "IZQUIERDA" if side == PanelSide.LEFT else "DERECHA", " | Abierto: ", is_open)
-	print("Ancho Pantalla: ", ancho_pantalla, " | Ancho Cajón: ", ancho_cajon)
+	#print("--- DEBUG PANEL ---")
+	#print("Lado: ", "IZQUIERDA" if side == PanelSide.LEFT else "DERECHA", " | Abierto: ", is_open)
+	#print("Ancho Pantalla: ", ancho_pantalla, " | Ancho Cajón: ", ancho_cajon)
 	
 	if side == PanelSide.LEFT:
 		return 0.0 if is_open else -ancho_cajon
@@ -97,7 +97,7 @@ func _get_target_x() -> float:
 func _force_position() -> void:
 	if not is_node_ready(): return
 	cajon.position.x = _get_target_x()
-	print("[UI] Posición forzada a: ", cajon.position.x)
+	#print("[UI] Posición forzada a: ", cajon.position.x)
 
 func _update_btn_icon() -> void:
 	if not is_node_ready(): return
