@@ -4,6 +4,12 @@ extends Control
 const ES_NAME_CLASS = "TestMainGame"
 
 # ==========================================
+# GESTIÓN DEL FLUJO
+# ==========================================
+enum TestPhase { INTRO, GAMEPLAY }
+var current_phase: TestPhase = TestPhase.INTRO
+
+# ==========================================
 # CONEXIONES DE UI Y MUNDO
 # ==========================================
 @export_category("UI Connections")
@@ -24,11 +30,67 @@ func _ready() -> void:
 	_config_buttons()
 	_config_character()
 	
-	# Revisamos si venimos de Cargar una Partida
+	# Ocultamos al personaje al inicio de la escena
+	if character:
+		character.modulate.a = 0.0
+		character.is_interactable = false
+	
+	# Conectamos la señal de cuando el tutorial se cierra
+	if tutorial_panel:
+		tutorial_panel.tutorial_finished.connect(_on_tutorial_finished)
+	
+	# Revisamos si venimos de Cargar una Partida o si es juego nuevo
 	if is_instance_valid(SaveManager) and not SaveManager.loaded_game_data.is_empty():
 		_restaurar_partida_cargada()
+	else:
+		# Si es juego nuevo, iniciamos la secuencia
+		_iniciar_secuencia_intro()
 		
 	EssenceLogger.system_info("[%s/_ready] Escena principal inicializada." % ES_NAME_CLASS)
+	
+# ==========================================
+# LÓGICA DE FLUJO (TUTORIALES Y EVENTOS)
+# ==========================================
+
+func _iniciar_secuencia_intro() -> void:
+	current_phase = TestPhase.INTRO
+	
+	# Pequeña pausa antes de que salte el tutorial para que no sea tan brusco
+	await get_tree().create_timer(0.5).timeout
+	
+	var intro_messages: Array[String] = [
+		"Welcome to the Essence Framework sandbox.",
+		"Please note: This is strictly a controls test and technical demo, not the actual game.",
+		"Here we will test the rendering, saving systems, and interactive actors.",
+		"Click 'Understood' to begin the test."
+	]
+	
+	if tutorial_panel:
+		tutorial_panel.load_and_show_tutorial(intro_messages)
+
+func _on_tutorial_finished() -> void:
+	if current_phase == TestPhase.INTRO:
+		print("[%s] Tutorial Intro terminado. Esperando cierre de UI..." % ES_NAME_CLASS)
+		
+		# Cambiamos de fase
+		current_phase = TestPhase.GAMEPLAY
+		
+		# 1. Esperamos a que el panel del tutorial termine su animación de cierre natural
+		await get_tree().create_timer(0.6).timeout 
+		
+		# 2. Hacemos aparecer al personaje
+		if character:
+			# ¡EL SECRETO ESTÁ AQUÍ! 
+			# Lo volvemos visible para el motor, pero totalmente transparente al inicio
+			character.visible = true
+			character.modulate.a = 0.0 
+			
+			# Ahora sí, animamos la transparencia para que aparezca suavemente
+			var tween = create_tween()
+			tween.tween_property(character, "modulate:a", 1.0, 1.0).set_trans(Tween.TRANS_SINE)
+			
+			# Cuando termine de aparecer, le activamos la interactividad
+			tween.finished.connect(func(): character.is_interactable = true)
 
 # ==========================================
 # BLINDAJE DE SEGURIDAD
@@ -43,10 +105,7 @@ func _check_security_nodes() -> void:
 	
 	if missing.size() > 0:
 		var msg = "Faltan nodos exportados en %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		if is_instance_valid(EssenceError) and EssenceError.has_method("report"):
-			EssenceError.report("UI Setup Warning", msg, EssenceError.Severity.WARNING)
-		else:
-			push_error(msg)
+		push_error(msg)
 
 # ==========================================
 # CONFIGURACIÓN
@@ -68,7 +127,7 @@ func _play_sfx() -> void:
 # LÓGICA DE GUARDADO / CARGA
 # ==========================================
 func _preparar_datos_para_menu() -> void:
-	EssenceLogger.system_info("[%s] Capturando pantalla y preparando datos..." % ES_NAME_CLASS)
+	print("[%s] Capturando pantalla y preparando datos..." % ES_NAME_CLASS)
 	
 	# 1. Esperamos y tomamos la foto (exactamente como en tu game.gd)
 	await get_tree().process_frame
@@ -91,16 +150,18 @@ func _preparar_datos_para_menu() -> void:
 	SaveManager.cache_current_state(current_game_data, current_meta_data)
 
 func _restaurar_partida_cargada() -> void:
-	EssenceLogger.system_info("[%s] Restaurando datos cargados." % ES_NAME_CLASS)
+	print("[%s] Restaurando datos cargados." % ES_NAME_CLASS)
 	var datos = SaveManager.loaded_game_data
 	
-	# 1. Restauramos al personaje
 	if character:
 		var ropa_guardada = datos.get("ropa_estado_personaje", {})
-		# El framework se encarga de aplicar los nodos visuales
 		character.load_clothing_state(ropa_guardada)
+		
+		# Si cargamos partida, asumimos que ya pasó la intro, así que mostramos al personaje
+		current_phase = TestPhase.GAMEPLAY
+		character.modulate.a = 1.0
+		character.is_interactable = true
 	
-	# 2. Limpiamos para que no se recargue infinitamente
 	SaveManager.loaded_game_data.clear()
 
 # ==========================================
@@ -123,17 +184,15 @@ func _on_return_pressed() -> void:
 
 ## Evento que se dispara al hacer clic sobre el personaje
 func _on_character_interacted() -> void:
-	EssenceLogger.system_info("[%s] El jugador interactuó con: %s" % [ES_NAME_CLASS, character.display_name])
-	
-	# Cambiamos algo de ropa de forma dinámica para ver si se guarda
-	# (Esto asume que le pusiste una prenda llamada "Camisa" en su Wardrobe Nodes)
-	# character.toggle_garment("Camisa", false) 
-	
-	if tutorial_panel:
-		var mensajes_demo: Array[String] = [
-			"Prueba a quitarme alguna prenda desde el inspector o el código...",
-			"Luego pulsa 'Save' y ve al menú de guardado.",
-			"Cuando cargues la partida, ¡debería tener la misma ropa!"
-		]
-		tutorial_panel.load_and_show_tutorial(mensajes_demo)
+	# Verificamos que estemos en Gameplay y que el personaje ya sea interactuable
+	if current_phase == TestPhase.GAMEPLAY and character.is_interactable:
+		print("[%s] El jugador interactuó con: %s" % [ES_NAME_CLASS, character.display_name])
 		
+		if tutorial_panel:
+			var interaction_messages: Array[String] = [
+				"Character Interaction Detected!",
+				"Try removing some of my clothes using the Inspector, or via code.",
+				"Then, save the game and load it to verify the Wardrobe System."
+			]
+			tutorial_panel.load_and_show_tutorial(interaction_messages)
+	

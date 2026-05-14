@@ -32,6 +32,7 @@ expand_mode = 1
 stretch_mode = 6
 
 [node name="CharacterRoot" parent="." unique_id=1680410021 instance=ExtResource("3_woyu4")]
+visible = false
 position = Vector2(612, 507)
 scale = Vector2(0.5, 0.5)
 
@@ -63,6 +64,7 @@ offset_top = -50.0
 offset_right = 282.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_constants/separation = 6
 alignment = 1
 
 [node name="btnBack" type="Button" parent="PanelControles/HBoxContainer" unique_id=54749940]

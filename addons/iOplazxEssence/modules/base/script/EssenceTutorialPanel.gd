@@ -43,6 +43,7 @@ signal page_changed(page: int)
 # VARIABLES Y NODOS
 # ==========================================
 var _current_page: int = 0
+var _ocultar_al_terminar: bool = true
 
 # Referencias a la UI (Asegúrate de tener el % en la escena)
 @onready var rich_text_tutorial: RichTextLabel = %TextoExplicativo
@@ -76,11 +77,14 @@ func _ready() -> void:
 # ==========================================
 # MÉTODOS PÚBLICOS (API del Tutorial)
 # ==========================================
-func load_and_show_tutorial(messages: Array[String]) -> void:
+func load_and_show_tutorial(messages: Array[String], ocultar: bool = true) -> void:
+	_ocultar_al_terminar = ocultar # Guardamos la preferencia
 	_setup_new_tutorial(messages)
-	show() # Asegura que el control principal sea visible
+	
+	show() # Nos aseguramos de encender el nodo en el motor
+	
 	if not is_open:
-		toggle() # Llama a la función de la clase base para abrirlo con animación
+		toggle() # Animación de entrada
 
 func load_tutorial_silently(messages: Array[String]) -> void:
 	_setup_new_tutorial(messages)
@@ -90,10 +94,17 @@ func next_page() -> void:
 		_current_page += 1
 		_update_ui()
 	else:
+		# 1. SIEMPRE emitimos la señal para que TestMainGame sepa que el texto acabó
 		tutorial_finished.emit()
-		# Cierra el panel automáticamente al terminar
+		
+		# 2. Iniciamos la animación de salida
 		if is_open:
-			toggle()
+			toggle() 
+			
+		# 3. Si el dev pidió que se oculte, esperamos la animación y lo apagamos
+		if _ocultar_al_terminar:
+			await get_tree().create_timer(anim_duration).timeout
+			visible = false
 
 func prev_page() -> void:
 	if _current_page > 0:
