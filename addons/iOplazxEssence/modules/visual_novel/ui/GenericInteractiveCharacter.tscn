@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://c2pv7r15ot7sa"]
+
+[ext_resource type="Script" uid="uid://duv0k0proe7fr" path="res://addons/iOplazxEssence/modules/visual_novel/script/GenericInteractiveCharacter.gd" id="1_84ggt"]
+[ext_resource type="Texture2D" uid="uid://ddba3a0fhjg8t" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_base.png" id="1_y4k16"]
+[ext_resource type="Texture2D" uid="uid://b7fnbcqtglls4" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_belt.png" id="2_84ggt"]
+[ext_resource type="Texture2D" uid="uid://dpkcijcider0l" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_hat.png" id="3_6fi35"]
+[ext_resource type="Texture2D" uid="uid://g2mg46lbf826" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_pant.png" id="4_5wcuj"]
+[ext_resource type="Texture2D" uid="uid://b0631km86e6tw" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_shirt.png" id="5_r3stj"]
+[ext_resource type="Texture2D" uid="uid://cym5fc1fcav0n" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_shoes.png" id="6_uf5u5"]
+[ext_resource type="Texture2D" uid="uid://cgt4awyjtklfk" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_sunglass.png" id="7_d7ygk"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_y4k16"]
+radius = 98.0
+height = 994.0
+
+[node name="CharacterRoot" type="Node2D" unique_id=1680410021 node_paths=PackedStringArray("wardrobe_nodes")]
+script = ExtResource("1_84ggt")
+wardrobe_nodes = [NodePath("Visuals/Wardrobe/GenericChrBelt"), NodePath("Visuals/Wardrobe/GenericChrHat"), NodePath("Visuals/Wardrobe/GenericChrPant"), NodePath("Visuals/Wardrobe/GenericChrShirt"), NodePath("Visuals/Wardrobe/GenericChrShoes"), NodePath("Visuals/Wardrobe/GenericChrSunglass")]
+character_id = "chr01"
+display_name = "Main Character"
+
+[node name="Visuals" type="Node2D" parent="." unique_id=1436441995]
+
+[node name="BaseBody" type="Sprite2D" parent="Visuals" unique_id=413827466]
+texture = ExtResource("1_y4k16")
+
+[node name="Wardrobe" type="Node2D" parent="Visuals" unique_id=888979199]
+
+[node name="GenericChrBelt" type="Sprite2D" parent="Visuals/Wardrobe" unique_id=2131330393]
+texture = ExtResource("2_84ggt")
+
+[node name="GenericChrHat" type="Sprite2D" parent="Visuals/Wardrobe" unique_id=597078295]
+texture = ExtResource("3_6fi35")
+
+[node name="GenericChrPant" type="Sprite2D" parent="Visuals/Wardrobe" unique_id=1408931492]
+texture = ExtResource("4_5wcuj")
+
+[node name="GenericChrShirt" type="Sprite2D" parent="Visuals/Wardrobe" unique_id=34606274]
+texture = ExtResource("5_r3stj")
+
+[node name="GenericChrShoes" type="Sprite2D" parent="Visuals/Wardrobe" unique_id=498943442]
+texture = ExtResource("6_uf5u5")
+
+[node name="GenericChrSunglass" type="Sprite2D" parent="Visuals/Wardrobe" unique_id=1184219910]
+texture = ExtResource("7_d7ygk")
+
+[node name="Effects" type="Node2D" parent="Visuals" unique_id=575122504]
+
+[node name="InteractArea" type="Area2D" parent="Visuals" unique_id=1482201528]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Visuals/InteractArea" unique_id=201305753]
+shape = SubResource("CapsuleShape2D_y4k16")
+
+[connection signal="input_event" from="Visuals/InteractArea" to="." method="_on_interact_area_input_event"]

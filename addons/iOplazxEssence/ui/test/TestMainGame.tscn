@@ -1,0 +1,94 @@
+[gd_scene format=3 uid="uid://cfny0ci2r8dtn"]
+
+[ext_resource type="Script" uid="uid://df7guifof0p3l" path="res://addons/iOplazxEssence/core/SceneScript/TestMainGame.gd" id="1_jd08u"]
+[ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="1_ovfnw"]
+[ext_resource type="PackedScene" uid="uid://7lbtoybnlsus" path="res://addons/iOplazxEssence/modules/base/ui/EssenceTutorialPanelUI.tscn" id="3_idmch"]
+[ext_resource type="PackedScene" uid="uid://c2pv7r15ot7sa" path="res://addons/iOplazxEssence/modules/visual_novel/ui/GenericInteractiveCharacter.tscn" id="3_woyu4"]
+
+[node name="TestMainGame" type="Control" unique_id=153983025 node_paths=PackedStringArray("btn_return", "btn_save", "btn_load", "tutorial_panel", "ui_principal", "character")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jd08u")
+btn_return = NodePath("PanelControles/HBoxContainer/btnReturn")
+btn_save = NodePath("PanelControles/HBoxContainer/btnSave")
+btn_load = NodePath("PanelControles/HBoxContainer/btnLoad")
+tutorial_panel = NodePath("TutorialPanelUI")
+ui_principal = NodePath("PanelControles")
+character = NodePath("CharacterRoot")
+
+[node name="background" type="TextureRect" parent="." unique_id=1243969001]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_ovfnw")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="CharacterRoot" parent="." unique_id=1680410021 instance=ExtResource("3_woyu4")]
+position = Vector2(612, 507)
+scale = Vector2(0.5, 0.5)
+
+[node name="TutorialPanelUI" parent="." unique_id=806485748 instance=ExtResource("3_idmch")]
+layout_mode = 1
+top_margin = 0.25
+bottom_margin = 0.7
+side = 1
+
+[node name="PanelControles" type="Panel" parent="." unique_id=505927572]
+custom_minimum_size = Vector2(400, 50)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelControles" unique_id=72135154]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -282.0
+offset_top = -50.0
+offset_right = 282.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="btnBack" type="Button" parent="PanelControles/HBoxContainer" unique_id=54749940]
+layout_mode = 2
+text = "Back"
+
+[node name="btnHistory" type="Button" parent="PanelControles/HBoxContainer" unique_id=1957813278]
+layout_mode = 2
+text = "History"
+
+[node name="btnSave" type="Button" parent="PanelControles/HBoxContainer" unique_id=1467471679]
+layout_mode = 2
+text = "Save"
+
+[node name="btnLoad" type="Button" parent="PanelControles/HBoxContainer" unique_id=67121280]
+layout_mode = 2
+text = "Load"
+
+[node name="btnQSave" type="Button" parent="PanelControles/HBoxContainer" unique_id=851980104]
+layout_mode = 2
+text = "Quick Save"
+
+[node name="btnQLoad" type="Button" parent="PanelControles/HBoxContainer" unique_id=801468670]
+layout_mode = 2
+text = "Quick Load"
+
+[node name="btnReturn" type="Button" parent="PanelControles/HBoxContainer" unique_id=1276848986]
+layout_mode = 2
+text = "Return Main Menu"

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dbcs7828cew15"]
 
-[ext_resource type="Script" uid="uid://c5gij173ao6h3" path="res://addons/iOplazxEssence/scriptsItems/TestSaveScene.gd" id="1_qd6tp"]
+[ext_resource type="Script" uid="uid://c5gij173ao6h3" path="res://addons/iOplazxEssence/core/SceneScript/TestSaveScene.gd" id="1_qd6tp"]
 [ext_resource type="PackedScene" uid="uid://m2obut6r5np8" path="res://addons/iOplazxEssence/modules/base/ui/EssenceSimpleLateralPanelUI.tscn" id="2_bqdq2"]
 [ext_resource type="PackedScene" uid="uid://7lbtoybnlsus" path="res://addons/iOplazxEssence/modules/base/ui/EssenceTutorialPanelUI.tscn" id="3_50g51"]
 
