@@ -32,19 +32,18 @@ class_name GenericInteractiveCharacter
 func _ready() -> void:
 	# 1. IMPORTANTE: Llamamos al _ready del padre para que el Addon
 	# construya automáticamente el diccionario de ropa (Wardrobe Map).
-	super._ready() 
-	
-	# 2. Conectamos la señal de clic (que emite el padre) a nuestra propia función
-	clicked_on_character.connect(_on_character_clicked)	
-	
+	super._ready() 	
 
 # ==========================================
-# RESPUESTA A LA INTERACCIÓN
+# DETECCIÓN DE CLIC EN EL ÁREA
 # ==========================================
-func _on_character_clicked() -> void:
-	# Aquí ocurre lo que sea que deba pasar cuando el jugador le hace clic.
-	# Puede ser abrir un DialogBox, reproducir un sonido, etc.
-	print("[%s] ¡Fui clicado! Ejecutando evento..." % display_name)
-	
-	# Ejemplo de uso de las funciones del addon (cambiar ropa al hacer clic):
-	# toggle_garment("Camisa", false) 
+func _on_interact_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	# Solo nos interesa clic izquierdo y presionado
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		
+		if is_interactable:
+			# Emitimos la señal oficial del Framework
+			clicked_on_character.emit()
+			
+			# Consumimos el clic para que no siga traspasando la pantalla
+			get_viewport().set_input_as_handled()

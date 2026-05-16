@@ -22,6 +22,7 @@ display_name = "Main Character"
 [node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1709483046]
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 2
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=846808459]
 transparent_bg = true
