@@ -129,21 +129,20 @@ func _play_sfx() -> void:
 func _preparar_datos_para_menu() -> void:
 	print("[%s] Capturando pantalla y preparando datos..." % ES_NAME_CLASS)
 	
-	# 1. Esperamos y tomamos la foto (exactamente como en tu game.gd)
 	await get_tree().process_frame
 	await SaveManager.take_temp_screenshot()
 	await get_tree().create_timer(0.1).timeout
 	
-	# 2. Preparamos los datos del nivel y de los personajes
+	# AGREGAMOS "fase_actual" AL DICCIONARIO
 	var current_game_data = {
 		"escena_actual": "MainRoom",
-		# ¡Aquí usamos el nuevo framework! El personaje devuelve su ropa dinámicamente
+		"fase_actual": current_phase, # <--- NUEVO: Guardamos si estamos en INTRO o GAMEPLAY
 		"ropa_estado_personaje": character.get_clothing_state() if character else {}
 	}
 	
 	var current_meta_data = {
 		"title": "Prueba de Framework",
-		"description": "Probando Guardado Modular",
+		"description": "Fase actual: " + ("Intro" if current_phase == TestPhase.INTRO else "Gameplay"),
 		"play_time": "00:01:00"
 	}
 	
@@ -153,15 +152,39 @@ func _restaurar_partida_cargada() -> void:
 	print("[%s] Restaurando datos cargados." % ES_NAME_CLASS)
 	var datos = SaveManager.loaded_game_data
 	
+	# 1. Recuperamos la fase (Lo forzamos a int por si Godot se confunde con el Enum)
+	current_phase = int(datos.get("fase_actual", 0))
+	
+	# 2. Restauramos la ropa del personaje
 	if character:
 		var ropa_guardada = datos.get("ropa_estado_personaje", {})
 		character.load_clothing_state(ropa_guardada)
 		
-		# Si cargamos partida, asumimos que ya pasó la intro, así que mostramos al personaje
-		current_phase = TestPhase.GAMEPLAY
-		character.modulate.a = 1.0
-		character.is_interactable = true
-	
+	# 3. TOMAMOS ACCIONES SEGÚN LA FASE RECUPERADA
+	if current_phase == TestPhase.GAMEPLAY:
+		print("[%s] Fase GAMEPLAY detectada. Mostrando personaje." % ES_NAME_CLASS)
+		
+		# ¡TU DEDUCCIÓN APLICADA AQUÍ!
+		if character:
+			character.visible = true # <--- Obligamos al motor a dibujarlo
+			character.modulate.a = 1.0
+			character.is_interactable = true
+			
+		# Nos aseguramos de que el tutorial no estorbe
+		if tutorial_panel:
+			tutorial_panel.visible = false 
+			
+	else:
+		print("[%s] Fase INTRO detectada. Lanzando tutorial inicial." % ES_NAME_CLASS)
+		
+		# Guardó durante la intro: el personaje sigue oculto y relanzamos el tutorial
+		if character:
+			character.visible = false
+			character.modulate.a = 0.0
+			character.is_interactable = false
+		_iniciar_secuencia_intro()
+		
+	# Limpiamos para no crear bucles de recarga
 	SaveManager.loaded_game_data.clear()
 
 # ==========================================
