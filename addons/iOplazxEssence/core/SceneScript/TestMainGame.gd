@@ -75,23 +75,32 @@ func _on_tutorial_finished() -> void:
 		# Cambiamos de fase
 		current_phase = TestPhase.GAMEPLAY
 		
-		# 1. Esperamos a que el panel del tutorial termine su animación de cierre natural
 		await get_tree().create_timer(0.6).timeout 
 		
-		# 2. Hacemos aparecer al personaje
+		# 2. Hacemos aparecer al personaje usando la "Solución Annie"
 		if character:
-			# ¡EL SECRETO ESTÁ AQUÍ! 
-			# Lo volvemos visible para el motor, pero totalmente transparente al inicio
 			character.visible = true
-			character.modulate.a = 0.0 
 			
-			# Ahora sí, animamos la transparencia para que aparezca suavemente
-			var tween = create_tween()
-			tween.tween_property(character, "modulate:a", 1.0, 1.0).set_trans(Tween.TRANS_SINE)
+			# ¡ESTA ES LA LÍNEA CLAVE QUE FALTABA! 
+			# Hacemos que la raíz vuelva a ser sólida para que el hijo pueda verse
+			character.modulate.a = 1.0 
 			
-			# Cuando termine de aparecer, le activamos la interactividad
-			tween.finished.connect(func(): character.is_interactable = true)
-
+			character.is_interactable = false # Lo bloqueamos mientras aparece
+			
+			# Buscamos el contenedor
+			var container = character.get_node_or_null("SubViewportContainer")
+			
+			if container and container is SubViewportContainer:
+				# Hacemos invisible la "foto" completa
+				container.modulate.a = 0.0
+				
+				var tween = create_tween()
+				tween.tween_property(container, "modulate:a", 1.0, 1.0).set_trans(Tween.TRANS_SINE)
+				
+				tween.finished.connect(func(): character.is_interactable = true)
+			else:
+				print("ERROR: No se encontró el SubViewportContainer en el personaje.")
+	
 # ==========================================
 # BLINDAJE DE SEGURIDAD
 # ==========================================

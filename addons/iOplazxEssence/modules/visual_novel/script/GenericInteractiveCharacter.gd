@@ -1,17 +1,20 @@
 extends EssenceInteractiveActor
 class_name GenericInteractiveCharacter
-# ===
+# ==
 # ESTRUCTURA DE LA ESCENA: GenericInteractiveCharacter (Base para Personajes)
-# ===
+# ==
 # CharacterRoot (Node2D) [Script: EssenceInteractiveActor]
-# ├── Visuals (Node2D)                       <-- Contenedor de capas visuales
-# │   ├── BaseBody (Sprite2D)                <-- El cuerpo/piel del personaje
-# │   └── Wardrobe (Node2D)                  <-- Contenedor de ropa (opcional)
-# │       ├── ... 
-# ├── Effects (Node2D)                       <-- Capas de efectos (fantasmas, etc)
-# │   └── ...
-# └── InteractArea (Area2D)                  <-- Zona de detección de clics
-#     └── CollisionShape2D                   <-- Forma de la zona (Silueta)
+# ├── SubViewportContainer                     <-- Igual que Annie
+# │   ├── SubViewport                          <-- Igual que Annie
+# │   │   └── Visuals (Node2D)                 <-- Tu "Carpeta Raíz" interna
+# │   │       └── Pose_Normal (Node2D)         <-- Carpeta de Pose (Aquí puedes crear Pose_B, Pose_C, etc.)
+# │   │           ├── BaseBody (Sprite2D)      <-- El cuerpo de esta pose específica
+# │   │           └── Wardrobe (Node2D)        <-- Contenedor de ropa de esta pose
+# │   │               ├── FemDibujoCamisa (Sprite2D)
+# │   │               └── FemDibujoPantalon (Sprite2D)
+# │   └── Effects (Node2D)                     <-- Igual que Annie (Hermano de SubViewport)
+# └── InteractArea (Area2D)                    <-- Igual que Annie (En la raíz, para los clics)
+#     └── CollisionShape2D
 # ==
 # ==========================================
 # NODOS Y EFECTOS ESPECÍFICOS DEL PERSONAJE

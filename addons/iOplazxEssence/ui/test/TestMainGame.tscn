@@ -32,8 +32,7 @@ expand_mode = 1
 stretch_mode = 6
 
 [node name="CharacterRoot" parent="." unique_id=1680410021 instance=ExtResource("3_woyu4")]
-visible = false
-position = Vector2(612, 507)
+position = Vector2(575, 180)
 scale = Vector2(0.5, 0.5)
 
 [node name="TutorialPanelUI" parent="." unique_id=806485748 instance=ExtResource("3_idmch")]
