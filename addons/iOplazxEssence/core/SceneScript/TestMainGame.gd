@@ -79,9 +79,12 @@ func _on_tutorial_finished() -> void:
 		
 		# 2. Hacemos aparecer al personaje usando la "Solución Annie"
 		if character:
+			if character.has_method("toggle_garment"):
+				character.toggle_garment("GenericChrHat", false)
+				character.toggle_garment("GenericChrSunglass", false)
+			
 			character.visible = true
 			
-			# ¡ESTA ES LA LÍNEA CLAVE QUE FALTABA! 
 			# Hacemos que la raíz vuelva a ser sólida para que el hijo pueda verse
 			character.modulate.a = 1.0 
 			
@@ -145,7 +148,7 @@ func _preparar_datos_para_menu() -> void:
 	# AGREGAMOS "fase_actual" AL DICCIONARIO
 	var current_game_data = {
 		"escena_actual": "MainRoom",
-		"fase_actual": current_phase, # <--- NUEVO: Guardamos si estamos en INTRO o GAMEPLAY
+		"fase_actual": current_phase, 
 		"ropa_estado_personaje": character.get_clothing_state() if character else {}
 	}
 	
