@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://dsd1fcuw1f232"]
+
+[ext_resource type="PackedScene" uid="uid://44l1lwtw05ky" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/TemplateInteractiveLocation.tscn" id="1_3dh4f"]
+[ext_resource type="Texture2D" uid="uid://glodfv7s37sk" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_3.png" id="2_xjusj"]
+[ext_resource type="Texture2D" uid="uid://d1q0h5m2tn5h8" path="res://addons/iOplazxEssence/resources/images/objects/background_room_ai_3_puerta1_3.png" id="3_lvxlj"]
+[ext_resource type="Texture2D" uid="uid://dl4w41uqshws8" path="res://addons/iOplazxEssence/resources/images/objects/background_room_ai_3_puerta2_3.png" id="4_nvipa"]
+[ext_resource type="Texture2D" uid="uid://bwr8nq8vfktqw" path="res://addons/iOplazxEssence/resources/images/objects/background_room_ai_3_puerta3_3.png" id="5_b3c5c"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5mag7"]
+size = Vector2(345, 831)
+
+[node name="TestRoomDoor" unique_id=1565414698 instance=ExtResource("1_3dh4f")]
+
+[node name="StageBackground" parent="." index="0" unique_id=178403615]
+texture = ExtResource("2_xjusj")
+
+[node name="Sprite2D" parent="FixedHotspots/ExampleDoor" parent_id_path=PackedInt32Array(1551232841) index="0" unique_id=2002122368]
+texture = ExtResource("3_lvxlj")
+
+[node name="CollisionShape2D" parent="FixedHotspots/ExampleDoor" parent_id_path=PackedInt32Array(1551232841) index="1" unique_id=1695174339]
+position = Vector2(-731.5, 47.5)
+shape = SubResource("RectangleShape2D_5mag7")
+
+[node name="ExampleDoor2" type="Area2D" parent="FixedHotspots" parent_id_path=PackedInt32Array(1462631526) index="1" unique_id=173510285]
+
+[node name="Sprite2D" type="Sprite2D" parent="FixedHotspots/ExampleDoor2" index="0" unique_id=1328527611]
+texture = ExtResource("4_nvipa")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FixedHotspots/ExampleDoor2" index="1" unique_id=1306681051]
+position = Vector2(34, 48)
+shape = SubResource("RectangleShape2D_5mag7")
+
+[node name="ExampleDoor3" type="Area2D" parent="FixedHotspots" parent_id_path=PackedInt32Array(1462631526) index="2" unique_id=490499797]
+
+[node name="Sprite2D" type="Sprite2D" parent="FixedHotspots/ExampleDoor3" index="0" unique_id=425280590]
+texture = ExtResource("5_b3c5c")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FixedHotspots/ExampleDoor3" index="1" unique_id=1318382689]
+position = Vector2(777, 44)
+shape = SubResource("RectangleShape2D_5mag7")

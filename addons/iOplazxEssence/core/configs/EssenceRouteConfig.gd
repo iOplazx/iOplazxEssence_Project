@@ -9,5 +9,6 @@ class_name EssenceRouteConfig extends Resource
 @export_file("*.tscn") var credits_scene: String = ""
 
 @export_category("Custom Routes (User)")
-## Escribe un nombre clave a la izquierda (ej: "casa", "nivel_1") y su ruta a la derecha.
-@export var custom_routes: Dictionary = {}
+## Enter the key name (String) and the file path (String).
+## Example: Key: "room_3", Value: "res://ui/Test/TestRoomDoor.tscn"
+@export var custom_routes: Dictionary[String, String] = {}

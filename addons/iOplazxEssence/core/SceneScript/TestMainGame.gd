@@ -1,6 +1,25 @@
 class_name TestMainGame
 extends Control 
 
+# ==
+# TestMainGame.tscn
+# ==
+# TestMainGame (TestMainGame) [Script: TestMainGame]
+# ├── background (TestureRect)                     
+# ├── GameplayDirector (EssenceGameplayDirector)   
+# │   ├── EnveriromentFilter (CanvasModulate)           
+# │   ├── ActiveLocation (Node2D)           
+# │   │   └── ImgPuerta (Node2D)  
+# │   ├── CharacterStage (Node2D)      
+# │   └── HUD_Layer (CanvasLayer)
+# │       ├── TranslationManager (Node)           
+# │       └── DialogBoxUI (Node)            
+# ├── CharacterRoot (GenericInteractiveCharacter)                    
+# ├── TutorialPanelUI (EssenceTutorialPanel)    
+# └── PanelControles (Panel)   
+#     └── ...   
+# ==
+
 const ES_NAME_CLASS = "TestMainGame"
 
 # ==========================================
@@ -22,13 +41,29 @@ var current_phase: TestPhase = TestPhase.INTRO
 @export_category("World Connections")
 @export var character: EssenceInteractiveActor 
 
+# Usamos % en lugar de $ para acceder al instante sin importar la jerarquía
+@onready var director: EssenceGameplayDirector = %GameplayDirector
+@onready var area2D_door: Area2D = %Area2D_door
+
+const ROUTES_PATH = "res://_static/RouteConfig.tres"
+var routes: EssenceRouteConfig
+
 # ==========================================
 # INICIALIZACIÓN
 # ==========================================
 func _ready() -> void:
+	_cargar_configuracion()
 	_check_security_nodes()
 	_config_buttons()
 	_config_character()
+	
+	# 1. Le decimos al Director que active el modo exploración 
+	# (para que permita los clics en el entorno)
+	director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
+	
+	# 2. Conectamos la señal de clic de nuestra ImgPuerta
+	if area2D_door:
+		area2D_door.input_event.connect(_on_img_puerta_input_event)
 	
 	# Ocultamos al personaje al inicio de la escena
 	if character:
@@ -48,6 +83,13 @@ func _ready() -> void:
 		
 	EssenceLogger.system_info("[%s/_ready] Escena principal inicializada." % ES_NAME_CLASS)
 	
+## Carga el archivo .tres en memoria
+func _cargar_configuracion() -> void:
+	if ResourceLoader.exists(ROUTES_PATH):
+		routes = load(ROUTES_PATH) as EssenceRouteConfig
+	else:
+		push_error("[%s] ERROR: No se encontró RouteConfig.tres en %s" % ["TestMainGame", ROUTES_PATH])
+		
 # ==========================================
 # LÓGICA DE FLUJO (TUTORIALES Y EVENTOS)
 # ==========================================
@@ -230,4 +272,24 @@ func _on_character_interacted() -> void:
 				"Then, save the game and load it to verify the Wardrobe System."
 			]
 			tutorial_panel.load_and_show_tutorial(interaction_messages)
-	
+
+## Esta función se dispara automáticamente cuando el ratón hace algo sobre ImgPuerta
+func _on_img_puerta_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		
+		# Verificamos que el archivo de rutas se haya cargado bien
+		if routes == null:
+			push_error("No se pueden cargar escenas porque RouteConfig es nulo.")
+			return
+			
+		# Buscamos la clave en tu diccionario custom_routes (asegúrate de que el nombre coincida)
+		var clave_habitacion = "room_3"
+		
+		if routes.custom_routes.has(clave_habitacion):
+			var ruta_escena = routes.custom_routes[clave_habitacion]
+			var escena_a_cargar = load(ruta_escena) as PackedScene
+			
+			print("Cargando nivel desde ruta dinámica: ", ruta_escena)
+			director.load_location(escena_a_cargar)
+		else:
+			push_error("La clave '%s' no existe en el diccionario custom_routes." % clave_habitacion)

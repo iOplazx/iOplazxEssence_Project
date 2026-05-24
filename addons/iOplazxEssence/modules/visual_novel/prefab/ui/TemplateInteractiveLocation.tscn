@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://44l1lwtw05ky"]
+
+[ext_resource type="Script" uid="uid://smjtajdg4aug" path="res://addons/iOplazxEssence/modules/visual_novel/location/EssenceInteractiveLocation.gd" id="1_ejsxf"]
+
+[node name="TemplateInteractiveLocation" type="Node2D" unique_id=1565414698 node_paths=PackedStringArray("fixed_hotspots", "dynamic_hotspots")]
+script = ExtResource("1_ejsxf")
+fixed_hotspots = NodePath("FixedHotspots")
+dynamic_hotspots = NodePath("DynamicHotspots")
+
+[node name="StageBackground" type="Sprite2D" parent="." unique_id=178403615]
+
+[node name="FixedHotspots" type="Node2D" parent="." unique_id=1462631526]
+
+[node name="ExampleDoor" type="Area2D" parent="FixedHotspots" unique_id=1551232841]
+
+[node name="Sprite2D" type="Sprite2D" parent="FixedHotspots/ExampleDoor" unique_id=2002122368]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FixedHotspots/ExampleDoor" unique_id=1695174339]
+
+[node name="DynamicHotspots" type="Node2D" parent="." unique_id=234169157]
+
+[node name="SpawnPoints" type="Node2D" parent="DynamicHotspots" unique_id=909562104]
+
+[node name="Marker2D_Example" type="Node2D" parent="DynamicHotspots/SpawnPoints" unique_id=1948973950]

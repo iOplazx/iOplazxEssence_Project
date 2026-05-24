@@ -4,16 +4,16 @@ class_name GenericInteractiveCharacter
 # ESTRUCTURA DE LA ESCENA: GenericInteractiveCharacter (Base para Personajes)
 # ==
 # CharacterRoot (Node2D) [Script: EssenceInteractiveActor]
-# ├── SubViewportContainer                     <-- Igual que Annie
-# │   ├── SubViewport                          <-- Igual que Annie
-# │   │   └── Visuals (Node2D)                 <-- Tu "Carpeta Raíz" interna
-# │   │       └── Pose_Normal (Node2D)         <-- Carpeta de Pose (Aquí puedes crear Pose_B, Pose_C, etc.)
-# │   │           ├── BaseBody (Sprite2D)      <-- El cuerpo de esta pose específica
-# │   │           └── Wardrobe (Node2D)        <-- Contenedor de ropa de esta pose
+# ├── SubViewportContainer                     
+# │   ├── SubViewport                          
+# │   │   └── Visuals (Node2D)                 
+# │   │       └── Pose_Normal (Node2D)         
+# │   │           ├── BaseBody (Sprite2D)     
+# │   │           └── Wardrobe (Node2D)        
 # │   │               ├── FemDibujoCamisa (Sprite2D)
 # │   │               └── FemDibujoPantalon (Sprite2D)
-# │   └── Effects (Node2D)                     <-- Igual que Annie (Hermano de SubViewport)
-# └── InteractArea (Area2D)                    <-- Igual que Annie (En la raíz, para los clics)
+# │   └── Effects (Node2D)                    
+# └── InteractArea (Area2D)                    
 #     └── CollisionShape2D
 # ==
 # ==========================================

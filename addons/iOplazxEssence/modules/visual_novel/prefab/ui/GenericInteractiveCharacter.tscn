@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c2pv7r15ot7sa"]
 
-[ext_resource type="Script" uid="uid://duv0k0proe7fr" path="res://addons/iOplazxEssence/modules/visual_novel/script/GenericInteractiveCharacter.gd" id="1_84ggt"]
+[ext_resource type="Script" uid="uid://duv0k0proe7fr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/script/GenericInteractiveCharacter.gd" id="1_84ggt"]
 [ext_resource type="Texture2D" uid="uid://ddba3a0fhjg8t" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_base.png" id="1_y4k16"]
 [ext_resource type="Texture2D" uid="uid://b7fnbcqtglls4" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_belt.png" id="2_84ggt"]
 [ext_resource type="Texture2D" uid="uid://dpkcijcider0l" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_hat.png" id="3_6fi35"]
