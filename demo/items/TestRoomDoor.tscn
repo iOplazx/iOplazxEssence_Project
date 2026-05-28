@@ -11,8 +11,15 @@ size = Vector2(345, 831)
 
 [node name="TestRoomDoor" unique_id=1565414698 instance=ExtResource("1_3dh4f")]
 
-[node name="StageBackground" parent="." index="0" unique_id=178403615]
+[node name="StageBackground" parent="." index="0" unique_id=104467830]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_xjusj")
+stretch_mode = 6
 
 [node name="Sprite2D" parent="FixedHotspots/ExampleDoor" parent_id_path=PackedInt32Array(1551232841) index="0" unique_id=2002122368]
 texture = ExtResource("3_lvxlj")
@@ -38,3 +45,12 @@ texture = ExtResource("5_b3c5c")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FixedHotspots/ExampleDoor3" index="1" unique_id=1318382689]
 position = Vector2(777, 44)
 shape = SubResource("RectangleShape2D_5mag7")
+
+[node name="DynamicHotspots" parent="." index="2" unique_id=234169157]
+visible = false
+
+[node name="SpawnPoints" parent="DynamicHotspots" index="0" unique_id=909562104]
+visible = false
+
+[node name="Marker2D_Example" parent="DynamicHotspots/SpawnPoints" index="0" unique_id=1948973950]
+visible = false

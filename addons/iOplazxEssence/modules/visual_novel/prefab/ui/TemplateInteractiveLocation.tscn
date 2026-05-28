@@ -2,12 +2,13 @@
 
 [ext_resource type="Script" uid="uid://smjtajdg4aug" path="res://addons/iOplazxEssence/modules/visual_novel/location/EssenceInteractiveLocation.gd" id="1_ejsxf"]
 
-[node name="TemplateInteractiveLocation" type="Node2D" unique_id=1565414698 node_paths=PackedStringArray("fixed_hotspots", "dynamic_hotspots")]
+[node name="TemplateInteractiveLocation" type="Node2D" unique_id=1565414698 node_paths=PackedStringArray("fixed_hotspots", "dynamic_hotspots", "stage_background")]
 script = ExtResource("1_ejsxf")
 fixed_hotspots = NodePath("FixedHotspots")
 dynamic_hotspots = NodePath("DynamicHotspots")
+stage_background = NodePath("StageBackground")
 
-[node name="StageBackground" type="Sprite2D" parent="." unique_id=178403615]
+[node name="StageBackground" type="TextureRect" parent="." unique_id=104467830]
 
 [node name="FixedHotspots" type="Node2D" parent="." unique_id=1462631526]
 

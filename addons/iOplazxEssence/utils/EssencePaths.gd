@@ -6,6 +6,9 @@ class_name EssencePaths extends RefCounted
 const BASE_RUTE = "res://addons/iOplazxEssence/"
 const BASE_RESOURCES = BASE_RUTE + "resources/"
 const PATH_IMAGES = BASE_RESOURCES + "images/"
+const PATH_IMAGES_BACKGROUND = PATH_IMAGES + "background/"
+const PATH_IMAGES_CHARACTER = PATH_IMAGES + "character/"
+const PATH_IMAGES_OBJECTS = PATH_IMAGES + "objects/"
 const PATH_AUDIO = BASE_RESOURCES + "audio/"
 const PATH_CORE = BASE_RUTE + "core/"
 const PATH_UI = BASE_RUTE + "ui/"
@@ -79,3 +82,10 @@ const INTERNAL_IMAGES = {
 	KeyImage.ICON_CONTROL_W: PATH_IMAGES + "icon_control_w.png",
 	KeyImage.ICON_LAYOUT_W: PATH_IMAGES + "icon_layout_w.png"
 }
+
+# ==========================================
+# DEMO RESOURCES (ONLY USE FOR DEMO GAME)
+# ==========================================
+const BACKGROUND_ROOM_INITIAL = PATH_IMAGES_BACKGROUND + "background_room_ai_1.png"
+const BACKGROUND_ROOM_3DOORS = PATH_IMAGES_BACKGROUND + "background_room_ai_3.png"
+const BACKGROUND_ROOM_1DOOR = PATH_IMAGES_BACKGROUND + "background_room_ai_2.png"

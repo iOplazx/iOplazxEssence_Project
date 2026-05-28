@@ -11,7 +11,7 @@ extends Node2D
 @export var location_name: String = "Zona Desconocida"
 
 @export_category("Referencias Visuales y Audio")
-@export var stage_background: Sprite2D
+@export var stage_background: TextureRect
 # @export var background_music: AudioStream # Descomentar si usas música por escenario
 
 func _ready() -> void:

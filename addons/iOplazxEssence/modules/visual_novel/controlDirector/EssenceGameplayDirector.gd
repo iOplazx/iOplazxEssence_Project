@@ -5,7 +5,8 @@ extends Node2D
 # ==
 # GameplayDirector (Node2D) [Script: EssenceGameplayDirector]
 # ├── EnvironmentFilter (CanvasModulate)     <-- Colors the whole screen (Day/Night)
-# ├── ActiveLocation (Node2D)                <-- The anchor where rooms are loaded
+# ├── BackgroundLayer (TextureRect)          <-- NEW: Global background image
+# ├── ActiveLocation (Node2D)                <-- The anchor where interactive hotspots are loaded
 # │   └── (Empty by default)
 # ├── CharactersStage (Node2D)               <-- Where actors/characters are placed
 # │   └── (Empty by default)
@@ -53,7 +54,6 @@ func change_game_state(new_state: GameState) -> void:
 # ==========================================
 # SCENE & ENVIRONMENT CONTROL
 # ==========================================
-
 ## Loads and instantiates a new location scene into the ActiveLocation container.
 func load_location(location_scene: PackedScene) -> void:
 	if not active_location_container or not location_scene: 
@@ -64,11 +64,19 @@ func load_location(location_scene: PackedScene) -> void:
 	for child in active_location_container.get_children():
 		child.queue_free()
 	
-	# 2. Instanciamos y añadimos la nueva habitación al ancla
+	# 2. Instanciamos la nueva habitación
 	var new_location = location_scene.instantiate()
+	
+	# --- ¡AQUÍ ESTÁ LA MAGIA DEL RESETEO! ---
+	# Forzamos posición (0,0), rotación (0) y escala (1,1)
+	if new_location is Node2D:
+		new_location.transform = Transform2D.IDENTITY
+	# ----------------------------------------
+	
+	# 3. Añadimos la nueva habitación al ancla
 	active_location_container.add_child(new_location)
 	
-	# 3. Guardamos la referencia para poder interactuar con ella después
+	# 4. Guardamos la referencia para poder interactuar con ella después
 	if new_location is EssenceLocation:
 		current_location_node = new_location
 		print("[EssenceGameplayDirector] Location loaded successfully: ", new_location.name)

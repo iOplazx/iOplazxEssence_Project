@@ -5,7 +5,7 @@ extends Control
 # TestMainGame.tscn
 # ==
 # TestMainGame (TestMainGame) [Script: TestMainGame]
-# ├── background (TestureRect)                     
+# ├── BackgroundLayer (TextureRect)                     
 # ├── GameplayDirector (EssenceGameplayDirector)   
 # │   ├── EnveriromentFilter (CanvasModulate)           
 # │   ├── ActiveLocation (Node2D)           
@@ -32,6 +32,7 @@ var current_phase: TestPhase = TestPhase.INTRO
 # CONEXIONES DE UI Y MUNDO
 # ==========================================
 @export_category("UI Connections")
+@export var background_layer: TextureRect
 @export var btn_return: Button
 @export var btn_save: Button
 @export var btn_load: Button
@@ -218,9 +219,9 @@ func _restaurar_partida_cargada() -> void:
 	if current_phase == TestPhase.GAMEPLAY:
 		print("[%s] Fase GAMEPLAY detectada. Mostrando personaje." % ES_NAME_CLASS)
 		
-		# ¡TU DEDUCCIÓN APLICADA AQUÍ!
+		
 		if character:
-			character.visible = true # <--- Obligamos al motor a dibujarlo
+			character.visible = true 
 			character.modulate.a = 1.0
 			character.is_interactable = true
 			
@@ -277,19 +278,43 @@ func _on_character_interacted() -> void:
 func _on_img_puerta_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		
-		# Verificamos que el archivo de rutas se haya cargado bien
-		if routes == null:
-			push_error("No se pueden cargar escenas porque RouteConfig es nulo.")
-			return
-			
-		# Buscamos la clave en tu diccionario custom_routes (asegúrate de que el nombre coincida)
-		var clave_habitacion = "room_3"
+		# 1. Consultamos a la matriz (Pasamos de INITIAL_ROOM a ROOM_3_DOORS)
+		var data = LevelManager.get_scenery_config(
+			LevelManager.RoomID["INITIAL_ROOM"], 
+			LevelManager.RoomID["ROOM_3_DOORS"], 
+			0, 
+			false
+		)
 		
-		if routes.custom_routes.has(clave_habitacion):
-			var ruta_escena = routes.custom_routes[clave_habitacion]
-			var escena_a_cargar = load(ruta_escena) as PackedScene
-			
-			print("Cargando nivel desde ruta dinámica: ", ruta_escena)
-			director.load_location(escena_a_cargar)
-		else:
-			push_error("La clave '%s' no existe en el diccionario custom_routes." % clave_habitacion)
+		# 2. Si no hay error, disparamos tu callback específico
+		if not data["flag_error"]:
+			_on_ready_room3doors(data)
+
+
+## Sets up the 3 doors room by applying backgrounds, loading scenes, and updating director states
+func _on_ready_room3doors(data: Dictionary) -> void:
+	# A) Cambiamos el fondo físico usando tu enum de imágenes
+	match data["id_background_scene"]:
+		LevelManager.BackgroundImageID["ROOM_3_DOORS"]:
+			background_layer.texture = load(EssencePaths.BACKGROUND_ROOM_3DOORS)
+		_:
+			push_warning("Background ID not recognized.")
+
+	
+	# B) CARGAR E INYECTAR LA ESCENA INTERACTIVA
+	# Convertimos el String de tu archivo central en un PackedScene usando load()
+	var scene_path: String = DemoItemsRoute.TESTROOMDOOR_SCENE
+	var interactive_scene: PackedScene = load(scene_path) as PackedScene
+	
+	if interactive_scene:
+		# Ahora sí, el tipo coincide perfectamente con lo que tu Director espera
+		director.load_location(interactive_scene)
+	else:
+		push_error("Failed to load interactive scene from path: " + scene_path)
+	
+	# C) Control de estados con el Director
+	match data["interaction_mode"]:
+		0:
+			director.change_game_state(EssenceGameplayDirector.GameState.DIALOGUE)
+		1:
+			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
