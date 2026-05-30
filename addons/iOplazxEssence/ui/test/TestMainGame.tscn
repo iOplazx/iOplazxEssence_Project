@@ -42,6 +42,9 @@ stretch_mode = 6
 [node name="GameplayDirector" parent="." unique_id=1915930015 instance=ExtResource("3_ceb05")]
 unique_name_in_owner = true
 
+[node name="ActiveLocation" parent="GameplayDirector" index="1" unique_id=115441188]
+position = Vector2(640, 360)
+
 [node name="DialogBoxUI" parent="GameplayDirector/HUD_Layer" parent_id_path=PackedInt32Array(1915930015, 1557427055) index="1" unique_id=894732781]
 metadata/_edit_use_anchors_ = true
 

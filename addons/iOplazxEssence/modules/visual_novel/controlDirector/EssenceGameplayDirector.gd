@@ -5,7 +5,6 @@ extends Node2D
 # ==
 # GameplayDirector (Node2D) [Script: EssenceGameplayDirector]
 # ├── EnvironmentFilter (CanvasModulate)     <-- Colors the whole screen (Day/Night)
-# ├── BackgroundLayer (TextureRect)          <-- NEW: Global background image
 # ├── ActiveLocation (Node2D)                <-- The anchor where interactive hotspots are loaded
 # │   └── (Empty by default)
 # ├── CharactersStage (Node2D)               <-- Where actors/characters are placed
@@ -22,7 +21,7 @@ var current_state: GameState = GameState.CUTSCENE
 @export var environment_filter: CanvasModulate
 @export var active_location_container: Node2D
 @export var characters_stage: Node2D
-@export var dialog_box_ui: Control # Cambia "Control" por la clase de tu DialogBox si la tienes
+@export var dialog_box_ui: Control 
 
 # Variable interna para rastrear la habitación instanciada actualmente
 var current_location_node: EssenceLocation

@@ -3,19 +3,19 @@ class_name EssencePaths extends RefCounted
 # ==========================================
 # RUTAS BASE
 # ==========================================
-const BASE_RUTE = "res://addons/iOplazxEssence/"
-const BASE_RESOURCES = BASE_RUTE + "resources/"
+const BASE_ROUTE = "res://addons/iOplazxEssence/"
+const BASE_RESOURCES = BASE_ROUTE + "resources/"
 const PATH_IMAGES = BASE_RESOURCES + "images/"
 const PATH_IMAGES_BACKGROUND = PATH_IMAGES + "background/"
 const PATH_IMAGES_CHARACTER = PATH_IMAGES + "character/"
 const PATH_IMAGES_OBJECTS = PATH_IMAGES + "objects/"
 const PATH_AUDIO = BASE_RESOURCES + "audio/"
-const PATH_CORE = BASE_RUTE + "core/"
-const PATH_UI = BASE_RUTE + "ui/"
-const PATH_UI_CARDS = BASE_RUTE + "ui/cards/"
-const PATH_UI_OVERLAYS = BASE_RUTE + "ui/overlays/"
-const PATH_UI_SCREEN = BASE_RUTE + "ui/screens/"
-const PATH_UI_WIDGETS = BASE_RUTE + "ui/widgets/"
+const PATH_CORE = BASE_ROUTE + "core/"
+const PATH_UI = BASE_ROUTE + "ui/"
+const PATH_UI_CARDS = BASE_ROUTE + "ui/cards/"
+const PATH_UI_OVERLAYS = BASE_ROUTE + "ui/overlays/"
+const PATH_UI_SCREEN = BASE_ROUTE + "ui/screens/"
+const PATH_UI_WIDGETS = BASE_ROUTE + "ui/widgets/"
 
 # ==========================================
 # RUTAS CARPETAS
@@ -86,6 +86,12 @@ const INTERNAL_IMAGES = {
 # ==========================================
 # DEMO RESOURCES (ONLY USE FOR DEMO GAME)
 # ==========================================
+const MODULE_ROUTE = BASE_ROUTE + "module/"
+const MODULE_VISUALNOVEL_ROUTE = MODULE_ROUTE + "visual_novel/"
+const PREFAB_UI_ROUTE = MODULE_VISUALNOVEL_ROUTE + "prefab/ui/"
+
 const BACKGROUND_ROOM_INITIAL = PATH_IMAGES_BACKGROUND + "background_room_ai_1.png"
 const BACKGROUND_ROOM_3DOORS = PATH_IMAGES_BACKGROUND + "background_room_ai_3.png"
 const BACKGROUND_ROOM_1DOOR = PATH_IMAGES_BACKGROUND + "background_room_ai_2.png"
+
+const ITEM_GENERIC_INTERACTIVE_CHARACTER = PREFAB_UI_ROUTE + "GenericInteractiveCharacter.tscn"

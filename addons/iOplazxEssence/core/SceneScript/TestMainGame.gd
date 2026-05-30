@@ -7,9 +7,8 @@ extends Control
 # TestMainGame (TestMainGame) [Script: TestMainGame]
 # ├── BackgroundLayer (TextureRect)                     
 # ├── GameplayDirector (EssenceGameplayDirector)   
-# │   ├── EnveriromentFilter (CanvasModulate)           
-# │   ├── ActiveLocation (Node2D)           
-# │   │   └── ImgPuerta (Node2D)  
+# │   ├── EnviromentFilter (CanvasModulate)           
+# │   ├── ActiveLocation (Node2D)    
 # │   ├── CharacterStage (Node2D)      
 # │   └── HUD_Layer (CanvasLayer)
 # │       ├── TranslationManager (Node)           
@@ -273,6 +272,9 @@ func _on_character_interacted() -> void:
 				"Then, save the game and load it to verify the Wardrobe System."
 			]
 			tutorial_panel.load_and_show_tutorial(interaction_messages)
+			
+func _on_ready_initialRoom(data: Dictionary) -> void:
+	pass
 
 ## Esta función se dispara automáticamente cuando el ratón hace algo sobre ImgPuerta
 func _on_img_puerta_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
