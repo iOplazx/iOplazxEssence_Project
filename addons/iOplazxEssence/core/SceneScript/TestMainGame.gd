@@ -48,6 +48,13 @@ var current_phase: TestPhase = TestPhase.INTRO
 const ROUTES_PATH = "res://_static/RouteConfig.tres"
 var routes: EssenceRouteConfig
 
+# Variable global para saber en qué ID de habitación numérica estamos parados
+var current_room_id: int = LevelManager.RoomID["INITIAL_ROOM"]
+
+######################################
+# SECTION (ALL SCENES IN THIS TSCN)  #
+######################################
+
 # ==========================================
 # INICIALIZACIÓN
 # ==========================================
@@ -273,6 +280,10 @@ func _on_character_interacted() -> void:
 			]
 			tutorial_panel.load_and_show_tutorial(interaction_messages)
 			
+#########################
+# SECTION Initial Room  #
+#########################
+			
 func _on_ready_initialRoom(data: Dictionary) -> void:
 	pass
 
@@ -293,30 +304,89 @@ func _on_img_puerta_input_event(_viewport: Node, event: InputEvent, _shape_idx: 
 			_on_ready_room3doors(data)
 
 
-## Sets up the 3 doors room by applying backgrounds, loading scenes, and updating director states
+#########################
+# SECTION Room 3 Doors  #
+#########################
+
+## Sets up the 3 doors room by applying backgrounds with animations, loading scenes, and updating director states
 func _on_ready_room3doors(data: Dictionary) -> void:
-	# A) Cambiamos el fondo físico usando tu enum de imágenes
+	current_room_id = data["id_room"]
+	
+	# ------------------------------------------------==========================
+	# PASO 1: ANIMACIÓN DE SALIDA (FADE OUT)
+	# ----------------------------------------------------------------==========
+	# Desvanecemos el fondo viejo durante 0.4 segundos
+	var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
+	
+	# La palabra mágica 'await' frena este script hasta que el Fade Out termine al 100%
+	if fade_out_tween:
+		await fade_out_tween.finished
+		
+	# ------------------------------------------------==========================
+	# PASO 2: CAMBIO DE TEXTURA (OCULTO)
+	# ----------------------------------------------------------------==========
+	# Ahora que el TextureRect es transparente, cambiamos la imagen sin que el jugador note el "salto"
 	match data["id_background_scene"]:
 		LevelManager.BackgroundImageID["ROOM_3_DOORS"]:
 			background_layer.texture = load(EssencePaths.BACKGROUND_ROOM_3DOORS)
 		_:
 			push_warning("Background ID not recognized.")
-
+			
+	# ------------------------------------------------==========================
+	# PASO 3: ANIMACIÓN DE ENTRADA (FADE IN)
+	# ----------------------------------------------------------------==========
+	# Revelamos el nuevo fondo suavemente durante 0.5 segundos
+	var fade_in_tween: Tween = EssenceUIAnimator.fade_in(background_layer, 0.5)
 	
-	# B) CARGAR E INYECTAR LA ESCENA INTERACTIVA
-	# Convertimos el String de tu archivo central en un PackedScene usando load()
+	# ------------------------------------------------==========================
+	# PASO 4: CARGAR E INYECTAR LA ESCENA INTERACTIVA
+	# ----------------------------------------------------------------==========
+	# Colocamos los hotspots en la pantalla (las puertas se instanciarán listas pero inmóviles)
 	var scene_path: String = DemoItemsRoute.TESTROOMDOOR_SCENE
 	var interactive_scene: PackedScene = load(scene_path) as PackedScene
 	
 	if interactive_scene:
-		# Ahora sí, el tipo coincide perfectamente con lo que tu Director espera
 		director.load_location(interactive_scene)
+		
+		# Conectamos las señales dinámicas para futuras navegaciones
+		var current_loc = director.current_location_node
+		if current_loc and current_loc.has_signal("navigation_requested"):
+			current_loc.navigation_requested.connect(_on_room_navigation_requested)
 	else:
 		push_error("Failed to load interactive scene from path: " + scene_path)
-	
-	# C) Control de estados con el Director
+		
+	# Esperamos a que el nuevo fondo termine de revelarse por completo
+	if fade_in_tween:
+		await fade_in_tween.finished
+		
+	# ------------------------------------------------==========================
+	# PASO 5: ACTIVAR LA INTERACCIÓN (SÓLO CUANDO ACABE LA ANIMACIÓN)
+	# ----------------------------------------------------------------==========
+	# Ahora que la pantalla ya está completamente visible, le damos el control al jugador
 	match data["interaction_mode"]:
 		0:
 			director.change_game_state(EssenceGameplayDirector.GameState.DIALOGUE)
 		1:
 			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
+		2:
+			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
+			# Aquí iría tu lógica si el modo 2 necesita apagar alguna puerta tras la transición
+
+
+## Central listener that processes all navigation signals coming from inside the active rooms.
+func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: bool) -> void:
+	# Consultamos a nuestra matriz usando nuestro rastreador dinámico 'current_room_id'
+	var data = LevelManager.get_scenery_config(current_room_id, next_place, mode, is_only_mode)
+	
+	if data["flag_error"]:
+		push_error("[TestMainGame] Illegal transition requested by room layout.")
+		return
+		
+	# Redirigimos el resultado al callback del cuarto correspondiente
+	match data["id_room"]:
+		LevelManager.RoomID["INITIAL_ROOM"]:
+			pass # Aquí llamarías a tu función: _on_ready_initial_room(data)
+		LevelManager.RoomID["ROOM_3_DOORS"]:
+			_on_ready_room3doors(data)
+		LevelManager.RoomID["ROOM_1_DOOR"]:
+			pass # Aquí llamarías a tu función: _on_ready_room1door(data)

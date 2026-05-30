@@ -12,4 +12,4 @@ const DEMO_ITEMS_ROUTE = DEMO_ROUTE + "items/"
 # ==========================================
 # SCENE PATHS
 # ==========================================
-const TESTROOMDOOR_SCENE = DEMO_ITEMS_ROUTE + "TestRoomDoor.tscn"
+const TESTROOMDOOR_SCENE = DEMO_ITEMS_ROUTE + "scene/TestRoomDoor.tscn"
