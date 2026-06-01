@@ -86,7 +86,7 @@ const INTERNAL_IMAGES = {
 # ==========================================
 # DEMO RESOURCES (ONLY USE FOR DEMO GAME)
 # ==========================================
-const MODULE_ROUTE = BASE_ROUTE + "module/"
+const MODULE_ROUTE = BASE_ROUTE + "modules/"
 const MODULE_VISUALNOVEL_ROUTE = MODULE_ROUTE + "visual_novel/"
 const PREFAB_UI_ROUTE = MODULE_VISUALNOVEL_ROUTE + "prefab/ui/"
 
@@ -95,3 +95,4 @@ const BACKGROUND_ROOM_3DOORS = PATH_IMAGES_BACKGROUND + "background_room_ai_3.pn
 const BACKGROUND_ROOM_1DOOR = PATH_IMAGES_BACKGROUND + "background_room_ai_2.png"
 
 const ITEM_GENERIC_INTERACTIVE_CHARACTER = PREFAB_UI_ROUTE + "GenericInteractiveCharacter.tscn"
+const x = "res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/GenericInteractiveCharacter.tscn"

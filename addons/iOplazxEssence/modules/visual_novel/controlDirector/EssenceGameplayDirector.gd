@@ -111,3 +111,12 @@ func initialize_dialog_sequence(sequence_id: String) -> void:
 	if dialog_box_ui:
 		dialog_box_ui.visible = true
 		# TODO: dialog_box_ui.display_text(...)
+
+## Instantiates and adds an actor to the CharactersStage container.
+## Returns the instantiated Node for further manipulation.
+func add_actor_to_stage(actor_scene: PackedScene) -> Node2D:
+	if not characters_stage or not actor_scene: return null
+	
+	var new_actor = actor_scene.instantiate()
+	characters_stage.add_child(new_actor)
+	return new_actor

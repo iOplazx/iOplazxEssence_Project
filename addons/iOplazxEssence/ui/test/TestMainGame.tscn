@@ -10,7 +10,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ceb05"]
 size = Vector2(370.00015, 750.0005)
 
-[node name="TestMainGame" type="Control" unique_id=153983025 node_paths=PackedStringArray("background_layer", "btn_return", "btn_save", "btn_load", "tutorial_panel", "ui_principal", "character")]
+[node name="TestMainGame" type="Control" unique_id=153983025 node_paths=PackedStringArray("background_layer", "btn_return", "btn_save", "btn_load", "tutorial_panel", "ui_principal")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,7 +25,6 @@ btn_save = NodePath("PanelControles/HBoxContainer/btnSave")
 btn_load = NodePath("PanelControles/HBoxContainer/btnLoad")
 tutorial_panel = NodePath("TutorialPanelUI")
 ui_principal = NodePath("PanelControles")
-character = NodePath("CharacterRoot")
 
 [node name="BackgroundLayer" type="TextureRect" parent="." unique_id=1243969001]
 layout_mode = 1
@@ -45,7 +44,10 @@ unique_name_in_owner = true
 [node name="ActiveLocation" parent="GameplayDirector" index="1" unique_id=115441188]
 position = Vector2(640, 360)
 
-[node name="DialogBoxUI" parent="GameplayDirector/HUD_Layer" parent_id_path=PackedInt32Array(1915930015, 1557427055) index="1" unique_id=894732781]
+[node name="HUD_Layer" parent="GameplayDirector" index="3" unique_id=1557427055]
+visible = false
+
+[node name="DialogBoxUI" parent="GameplayDirector/HUD_Layer" index="1" unique_id=894732781]
 metadata/_edit_use_anchors_ = true
 
 [node name="Area2D_door" type="Area2D" parent="." unique_id=315862526]
@@ -62,10 +64,6 @@ texture = ExtResource("4_42cpq")
 position = Vector2(-6.1035156e-05, -0.00024414063)
 scale = Vector2(0.9999994, 0.9999994)
 shape = SubResource("RectangleShape2D_ceb05")
-
-[node name="CharacterRoot" parent="." unique_id=1680410021 instance=ExtResource("3_woyu4")]
-position = Vector2(575, 180)
-scale = Vector2(0.5, 0.5)
 
 [node name="TutorialPanelUI" parent="." unique_id=806485748 instance=ExtResource("3_idmch")]
 layout_mode = 1
@@ -125,5 +123,10 @@ text = "Quick Load"
 [node name="btnReturn" type="Button" parent="PanelControles/HBoxContainer" unique_id=1276848986]
 layout_mode = 2
 text = "Return Main Menu"
+
+[node name="CharacterRoot" parent="." unique_id=1680410021 instance=ExtResource("3_woyu4")]
+visible = false
+position = Vector2(575, 180)
+scale = Vector2(0.5, 0.5)
 
 [editable path="GameplayDirector"]
