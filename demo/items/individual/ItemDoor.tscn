@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://x54s0atpf5hp"]
+
+[ext_resource type="Texture2D" uid="uid://xv8v3b06d0dd" path="res://addons/iOplazxEssence/resources/images/objects/imgPuerta.png" id="1_5pv7y"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ethqq"]
+size = Vector2(370.00015, 750.0005)
+
+[node name="ItemDoor" type="Area2D" unique_id=1115261331]
+
+[node name="ImgPuerta" type="Sprite2D" parent="." unique_id=1056738629]
+position = Vector2(-9.1552734e-05, -0.00024414063)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("1_5pv7y")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1300142259]
+position = Vector2(-6.1035156e-05, -0.00024414063)
+scale = Vector2(0.9999994, 0.9999994)
+shape = SubResource("RectangleShape2D_ethqq")

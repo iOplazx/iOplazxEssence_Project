@@ -2,11 +2,12 @@
 
 [ext_resource type="Script" uid="uid://bmwro6b07v63e" path="res://addons/iOplazxEssence/modules/visual_novel/controlDirector/EssenceGameplayDirector.gd" id="1_6w5qv"]
 
-[node name="GameplayDirector" type="Node2D" unique_id=1915930015 node_paths=PackedStringArray("environment_filter", "active_location_container", "characters_stage", "dialog_box_ui")]
+[node name="GameplayDirector" type="Node2D" unique_id=1915930015 node_paths=PackedStringArray("environment_filter", "active_location_container", "characters_stage", "item_stage", "dialog_box_ui")]
 script = ExtResource("1_6w5qv")
 environment_filter = NodePath("EnvironmentFilter")
 active_location_container = NodePath("ActiveLocation")
 characters_stage = NodePath("CharactersStage")
+item_stage = NodePath("ItemStage")
 dialog_box_ui = NodePath("HUD_Layer/DialogBoxUI")
 
 [node name="EnvironmentFilter" type="CanvasModulate" parent="." unique_id=1922817007]
@@ -14,6 +15,8 @@ dialog_box_ui = NodePath("HUD_Layer/DialogBoxUI")
 [node name="ActiveLocation" type="Node2D" parent="." unique_id=115441188]
 
 [node name="CharactersStage" type="Node2D" parent="." unique_id=1365570825]
+
+[node name="ItemStage" type="Node2D" parent="." unique_id=800132712]
 
 [node name="HUD_Layer" type="CanvasLayer" parent="." unique_id=1557427055]
 layer = 100

@@ -9,7 +9,8 @@ extends Control
 # ├── GameplayDirector (EssenceGameplayDirector)   
 # │   ├── EnviromentFilter (CanvasModulate)           
 # │   ├── ActiveLocation (Node2D)    
-# │   ├── CharacterStage (Node2D)      
+# │   ├── CharacterStage (Node2D) 
+# │   ├── ItemStage (Node2D)      
 # │   └── HUD_Layer (CanvasLayer) (no visible)
 # │       ├── TranslationManager (Node)           
 # │       └── DialogBoxUI (Node)           
@@ -43,8 +44,8 @@ var current_phase: TestPhase = TestPhase.INTRO
 
 # Usamos % en lugar de $ para acceder al instante sin importar la jerarquía
 @onready var director: EssenceGameplayDirector = %GameplayDirector
-@onready var area2D_door: Area2D = %Area2D_door
 @onready var active_location_container: Node2D = %GameplayDirector/ActiveLocation
+@onready var item_stage_container: Node2D = %GameplayDirector/ItemStage
 
 const ROUTES_PATH = "res://_static/RouteConfig.tres"
 var routes: EssenceRouteConfig
@@ -63,6 +64,9 @@ var story_flags: Dictionary = {
 var active_character: GenericInteractiveCharacter = null
 const CHARACTER_ROOT_SCENE = EssencePaths.ITEM_GENERIC_INTERACTIVE_CHARACTER
 
+const DOOR_ITEM_SCENE = DemoItemsRoute.ITEMDOOR_SCENE
+var spawned_doors_in_room: Array[Node2D] = []
+
 ######################################
 # SECTION (ALL SCENES IN THIS TSCN)  #
 ######################################
@@ -80,8 +84,9 @@ func _ready() -> void:
 	director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 	
 	# 2. Conectamos la señal de clic de nuestra ImgPuerta
-	if area2D_door:
-		area2D_door.input_event.connect(_on_img_puerta_input_event)
+	_setup_initial_room_layout()
+	
+	director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 	
 	# Conectamos la señal de cuando el tutorial se cierra
 	if tutorial_panel:
@@ -122,6 +127,12 @@ func _iniciar_secuencia_intro() -> void:
 	
 	if tutorial_panel:
 		tutorial_panel.load_and_show_tutorial(intro_messages)
+		
+func _setup_initial_room_layout():
+	director.clear_item_stage()
+	
+	# Invoca la puerta Variante 0 y la amarra para que al hacer clic viaje a ROOM_3_DOORS
+	_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
 
 func _on_tutorial_finished() -> void:
 	if current_phase == TestPhase.INTRO:
@@ -267,7 +278,6 @@ func _spawn_main_character(room_id: int, mode: int, is_instant: bool = false) ->
 	active_character.position = placement["position"]
 	active_character.scale = placement["scale"]
 	
-	# === AQUÍ REEMPLAZAMOS TU ANTIGUO _config_character() ===
 	active_character.clicked_on_character.connect(_on_character_interacted)
 	# ==========================================================
 	
@@ -362,7 +372,80 @@ func unload_location() -> void:
 		child.queue_free()
 		
 	print("[EssenceGameplayDirector] ActiveLocation container cleared successfully.")
+	
+
+## Instantiates a dynamic transition door into the ItemStage and binds its destination room.
+## [param door_mode_index]: The variant index (0 for left/first door, 1 for right/second door, etc.)
+## [param destination_room_id]: The LevelManager.RoomID where this door will lead.
+func _spawn_navigation_door(door_mode_index: int, destination_room_id: int) -> void:
+	# 1. Cargamos el archivo .tscn desde tu ruta centralizada
+	var packed_door = load(DOOR_ITEM_SCENE) as PackedScene
+	if not packed_door:
+		push_error("[TestMainGame] Error crítico: No se pudo cargar la escena desde: " + DOOR_ITEM_SCENE)
+		return
+		
+	# 2. Le ordenamos al Director que la instancie dentro del contenedor ItemStage
+	var door_instance = director.add_item_to_stage(packed_door)
+	
+	# 3. PREGUNTA/VALIDACIÓN: ¿Se instanció correctamente?
+	if is_instance_valid(door_instance):
+		print("[TestMainGame] ¡Éxito! Puerta variante %d instanciada correctamente." % door_mode_index)
+		
+		# 4. Posicionamiento dinámico: Buscamos las coordenadas en tu StageItemManager
+		# Le pasamos el cuarto actual, el ID general de puertas y el índice del modo (0, 1, etc.)
+		var config = StageItemManager.get_item_placement(
+			current_room_id, 
+			StageItemManager.ItemID["DOOR_SPRITE"], 
+			door_mode_index
+		)
+		
+		# Si por alguna regla de la historia el mánager dice que no es visible, la borramos y salimos
+		if not config.get("is_visible", true):
+			door_instance.queue_free()
+			return
 			
+		door_instance.position = config["position"]
+		door_instance.scale = config["scale"]
+		
+		# Guardamos la referencia en nuestra lista general para poder limpiarla al cambiar de cuarto
+		spawned_doors_in_room.append(door_instance)
+		
+		# 5. PROGRAMAR EL EVENTO DE SER TOCADA (Smart Input Binding)
+		var target_area: Area2D = door_instance if door_instance is Area2D else null
+		if not target_area:
+			for child in door_instance.get_children():
+				if child is Area2D:
+					target_area = child
+					break
+		
+		# 6. Conectamos la señal nativa de Godot amarrando (bind) el destino dinámico
+		if target_area:
+			# Usamos .bind() para inyectar de forma segura el ID de destino al hacer clic
+			target_area.input_event.connect(_on_dynamic_door_clicked.bind(destination_room_id))
+			print("[TestMainGame] Sensores de físicas listos. Puerta amarrada al cuarto ID: ", destination_room_id)
+		else:
+			push_error("[TestMainGame] Advertencia: No se encontró ningún Area2D en la puerta.")
+			
+	else:
+		push_error("[TestMainGame] Fallo crítico: El Director devolvió un nodo nulo al intentar añadir la puerta.")
+		
+		
+## Processes the click of any dynamic door and requests navigation to its bound destination.
+func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, next_room_id: int) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		print("[Framework] ¡Puerta cruzada! Viajando hacia la habitación ID: ", next_room_id)
+		
+		# Consultamos la matriz del LevelManager con el destino que venía amarrado en la puerta
+		var data = LevelManager.get_scenery_config(current_room_id, next_room_id, 0, false)
+		
+		if not data["flag_error"]:
+			# Al cambiar de cuarto, vaciamos nuestra lista de referencias e indicamos al Director que limpie la pantalla
+			spawned_doors_in_room.clear()
+			director.clear_item_stage() 
+			
+			# Redirigimos el resultado al callback central que ya construiste
+			_on_room_navigation_requested(next_room_id, 0, false)
+
 #########################
 # SECTION Initial Room  #
 #########################
@@ -415,8 +498,5 @@ func _on_ready_room3doors(data: Dictionary) -> void:
 	
 	if fade_in_tween: await fade_in_tween.finished
 		
-	# --- EL CAMBIO ARQUITECTÓNICO ESTÁ AQUÍ ---
-	# En lugar de hacer un match directo de 'data["interaction_mode"]', 
-	# le pasamos el control al "Director de la Trama" y le sugerimos el modo por defecto.
 	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
 	

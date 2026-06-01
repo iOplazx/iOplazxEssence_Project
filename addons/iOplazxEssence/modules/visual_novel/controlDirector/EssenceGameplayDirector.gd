@@ -9,6 +9,8 @@ extends Node2D
 # │   └── (Empty by default)
 # ├── CharactersStage (Node2D)               <-- Where actors/characters are placed
 # │   └── (Empty by default)
+# ├── ItemStage  (Node2D)                    <-- 
+# │   └── (Empty by default)
 # └── HUD_Layer (CanvasLayer)                <-- UI always stays on top
 #     ├── TranslationManager (Node)          <-- Addon Autoload/Manager
 #     └── DialogBoxUI (Control)              <-- Reference to your text box
@@ -21,6 +23,7 @@ var current_state: GameState = GameState.CUTSCENE
 @export var environment_filter: CanvasModulate
 @export var active_location_container: Node2D
 @export var characters_stage: Node2D
+@export var item_stage: Node2D
 @export var dialog_box_ui: Control 
 
 # Variable interna para rastrear la habitación instanciada actualmente
@@ -120,3 +123,25 @@ func add_actor_to_stage(actor_scene: PackedScene) -> Node2D:
 	var new_actor = actor_scene.instantiate()
 	characters_stage.add_child(new_actor)
 	return new_actor
+	
+## Instantiates and adds an interactive item/icon to the screen.
+func add_item_to_stage(item_scene: PackedScene) -> Node2D:
+	if not item_stage or not item_scene: return null
+	
+	var new_item = item_scene.instantiate()
+	item_stage.add_child(new_item)
+	return new_item
+
+
+## Removes a specific item from the screen by its node reference.
+func remove_item_from_stage(item_node: Node) -> void:
+	if is_instance_valid(item_node):
+		item_node.queue_free()
+
+
+## Clears all floating items from the screen.
+func clear_item_stage() -> void:
+	if not item_stage: return
+	for child in item_stage.get_children():
+		child.queue_free()
+	print("[EssenceGameplayDirector] ItemStage cleared.")
