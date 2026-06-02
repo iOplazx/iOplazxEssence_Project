@@ -10,6 +10,8 @@ var player_hp: int = 100
 var escena_actual: String = "MainRoom"
 var fase_actual: int = 0 # Usamos int porque los enum (TestPhase.INTRO) se guardan como números
 var ropa_estado_personaje: Dictionary = {}
+var habitacion_actual: String
+var story_flags: Dictionary
 
 # 2. Empaquetado: El Manager llamará a esto para crear el JSON
 func _get_child_data() -> Dictionary:
@@ -19,7 +21,9 @@ func _get_child_data() -> Dictionary:
 		# Empaquetamos los nuevos datos
 		"escena_actual": escena_actual,
 		"fase_actual": fase_actual,
-		"ropa_estado_personaje": ropa_estado_personaje
+		"habitacion_actual": habitacion_actual,
+		"ropa_estado_personaje": ropa_estado_personaje,
+		"story_flags": story_flags
 	}
 
 # 3. Desempaquetado: Se llama al cargar una partida existente
