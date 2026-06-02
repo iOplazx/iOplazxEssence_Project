@@ -339,9 +339,9 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	if _check_room_interruptions(room_id):
 		return 
 		
-	# 2. ✅ FLUJO NORMAL DE EXPLORACIÓN
+	# 2. FLUJO NORMAL DE EXPLORACIÓN
 	# Si llegamos aquí, es porque la habitación está libre de eventos.
-	print("[Story] Todo despejado. Promoviendo a Exploracion (Modo 1).")
+	#print("[Story] Todo despejado. Promoviendo a Exploracion (Modo 1).")
 	
 	var data = LevelManager.get_scenery_config(room_id, room_id, 1, true)
 	if data["flag_error"]: return
@@ -369,7 +369,7 @@ func _check_room_interruptions(room_id: int) -> bool:
 		LevelManager.RoomID["INITIAL_ROOM"]:
 			# Interrupción: Es la primera vez en el juego (Tutorial)
 			if story_flags.get("is_first_time_here", false):
-				print("[Story] Interrupción: Primera vez en la habitación inicial. Esperando tutorial.")
+				#print("[Story] Interrupción: Primera vez en la habitación inicial. Esperando tutorial.")
 				# Lo dejamos en modo diálogo/bloqueado. El tutorial lo desbloqueará.
 				director.change_game_state(EssenceGameplayDirector.GameState.DIALOGUE)
 				return true # 🛑 Retorna TRUE para detener el flujo normal

@@ -40,7 +40,7 @@ func _ready() -> void:
 ## Changes the current game state and automatically updates environment interactivity.
 func change_game_state(new_state: GameState) -> void:
 	current_state = new_state
-	print("[EssenceGameplayDirector] Game state changed to: ", GameState.keys()[new_state])
+	#print("[EssenceGameplayDirector] Game state changed to: ", GameState.keys()[new_state])
 	
 	# Si pasamos a Exploración, encendemos el escenario interactivo
 	if current_state == GameState.EXPLORATION:
@@ -97,7 +97,7 @@ func unload_location() -> void:
 	# 2. Rompemos la referencia para que el sistema sepa que no hay escenario activo
 	current_location_node = null
 	
-	print("[EssenceGameplayDirector] Location unloaded successfully.")
+	#print("[EssenceGameplayDirector] Location unloaded successfully.")
 
 ## Applies a color tint to the entire screen using the EnvironmentFilter.
 func set_environment_color(hex_color: String) -> void:
@@ -166,4 +166,4 @@ func clear_item_stage() -> void:
 	if not item_stage: return
 	for child in item_stage.get_children():
 		child.queue_free()
-	print("[EssenceGameplayDirector] ItemStage cleared.")
+	#print("[EssenceGameplayDirector] ItemStage cleared.")

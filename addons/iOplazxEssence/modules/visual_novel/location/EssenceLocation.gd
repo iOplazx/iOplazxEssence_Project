@@ -17,7 +17,7 @@ extends Node2D
 func _ready() -> void:
 	if not stage_background:
 		push_warning("[%s] Alerta: No se asignó un Sprite2D para el fondo." % location_id)
-	print("[EssenceLocation] Escenario cargado: %s (%s)" % [location_name, location_id])
+	#print("[EssenceLocation] Escenario cargado: %s (%s)" % [location_name, location_id])
 
 ## Changes the current background texture.
 ## Ideal for time transitions (e.g., Day -> Night) if no filters are used.

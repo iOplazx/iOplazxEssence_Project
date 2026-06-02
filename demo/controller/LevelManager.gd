@@ -78,19 +78,19 @@ static func _handle_internal_room_modes(room: int, mode: int, config: Dictionary
 	
 	match room:
 		RoomID["INITIAL_ROOM"]:
-			print("No estamos cambiando de habitacion, activamos el modo 1/interactuable")
+			#print("No estamos cambiando de habitacion, activamos el modo 1/interactuable")
 			config["interaction_mode"] = 1
 			
 		RoomID["ROOM_3_DOORS"]:
 			if mode == 1:
-				print("Activamos el modo 1 osea el interactivo inicial")
+				#print("Activamos el modo 1 osea el interactivo inicial")
 				config["interaction_mode"] = 1
 			else:
-				print("Activamos el modo 2, osea el interactivo con la puerta 3 incapaz de interactuar")
+				#print("Activamos el modo 2, osea el interactivo con la puerta 3 incapaz de interactuar")
 				config["interaction_mode"] = 2
 				
 		RoomID["ROOM_1_DOOR"]:
-			print("No estamos cambiando de habitacion, activamos el modo 1/interactuable")
+			#print("No estamos cambiando de habitacion, activamos el modo 1/interactuable")
 			config["interaction_mode"] = 1
 			
 		_:

@@ -25,7 +25,7 @@ func _ready() -> void:
 	# Por defecto, bloqueamos el escenario al cargar (esperando órdenes del Director)
 	environment_interactable = false
 	_connect_fixed_hotspots()
-	print("[EssenceInteractiveLocation] Nodos interactivos preparados para: %s" % location_id)
+	#print("[EssenceInteractiveLocation] Nodos interactivos preparados para: %s" % location_id)
 
 ## Find the doors/objects and connect their click signals to the script
 func _connect_fixed_hotspots() -> void:
