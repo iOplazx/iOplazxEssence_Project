@@ -139,12 +139,17 @@ func _on_tutorial_finished() -> void:
 		print("[%s] Tutorial Intro terminado. Esperando cierre de UI..." % ES_NAME_CLASS)
 		current_phase = TestPhase.GAMEPLAY
 		
+		# 💾 CAMBIO CRUCIAL: Guardamos en la historia que ya pasamos por aquí
+		story_flags["is_first_time_here"] = false
+		
 		await get_tree().create_timer(0.6).timeout 
 		
-		# Invocamos al personaje con animación suave (is_instant = false)
+		# Invocamos al personaje de forma animada (primera aparición)
 		_spawn_main_character(LevelManager.RoomID["INITIAL_ROOM"], 0, false)
 		
-		# Quitamos accesorios por defecto
+		# Invocamos la puerta inicial dinámicamente para que pueda viajar por primera vez
+		_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
+		
 		if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
 			active_character.toggle_garment("GenericChrHat", false)
 			active_character.toggle_garment("GenericChrSunglass", false)
@@ -316,8 +321,8 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 	# 4. Si es un viaje real a otra habitación, redirigimos el resultado al callback del cuarto correspondiente
 	match data["id_room"]:
 		LevelManager.RoomID["INITIAL_ROOM"]:
-			print("Cargando habitación inicial...")
-			# Aquí llamarías a tu función si la tienes: _on_ready_initial_room(data)
+			# Conectamos tu nueva función mágica de retorno
+			_on_ready_initialRoom(data)
 		LevelManager.RoomID["ROOM_3_DOORS"]:
 			_on_ready_room3doors(data)
 		LevelManager.RoomID["ROOM_1_DOOR"]:
@@ -328,33 +333,60 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 ## [param room_id]: The active Room ID from LevelManager.
 ## [param default_mode]: The fallback interaction mode if no story events trigger.
 func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
+	
+	# 1. 🛑 PASO POR EL FILTRO INTERMEDIO
+	# Si el método devuelve true, el evento tomó el control, así que hacemos un 'return' para salir.
+	if _check_room_interruptions(room_id):
+		return 
+		
+	# 2. ✅ FLUJO NORMAL DE EXPLORACIÓN
+	# Si llegamos aquí, es porque la habitación está libre de eventos.
+	print("[Story] Todo despejado. Promoviendo a Exploracion (Modo 1).")
+	
+	var data = LevelManager.get_scenery_config(room_id, room_id, 1, true)
+	if data["flag_error"]: return
+		
+	_apply_interaction_state(data["interaction_mode"])
+	
+	# 3. CONSTRUCCIÓN DE LA HABITACIÓN
+	# Aquí solo ponemos lo que SIEMPRE aparece cuando la habitación está normal
 	match room_id:
+		LevelManager.RoomID["INITIAL_ROOM"]:
+			_spawn_main_character(room_id, 0, true)
+			_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
+			
 		LevelManager.RoomID["ROOM_3_DOORS"]:
-			# 1. ¿Hay alguna interrupción narrativa de la historia? (Ej: El teléfono)
-			if story_flags["is_phone_event_active"]:
-				print("[Story] ¡EVENTO DETECTADO! Alguien llama al telefono. Bloqueando exploracion.")
+			_spawn_navigation_door(0, LevelManager.RoomID["ROOM_1_DOOR"])
+			_spawn_navigation_door(1, LevelManager.RoomID["INITIAL_ROOM"])
+			
+			# Si tuvieras un ItemManager, aquí harías aparecer la mochila o cosas fijas:
+			# _spawn_screen_item(StageItemManager.ItemID["BACKPACK_ICON"], 0)
 				
-				# Forzamos el estado cinemático/diálogo
+## Checks for pending story events in the given room.
+## Returns TRUE if an event intercepted the flow, FALSE if the room is clear.
+func _check_room_interruptions(room_id: int) -> bool:
+	match room_id:
+		LevelManager.RoomID["INITIAL_ROOM"]:
+			# Interrupción: Es la primera vez en el juego (Tutorial)
+			if story_flags.get("is_first_time_here", false):
+				print("[Story] Interrupción: Primera vez en la habitación inicial. Esperando tutorial.")
+				# Lo dejamos en modo diálogo/bloqueado. El tutorial lo desbloqueará.
+				director.change_game_state(EssenceGameplayDirector.GameState.DIALOGUE)
+				return true # 🛑 Retorna TRUE para detener el flujo normal
+				
+		LevelManager.RoomID["ROOM_3_DOORS"]:
+			# Interrupción: El teléfono está sonando
+			if story_flags.get("is_phone_event_active", false):
+				print("[Story] Interrupción: ¡Alguien llama al telefono! Bloqueando exploracion.")
 				director.change_game_state(EssenceGameplayDirector.GameState.DIALOGUE)
 				
-				# TODO: Aquí disparas tu cuadro de texto (DialogBoxUI) para la llamada.
-				# Cuando el jugador termine de leer ese diálogo, el botón de "Continuar" de la UI
-				# será el encargado de llamar a: update_current_room_mode(1) para desbloquear el cuarto.
+				# TODO: Lanzar el UI de diálogo del teléfono aquí...
 				
 				story_flags["is_phone_event_active"] = false # Consumimos el evento
-				return # Cortamos el flujo aquí; el teléfono tomó el control.
-			
-			# 2. ¡VALIDACIÓN EXITOSA! No hay eventos de historia pendientes en este cuarto.
-			print("[Story] No hay eventos narrativos pendientes. Promoviendo a Exploracion (Modo 1).")
-			
-			# Le pedimos al LevelManager que nos devuelva las reglas del Modo 1 de forma interna (is_only_change_mode = true)
-			var data = LevelManager.get_scenery_config(room_id, room_id, 1, true)
-			if not data["flag_error"]:
-				_apply_interaction_state(data["interaction_mode"])
+				return true # 🛑 Retorna TRUE para detener el flujo normal
 				
-		LevelManager.RoomID["INITIAL_ROOM"]:
-			# Para la habitación inicial aplicamos el comportamiento directo que venga de la matriz
-			_apply_interaction_state(default_mode)
+	# Si llega hasta aquí, significa que ningún 'if' se cumplió. ¡Todo está despejado!
+	return false # ✅ Retorna FALSE permitiendo que la exploración continúe
 
 ## Helper method to translate matrix modes into director game states.
 func _apply_interaction_state(matrix_mode: int) -> void:
@@ -364,15 +396,6 @@ func _apply_interaction_state(matrix_mode: int) -> void:
 		1, 2:
 			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 			
-## Clears and removes all instantiated nodes inside the ActiveLocation container.
-func unload_location() -> void:
-	if not active_location_container: return
-	
-	for child in active_location_container.get_children():
-		child.queue_free()
-		
-	print("[EssenceGameplayDirector] ActiveLocation container cleared successfully.")
-	
 
 ## Instantiates a dynamic transition door into the ItemStage and binds its destination room.
 ## [param door_mode_index]: The variant index (0 for left/first door, 1 for right/second door, etc.)
@@ -450,25 +473,45 @@ func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: in
 # SECTION Initial Room  #
 #########################
 			
+## Sets up the initial room layout when returning to it, cleaning assets and updating states.
 func _on_ready_initialRoom(data: Dictionary) -> void:
-	pass
-
-## Esta función se dispara automáticamente cuando el ratón hace algo sobre ImgPuerta
-func _on_img_puerta_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+	current_room_id = data["id_room"]
+	
+	# A) Desvanecemos el fondo viejo durante 0.4 segundos
+	var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
+	if fade_out_tween: 
+		await fade_out_tween.finished
 		
-		# 1. Consultamos a la matriz (Pasamos de INITIAL_ROOM a ROOM_3_DOORS)
-		var data = LevelManager.get_scenery_config(
-			LevelManager.RoomID["INITIAL_ROOM"], 
-			LevelManager.RoomID["ROOM_3_DOORS"], 
-			0, 
-			false
-		)
+	# 🧹 LIMPIEZA TOTAL (Detrás de cámaras)
+	director.clear_character_stage()
+	active_character = null
+	director.clear_item_stage()
+	spawned_doors_in_room.clear()
+	director.unload_location()
+	
+	# B) Cambiamos la textura al fondo original de la habitación inicial
+	match data["id_background_scene"]:
+		LevelManager.BackgroundImageID["INITIAL_ROOM"]:
+			background_layer.texture = load(EssencePaths.BACKGROUND_ROOM_INITIAL)
+			
+	# C) Revelamos el nuevo fondo suavemente durante 0.5 segundos
+	var fade_in_tween: Tween = EssenceUIAnimator.fade_in(background_layer, 0.5)
+	
+	# D) Cargamos la locación interactiva base (si tiene colisiones fijas de fondo)
+	#var scene_path: String = DemoItemsRoute.TESTINITIALROOM_SCENE # Asegúrate de tener esta ruta
+	#var interactive_scene: PackedScene = load(scene_path) as PackedScene
+	
+	#if interactive_scene:
+	#	director.load_location(interactive_scene)
+	#	var current_loc = director.current_location_node
+	#	if current_loc and current_loc.has_signal("navigation_requested"):
+	#		current_loc.navigation_requested.connect(_on_room_navigation_requested)
+			
+	if fade_in_tween: 
+		await fade_in_tween.finished
 		
-		# 2. Si no hay error, disparamos tu callback específico
-		if not data["flag_error"]:
-			_on_ready_room3doors(data)
-
+	# E) Pasamos el control al Director de la Trama
+	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
 
 #########################
 # SECTION Room 3 Doors  #
@@ -478,17 +521,13 @@ func _on_img_puerta_input_event(_viewport: Node, event: InputEvent, _shape_idx: 
 func _on_ready_room3doors(data: Dictionary) -> void:
 	current_room_id = data["id_room"]
 	
-	# [Toda tu lógica técnica de animaciones y cargas se queda exactamente IGUAL]
 	var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
 	if fade_out_tween: await fade_out_tween.finished
 	
-	# 1. Borramos los personajes del cuarto anterior para que no se dupliquen
 	director.clear_character_stage()
 	
-	# 2. Reseteamos la variable local de rastreo para dejarla limpia
 	active_character = null
 	
-	# 3. Aprovechamos para limpiar también los ítems y botones flotantes del cuarto anterior
 	director.clear_item_stage()
 	spawned_doors_in_room.clear()
 		

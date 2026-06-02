@@ -70,8 +70,6 @@ func load_location(location_scene: PackedScene) -> void:
 	# 2. Instanciamos la nueva habitación
 	var new_location = location_scene.instantiate()
 	
-	# --- ¡AQUÍ ESTÁ LA MAGIA DEL RESETEO! ---
-	# Forzamos posición (0,0), rotación (0) y escala (1,1)
 	if new_location is Node2D:
 		new_location.transform = Transform2D.IDENTITY
 	# ----------------------------------------
@@ -82,10 +80,24 @@ func load_location(location_scene: PackedScene) -> void:
 	# 4. Guardamos la referencia para poder interactuar con ella después
 	if new_location is EssenceLocation:
 		current_location_node = new_location
-		print("[EssenceGameplayDirector] Location loaded successfully: ", new_location.name)
+		#print("[EssenceGameplayDirector] Location loaded successfully: ", new_location.name)
 		
 		# Aseguramos que inicie con la interactividad correcta según el estado actual
 		change_game_state(current_state)
+
+## Removes the current location scene from the ActiveLocation container.
+func unload_location() -> void:
+	if not active_location_container: 
+		return
+	
+	# 1. Borramos cualquier escenario que esté montado en el ancla
+	for child in active_location_container.get_children():
+		child.queue_free()
+		
+	# 2. Rompemos la referencia para que el sistema sepa que no hay escenario activo
+	current_location_node = null
+	
+	print("[EssenceGameplayDirector] Location unloaded successfully.")
 
 ## Applies a color tint to the entire screen using the EnvironmentFilter.
 func set_environment_color(hex_color: String) -> void:
@@ -132,7 +144,7 @@ func clear_character_stage() -> void:
 	for child in characters_stage.get_children():
 		child.queue_free()
 		
-	print("[EssenceGameplayDirector] CharactersStage cleared successfully.")
+	#print("[EssenceGameplayDirector] CharactersStage cleared successfully.")
 	
 ## Instantiates and adds an interactive item/icon to the screen.
 func add_item_to_stage(item_scene: PackedScene) -> Node2D:
