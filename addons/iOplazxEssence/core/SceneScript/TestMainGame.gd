@@ -84,7 +84,7 @@ func _ready() -> void:
 	director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 	
 	# 2. Conectamos la señal de clic de nuestra ImgPuerta
-	_setup_initial_room_layout()
+	#_setup_initial_room_layout()
 	
 	director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 	
@@ -144,13 +144,16 @@ func _on_tutorial_finished() -> void:
 		
 		await get_tree().create_timer(0.6).timeout 
 		
-		# Invocamos al personaje de forma animada (primera aparición)
-		_spawn_main_character(LevelManager.RoomID["INITIAL_ROOM"], 0, false)
-		
-		# Invocamos la puerta inicial dinámicamente para que pueda viajar por primera vez
-		_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
-		
-		if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
+		_instanciar_actor_principal()
+			
+func _instanciar_actor_principal():
+	# Invocamos al personaje de forma animada (primera aparición)
+	_spawn_main_character(LevelManager.RoomID["INITIAL_ROOM"], 0, false)
+	
+	# Invocamos la puerta inicial dinámicamente para que pueda viajar por primera vez
+	_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
+	
+	if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
 			active_character.toggle_garment("GenericChrHat", false)
 			active_character.toggle_garment("GenericChrSunglass", false)
 	
@@ -352,8 +355,7 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	# Aquí solo ponemos lo que SIEMPRE aparece cuando la habitación está normal
 	match room_id:
 		LevelManager.RoomID["INITIAL_ROOM"]:
-			_spawn_main_character(room_id, 0, true)
-			_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
+			_instanciar_actor_principal()
 			
 		LevelManager.RoomID["ROOM_3_DOORS"]:
 			_spawn_navigation_door(0, LevelManager.RoomID["ROOM_1_DOOR"])
