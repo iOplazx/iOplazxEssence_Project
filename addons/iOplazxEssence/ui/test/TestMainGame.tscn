@@ -4,11 +4,6 @@
 [ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="1_ovfnw"]
 [ext_resource type="PackedScene" uid="uid://buacpdfefp8fr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/TemplateGameplayDirector.tscn" id="3_ceb05"]
 [ext_resource type="PackedScene" uid="uid://7lbtoybnlsus" path="res://addons/iOplazxEssence/modules/base/ui/EssenceTutorialPanelUI.tscn" id="3_idmch"]
-[ext_resource type="PackedScene" uid="uid://c2pv7r15ot7sa" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/GenericInteractiveCharacter.tscn" id="3_woyu4"]
-[ext_resource type="Texture2D" uid="uid://xv8v3b06d0dd" path="res://addons/iOplazxEssence/resources/images/objects/imgPuerta.png" id="4_42cpq"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ceb05"]
-size = Vector2(370.00015, 750.0005)
 
 [node name="TestMainGame" type="Control" unique_id=153983025 node_paths=PackedStringArray("background_layer", "btn_return", "btn_save", "btn_load", "tutorial_panel", "ui_principal")]
 layout_mode = 3
@@ -43,20 +38,6 @@ unique_name_in_owner = true
 
 [node name="ActiveLocation" parent="GameplayDirector" index="1" unique_id=115441188]
 position = Vector2(640, 360)
-
-[node name="Area2D_door" type="Area2D" parent="GameplayDirector/ItemStage" parent_id_path=PackedInt32Array(1915930015, 800132712) index="0" unique_id=315862526]
-position = Vector2(48.000015, 593.00006)
-scale = Vector2(0.2, 0.2)
-
-[node name="ImgPuerta" type="Sprite2D" parent="GameplayDirector/ItemStage/Area2D_door" unique_id=1823966785]
-position = Vector2(-9.1552734e-05, -0.00024414063)
-scale = Vector2(0.8, 0.8)
-texture = ExtResource("4_42cpq")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameplayDirector/ItemStage/Area2D_door" unique_id=1524203741]
-position = Vector2(-6.1035156e-05, -0.00024414063)
-scale = Vector2(0.9999994, 0.9999994)
-shape = SubResource("RectangleShape2D_ceb05")
 
 [node name="HUD_Layer" parent="GameplayDirector" index="4" unique_id=1557427055]
 visible = false
@@ -122,10 +103,5 @@ text = "Quick Load"
 [node name="btnReturn" type="Button" parent="PanelControles/HBoxContainer" unique_id=1276848986]
 layout_mode = 2
 text = "Return Main Menu"
-
-[node name="CharacterRoot" parent="." unique_id=1680410021 instance=ExtResource("3_woyu4")]
-visible = false
-position = Vector2(575, 180)
-scale = Vector2(0.5, 0.5)
 
 [editable path="GameplayDirector"]

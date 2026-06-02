@@ -62,7 +62,7 @@ static func get_scenery_config(current_place: int, next_place: int, mode: int, i
 static func _handle_room_transitions(origin: int, destination: int, config: Dictionary) -> Dictionary:
 	# Verificamos si la ruta existe en nuestro mapa declarativo (Igual que buscar una ruta en Compose)
 	if NAVIGATION_MAP.has(origin) and destination in NAVIGATION_MAP[origin]:
-		print("[LevelManager] Transition allowed. Navigating to room ID: ", destination)
+		#print("[LevelManager] Transition allowed. Navigating to room ID: ", destination)
 		config["interaction_mode"] = 0 # Toda habitación nueva inicia bloqueada (modo diálogo)
 		config["id_background_scene"] = destination # El ID de la habitación coincide con su imagen
 		return config

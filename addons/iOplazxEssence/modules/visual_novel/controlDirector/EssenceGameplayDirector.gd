@@ -30,7 +30,8 @@ var current_state: GameState = GameState.CUTSCENE
 var current_location_node: EssenceLocation
 
 func _ready() -> void:
-	print("[EssenceGameplayDirector] Director initialized. Waiting for commands.")
+	#print("[EssenceGameplayDirector] Director initialized. Waiting for commands.")
+	pass
 
 # ==========================================
 # STATE MANAGEMENT
@@ -45,13 +46,13 @@ func change_game_state(new_state: GameState) -> void:
 	if current_state == GameState.EXPLORATION:
 		if current_location_node and current_location_node is EssenceInteractiveLocation:
 			current_location_node.environment_interactable = true
-			print(" -> Environment interaction ENABLED.")
+			#print(" -> Environment interaction ENABLED.")
 			
 	# Si pasamos a Diálogo/Cinemática, bloqueamos el escenario
 	elif current_state == GameState.DIALOGUE or current_state == GameState.CUTSCENE:
 		if current_location_node and current_location_node is EssenceInteractiveLocation:
 			current_location_node.environment_interactable = false
-			print(" -> Environment interaction DISABLED.")
+			#print(" -> Environment interaction DISABLED.")
 
 # ==========================================
 # SCENE & ENVIRONMENT CONTROL
@@ -123,6 +124,15 @@ func add_actor_to_stage(actor_scene: PackedScene) -> Node2D:
 	var new_actor = actor_scene.instantiate()
 	characters_stage.add_child(new_actor)
 	return new_actor
+	
+## Clears and removes all instantiated characters inside the CharactersStage container.
+func clear_character_stage() -> void:
+	if not characters_stage: return
+	
+	for child in characters_stage.get_children():
+		child.queue_free()
+		
+	print("[EssenceGameplayDirector] CharactersStage cleared successfully.")
 	
 ## Instantiates and adds an interactive item/icon to the screen.
 func add_item_to_stage(item_scene: PackedScene) -> Node2D:

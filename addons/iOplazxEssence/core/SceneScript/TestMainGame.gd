@@ -389,7 +389,7 @@ func _spawn_navigation_door(door_mode_index: int, destination_room_id: int) -> v
 	
 	# 3. PREGUNTA/VALIDACIÓN: ¿Se instanció correctamente?
 	if is_instance_valid(door_instance):
-		print("[TestMainGame] ¡Éxito! Puerta variante %d instanciada correctamente." % door_mode_index)
+		#print("[TestMainGame] ¡Éxito! Puerta variante %d instanciada correctamente." % door_mode_index)
 		
 		# 4. Posicionamiento dinámico: Buscamos las coordenadas en tu StageItemManager
 		# Le pasamos el cuarto actual, el ID general de puertas y el índice del modo (0, 1, etc.)
@@ -422,7 +422,7 @@ func _spawn_navigation_door(door_mode_index: int, destination_room_id: int) -> v
 		if target_area:
 			# Usamos .bind() para inyectar de forma segura el ID de destino al hacer clic
 			target_area.input_event.connect(_on_dynamic_door_clicked.bind(destination_room_id))
-			print("[TestMainGame] Sensores de físicas listos. Puerta amarrada al cuarto ID: ", destination_room_id)
+			#print("[TestMainGame] Sensores de físicas listos. Puerta amarrada al cuarto ID: ", destination_room_id)
 		else:
 			push_error("[TestMainGame] Advertencia: No se encontró ningún Area2D en la puerta.")
 			
@@ -433,7 +433,7 @@ func _spawn_navigation_door(door_mode_index: int, destination_room_id: int) -> v
 ## Processes the click of any dynamic door and requests navigation to its bound destination.
 func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, next_room_id: int) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		print("[Framework] ¡Puerta cruzada! Viajando hacia la habitación ID: ", next_room_id)
+		#print("[Framework] ¡Puerta cruzada! Viajando hacia la habitación ID: ", next_room_id)
 		
 		# Consultamos la matriz del LevelManager con el destino que venía amarrado en la puerta
 		var data = LevelManager.get_scenery_config(current_room_id, next_room_id, 0, false)
@@ -481,6 +481,16 @@ func _on_ready_room3doors(data: Dictionary) -> void:
 	# [Toda tu lógica técnica de animaciones y cargas se queda exactamente IGUAL]
 	var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
 	if fade_out_tween: await fade_out_tween.finished
+	
+	# 1. Borramos los personajes del cuarto anterior para que no se dupliquen
+	director.clear_character_stage()
+	
+	# 2. Reseteamos la variable local de rastreo para dejarla limpia
+	active_character = null
+	
+	# 3. Aprovechamos para limpiar también los ítems y botones flotantes del cuarto anterior
+	director.clear_item_stage()
+	spawned_doors_in_room.clear()
 		
 	match data["id_background_scene"]:
 		LevelManager.BackgroundImageID["ROOM_3_DOORS"]:
