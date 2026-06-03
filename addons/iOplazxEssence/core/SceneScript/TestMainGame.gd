@@ -136,23 +136,27 @@ func _on_tutorial_finished() -> void:
 		print("[%s] Tutorial Intro terminado. Esperando cierre de UI..." % ES_NAME_CLASS)
 		current_phase = TestPhase.GAMEPLAY
 		
-		# 💾 CAMBIO CRUCIAL: Guardamos en la historia que ya pasamos por aquí
+		# CAMBIO CRUCIAL: Guardamos en la historia que ya pasamos por aquí
 		story_flags["is_first_time_here"] = false
 		
 		await get_tree().create_timer(0.6).timeout 
 		
 		_instanciar_actor_principal()
 			
-func _instanciar_actor_principal():
-	# Invocamos al personaje de forma animada (primera aparición)
-	_spawn_main_character(LevelManager.RoomID["INITIAL_ROOM"], 0, false)
+## Instantiates the main character and default room elements dynamically
+## [param is_instant]: If true, skips spawn animations (perfect for loading saves)
+func _instanciar_actor_principal(is_instant: bool = false) -> void:
+	# Invocamos al personaje usando la habitación en la que realmente estamos parado
+	_spawn_main_character(current_room_id, 0, is_instant)
 	
-	# Invocamos la puerta inicial dinámicamente para que pueda viajar por primera vez
-	_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
+	# Si estamos en la habitación inicial, pintamos su puerta correspondiente
+	if current_room_id == LevelManager.RoomID["INITIAL_ROOM"]:
+		_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
 	
+	# Aplicamos los cambios de vestuario iniciales de Annie de forma segura
 	if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
-			active_character.toggle_garment("GenericChrHat", false)
-			active_character.toggle_garment("GenericChrSunglass", false)
+		active_character.toggle_garment("GenericChrHat", false)
+		active_character.toggle_garment("GenericChrSunglass", false)
 	
 # ==========================================
 # BLINDAJE DE SEGURIDAD
@@ -192,13 +196,12 @@ func _preparar_datos_para_menu() -> void:
 	await get_tree().create_timer(0.1).timeout
 	
 	# ==========================================
-	# DICCIONARIO DEL JUEGO (ESTILO VESSEL VOYAGEUR)
+	# DICCIONARIO PARA LA INTERFAZ / CACHÉ
 	# ==========================================
 	var current_game_data = {
 		"escena_actual": "MainRoom",
 		"fase_actual": current_phase, 
 		"habitacion_actual": current_room_id,
-		# ¡NUEVO! Guardamos todas las banderas de la historia
 		"story_flags": story_flags, 
 		"ropa_estado_personaje": active_character.get_clothing_state() if is_instance_valid(active_character) else {}
 	}
@@ -224,32 +227,37 @@ func _restaurar_partida_cargada() -> void:
 	current_phase = int(datos.get("fase_actual", 0))
 	var room_saved_id = int(datos.get("habitacion_actual", LevelManager.RoomID["INITIAL_ROOM"]))
 	
-	# Restaurar banderas
+	# 1. Restaurar banderas de la historia inmediatamente
 	if datos.has("story_flags"):
 		story_flags = datos.get("story_flags").duplicate()
 	
-	await get_tree().process_frame # Estabilizamos nodos (Lo que vimos en el paso anterior)
+	await get_tree().process_frame # Estabilizamos nodos del motor
 	
 	if current_phase == TestPhase.GAMEPLAY:
-		print("[%s] Fase GAMEPLAY. Delegando carga a la constructora de la habitación..." % ES_NAME_CLASS)
+		print("[%s] Fase GAMEPLAY. Iniciando reconstrucción..." % ES_NAME_CLASS)
 		if tutorial_panel: tutorial_panel.visible = false 
 		
-		# Forzamos exploración
+		# Forzamos estado de exploración para habilitar físicas e interacciones
 		director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 		
-		# Obtenemos los datos limpios de la habitación guardada
+		# 🚨 ¡PUNTO CRUCIAL 1! Asignamos la variable global de la escena AQUÍ,
+		# ANTES de llamar a las constructoras, para que todo el script sepa el cuarto real.
+		current_room_id = room_saved_id
+		
+		# Obtenemos la configuración limpia de la habitación guardada
 		var room_data = LevelManager.get_scenery_config(room_saved_id, room_saved_id, 1, true)
 		
-		# LLAMAMOS A TUS CONSTRUCTORAS GENÉRICAS (skip_animations = true)
 		if not room_data["flag_error"]:
+			# 🚨 ¡PUNTO CRUCIAL 2! Ejecutamos las constructoras genéricas en seco
 			match room_saved_id:
 				LevelManager.RoomID["INITIAL_ROOM"]:
-					_on_ready_initialRoom(room_data, true)
+					await _on_ready_initialRoom(room_data, true)
 				LevelManager.RoomID["ROOM_3_DOORS"]:
-					_on_ready_room3doors(room_data, true)
+					await _on_ready_room3doors(room_data, true)
 		
-		# Restauramos vestuario (El personaje YA se creó de forma instantánea gracias a que no hubo awaits)
+		# 👗 Restauramos vestuario (Ahora sí, garantizado que el personaje ya nació en el cuarto correcto)
 		if is_instance_valid(active_character):
+			print("[%s] Personaje detectado. Aplicando vestuario guardado..." % ES_NAME_CLASS)
 			var ropa_guardada = datos.get("ropa_estado_personaje", {})
 			active_character.load_clothing_state(ropa_guardada)
 			
@@ -257,7 +265,9 @@ func _restaurar_partida_cargada() -> void:
 		print("[%s] Fase INTRO detectada. Lanzando secuencia inicial." % ES_NAME_CLASS)
 		_iniciar_secuencia_intro()
 		
+	# Limpiamos la caché de guardado al final
 	SaveManager.loaded_game_data.clear()
+	print("[%s] ¡Carga de partida en habitación %d completada con éxito!" % [ES_NAME_CLASS, room_saved_id])
 	
 # ==========================================
 # EVENTOS DE BOTONES
@@ -375,7 +385,7 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	# Aquí solo ponemos lo que SIEMPRE aparece cuando la habitación está normal
 	match room_id:
 		LevelManager.RoomID["INITIAL_ROOM"]:
-			_instanciar_actor_principal()
+			_instanciar_actor_principal(false)
 			
 		LevelManager.RoomID["ROOM_3_DOORS"]:
 			_spawn_navigation_door(0, LevelManager.RoomID["ROOM_1_DOOR"])
