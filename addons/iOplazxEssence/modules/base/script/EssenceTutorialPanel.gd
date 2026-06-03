@@ -54,7 +54,7 @@ var _ocultar_al_terminar: bool = true
 # INICIALIZACIÓN
 # ==========================================
 func _ready() -> void:
-	super._ready() # Importante: inicializa la base primero
+	super._ready() 
 	
 	# Aplicar los anclajes verticales personalizados al iniciar
 	_update_custom_layout()
@@ -119,8 +119,6 @@ func _update_custom_layout() -> void:
 		cajon.anchor_top = top_margin
 		cajon.anchor_bottom = bottom_margin
 		
-		# ¡ESTE ES EL SECRETO PARA QUE SE ESTIRE!
-		# Al poner los offsets en 0, el cajón obedece 100% a los anclajes.
 		cajon.offset_top = 0.0
 		cajon.offset_bottom = 0.0
 
@@ -140,11 +138,12 @@ func _update_ui() -> void:
 	# Actualizar estado de los botones
 	if btn_prev:
 		btn_prev.disabled = (_current_page == 0)
+		btn_prev.text = tr("ESS_BUTTON_PREV_TUTORIAL")
 	
 	if btn_next:
 		if _current_page == tutorial_pages.size() - 1:
-			btn_next.text = "Understood!"
+			btn_next.text = tr("ESS_BUTTON_UNDERSTOOD")
 		else:
-			btn_next.text = "Next >"
+			btn_next.text = tr("ESS_BUTTON_NEXT_TUTORIAL")
 
 	page_changed.emit(_current_page)
