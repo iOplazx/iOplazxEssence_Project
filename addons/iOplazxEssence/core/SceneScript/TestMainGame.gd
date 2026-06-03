@@ -94,6 +94,11 @@ func _ready() -> void:
 		# Si es un juego 100% nuevo
 		#_setup_initial_room_layout()
 		director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
+		
+		# Si es juego nuevo, abrimos la cortina suavemente
+		var fade = director.open_curtain(0.4)
+		if fade: await fade.finished
+		
 		_iniciar_secuencia_intro()
 		
 	EssenceLogger.system_info("[%s/_ready] Escena principal inicializada." % ES_NAME_CLASS)
@@ -227,47 +232,41 @@ func _restaurar_partida_cargada() -> void:
 	current_phase = int(datos.get("fase_actual", 0))
 	var room_saved_id = int(datos.get("habitacion_actual", LevelManager.RoomID["INITIAL_ROOM"]))
 	
-	# 1. Restaurar banderas de la historia inmediatamente
 	if datos.has("story_flags"):
 		story_flags = datos.get("story_flags").duplicate()
 	
-	await get_tree().process_frame # Estabilizamos nodos del motor
+	# El motor se estabiliza. El jugador solo ve negro porque forzamos Color.BLACK en el _ready
+	await get_tree().process_frame 
 	
 	if current_phase == TestPhase.GAMEPLAY:
-		print("[%s] Fase GAMEPLAY. Iniciando reconstrucción..." % ES_NAME_CLASS)
 		if tutorial_panel: tutorial_panel.visible = false 
-		
-		# Forzamos estado de exploración para habilitar físicas e interacciones
 		director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
-		
-		# 🚨 ¡PUNTO CRUCIAL 1! Asignamos la variable global de la escena AQUÍ,
-		# ANTES de llamar a las constructoras, para que todo el script sepa el cuarto real.
 		current_room_id = room_saved_id
 		
-		# Obtenemos la configuración limpia de la habitación guardada
 		var room_data = LevelManager.get_scenery_config(room_saved_id, room_saved_id, 1, true)
 		
 		if not room_data["flag_error"]:
-			# 🚨 ¡PUNTO CRUCIAL 2! Ejecutamos las constructoras genéricas en seco
 			match room_saved_id:
 				LevelManager.RoomID["INITIAL_ROOM"]:
 					await _on_ready_initialRoom(room_data, true)
 				LevelManager.RoomID["ROOM_3_DOORS"]:
 					await _on_ready_room3doors(room_data, true)
 		
-		# 👗 Restauramos vestuario (Ahora sí, garantizado que el personaje ya nació en el cuarto correcto)
 		if is_instance_valid(active_character):
-			print("[%s] Personaje detectado. Aplicando vestuario guardado..." % ES_NAME_CLASS)
 			var ropa_guardada = datos.get("ropa_estado_personaje", {})
 			active_character.load_clothing_state(ropa_guardada)
 			
 	else:
-		print("[%s] Fase INTRO detectada. Lanzando secuencia inicial." % ES_NAME_CLASS)
+		_setup_initial_room_layout()
 		_iniciar_secuencia_intro()
 		
-	# Limpiamos la caché de guardado al final
 	SaveManager.loaded_game_data.clear()
-	print("[%s] ¡Carga de partida en habitación %d completada con éxito!" % [ES_NAME_CLASS, room_saved_id])
+	
+	var fade_in = director.open_curtain(0.5)
+	if fade_in: 
+		await fade_in.finished
+		
+	print("[%s] ¡Carga completada y filtro de pantalla iluminado!" % ES_NAME_CLASS)
 	
 # ==========================================
 # EVENTOS DE BOTONES

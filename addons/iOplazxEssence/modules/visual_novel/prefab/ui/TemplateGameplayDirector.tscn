@@ -2,13 +2,14 @@
 
 [ext_resource type="Script" uid="uid://bmwro6b07v63e" path="res://addons/iOplazxEssence/modules/visual_novel/controlDirector/EssenceGameplayDirector.gd" id="1_6w5qv"]
 
-[node name="GameplayDirector" type="Node2D" unique_id=1915930015 node_paths=PackedStringArray("environment_filter", "active_location_container", "characters_stage", "item_stage", "dialog_box_ui")]
+[node name="GameplayDirector" type="Node2D" unique_id=1915930015 node_paths=PackedStringArray("environment_filter", "active_location_container", "characters_stage", "item_stage", "dialog_box_ui", "fade_overlay")]
 script = ExtResource("1_6w5qv")
 environment_filter = NodePath("EnvironmentFilter")
 active_location_container = NodePath("ActiveLocation")
 characters_stage = NodePath("CharactersStage")
 item_stage = NodePath("ItemStage")
 dialog_box_ui = NodePath("HUD_Layer/DialogBoxUI")
+fade_overlay = NodePath("HUD_Layer/FadeOverlay")
 
 [node name="EnvironmentFilter" type="CanvasModulate" parent="." unique_id=1922817007]
 
@@ -28,3 +29,12 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="FadeOverlay" type="ColorRect" parent="HUD_Layer" unique_id=1909526941]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

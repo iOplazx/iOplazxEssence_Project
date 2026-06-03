@@ -14,6 +14,7 @@ extends Node2D
 # └── HUD_Layer (CanvasLayer)                <-- UI always stays on top
 #     ├── TranslationManager (Node)          <-- Addon Autoload/Manager
 #     └── DialogBoxUI (Control)              <-- Reference to your text box
+#     └── FadeOverlay (ColorRect)            <-- curtain
 # ==
 
 enum GameState { DIALOGUE, EXPLORATION, CUTSCENE }
@@ -25,6 +26,7 @@ var current_state: GameState = GameState.CUTSCENE
 @export var characters_stage: Node2D
 @export var item_stage: Node2D
 @export var dialog_box_ui: Control 
+@export var fade_overlay: ColorRect 
 
 # Variable interna para rastrear la habitación instanciada actualmente
 var current_location_node: EssenceLocation
@@ -32,6 +34,62 @@ var current_location_node: EssenceLocation
 func _ready() -> void:
 	#print("[EssenceGameplayDirector] Director initialized. Waiting for commands.")
 	pass
+
+# ==========================================
+# environment_filter
+# ==========================================
+
+## Tints the screen smoothly using the CanvasModulate node.
+## [param target_color]: The final color (e.g., Color.BLACK to darken, Color.WHITE to illuminate).
+## [param duration]: How long the transition takes in seconds.
+## Returns the Tween object so the caller can 'await' its completion.
+func fade_filter_color(target_color: Color, duration: float) -> Tween:
+	if not environment_filter: return null
+	
+	# Creamos un tween que manipule la propiedad 'color' del CanvasModulate
+	var tween = create_tween()
+	tween.tween_property(environment_filter, "color", target_color, duration)\
+		.set_trans(Tween.TRANS_SINE)\
+		.set_ease(Tween.EASE_IN_OUT)
+		
+	return tween
+
+## Applies a color tint to the entire screen using the EnvironmentFilter.
+func set_environment_color(hex_color: String) -> void:
+	if environment_filter:
+		environment_filter.color = Color(hex_color)
+		
+# ==========================================
+# fade_overlay
+# ==========================================
+		
+## Oculta el juego (cierra la cortina negra) de forma suave o instantánea
+func close_curtain(duration: float = 0.4) -> Tween:
+	if not fade_overlay: return null
+	
+	fade_overlay.visible = true
+	var tween = create_tween()
+	# Animamos la opacidad (alpha) hacia 1.0 (totalmente negro)
+	tween.tween_property(fade_overlay, "modulate:a", 1.0, duration)
+	return tween
+
+## Revela el juego (abre la cortina negra) de forma suave
+func open_curtain(duration: float = 0.5) -> Tween:
+	if not fade_overlay: return null
+	
+	var tween = create_tween()
+	# Animamos la opacidad hacia 0.0 (totalmente transparente)
+	tween.tween_property(fade_overlay, "modulate:a", 0.0, duration)
+	
+	# Cuando termine el fundido, apagamos el visible para que no bloquee los clics del mouse
+	tween.finished.connect(func(): fade_overlay.visible = false)
+	return tween
+
+## Fuerza a que la pantalla esté negra de inmediato (útil para el inicio técnico)
+func force_curtain_closed() -> void:
+	if fade_overlay:
+		fade_overlay.visible = true
+		fade_overlay.modulate.a = 1.0
 
 # ==========================================
 # STATE MANAGEMENT
@@ -99,10 +157,6 @@ func unload_location() -> void:
 	
 	#print("[EssenceGameplayDirector] Location unloaded successfully.")
 
-## Applies a color tint to the entire screen using the EnvironmentFilter.
-func set_environment_color(hex_color: String) -> void:
-	if environment_filter:
-		environment_filter.color = Color(hex_color)
 
 # ==========================================
 # NARRATIVE ENTRY POINT
