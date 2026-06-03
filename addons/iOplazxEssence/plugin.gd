@@ -83,7 +83,7 @@ func _deploy_user_scaffolding() -> void:
 			else:
 				push_error("iOplazxEssence: Failed to copy GameSaveManager template. Error code: " + str(err))
 
-	# 3. Desplegar Bus Layout de Audio (NUEVO)
+	# 3. Desplegar Bus Layout de Audio 
 	if not FileAccess.file_exists(USER_BUS_LAYOUT):
 		var template_bus = PATH_TEMPLATES + "default_bus_layout.tres"
 		if FileAccess.file_exists(template_bus):
