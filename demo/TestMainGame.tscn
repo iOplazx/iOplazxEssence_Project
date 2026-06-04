@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://cfny0ci2r8dtn"]
 
-[ext_resource type="Script" uid="uid://df7guifof0p3l" path="res://addons/iOplazxEssence/core/SceneScript/TestMainGame.gd" id="1_jd08u"]
-[ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="1_ovfnw"]
-[ext_resource type="PackedScene" uid="uid://buacpdfefp8fr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/TemplateGameplayDirector.tscn" id="3_ceb05"]
-[ext_resource type="PackedScene" uid="uid://7lbtoybnlsus" path="res://addons/iOplazxEssence/modules/base/ui/EssenceTutorialPanelUI.tscn" id="3_idmch"]
+[ext_resource type="Script" uid="uid://df7guifof0p3l" path="res://demo/scenes/TestMainGame.gd" id="1_r4y5j"]
+[ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="2_36fp0"]
+[ext_resource type="PackedScene" uid="uid://buacpdfefp8fr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/TemplateGameplayDirector.tscn" id="3_aw23q"]
+[ext_resource type="PackedScene" uid="uid://7lbtoybnlsus" path="res://addons/iOplazxEssence/modules/base/ui/EssenceTutorialPanelUI.tscn" id="4_faggg"]
 
 [node name="TestMainGame" type="Control" unique_id=153983025 node_paths=PackedStringArray("background_layer", "btn_return", "btn_save", "btn_load", "tutorial_panel", "ui_principal")]
 layout_mode = 3
@@ -13,7 +13,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
-script = ExtResource("1_jd08u")
+script = ExtResource("1_r4y5j")
 background_layer = NodePath("BackgroundLayer")
 btn_return = NodePath("PanelControles/HBoxContainer/btnReturn")
 btn_save = NodePath("PanelControles/HBoxContainer/btnSave")
@@ -29,11 +29,11 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("1_ovfnw")
+texture = ExtResource("2_36fp0")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="GameplayDirector" parent="." unique_id=1915930015 instance=ExtResource("3_ceb05")]
+[node name="GameplayDirector" parent="." unique_id=1915930015 instance=ExtResource("3_aw23q")]
 unique_name_in_owner = true
 
 [node name="ActiveLocation" parent="GameplayDirector" index="1" unique_id=115441188]
@@ -42,7 +42,7 @@ position = Vector2(640, 360)
 [node name="DialogBoxUI" parent="GameplayDirector/HUD_Layer" parent_id_path=PackedInt32Array(1915930015, 1557427055) index="1" unique_id=894732781]
 metadata/_edit_use_anchors_ = true
 
-[node name="TutorialPanelUI" parent="." unique_id=806485748 instance=ExtResource("3_idmch")]
+[node name="TutorialPanelUI" parent="." unique_id=806485748 instance=ExtResource("4_faggg")]
 layout_mode = 1
 top_margin = 0.25
 bottom_margin = 0.7
