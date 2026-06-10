@@ -94,17 +94,17 @@ func next_page() -> void:
 		_current_page += 1
 		_update_ui()
 	else:
-		# 1. SIEMPRE emitimos la señal para que TestMainGame sepa que el texto acabó
-		tutorial_finished.emit()
-		
-		# 2. Iniciamos la animación de salida
+		# para que se guarde de forma elegante en la pantalla.
 		if is_open:
-			toggle() 
-			
-		# 3. Si el dev pidió que se oculte, esperamos la animación y lo apagamos
+			toggle() # Esto ejecuta tu Tween hacia la posición X de minimizado
+		
+		# esperamos el temporizador y lo apagamos del motor.
 		if _ocultar_al_terminar:
 			await get_tree().create_timer(anim_duration).timeout
 			visible = false
+		
+		# Emitimos la señal para que el juego principal continúe
+		tutorial_finished.emit()
 
 func prev_page() -> void:
 	if _current_page > 0:
