@@ -229,7 +229,7 @@ func _restaurar_partida_cargada() -> void:
 	print("[%s] Restaurando datos cargados." % ES_NAME_CLASS)
 	var datos = SaveManager.loaded_game_data
 	
-	current_phase = int(datos.get("fase_actual", 0))
+	current_phase = int(datos.get("fase_actual", 0)) as TestPhase
 	var room_saved_id = int(datos.get("habitacion_actual", LevelManager.RoomID["INITIAL_ROOM"]))
 	
 	if datos.has("story_flags"):

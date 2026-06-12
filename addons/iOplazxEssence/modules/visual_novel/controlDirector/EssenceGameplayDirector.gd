@@ -33,7 +33,10 @@ var current_location_node: EssenceLocation
 
 func _ready() -> void:
 	#print("[EssenceGameplayDirector] Director initialized. Waiting for commands.")
-	pass
+	if fade_overlay:
+		fade_overlay.visible = true
+		fade_overlay.modulate.a = 1.0
+		# print("[EssenceGameplayDirector] Cortina asegurada y cerrada al arrancar.")
 
 # ==========================================
 # environment_filter

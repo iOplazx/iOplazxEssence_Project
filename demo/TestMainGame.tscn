@@ -42,6 +42,9 @@ position = Vector2(640, 360)
 [node name="DialogBoxUI" parent="GameplayDirector/HUD_Layer" parent_id_path=PackedInt32Array(1915930015, 1557427055) index="1" unique_id=894732781]
 metadata/_edit_use_anchors_ = true
 
+[node name="FadeOverlay" parent="GameplayDirector/HUD_Layer" parent_id_path=PackedInt32Array(1915930015, 1557427055) index="2" unique_id=1909526941]
+visible = false
+
 [node name="TutorialPanelUI" parent="." unique_id=806485748 instance=ExtResource("4_faggg")]
 layout_mode = 1
 top_margin = 0.25
