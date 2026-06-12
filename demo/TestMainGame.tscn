@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://ci3qw0mgyt8tr"]
 
-[ext_resource type="Script" path="res://demo/scenes/TestMainGame.gd" id="1_r4y5j"]
 [ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="2_36fp0"]
 [ext_resource type="PackedScene" uid="uid://buacpdfefp8fr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/TemplateGameplayDirector.tscn" id="3_aw23q"]
 [ext_resource type="PackedScene" uid="uid://7lbtoybnlsus" path="res://addons/iOplazxEssence/modules/base/ui/EssenceTutorialPanelUI.tscn" id="4_faggg"]
 
-[node name="TestMainGame" type="Control" unique_id=153983025 node_paths=PackedStringArray("background_layer", "btn_return", "btn_save", "btn_load", "tutorial_panel", "ui_principal")]
+[node name="TestMainGame" type="Control" unique_id=153983025]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,13 +12,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
-script = ExtResource("1_r4y5j")
-background_layer = NodePath("BackgroundLayer")
-btn_return = NodePath("PanelControles/HBoxContainer/btnReturn")
-btn_save = NodePath("PanelControles/HBoxContainer/btnSave")
-btn_load = NodePath("PanelControles/HBoxContainer/btnLoad")
-tutorial_panel = NodePath("TutorialPanelUI")
-ui_principal = NodePath("PanelControles")
 
 [node name="BackgroundLayer" type="TextureRect" parent="." unique_id=1243969001]
 layout_mode = 1
