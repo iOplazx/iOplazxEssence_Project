@@ -17,6 +17,10 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/show_image=false
 config/icon="uid://dvp7ydrt6x37m"
 
+[audio]
+
+buses/default_bus_layout="uid://b7fh3gymf3nue"
+
 [autoload]
 
 EssenceLogger="*uid://dtdy5f6m7uqq7"

@@ -169,18 +169,19 @@ func set_bus_volume(bus_name: String, value: float) -> void:
 		AudioServer.set_bus_volume_db(bus_idx, linear_to_db(value))
 
 func save_audio_settings(
-		vol_master: float, vol_music: float, vol_sfx: float, vol_ui: float, vol_voices: float,
-		mute_master: bool, mute_music: bool, mute_sfx: bool, mute_ui: bool, mute_voices: bool,
-		focus_mute: bool
-	) -> void:
-		
-	# Guardamos Volúmenes
+	vol_master: float, vol_music: float, vol_sfx: float, vol_ui: float, vol_voices: float,
+	mute_master: bool, mute_music: bool, mute_sfx: bool, mute_ui: bool, mute_voices: bool,
+	focus_mute: bool
+) -> void:
+	
+	# 1. Guardamos los Volúmenes en el archivo de guardado
 	_safe_set_pref("audio", "Master", vol_master)
 	_safe_set_pref("audio", "Music", vol_music)
 	_safe_set_pref("audio", "SFX", vol_sfx)
 	_safe_set_pref("audio", "UI", vol_ui)
 	_safe_set_pref("audio", "Voices", vol_voices)
 	
+	# 2. Guardamos los Estados de Mute en el archivo de guardado
 	_safe_set_pref("audio", "Master_mute", mute_master)
 	_safe_set_pref("audio", "Music_mute", mute_music)
 	_safe_set_pref("audio", "SFX_mute", mute_sfx)
@@ -189,10 +190,18 @@ func save_audio_settings(
 	
 	_safe_set_pref("audio", "mute_on_focus", focus_mute)
 	
+	set_bus_mute("Master", mute_master)
+	set_bus_mute("Music", mute_music)
+	set_bus_mute("SFX", mute_sfx)
+	set_bus_mute("UI", mute_ui)
+	set_bus_mute("Voices", mute_voices)
+	
+	# 4. Consolidamos en el disco duro
 	_safe_save_prefs()
 
 func set_bus_mute(bus_name: String, is_muted: bool) -> void:
 	var bus_index = AudioServer.get_bus_index(bus_name)
+	print("[AUDIO_DEBUG] Intentando mutear el bus: '", bus_name, "' | Índice encontrado: ", bus_index, " | ¿Silenciar?: ", is_muted)
 	if bus_index >= 0:
 		AudioServer.set_bus_mute(bus_index, is_muted)
 
