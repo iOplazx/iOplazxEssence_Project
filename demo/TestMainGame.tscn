@@ -21,6 +21,16 @@ btn_load = NodePath("PanelControles/HBoxContainer/btnLoad")
 tutorial_panel = NodePath("TutorialPanelUI")
 ui_principal = NodePath("PanelControles")
 
+[node name="ColorRect" type="ColorRect" parent="." unique_id=242458088]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.7665823, 0.7202664, 0, 1)
+
 [node name="BackgroundLayer" type="TextureRect" parent="." unique_id=1243969001]
 layout_mode = 1
 anchors_preset = 15

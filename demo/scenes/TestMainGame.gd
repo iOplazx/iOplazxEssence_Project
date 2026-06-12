@@ -337,29 +337,50 @@ func _spawn_main_character(room_id: int, mode: int, is_instant: bool = false) ->
 ## [param mode]: The required interaction layout mode.
 ## [param is_only_mode]: True if we are just switching internal rules instead of reloading.
 func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: bool) -> void:
-	# 1. Consultamos a la matriz estática del LevelManager usando nuestro rastreador dinámico 'current_room_id'
 	var data = LevelManager.get_scenery_config(current_room_id, next_place, mode, is_only_mode)
 	
-	# 2. Si la matriz dice que el viaje es ilegal, frenamos
 	if data["flag_error"]:
 		push_error("[TestMainGame] Illegal transition requested by room layout.")
 		return
 		
-	# 3. Si es un cambio de modo interno (ej. desbloquear exploración), usamos la función directa
 	if is_only_mode:
 		_apply_interaction_state(data["interaction_mode"])
 		return
 		
-	# 4. Si es un viaje real a otra habitación, redirigimos el resultado al callback del cuarto correspondiente
+	# =======================================================
+	# 🚨 PROTECCIÓN ANTIDESTELLOS: CERRAMOS EL TELÓN PRIMERO
+	# =======================================================
+	if director:
+		# Le pedimos al director que cierre su cortina negra de inmediato (en 0.25s)
+		var curtain_tween = director.close_curtain(0.25)
+		if curtain_tween:
+			# Escondemos el juego detrás del muro negro antes de mover un solo pixel
+			await curtain_tween.finished 
+			
+	# Ahora que la pantalla está TOTALMENTE negra y segura,
+	# ejecutamos la carga pesada. Nadie notará si el fondo se borra o parpadea gris.
 	match data["id_room"]:
 		LevelManager.RoomID["INITIAL_ROOM"]:
-			# Conectamos tu nueva función mágica de retorno
-			_on_ready_initialRoom(data, false)
+			# Pasamos 'true' en skip_animations porque el director ya cerró la cortina,
+			# no necesitamos que la habitación intente hacer otro fundido interno.
+			_on_ready_initialRoom(data, true)
 		LevelManager.RoomID["ROOM_3_DOORS"]:
-			_on_ready_room3doors(data, false)
+			_on_ready_room3doors(data, true)
 		LevelManager.RoomID["ROOM_1_DOOR"]:
 			print("Cargando habitación de 1 puerta...")
-			# Aquí llamarías a tu función si la tienes: _on_ready_room1door(data)
+			# _on_ready_room1door(data, true)
+
+	# =======================================================
+	# 🚨 REVELAMOS EL JUEGO: EL TELÓN SE ABRE CON EL NUEVO MAPA LISTO
+	# =======================================================
+	if director:
+		# Esperamos un frame de estabilización para que el motor termine de renderizar el mapa
+		await get_tree().process_frame
+		
+		# Abrimos la cortina suavemente para revelar el nuevo escenario
+		var open_tween = director.open_curtain(0.4)
+		if open_tween:
+			await open_tween.finished
 
 ## Evaluates story conditions before enabling player control inside a room.
 ## [param room_id]: The active Room ID from LevelManager.
