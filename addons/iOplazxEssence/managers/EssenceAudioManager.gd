@@ -201,7 +201,7 @@ func save_audio_settings(
 
 func set_bus_mute(bus_name: String, is_muted: bool) -> void:
 	var bus_index = AudioServer.get_bus_index(bus_name)
-	print("[AUDIO_DEBUG] Intentando mutear el bus: '", bus_name, "' | Índice encontrado: ", bus_index, " | ¿Silenciar?: ", is_muted)
+	#print("[AUDIO_DEBUG] Intentando mutear el bus: '", bus_name, "' | Índice encontrado: ", bus_index, " | ¿Silenciar?: ", is_muted)
 	if bus_index >= 0:
 		AudioServer.set_bus_mute(bus_index, is_muted)
 
