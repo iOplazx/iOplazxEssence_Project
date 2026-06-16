@@ -347,9 +347,6 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 		_apply_interaction_state(data["interaction_mode"])
 		return
 		
-	# =======================================================
-	# 🚨 PROTECCIÓN ANTIDESTELLOS: CERRAMOS EL TELÓN PRIMERO
-	# =======================================================
 	if director:
 		# Le pedimos al director que cierre su cortina negra de inmediato (en 0.25s)
 		var curtain_tween = director.close_curtain(0.25)
@@ -367,12 +364,8 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 		LevelManager.RoomID["ROOM_3_DOORS"]:
 			_on_ready_room3doors(data, true)
 		LevelManager.RoomID["ROOM_1_DOOR"]:
-			print("Cargando habitación de 1 puerta...")
-			# _on_ready_room1door(data, true)
+			_on_ready_room1door(data, true)
 
-	# =======================================================
-	# 🚨 REVELAMOS EL JUEGO: EL TELÓN SE ABRE CON EL NUEVO MAPA LISTO
-	# =======================================================
 	if director:
 		# Esperamos un frame de estabilización para que el motor termine de renderizar el mapa
 		await get_tree().process_frame
@@ -396,7 +389,7 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	# Si llegamos aquí, es porque la habitación está libre de eventos.
 	#print("[Story] Todo despejado. Promoviendo a Exploracion (Modo 1).")
 	
-	var data = LevelManager.get_scenery_config(room_id, room_id, 1, true)
+	var data = LevelManager.get_scenery_config(room_id, room_id, default_mode, true)
 	if data["flag_error"]: return
 		
 	_apply_interaction_state(data["interaction_mode"])
@@ -413,6 +406,10 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 			
 			# Si tuvieras un ItemManager, aquí harías aparecer la mochila o cosas fijas:
 			# _spawn_screen_item(StageItemManager.ItemID["BACKPACK_ICON"], 0)
+		LevelManager.RoomID["ROOM_1_DOOR"]:
+			# Spawnear una puerta que use, por ejemplo, el índice de slot 0 
+			# y que su destino de regreso sea la habitación de 3 puertas
+			_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
 				
 ## Checks for pending story events in the given room.
 ## Returns TRUE if an event intercepted the flow, FALSE if the room is clear.
@@ -517,6 +514,47 @@ func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: in
 			
 			# Redirigimos el resultado al callback central que ya construiste
 			_on_room_navigation_requested(next_room_id, 0, false)
+			
+## BASE GENERIC METHOD (The Framework's Build Engine)
+## Executes the common steps and returns the location node in case the room
+## needs to have extra scripts, interactables, or logic attached to it in the middle of the flow.
+func _build_room_base(data: Dictionary, background_path: String, interactive_scene_path: String, skip_animations: bool) -> Node2D:
+	current_room_id = data["id_room"]
+	
+	# 1. Animación de salida (Si aplica)
+	if not skip_animations:
+		var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
+		if fade_out_tween: await fade_out_tween.finished
+	
+	# 2. LIMPIEZA TOTAL CENTRALIZADA
+	director.clear_character_stage()
+	active_character = null
+	director.clear_item_stage()
+	spawned_doors_in_room.clear()
+	director.unload_location() # Aseguramos que descargue el anterior siempre
+	
+	# 3. Asignación del Fondo
+	if background_path != "":
+		background_layer.texture = load(background_path)
+		
+	# 4. Carga de la Escena Interactiva (Hotspots, colisiones, puertas)
+	var current_loc: Node2D = null
+	if interactive_scene_path != "":
+		var interactive_scene = load(interactive_scene_path) as PackedScene
+		if interactive_scene:
+			director.load_location(interactive_scene)
+			current_loc = director.current_location_node
+			if current_loc and current_loc.has_signal("navigation_requested"):
+				current_loc.navigation_requested.connect(_on_room_navigation_requested)
+				
+	# 5. Animación de entrada (Si aplica)
+	if not skip_animations:
+		var fade_in_tween: Tween = EssenceUIAnimator.fade_in(background_layer, 0.5)
+		if fade_in_tween: await fade_in_tween.finished
+	else:
+		background_layer.modulate.a = 1.0
+		
+	return current_loc
 
 #########################
 # SECTION Initial Room  #
@@ -524,36 +562,10 @@ func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: in
 			
 ## Sets up the initial room layout. If skip_animations is true, it builds instantly.
 func _on_ready_initialRoom(data: Dictionary, skip_animations: bool = false) -> void:
-	current_room_id = data["id_room"]
+	# Llamamos a la base (pasamos "" en la escena interactiva porque no lleva)
+	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_INITIAL, "", skip_animations)
 	
-	# A) Desvanecimiento (Solo si NO saltamos animaciones)
-	if not skip_animations:
-		var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
-		if fade_out_tween: 
-			await fade_out_tween.finished
-			
-	# LIMPIEZA TOTAL
-	director.clear_character_stage()
-	active_character = null
-	director.clear_item_stage()
-	spawned_doors_in_room.clear()
-	director.unload_location()
-	
-	# B) Cambiamos la textura al fondo original
-	match data["id_background_scene"]:
-		LevelManager.BackgroundImageID["INITIAL_ROOM"]:
-			background_layer.texture = load(EssencePaths.BACKGROUND_ROOM_INITIAL)
-			
-	# C) Revelamos el nuevo fondo
-	if not skip_animations:
-		var fade_in_tween: Tween = EssenceUIAnimator.fade_in(background_layer, 0.5)
-		if fade_in_tween: 
-			await fade_in_tween.finished
-	else:
-		# Si saltamos la animación, forzamos la opacidad al 100% por seguridad
-		background_layer.modulate.a = 1.0
-		
-	# D) Pasamos el control al Director de la Trama
+	# Fin de transición
 	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
 
 #########################
@@ -562,35 +574,38 @@ func _on_ready_initialRoom(data: Dictionary, skip_animations: bool = false) -> v
 
 ## Sets up the 3 doors room. If skip_animations is true, it builds instantly.
 func _on_ready_room3doors(data: Dictionary, skip_animations: bool = false) -> void:
-	current_room_id = data["id_room"]
+	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_3DOORS, DemoItemsRoute.TESTROOMDOOR_SCENE, skip_animations)
+	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
+
+#########################
+# SECTION Room 1 Door   #
+#########################
+
+## Sets up the 3 doors room. If skip_animations is true, it builds instantly.
+func _on_ready_room1door(data: Dictionary, skip_animations: bool = false) -> void:
+	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_1DOOR, DemoItemsRoute.ONEDOORROOM_SCENE, skip_animations)
+	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
 	
-	if not skip_animations:
-		var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
-		if fade_out_tween: await fade_out_tween.finished
+
+##############
+# Ejemplo
+#############
+func _on_ready_habitacion_secreta(data: Dictionary, skip_animations: bool = false) -> void:
+	# 🟢 Código ESPECÍFICO ANTES de cargar:
+	print("¡Alerta! El jugador entró a una zona peligrosa. Modificando música...")
+	#AudioManager.play_music("Musica_Tension")
 	
-	# LIMPIEZA TOTAL
-	director.clear_character_stage()
-	active_character = null
-	director.clear_item_stage()
-	spawned_doors_in_room.clear()
-		
-	match data["id_background_scene"]:
-		LevelManager.BackgroundImageID["ROOM_3_DOORS"]:
-			background_layer.texture = load(EssencePaths.BACKGROUND_ROOM_3DOORS)
+	# 🛠️ Ejecutamos la carga base común y atrapamos el nodo que genera
+	var locacion_actual = await _build_room_base(data, "res://FondoSecreto.tscn", "res://ColisionesSecretas.tscn", skip_animations)
+	
+	# 🔵 Código ESPECÍFICO DESPUÉS de cargar (Modificar cosas dentro del cuarto):
+	if is_instance_valid(locacion_actual):
+		# Buscamos un cofre que solo existe en esta habitación y lo alteramos por código
+		var cofre = locacion_actual.get_node_or_null("CofreOculto")
+		if cofre:
+			print("x")
+		#if cofre and GlobalSave.ya_abrio_cofre:
+		#	cofre.queue_free() # Borramos el cofre si ya lo usó
 			
-	# Carga de la locación con colisiones
-	var scene_path: String = DemoItemsRoute.TESTROOMDOOR_SCENE
-	var interactive_scene: PackedScene = load(scene_path) as PackedScene
-	if interactive_scene:
-		director.load_location(interactive_scene)
-		var current_loc = director.current_location_node
-		if current_loc and current_loc.has_signal("navigation_requested"):
-			current_loc.navigation_requested.connect(_on_room_navigation_requested)
-	
-	if not skip_animations:
-		var fade_in_tween: Tween = EssenceUIAnimator.fade_in(background_layer, 0.5)
-		if fade_in_tween: await fade_in_tween.finished
-	else:
-		background_layer.modulate.a = 1.0
-		
+	# Pasamos el control narrativo normal
 	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])

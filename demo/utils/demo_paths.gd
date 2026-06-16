@@ -14,4 +14,5 @@ const DEMO_ITEMS_INDIVIDUAL_ROUTE = DEMO_ITEMS_ROUTE + "individual/"
 # SCENE PATHS
 # ==========================================
 const TESTROOMDOOR_SCENE = DEMO_ITEMS_ROUTE + "scene/TestRoomDoor.tscn"
+const ONEDOORROOM_SCENE = DEMO_ITEMS_ROUTE + "scene/OneDoorRoom.tscn"
 const ITEMDOOR_SCENE = DEMO_ITEMS_INDIVIDUAL_ROUTE + "ItemDoor.tscn"

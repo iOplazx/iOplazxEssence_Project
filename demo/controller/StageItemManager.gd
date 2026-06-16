@@ -64,4 +64,10 @@ static func get_item_placement(room_id: int, item_id: int, mode: int) -> Diction
 						1: 
 							config["position"] = Vector2(1223, 593)
 							config["scale"] = Vector2(0.2, 0.2)
+		LevelManager.RoomID["ROOM_1_DOOR"]:
+			match item_id:
+				ItemID["DOOR_SPRITE"]:			
+					config["position"] = Vector2(1223, 593)
+					config["scale"] = Vector2(0.2, 0.2)
+							
 	return config
