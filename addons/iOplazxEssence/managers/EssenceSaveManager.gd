@@ -146,6 +146,28 @@ func load_game(slot_id: String) -> Dictionary:
 	
 	on_load_completed.emit(slot_id, final_data)
 	return final_data
+	
+# LECTURA Y FUSION
+## Takes the current state from the temporary cache (_temp_game_data) and overwrites a dictionary of modifications without altering the rest of the keys.
+## Designed for technical transitions (e.g., returning from in-game menus while maintaining the state).
+func patch_cache_and_prepare_load(overrides: Dictionary) -> void:
+	# 1. Si por alguna razón la caché interna está vacía, inicializamos un mapa seguro
+	if _temp_game_data == null:
+		_temp_game_data = {}
+		
+	# 2. Duplicamos en profundidad para no romper referencias de memoria
+	var final_data = _temp_game_data.duplicate(true)
+	
+	# 3. FUSIÓN GENÉRICA (Merge)
+	# Recorremos el diccionario de cambios externos. Si la llave existe, la pisa; si no, la crea.
+	for key in overrides.keys():
+		final_data[key] = overrides[key]
+		
+	# 4. Exponemos el resultado al cargador del juego
+	loaded_game_data = final_data
+	
+	_safe_log("[%s] Temporal cache genéricamente fusionada y lista para restauración." % ES_NAME_CLASS)
+	
 
 # ==========================================
 # UTILIDADES DE UI

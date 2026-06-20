@@ -235,7 +235,7 @@ func _restaurar_partida_cargada() -> void:
 	if datos.has("story_flags"):
 		story_flags = datos.get("story_flags").duplicate()
 	
-	# El motor se estabiliza. El jugador solo ve negro porque forzamos Color.BLACK en el _ready
+	# El motor se estabiliza. El jugador solo ve negro porque forzamos Color.BLACK en el _ready o en el Director
 	await get_tree().process_frame 
 	
 	if current_phase == TestPhase.GAMEPLAY:
@@ -251,6 +251,10 @@ func _restaurar_partida_cargada() -> void:
 					await _on_ready_initialRoom(room_data, true)
 				LevelManager.RoomID["ROOM_3_DOORS"]:
 					await _on_ready_room3doors(room_data, true)
+				# 🚨 CONECTAMOS EL CASO PARA TU NUEVA HABITACIÓN:
+				LevelManager.RoomID["ROOM_1_DOOR"]:
+					print("[%s] Restaurador redirigiendo a la habitación de 1 puerta." % ES_NAME_CLASS)
+					await _on_ready_room1door(room_data, true) # Pasamos true en skip_animations
 		
 		if is_instance_valid(active_character):
 			var ropa_guardada = datos.get("ropa_estado_personaje", {})
@@ -260,8 +264,10 @@ func _restaurar_partida_cargada() -> void:
 		_setup_initial_room_layout()
 		_iniciar_secuencia_intro()
 		
+	# Limpiamos la caché inmediatamente para dejar el cargador listo para la siguiente vez
 	SaveManager.loaded_game_data.clear()
 	
+	# Abrimos la cortina de forma automática e impecable
 	var fade_in = director.open_curtain(0.5)
 	if fade_in: 
 		await fade_in.finished
@@ -365,6 +371,24 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 			_on_ready_room3doors(data, true)
 		LevelManager.RoomID["ROOM_1_DOOR"]:
 			_on_ready_room1door(data, true)
+			
+		# 🚨 EL ESLABÓN DE IDA QUE FALTABA:
+		LevelManager.RoomID["SAVE_SCENE"]:
+			print("[%s] Interceptando viaje técnico. Saltando a la pantalla de guardado..." % ES_NAME_CLASS)
+			
+			# 1. Ejecutamos la limpieza física del escenario para no dejar "fugas" de memoria
+			spawned_doors_in_room.clear()
+			if director: 
+				director.unload_location()
+			
+			# 2. Esperamos a que el motor asiente la destrucción de nodos
+			await get_tree().process_frame
+			
+			# 3. Viajamos físicamente usando tu constante centralizada 
+			get_tree().change_scene_to_file(DemoItemsRoute.TESTSAVESCENE_SCENE)
+			
+			return # CRÍTICO: Hacemos un return aquí para que la función muera 
+				   # y no intente ejecutar el open_curtain de abajo, ya que cambiamos de escena.
 
 	if director:
 		# Esperamos un frame de estabilización para que el motor termine de renderizar el mapa

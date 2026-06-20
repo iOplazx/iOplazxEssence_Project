@@ -4,7 +4,8 @@ extends RefCounted
 const RoomID = {
 	"INITIAL_ROOM" : 0,
 	"ROOM_3_DOORS" : 1,
-	"ROOM_1_DOOR" : 2
+	"ROOM_1_DOOR" : 2,
+	"SAVE_SCENE": 29
 }
 
 const BackgroundImageID = {
@@ -18,9 +19,9 @@ const BackgroundImageID = {
 # Aquí registramos qué habitaciones están conectadas legalmente entre sí.
 # Clave: Habitación Origen -> Valor: Lista de Habitaciones Destino Permitidas.
 const NAVIGATION_MAP = {
-	0: [1], # INITIAL_ROOM puede ir solo a la habitacion 3 doors.
-	1: [0, 2], # ROOM_3_DOORS puede volver al inicio o ir a la de 1 puerta.
-	2: [1]  # ROOM_1_DOOR puede volver a la habitacion 3 puertas.
+	0: [RoomID["ROOM_3_DOORS"]], # INITIAL_ROOM puede ir solo a la habitacion 3 doors.
+	1: [RoomID["INITIAL_ROOM"], RoomID["ROOM_1_DOOR"]], # ROOM_3_DOORS puede volver al inicio o ir a la de 1 puerta.
+	2: [RoomID["ROOM_3_DOORS"], RoomID["SAVE_SCENE"]]  # ROOM_1_DOOR puede volver a la habitacion 3 puertas.
 }
 
 ## Calculates and returns the scenery configuration based on spatial transitions and interaction modes.

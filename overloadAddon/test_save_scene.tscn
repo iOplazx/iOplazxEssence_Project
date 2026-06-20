@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://chxkcfp4bpxr6"]
+
+[ext_resource type="PackedScene" uid="uid://dbcs7828cew15" path="res://addons/iOplazxEssence/ui/test/TestSaveScene.tscn" id="1_rmtwu"]
+[ext_resource type="Script" uid="uid://coe2t7kgk5rw7" path="res://overloadAddon/TestSaveScene.gd" id="2_xf0xu"]
+
+[node name="TestSaveScene" unique_id=1888341287 instance=ExtResource("1_rmtwu")]
+script = ExtResource("2_xf0xu")
+
+[node name="btnReturn" parent="VBC/VBoxContainer/HBoxContainer" parent_id_path=PackedInt32Array(2132015401) index="2" unique_id=1160568684]
+text = "RETURN"

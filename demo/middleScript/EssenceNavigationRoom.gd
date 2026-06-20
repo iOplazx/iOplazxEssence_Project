@@ -1,8 +1,7 @@
 class_name EssenceNavigationRoom
 extends EssenceInteractiveLocation
 
-## NOTA: Para evitar el conflicto de firmas de 1 vs 3 argumentos,
-## cambiamos la señal para que use la firma EXACTA que espera el Main Game.
+#warning_ignore("unused_signal")
 signal navigation_requested(next_place: int, mode: int, is_only_mode: bool)
 
 func _ready() -> void:
