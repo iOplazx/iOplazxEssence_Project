@@ -1,6 +1,6 @@
 [gd_resource type="StyleBoxTexture" format=3 uid="uid://cq6gtq8h4plpm"]
 
-[ext_resource type="Texture2D" uid="uid://cc8bk6lg23dyd" path="res://addons/iOplazxEssence/resources/backgroundBotonHover.png" id="1_dslwu"]
+[ext_resource type="Texture2D" uid="uid://cc8bk6lg23dyd" path="res://addons/iOplazxEssence/resources/images/objects/backgroundBotonHover.png" id="1_dslwu"]
 
 [resource]
 texture = ExtResource("1_dslwu")

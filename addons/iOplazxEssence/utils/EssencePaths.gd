@@ -5,12 +5,16 @@ class_name EssencePaths extends RefCounted
 # ==========================================
 const BASE_ROUTE = "res://addons/iOplazxEssence/"
 const BASE_RESOURCES = BASE_ROUTE + "resources/"
+
 const PATH_IMAGES = BASE_RESOURCES + "images/"
 const PATH_IMAGES_BACKGROUND = PATH_IMAGES + "background/"
 const PATH_IMAGES_CHARACTER = PATH_IMAGES + "character/"
 const PATH_IMAGES_OBJECTS = PATH_IMAGES + "objects/"
+const PATH_IMAGES_ICON = PATH_IMAGES + "icon/"
+
 const PATH_AUDIO = BASE_RESOURCES + "audio/"
 const PATH_CORE = BASE_ROUTE + "core/"
+
 const PATH_UI = BASE_ROUTE + "ui/"
 const PATH_UI_CARDS = BASE_ROUTE + "ui/cards/"
 const PATH_UI_OVERLAYS = BASE_ROUTE + "ui/overlays/"
@@ -65,22 +69,22 @@ enum KeyImage {
 }
 
 const INTERNAL_IMAGES = {
-	KeyImage.GODOT: PATH_IMAGES + "icon_godot.png",
-	KeyImage.IOPLAZX: PATH_IMAGES + "ioplazx_logo.png",
-	KeyImage.WARNING: PATH_IMAGES + "iconWarning.png",
-	KeyImage.EYE: PATH_IMAGES + "iconEye.png",
-	KeyImage.PLUS18: PATH_IMAGES + "iconPlus18.png",
-	KeyImage.ERROR_FALLBACK: PATH_IMAGES + "iconImageNoLoad.png",
-	KeyImage.ICON_PLAY: PATH_IMAGES + "icon_play.png",
-	KeyImage.ICON_PAUSE: PATH_IMAGES + "icon_pause.png",
-	KeyImage.ICON_INFO: PATH_IMAGES + "icon_info.png",
-	KeyImage.ICON_INFO_MED: PATH_IMAGES + "icon_info_med.png",
-	KeyImage.ICON_FILTER: PATH_IMAGES + "icon_filter.png",
-	KeyImage.ICON_FILTER_X: PATH_IMAGES + "icon_filter-x.png",
-	KeyImage.ICON_CONTROL: PATH_IMAGES + "icon_control.png",
-	KeyImage.ICON_LAYOUT: PATH_IMAGES + "icon_layout.png",
-	KeyImage.ICON_CONTROL_W: PATH_IMAGES + "icon_control_w.png",
-	KeyImage.ICON_LAYOUT_W: PATH_IMAGES + "icon_layout_w.png"
+	KeyImage.GODOT: PATH_IMAGES_ICON + "icon_godot.png",
+	KeyImage.IOPLAZX: PATH_IMAGES_ICON + "ioplazx_logo.png",
+	KeyImage.WARNING: PATH_IMAGES_ICON + "iconWarning.png",
+	KeyImage.EYE: PATH_IMAGES_ICON + "iconEye.png",
+	KeyImage.PLUS18: PATH_IMAGES_ICON + "iconPlus18.png",
+	KeyImage.ERROR_FALLBACK: PATH_IMAGES_ICON + "iconImageNoLoad.png",
+	KeyImage.ICON_PLAY: PATH_IMAGES_ICON + "icon_play.png",
+	KeyImage.ICON_PAUSE: PATH_IMAGES_ICON + "icon_pause.png",
+	KeyImage.ICON_INFO: PATH_IMAGES_ICON + "icon_info.png",
+	KeyImage.ICON_INFO_MED: PATH_IMAGES_ICON + "icon_info_med.png",
+	KeyImage.ICON_FILTER: PATH_IMAGES_ICON + "icon_filter.png",
+	KeyImage.ICON_FILTER_X: PATH_IMAGES_ICON + "icon_filter-x.png",
+	KeyImage.ICON_CONTROL: PATH_IMAGES_ICON + "icon_control.png",
+	KeyImage.ICON_LAYOUT: PATH_IMAGES_ICON + "icon_layout.png",
+	KeyImage.ICON_CONTROL_W: PATH_IMAGES_ICON + "icon_control_w.png",
+	KeyImage.ICON_LAYOUT_W: PATH_IMAGES_ICON + "icon_layout_w.png"
 }
 
 # ==========================================

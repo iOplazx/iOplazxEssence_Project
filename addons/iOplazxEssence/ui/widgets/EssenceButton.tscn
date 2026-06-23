@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://c58ydoc3e2fbk"]
 
-[ext_resource type="Texture2D" uid="uid://bdo14d66ogjtv" path="res://addons/iOplazxEssence/resources/backgroundBoton.png" id="1_rnxv7"]
-[ext_resource type="Texture2D" uid="uid://cih2ovck2ukx3" path="res://addons/iOplazxEssence/resources/backgroundBotonClick.png" id="2_roc1a"]
-[ext_resource type="StyleBox" uid="uid://cq6gtq8h4plpm" path="res://addons/iOplazxEssence/resources/EssenceButtonHover_1.tres" id="3_rnxv7"]
+[ext_resource type="Texture2D" uid="uid://bdo14d66ogjtv" path="res://addons/iOplazxEssence/resources/images/objects/backgroundBoton.png" id="1_rnxv7"]
+[ext_resource type="Texture2D" uid="uid://cih2ovck2ukx3" path="res://addons/iOplazxEssence/resources/images/objects/backgroundBotonClick.png" id="2_roc1a"]
+[ext_resource type="StyleBox" uid="uid://cq6gtq8h4plpm" path="res://addons/iOplazxEssence/resources/file/EssenceButtonHover_1.tres" id="3_rnxv7"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_x3kw4"]
 texture = ExtResource("1_rnxv7")

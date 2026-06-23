@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://biiqsymbr6bbx"]
 
 [ext_resource type="Script" uid="uid://6gh7sqmidw5j" path="res://addons/iOplazxEssence/core/controllers/saves_module/EssenceSaveSlotClassic.gd" id="1_4wnk8"]
-[ext_resource type="Texture2D" uid="uid://n10s7noau54s" path="res://addons/iOplazxEssence/resources/images/iconImageNoLoad.png" id="2_dgxyi"]
+[ext_resource type="Texture2D" uid="uid://n10s7noau54s" path="res://addons/iOplazxEssence/resources/images/icon/iconImageNoLoad.png" id="2_dgxyi"]
 
 [node name="SlotClassic" type="PanelContainer" unique_id=1100819466 node_paths=PackedStringArray("img_screenshot", "lbl_slot_number", "lbl_save_date")]
 custom_minimum_size = Vector2(300, 200)

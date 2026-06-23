@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://dlj1lvkwmnm7d" path="res://addons/iOplazxEssence/core/controllers/settings_modules/EssenceTabAudio.gd" id="1_jusio"]
 [ext_resource type="PackedScene" uid="uid://35mqiemgmrnf" path="res://addons/iOplazxEssence/ui/widgets/RowSlider.tscn" id="2_aao1j"]
-[ext_resource type="Texture2D" uid="uid://cr8greyke17um" path="res://addons/iOplazxEssence/resources/images/icon_volume_master_music.png" id="3_246lx"]
-[ext_resource type="Texture2D" uid="uid://ct8tp7w56bq1x" path="res://addons/iOplazxEssence/resources/images/icon_volume_bg_music.png" id="4_dnlcb"]
-[ext_resource type="Texture2D" uid="uid://bav1i2yfbfom8" path="res://addons/iOplazxEssence/resources/images/icon_volume_sfx_1.png" id="5_k60ow"]
-[ext_resource type="Texture2D" uid="uid://dar5eu3157ogs" path="res://addons/iOplazxEssence/resources/images/icon_volume_UI.png" id="6_pirjt"]
-[ext_resource type="Texture2D" uid="uid://cuymwe61fbn33" path="res://addons/iOplazxEssence/resources/images/icon_volume_voices.png" id="7_ckxi0"]
+[ext_resource type="Texture2D" uid="uid://cr8greyke17um" path="res://addons/iOplazxEssence/resources/images/icon/icon_volume_master_music.png" id="3_246lx"]
+[ext_resource type="Texture2D" uid="uid://ct8tp7w56bq1x" path="res://addons/iOplazxEssence/resources/images/icon/icon_volume_bg_music.png" id="4_dnlcb"]
+[ext_resource type="Texture2D" uid="uid://bav1i2yfbfom8" path="res://addons/iOplazxEssence/resources/images/icon/icon_volume_sfx_1.png" id="5_k60ow"]
+[ext_resource type="Texture2D" uid="uid://dar5eu3157ogs" path="res://addons/iOplazxEssence/resources/images/icon/icon_volume_UI.png" id="6_pirjt"]
+[ext_resource type="Texture2D" uid="uid://cuymwe61fbn33" path="res://addons/iOplazxEssence/resources/images/icon/icon_volume_voices.png" id="7_ckxi0"]
 
 [node name="mgAudio" type="MarginContainer" unique_id=964859787 node_paths=PackedStringArray("row_master", "row_music", "row_sfx", "row_ui", "row_voices", "chk_mute_focus", "dpd_theme", "btn_preview", "preview_player")]
 script = ExtResource("1_jusio")
