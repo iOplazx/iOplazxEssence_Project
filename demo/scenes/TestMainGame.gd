@@ -51,7 +51,7 @@ const ROUTES_PATH = "res://_static/RouteConfig.tres"
 var routes: EssenceRouteConfig
 
 # Variable global para saber en qué ID de habitación numérica estamos parados
-var current_room_id: int = LevelManager.RoomID["INITIAL_ROOM"]
+var current_room_id: int = GameIDs.RoomID.INITIAL_ROOM
 # Diccionario de ejemplo para simular las condiciones de tu historia (Flags)
 var story_flags: Dictionary = {
 	"is_phone_event_active": false,   # La condición de tu ejemplo del teléfono
@@ -66,6 +66,9 @@ const CHARACTER_ROOT_SCENE = EssencePaths.ITEM_GENERIC_INTERACTIVE_CHARACTER
 
 const DOOR_ITEM_SCENE = DemoItemsRoute.ITEMDOOR_SCENE
 var spawned_doors_in_room: Array[Node2D] = []
+
+## Array to massively clean all floating elements when changing rooms
+var spawned_items_in_room: Array[Node2D] = []
 
 ######################################
 # SECTION (ALL SCENES IN THIS TSCN)  #
@@ -134,7 +137,7 @@ func _setup_initial_room_layout():
 	director.clear_item_stage()
 	
 	# Invoca la puerta Variante 0 y la amarra para que al hacer clic viaje a ROOM_3_DOORS
-	_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
+	#_spawn_navigation_door(0, GameIDs.RoomID.ROOM_3_DOORS) TODO
 
 func _on_tutorial_finished() -> void:
 	if current_phase == TestPhase.INTRO:
@@ -154,9 +157,9 @@ func _instanciar_actor_principal(is_instant: bool = false) -> void:
 	# Invocamos al personaje usando la habitación en la que realmente estamos parado
 	_spawn_main_character(current_room_id, 0, is_instant)
 	
-	# Si estamos en la habitación inicial, pintamos su puerta correspondiente
-	if current_room_id == LevelManager.RoomID["INITIAL_ROOM"]:
-		_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
+	# Si estamos en la habitación inicial, pintamos su puerta correspondiente TODO
+	#if current_room_id == GameIDs.RoomID.INITIAL_ROOM:
+	#	_spawn_navigation_door(0, GameIDs.RoomID.ROOM_3_DOORS)
 	
 	# Aplicamos los cambios de vestuario iniciales de Annie de forma segura
 	if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
@@ -211,11 +214,8 @@ func _preparar_datos_para_menu() -> void:
 		"ropa_estado_personaje": active_character.get_clothing_state() if is_instance_valid(active_character) else {}
 	}
 	
-	var room_name = "Habitación Desconocida"
-	for key in LevelManager.RoomID.keys():
-		if LevelManager.RoomID[key] == current_room_id:
-			room_name = key.capitalize().replace("_", " ")
-			break
+	var room_key = GameIDs.RoomID.find_key(current_room_id)
+	var room_name = room_key.capitalize().replace("_", " ") if room_key else "Habitación Desconocida"
 	
 	var current_meta_data = {
 		"title": "Prueba de Framework",
@@ -230,7 +230,7 @@ func _restaurar_partida_cargada() -> void:
 	var datos = SaveManager.loaded_game_data
 	
 	current_phase = int(datos.get("fase_actual", 0)) as TestPhase
-	var room_saved_id = int(datos.get("habitacion_actual", LevelManager.RoomID["INITIAL_ROOM"]))
+	var room_saved_id = int(datos.get("habitacion_actual", GameIDs.RoomID.INITIAL_ROOM))
 	
 	if datos.has("story_flags"):
 		story_flags = datos.get("story_flags").duplicate()
@@ -247,12 +247,12 @@ func _restaurar_partida_cargada() -> void:
 		
 		if not room_data["flag_error"]:
 			match room_saved_id:
-				LevelManager.RoomID["INITIAL_ROOM"]:
+				GameIDs.RoomID.INITIAL_ROOM:
 					await _on_ready_initialRoom(room_data, true)
-				LevelManager.RoomID["ROOM_3_DOORS"]:
+				GameIDs.RoomID.ROOM_3_DOORS:
 					await _on_ready_room3doors(room_data, true)
 				# 🚨 CONECTAMOS EL CASO PARA TU NUEVA HABITACIÓN:
-				LevelManager.RoomID["ROOM_1_DOOR"]:
+				GameIDs.RoomID.ROOM_1_DOOR:
 					print("[%s] Restaurador redirigiendo a la habitación de 1 puerta." % ES_NAME_CLASS)
 					await _on_ready_room1door(room_data, true) # Pasamos true en skip_animations
 		
@@ -316,7 +316,7 @@ func _spawn_main_character(room_id: int, mode: int, is_instant: bool = false) ->
 	var actor_scene = load(CHARACTER_ROOT_SCENE) as PackedScene
 	active_character = director.add_actor_to_stage(actor_scene)
 	
-	var placement = StageActorManager.get_actor_placement(room_id, StageActorManager.ActorID["PROTAGONIST"], mode)
+	var placement = StageActorManager.get_actor_placement(room_id, GameIDs.ActorID.PROTAGONIST, mode)
 	
 	active_character.position = placement["position"]
 	active_character.scale = placement["scale"]
@@ -363,17 +363,18 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 	# Ahora que la pantalla está TOTALMENTE negra y segura,
 	# ejecutamos la carga pesada. Nadie notará si el fondo se borra o parpadea gris.
 	match data["id_room"]:
-		LevelManager.RoomID["INITIAL_ROOM"]:
+		GameIDs.RoomID.INITIAL_ROOM:
 			# Pasamos 'true' en skip_animations porque el director ya cerró la cortina,
 			# no necesitamos que la habitación intente hacer otro fundido interno.
 			_on_ready_initialRoom(data, true)
-		LevelManager.RoomID["ROOM_3_DOORS"]:
+		GameIDs.RoomID.ROOM_3_DOORS:
 			_on_ready_room3doors(data, true)
-		LevelManager.RoomID["ROOM_1_DOOR"]:
+		GameIDs.RoomID.ROOM_1_DOOR:
 			_on_ready_room1door(data, true)
+		GameIDs.RoomID.PARK:
+			_on_ready_parkScene(data, true)
 			
-		# 🚨 EL ESLABÓN DE IDA QUE FALTABA:
-		LevelManager.RoomID["SAVE_SCENE"]:
+		GameIDs.RoomID.SAVE_SCENE:
 			print("[%s] Interceptando viaje técnico. Saltando a la pantalla de guardado..." % ES_NAME_CLASS)
 			
 			# 1. Ejecutamos la limpieza física del escenario para no dejar "fugas" de memoria
@@ -400,41 +401,34 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 			await open_tween.finished
 
 ## Evaluates story conditions before enabling player control inside a room.
-## [param room_id]: The active Room ID from LevelManager.
+## [param room_id]: The active Room ID from GameIDs.RoomID.
 ## [param default_mode]: The fallback interaction mode if no story events trigger.
 func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	
-	# 1. PASO POR EL FILTRO INTERMEDIO
-	# Si el método devuelve true, el evento tomó el control, así que hacemos un 'return' para salir.
+	# 1. INTERMEDIATE STORY FILTER
+	# If an event or cutscene takes control, we interrupt the normal flow.
 	if _check_room_interruptions(room_id):
 		return 
 		
-	# 2. FLUJO NORMAL DE EXPLORACIÓN
-	# Si llegamos aquí, es porque la habitación está libre de eventos.
-	#print("[Story] Todo despejado. Promoviendo a Exploracion (Modo 1).")
-	
+	# 2. NORMAL EXPLORATION FLOW
+	# Fetch the internal room configuration directly from the LevelManager.
 	var data = LevelManager.get_scenery_config(room_id, room_id, default_mode, true)
-	if data["flag_error"]: return
+	if data["flag_error"]: 
+		return
 		
 	_apply_interaction_state(data["interaction_mode"])
 	
-	# 3. CONSTRUCCIÓN DE LA HABITACIÓN
-	# Aquí solo ponemos lo que SIEMPRE aparece cuando la habitación está normal
+	# 3. AUTOMATED STAGE CONSTRUCTION
+	# The system reads the StageItemManager manifesto, processes filters, 
+	# and instantiates all floating buttons/interactables automatically.
+	_build_stage_interactables(room_id, data["interaction_mode"])
+	
+	# 4. EXCLUSIVE CHARACTER / ACTOR INITIALIZATION
+	# Hardcoded overrides are now strictly reserved for persistent narrative actors (like the protagonist).
 	match room_id:
-		LevelManager.RoomID["INITIAL_ROOM"]:
-			_instanciar_actor_principal(false)
-			
-		LevelManager.RoomID["ROOM_3_DOORS"]:
-			_spawn_navigation_door(0, LevelManager.RoomID["ROOM_1_DOOR"])
-			_spawn_navigation_door(1, LevelManager.RoomID["INITIAL_ROOM"])
-			
-			# Si tuvieras un ItemManager, aquí harías aparecer la mochila o cosas fijas:
-			# _spawn_screen_item(StageItemManager.ItemID["BACKPACK_ICON"], 0)
-		LevelManager.RoomID["ROOM_1_DOOR"]:
-			# Spawnear una puerta que use, por ejemplo, el índice de slot 0 
-			# y que su destino de regreso sea la habitación de 3 puertas
-			_spawn_navigation_door(0, LevelManager.RoomID["ROOM_3_DOORS"])
-				
+		GameIDs.RoomID.INITIAL_ROOM:
+			_instanciar_actor_principal(false) # TODO: Rename this method to English later if needed
+		
 ## Checks for pending story events in the given room.
 ## Returns TRUE if an event intercepted the flow, FALSE if the room is clear.
 func _check_room_interruptions(room_id: int) -> bool:
@@ -443,13 +437,13 @@ func _check_room_interruptions(room_id: int) -> bool:
 		return false # ✅ No hay interrupción, continúa libremente
 		
 	match room_id:
-		LevelManager.RoomID["INITIAL_ROOM"]:
+		GameIDs.RoomID.INITIAL_ROOM:
 			if story_flags.get("is_first_time_here", false):
 				print("[Story] Interrupción: Primera vez en la habitación inicial. Esperando tutorial.")
 				director.change_game_state(EssenceGameplayDirector.GameState.DIALOGUE)
 				return true 
 				
-		LevelManager.RoomID["ROOM_3_DOORS"]:
+		GameIDs.RoomID.ROOM_3_DOORS:
 			if story_flags.get("is_phone_event_active", false):
 				print("[Story] Interrupción: ¡Alguien llama al telefono! Bloqueando exploracion.")
 				director.change_game_state(EssenceGameplayDirector.GameState.DIALOGUE)
@@ -467,61 +461,97 @@ func _apply_interaction_state(matrix_mode: int) -> void:
 			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 			
 
-## Instantiates a dynamic transition door into the ItemStage and binds its destination room.
-## [param door_mode_index]: The variant index (0 for left/first door, 1 for right/second door, etc.)
-## [param destination_room_id]: The LevelManager.RoomID where this door will lead.
-func _spawn_navigation_door(door_mode_index: int, destination_room_id: int) -> void:
-	# 1. Cargamos el archivo .tscn desde tu ruta centralizada
-	var packed_door = load(DOOR_ITEM_SCENE) as PackedScene
-	if not packed_door:
-		push_error("[TestMainGame] Error crítico: No se pudo cargar la escena desde: " + DOOR_ITEM_SCENE)
-		return
-		
-	# 2. Le ordenamos al Director que la instancie dentro del contenedor ItemStage
-	var door_instance = director.add_item_to_stage(packed_door)
+## CENTRAL AUTOMATION: Builds and validates all interactive elements declared in the room
+## [param room_id]: The ID of the current scene (GameIDs.RoomID)
+## [param current_layout_mode]: The current sub-mode or variant of the room (0, 1, 2, etc.)
+func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
+	# 1. CONSULTA: Obtenemos el arreglo de ítems que este escenario "desea" tener por diseño
+	var raw_items_list: Array = StageItemManager.ROOM_ITEM_MANIFESTO.get(room_id, [])
 	
-	# 3. PREGUNTA/VALIDACIÓN: ¿Se instanció correctamente?
-	if is_instance_valid(door_instance):
-		#print("[TestMainGame] ¡Éxito! Puerta variante %d instanciada correctamente." % door_mode_index)
+	if raw_items_list.is_empty():
+		return # Habitación pasiva o puramente estática, nada que spawnear por código.
 		
-		# 4. Posicionamiento dinámico: Buscamos las coordenadas en tu StageItemManager
-		# Le pasamos el cuarto actual, el ID general de puertas y el índice del modo (0, 1, etc.)
-		var config = StageItemManager.get_item_placement(
-			current_room_id, 
-			StageItemManager.ItemID["DOOR_SPRITE"], 
-			door_mode_index
-		)
+	# 2. PROCESAMIENTO Y FILTRADO POR CADA ELEMENTO
+	for item_data in raw_items_list:
+		var item_id: int = item_data["item_id"]
+		var item_variant_mode: int = item_data["mode"] # Tu slot o sub-modo asignado en el arreglo
+		var destination: int = item_data["destination"]
 		
-		# Si por alguna regla de la historia el mánager dice que no es visible, la borramos y salimos
-		if not config.get("is_visible", true):
-			door_instance.queue_free()
-			return
+		# 🚨 FILTRO DE CONDICIONES (HOOK DE HISTORIA / PARÁMETROS DEL DICCIONARIO)
+		# Evaluamos si hay factores externos que impidan que el objeto se materialice.
+		# Ej: Si pasas el modo 3 (Noche), podemos bloquear ítems que solo existen de día.
+		if not _should_allow_item_spawn(room_id, item_id, current_layout_mode):
+			print("[%s/Spawner] Objeto ID %d RECHAZADO por condiciones del entorno (Modo: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
+			continue # Saltamos este objeto y vamos al siguiente del bucle
 			
-		door_instance.position = config["position"]
-		door_instance.scale = config["scale"]
+		# 3. IDENTIFICACIÓN DE RUTA DE ASSET (.TSCN)
+		# Buscamos la escena física correspondiente en tu script centralizado de paths
+		var scene_path: String = ""
+		match item_id:
+			#GameIDs.ItemID.PHONE_ICON:    scene_path = DemoItemsRoute.ITEMPHONE_SCENE
+			#GameIDs.ItemID.BACKPACK_ICON: scene_path = DemoItemsRoute.ITEMBACKPACK_SCENE
+			#GameIDs.ItemID.NOTEBOOK:      scene_path = DemoItemsRoute.ITEMNOTEBOOK_SCENE
+			GameIDs.ItemID.DOOR_SPRITE:   scene_path = DemoItemsRoute.ITEMDOOR_SCENE
+			GameIDs.ItemID.HOUSE_SPRITE:  scene_path = DemoItemsRoute.ITEMHOUSE_SCENE # Tu casita del parque
+			
+		if scene_path == "" or not ResourceLoader.exists(scene_path):
+			push_error("[%s] Error crítico: No se encontró escena .tscn para el ItemID %d" % [ES_NAME_CLASS, item_id])
+			continue
+			
+		# 4. INSTANCIACIÓN Detrás de escena
+		var packed_item = load(scene_path) as PackedScene
+		var item_instance = director.add_item_to_stage(packed_item)
 		
-		# Guardamos la referencia en nuestra lista general para poder limpiarla al cambiar de cuarto
-		spawned_doors_in_room.append(door_instance)
+		if not is_instance_valid(item_instance):
+			push_error("[%s] El Director devolvió un nodo nulo para el ItemID %d" % [ES_NAME_CLASS, item_id])
+			continue
+			
+		# 5. CONFIGURACIÓN DE ESCALA Y POSICIÓN (Delegada al StageItemManager)
+		# Le pasamos el modo/slot que venía en el manifiesto para que sepa qué coordenada usar
+		var placement = StageItemManager.get_item_placement(room_id, item_id, item_variant_mode)
 		
-		# 5. PROGRAMAR EL EVENTO DE SER TOCADA (Smart Input Binding)
-		var target_area: Area2D = door_instance if door_instance is Area2D else null
+		# Si las coordenadas estáticas dicen que no debe verse, lo limpiamos de inmediato
+		if not placement.get("is_visible", true):
+			item_instance.queue_free()
+			continue
+			
+		# Forzamos los valores físicos espaciales antes de volverlo interactuable
+		item_instance.position = placement["position"]
+		item_instance.scale = placement["scale"]
+		
+		# Guardamos la referencia para el recolector de basura al cambiar de habitación
+		spawned_items_in_room.append(item_instance)
+		
+		# 6. CONFIGURAR LA ACCIÓN (Smart Input Binding)
+		var target_area: Area2D = item_instance if item_instance is Area2D else null
 		if not target_area:
-			for child in door_instance.get_children():
+			for child in item_instance.get_children():
 				if child is Area2D:
 					target_area = child
 					break
-		
-		# 6. Conectamos la señal nativa de Godot amarrando (bind) el destino dinámico
+					
+		# 7. CONEXIÓN Y REVELACIÓN FINAL
 		if target_area:
-			# Usamos .bind() para inyectar de forma segura el ID de destino al hacer clic
-			target_area.input_event.connect(_on_dynamic_door_clicked.bind(destination_room_id))
-			#print("[TestMainGame] Sensores de físicas listos. Puerta amarrada al cuarto ID: ", destination_room_id)
+			if destination != -1:
+				# ACCIÓN DE VIAJE: Si el ítem amarra un destino, lo conectamos al flujo de la cortina negra
+				target_area.input_event.connect(_on_dynamic_door_clicked.bind(destination))
+			else:
+				# ACCIÓN DE UTILIDAD: Si es un ítem de interfaz (Celular, Mochila), detonará otra lógica en tu juego
+				# target_area.input_event.connect(_on_utility_interactable_clicked.bind(item_id))
+				pass
 		else:
-			push_error("[TestMainGame] Advertencia: No se encontró ningún Area2D en la puerta.")
-			
-	else:
-		push_error("[TestMainGame] Fallo crítico: El Director devolvió un nodo nulo al intentar añadir la puerta.")
+			push_warning("[%s] El item %d no posee un Area2D. Se instanció como elemento puramente visual." % [ES_NAME_CLASS, item_id])
+
+## INTERNAL VALIDATOR: Decides whether an item is eligible to enter based on the current rules
+func _should_allow_item_spawn(room_id: int, item_id: int, current_mode: int) -> bool:
+	# Ejemplo de la regla que sugeriste: Si es de noche (supongamos Modo 3), bloqueamos todo excepto la cama
+	if current_mode == 3: # Filtro de Noche ficticio para pruebas
+		# Si estamos en la habitación inicial de noche y el ítem no es el que queremos, lo bloqueamos
+		# if item_id != GameIDs.ItemID.BED_ITEM: return false
+		pass
 		
+	# Por defecto, si no hay ninguna regla de la historia o fase que lo prohíba, el objeto entra libre
+	return true
 		
 ## Processes the click of any dynamic door and requests navigation to its bound destination.
 func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, next_room_id: int) -> void:
@@ -610,6 +640,12 @@ func _on_ready_room1door(data: Dictionary, skip_animations: bool = false) -> voi
 	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_1DOOR, DemoItemsRoute.ONEDOORROOM_SCENE, skip_animations)
 	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
 	
+##################
+# SECTION PARK   #
+##################
+func _on_ready_parkScene(data: Dictionary, skip_animations: bool = false) -> void:
+	await _build_room_base(data, EssencePaths.BACKGROUND_PARK, "", skip_animations)
+	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
 
 ##############
 # Ejemplo

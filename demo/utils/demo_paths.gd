@@ -2,6 +2,10 @@
 class_name DemoItemsRoute
 extends RefCounted
 
+#Extension shortcut
+const EXTENSION_PNG = ".png"
+const EXTENSION_TSCN = ".tscn"
+
 # ==========================================
 # BASE ROUTES
 # ==========================================
@@ -14,9 +18,10 @@ const OVERLOAD_ADDON_ROUTE = BASE_ROUTE + "overloadAddon/"
 # ==========================================
 # SCENE PATHS
 # ==========================================
-const TESTMAINGAME_SCENE = DEMO_ROUTE + "TestMainGame.tscn"
-const TESTSAVESCENE_SCENE = OVERLOAD_ADDON_ROUTE + "test_save_scene.tscn"
+const TESTMAINGAME_SCENE = DEMO_ROUTE + "TestMainGame" + EXTENSION_TSCN
+const TESTSAVESCENE_SCENE = OVERLOAD_ADDON_ROUTE + "test_save_scene" + EXTENSION_TSCN
 
-const TESTROOMDOOR_SCENE = DEMO_ITEMS_ROUTE + "scene/TestRoomDoor.tscn"
-const ONEDOORROOM_SCENE = DEMO_ITEMS_ROUTE + "scene/OneDoorRoom.tscn"
-const ITEMDOOR_SCENE = DEMO_ITEMS_INDIVIDUAL_ROUTE + "ItemDoor.tscn"
+const TESTROOMDOOR_SCENE = DEMO_ITEMS_ROUTE + "scene/TestRoomDoor" + EXTENSION_TSCN
+const ONEDOORROOM_SCENE = DEMO_ITEMS_ROUTE + "scene/OneDoorRoom" + EXTENSION_TSCN
+const ITEMDOOR_SCENE = DEMO_ITEMS_INDIVIDUAL_ROUTE + "ItemDoor" + EXTENSION_TSCN
+const ITEMHOUSE_SCENE = DEMO_ITEMS_INDIVIDUAL_ROUTE + "ItemHouse" + EXTENSION_TSCN
