@@ -558,7 +558,14 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 			push_warning("[%s] El item %d no posee un Area2D. Se instanció como elemento puramente visual." % [ES_NAME_CLASS, item_id])
 
 ## INTERNAL VALIDATOR: Decides whether an item is eligible to enter based on the current rules
-func _should_allow_item_spawn(room_id: int, item_id: int, current_mode: int) -> bool:
+func _should_allow_item_spawn(_room_id: int, _item_id: int, current_mode: int) -> bool:
+	# Rule filter example: If it's night mode (Mode 3), we could block non-bed items here
+	if current_mode == 0:
+		# NOTA: Si necesitas usarlas dentro de un 'if' más adelante, 
+		# solo les quitas el guion bajo y listo. Por ahora, si solo usas current_mode,
+		# el filtro funciona igual de bien.
+		pass
+		
 	# Ejemplo de la regla que sugeriste: Si es de noche (supongamos Modo 3), bloqueamos todo excepto la cama
 	if current_mode == 3: # Filtro de Noche ficticio para pruebas
 		# Si estamos en la habitación inicial de noche y el ítem no es el que queremos, lo bloqueamos

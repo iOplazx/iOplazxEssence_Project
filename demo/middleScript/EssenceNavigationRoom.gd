@@ -1,7 +1,7 @@
 class_name EssenceNavigationRoom
 extends EssenceInteractiveLocation
 
-#warning_ignore("unused_signal")
+@warning_ignore("unused_signal")
 signal navigation_requested(next_place: int, mode: int, is_only_mode: bool)
 
 func _ready() -> void:
