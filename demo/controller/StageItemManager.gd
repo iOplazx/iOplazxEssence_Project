@@ -15,23 +15,24 @@ const ItemID = {
 # Cambiamos las claves numéricas crudas por las constantes tipadas del archivo central.
 const ROOM_ITEM_MANIFESTO = {
 	GameIDs.RoomID.INITIAL_ROOM: [
-		{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.NOTEBOOK, "mode": 0, "destination": -1},
+		#{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
+		#{"item_id": GameIDs.ItemID.NOTEBOOK, "mode": 0, "destination": -1},
 		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS}
 	],
 	GameIDs.RoomID.ROOM_3_DOORS: [
+		#{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1},
 		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_1_DOOR}, # Puerta Izq
-		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 1, "destination": GameIDs.RoomID.INITIAL_ROOM}, # Puerta Der
-		{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1}
+		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 1, "destination": GameIDs.RoomID.INITIAL_ROOM} # Puerta Der
 	],
 	GameIDs.RoomID.ROOM_1_DOOR: [
-		{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1},
+		#{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
+		#{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1},
 		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS}
 	],
 	GameIDs.RoomID.PARK: [
-		{"item_id": GameIDs.ItemID.HOUSE_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS}, # Casita de regreso
-		{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1}
+		#{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
+		{"item_id": GameIDs.ItemID.HOUSE_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS} # Casita de regreso
+		
 	]
 }
 
