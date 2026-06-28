@@ -16,17 +16,18 @@ const ItemID = {
 const ROOM_ITEM_MANIFESTO = {
 	GameIDs.RoomID.INITIAL_ROOM: [
 		{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.NOTEBOOK, "mode": 0, "destination": -1}
+		{"item_id": GameIDs.ItemID.NOTEBOOK, "mode": 0, "destination": -1},
+		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS}
 	],
 	GameIDs.RoomID.ROOM_3_DOORS: [
 		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_1_DOOR}, # Puerta Izq
 		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 1, "destination": GameIDs.RoomID.INITIAL_ROOM}, # Puerta Der
-		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 2, "destination": GameIDs.RoomID.PARK},         # Puerta Central -> Parque
 		{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1}
 	],
 	GameIDs.RoomID.ROOM_1_DOOR: [
 		{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1}
+		{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1},
+		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS}
 	],
 	GameIDs.RoomID.PARK: [
 		{"item_id": GameIDs.ItemID.HOUSE_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS}, # Casita de regreso
@@ -54,8 +55,6 @@ static func get_item_placement(room_id: int, item_id: int, mode: int) -> Diction
 	if GLOBAL_DEFAULTS.has(item_id):
 		config = GLOBAL_DEFAULTS[item_id].duplicate()
 		
-	# 🚨 PASO DE ANULACIÓN MODIFICADO:
-	# Ahora los filtros 'match' son 100% seguros y limpios usando GameIDs.
 	match room_id:
 		GameIDs.RoomID.INITIAL_ROOM:
 			match item_id:

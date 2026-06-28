@@ -14,4 +14,4 @@ func _on_hotspot_clicked(event: InputEvent, node: Area2D) -> void:
 			print("[%s] ¡Validación exitosa! Se pulsó físicamente ExampleDoor1_1. Transicionando..." % name)
 			
 			# 🚀 Emitimos la señal 'navigation_requested' que heredamos de la madre
-			navigation_requested.emit(LevelManager.RoomID["SAVE_SCENE"], 1, false)
+			navigation_requested.emit(GameIDs.RoomID.SAVE_SCENE, 1, false)

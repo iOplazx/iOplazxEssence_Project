@@ -139,6 +139,7 @@ func _setup_initial_room_layout():
 	# Invoca la puerta Variante 0 y la amarra para que al hacer clic viaje a ROOM_3_DOORS
 	#_spawn_navigation_door(0, GameIDs.RoomID.ROOM_3_DOORS) TODO
 
+## Callback triggered when the intro tutorial panel is closed.
 func _on_tutorial_finished() -> void:
 	if current_phase == TestPhase.INTRO:
 		print("[%s] Tutorial Intro terminado. Esperando cierre de UI..." % ES_NAME_CLASS)
@@ -149,17 +150,31 @@ func _on_tutorial_finished() -> void:
 		
 		await get_tree().create_timer(0.6).timeout 
 		
+		# 1. Instanciamos a Annie en su posición por defecto
 		_instanciar_actor_principal()
+		
+		# 2. 🚀 TRANSICIÓN NARRATIVA DE MODO: 
+		# Solicitamos el cambio interno al LevelManager para pasar del modo Cine (0) al modo Exploración (1)
+		var data = LevelManager.get_scenery_config(current_room_id, current_room_id, 1, true)
+		
+		if not data["flag_error"]:
+			# Aplicamos las reglas del Modo 1 (Habilitar clicks globales en el escenario)
+			_apply_interaction_state(data["interaction_mode"])
+			
+			# 3. 📦 CONSTRUCCIÓN AUTOMÁTICA:
+			# Ahora que estamos en el modo de juego real, le ordenamos al motor que recorra 
+			# el manifiesto y dibuje el teléfono, el cuaderno y la puerta de salida.
+			_build_stage_interactables(current_room_id, data["interaction_mode"])
+			
+		# 4. Le devolvemos el control físico del mouse y movimiento al jugador
+		if director:
+			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 			
 ## Instantiates the main character and default room elements dynamically
 ## [param is_instant]: If true, skips spawn animations (perfect for loading saves)
 func _instanciar_actor_principal(is_instant: bool = false) -> void:
 	# Invocamos al personaje usando la habitación en la que realmente estamos parado
 	_spawn_main_character(current_room_id, 0, is_instant)
-	
-	# Si estamos en la habitación inicial, pintamos su puerta correspondiente TODO
-	#if current_room_id == GameIDs.RoomID.INITIAL_ROOM:
-	#	_spawn_navigation_door(0, GameIDs.RoomID.ROOM_3_DOORS)
 	
 	# Aplicamos los cambios de vestuario iniciales de Annie de forma segura
 	if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):

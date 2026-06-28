@@ -142,7 +142,7 @@ func _on_return_pressed() -> void:
 	
 	# Tu juego define sus llaves específicas (las que declaraste en MyGameSave)
 	var cambios_juego = {
-		"habitacion_actual": LevelManager.RoomID["ROOM_1_DOOR"],
+		"habitacion_actual": GameIDs.RoomID.ROOM_1_DOOR,
 		"fase_actual": TestMainGame.TestPhase.GAMEPLAY # Tu enum numérico
 	}
 	
