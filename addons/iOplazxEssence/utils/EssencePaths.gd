@@ -70,7 +70,8 @@ enum KeyImage {
 	ICON_CONTROL,
 	ICON_LAYOUT,
 	ICON_CONTROL_W,
-	ICON_LAYOUT_W
+	ICON_LAYOUT_W,
+	ICON_TOUCH
 }
 
 const INTERNAL_IMAGES = {
@@ -89,7 +90,8 @@ const INTERNAL_IMAGES = {
 	KeyImage.ICON_CONTROL: PATH_IMAGES_ICON + "icon_control" + EXTENSION_PNG,
 	KeyImage.ICON_LAYOUT: PATH_IMAGES_ICON + "icon_layout" + EXTENSION_PNG,
 	KeyImage.ICON_CONTROL_W: PATH_IMAGES_ICON + "icon_control_w" + EXTENSION_PNG,
-	KeyImage.ICON_LAYOUT_W: PATH_IMAGES_ICON + "icon_layout_w" + EXTENSION_PNG
+	KeyImage.ICON_LAYOUT_W: PATH_IMAGES_ICON + "icon_layout_w" + EXTENSION_PNG,
+	KeyImage.ICON_TOUCH: PATH_IMAGES_ICON + "iconTouch" + EXTENSION_PNG
 }
 
 # ==========================================

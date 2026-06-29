@@ -1,14 +1,6 @@
 class_name StageItemManager
 extends RefCounted
 
-const ItemID = {
-	"PHONE_ICON": 0,
-	"BACKPACK_ICON": 1,
-	"NOTEBOOK": 2,
-	"DOOR_SPRITE": 4,
-	"HOUSE_SPRITE": 5
-}
-
 # ==============================================================================
 # 📋 MANIFIESTO DE ESCENARIOS (Qué ítems existen en cada habitación)
 # ==============================================================================
@@ -17,7 +9,8 @@ const ROOM_ITEM_MANIFESTO = {
 	GameIDs.RoomID.INITIAL_ROOM: [
 		#{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
 		#{"item_id": GameIDs.ItemID.NOTEBOOK, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS}
+		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 2, "destination": GameIDs.RoomID.ROOM_3_DOORS},
+		{"item_id": GameIDs.ItemID.TOUCH_INDICATOR, "mode": 1, "destination": -1}
 	],
 	GameIDs.RoomID.ROOM_3_DOORS: [
 		#{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1},
@@ -50,7 +43,7 @@ static func get_item_placement(room_id: int, item_id: int, mode: int) -> Diction
 	var config: Dictionary = {
 		"position": Vector2.ZERO,
 		"scale": Vector2.ONE,
-		"is_visible": true
+		"is_visible": true #invisble = destroy
 	}
 	
 	if GLOBAL_DEFAULTS.has(item_id):
@@ -64,8 +57,20 @@ static func get_item_placement(room_id: int, item_id: int, mode: int) -> Diction
 						config["position"] = Vector2(640, 360)
 						config["scale"] = Vector2(1.0, 1.0)
 				GameIDs.ItemID.DOOR_SPRITE:			
-					config["position"] = Vector2(48, 593)
-					config["scale"] = Vector2(0.2, 0.2)
+					if mode == 2: # La puerta ahora pertenece legalmente al Modo 2
+						config["position"] = Vector2(48, 593)
+						config["scale"] = Vector2(0.2, 0.2)
+						config["is_visible"] = true
+					else:
+						config["is_visible"] = false
+				GameIDs.ItemID.TOUCH_INDICATOR:
+					if mode == 1:
+						config["position"] = Vector2(672, 398) # Flotando arriba de la cabeza del actor
+						config["scale"] = Vector2(0.54, 0.54)
+					else:
+						# PROTECCIÓN CRUCIAL: Si nos consultan en cualquier otro modo, 
+						# apagamos la visibilidad para que el Spawner lo elimine de memoria de inmediato.
+						config["is_visible"] = false
 							
 		GameIDs.RoomID.ROOM_3_DOORS:
 			match item_id:

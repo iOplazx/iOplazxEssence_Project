@@ -135,9 +135,6 @@ func _iniciar_secuencia_intro() -> void:
 		
 func _setup_initial_room_layout():
 	director.clear_item_stage()
-	
-	# Invoca la puerta Variante 0 y la amarra para que al hacer clic viaje a ROOM_3_DOORS
-	#_spawn_navigation_door(0, GameIDs.RoomID.ROOM_3_DOORS) TODO
 
 ## Callback triggered when the intro tutorial panel is closed.
 func _on_tutorial_finished() -> void:
@@ -145,25 +142,18 @@ func _on_tutorial_finished() -> void:
 		print("[%s] Tutorial Intro terminado. Esperando cierre de UI..." % ES_NAME_CLASS)
 		current_phase = TestPhase.GAMEPLAY
 		
-		# CAMBIO CRUCIAL: Guardamos en la historia que ya pasamos por aquí
 		story_flags["is_first_time_here"] = false
 		
 		await get_tree().create_timer(0.6).timeout 
 		
-		# 1. Instanciamos a Annie en su posición por defecto
 		_instanciar_actor_principal()
 		
-		# 2. 🚀 TRANSICIÓN NARRATIVA DE MODO: 
-		# Solicitamos el cambio interno al LevelManager para pasar del modo Cine (0) al modo Exploración (1)
 		var data = LevelManager.get_scenery_config(current_room_id, current_room_id, 1, true)
 		
 		if not data["flag_error"]:
 			# Aplicamos las reglas del Modo 1 (Habilitar clicks globales en el escenario)
 			_apply_interaction_state(data["interaction_mode"])
 			
-			# 3. 📦 CONSTRUCCIÓN AUTOMÁTICA:
-			# Ahora que estamos en el modo de juego real, le ordenamos al motor que recorra 
-			# el manifiesto y dibuje el teléfono, el cuaderno y la puerta de salida.
 			_build_stage_interactables(current_room_id, data["interaction_mode"])
 			
 		# 4. Le devolvemos el control físico del mouse y movimiento al jugador
@@ -276,7 +266,7 @@ func _restaurar_partida_cargada() -> void:
 			active_character.load_clothing_state(ropa_guardada)
 			
 	else:
-		_setup_initial_room_layout()
+		_setup_initial_room_layout() #validar TODO
 		_iniciar_secuencia_intro()
 		
 	# Limpiamos la caché inmediatamente para dejar el cargador listo para la siguiente vez
@@ -307,14 +297,35 @@ func _on_return_pressed() -> void:
 	if is_instance_valid(SceneManager):
 		SceneManager.goto_main_menu()
 
-## Evento que se dispara al hacer clic sobre el personaje
+## Triggered when the user performs a physical left-click interaction over the active character.
 func _on_character_interacted() -> void:
-	if not is_instance_valid(active_character): return
+	if not is_instance_valid(active_character): 
+		return
 	
-	# Verificamos que estemos en Gameplay y que el personaje ya sea interactuable
+	# 1. VALIDATION LAYER
+	# Ensure we are in the gameplay phase and the character is cleared for interactions.
 	if current_phase == TestPhase.GAMEPLAY and active_character.is_interactable:
-		print("[%s] El jugador interactuó con: %s" % [ES_NAME_CLASS, active_character.display_name])
+		print("[%s] Player interacted with character: %s" % [ES_NAME_CLASS, active_character.display_name])
 		
+		# 2. STATE CHECK (Check if this is the first interaction during Modo 2)
+		# If the player hasn't triggered this event yet, we advance the layout state.
+		if not story_flags.get("has_touched_character", false):
+			story_flags["has_touched_character"] = true
+			
+			print("[%s] First-time interaction approved. Advancing Room to Modo 2..." % ES_NAME_CLASS)
+			
+			# A. Request internal mode transition to Modo 3 (Exploration + Exit Enabled)
+			var data = LevelManager.get_scenery_config(current_room_id, current_room_id, 2, true)
+			
+			if not data["flag_error"]:
+				_apply_interaction_state(data["interaction_mode"])
+				
+				# B. Re-build stage layout: This wipes the Touch Indicator and spawns the Navigation Door
+				director.clear_item_stage()
+				_build_stage_interactables(current_room_id, data["interaction_mode"])
+		
+		# 3. INTERACTION FEEDBACK (UI Tutorial Panel)
+		# Trigger the next instruction set on the UI overlay
 		if tutorial_panel:
 			var interaction_messages: Array[String] = [
 				"Character Interaction Detected!",
@@ -483,21 +494,27 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 	# 1. CONSULTA: Obtenemos el arreglo de ítems que este escenario "desea" tener por diseño
 	var raw_items_list: Array = StageItemManager.ROOM_ITEM_MANIFESTO.get(room_id, [])
 	
+	#print("[Spawner] Revisando manifiesto para cuarto %d. Encontrados %d items." % [room_id, raw_items_list.size()])
+	
 	if raw_items_list.is_empty():
 		return # Habitación pasiva o puramente estática, nada que spawnear por código.
 		
 	# 2. PROCESAMIENTO Y FILTRADO POR CADA ELEMENTO
 	for item_data in raw_items_list:
 		var item_id: int = item_data["item_id"]
-		var item_variant_mode: int = item_data["mode"] # Tu slot o sub-modo asignado en el arreglo
+		var item_variant_mode: int = item_data["mode"] 
 		var destination: int = item_data["destination"]
 		
-		# 🚨 FILTRO DE CONDICIONES (HOOK DE HISTORIA / PARÁMETROS DEL DICCIONARIO)
-		# Evaluamos si hay factores externos que impidan que el objeto se materialice.
-		# Ej: Si pasas el modo 3 (Noche), podemos bloquear ítems que solo existen de día.
+		# 🚨 MEJORA 1: FILTRO DE SINCRONIZACIÓN DE MODO
+		# Si el modo del ítem en el manifiesto no coincide con el modo actual de la habitación,
+		# lo ignoramos olímpicamente. Así la puerta (Modo 2) no nacerá en el Modo 1.
+		if item_variant_mode != current_layout_mode:
+			continue
+		
+		# 🚨 FILTRO DE CONDICIONES (HOOK DE HISTORIA)
 		if not _should_allow_item_spawn(room_id, item_id, current_layout_mode):
 			print("[%s/Spawner] Objeto ID %d RECHAZADO por condiciones del entorno (Modo: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
-			continue # Saltamos este objeto y vamos al siguiente del bucle
+			continue
 			
 		# 3. IDENTIFICACIÓN DE RUTA DE ASSET (.TSCN)
 		# Buscamos la escena física correspondiente en tu script centralizado de paths
@@ -508,10 +525,19 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 			#GameIDs.ItemID.NOTEBOOK:      scene_path = DemoItemsRoute.ITEMNOTEBOOK_SCENE
 			GameIDs.ItemID.DOOR_SPRITE:   scene_path = DemoItemsRoute.ITEMDOOR_SCENE
 			GameIDs.ItemID.HOUSE_SPRITE:  scene_path = DemoItemsRoute.ITEMHOUSE_SCENE # Tu casita del parque
+			GameIDs.ItemID.TOUCH_INDICATOR: scene_path = DemoItemsRoute.ITEMTOUCH_SCENE
 			
 		if scene_path == "" or not ResourceLoader.exists(scene_path):
 			push_error("[%s] Error crítico: No se encontró escena .tscn para el ItemID %d" % [ES_NAME_CLASS, item_id])
 			continue
+			
+		# 🚨 MEJORA 2: OPTIMIZACIÓN DE MEMORIA (PRE-CHECK DE VISIBILIDAD)
+		# En tu código viejo cargabas el archivo e instanciabas el nodo en memoria con el Director,
+		# para luego destruirlo inmediatamente con queue_free() si placement["is_visible"] era false.
+		# ¡Es mejor preguntar las coordenadas ANTES de gastar RAM instanciando el nodo!
+		var placement = StageItemManager.get_item_placement(room_id, item_id, item_variant_mode)
+		if not placement.get("is_visible", true):
+			continue # Si por coordenadas no debe verse, pasamos de largo sin crear nada.
 			
 		# 4. INSTANCIACIÓN Detrás de escena
 		var packed_item = load(scene_path) as PackedScene
@@ -519,15 +545,6 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 		
 		if not is_instance_valid(item_instance):
 			push_error("[%s] El Director devolvió un nodo nulo para el ItemID %d" % [ES_NAME_CLASS, item_id])
-			continue
-			
-		# 5. CONFIGURACIÓN DE ESCALA Y POSICIÓN (Delegada al StageItemManager)
-		# Le pasamos el modo/slot que venía en el manifiesto para que sepa qué coordenada usar
-		var placement = StageItemManager.get_item_placement(room_id, item_id, item_variant_mode)
-		
-		# Si las coordenadas estáticas dicen que no debe verse, lo limpiamos de inmediato
-		if not placement.get("is_visible", true):
-			item_instance.queue_free()
 			continue
 			
 		# Forzamos los valores físicos espaciales antes de volverlo interactuable

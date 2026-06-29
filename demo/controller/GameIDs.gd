@@ -20,7 +20,8 @@ const ItemID = {
 	"BACKPACK_ICON" : 1,
 	"NOTEBOOK"      : 2,
 	"DOOR_SPRITE"   : 4,
-	"HOUSE_SPRITE"  : 5
+	"HOUSE_SPRITE"  : 5,
+	"TOUCH_INDICATOR": 6
 }
 
 # ==============================================================================

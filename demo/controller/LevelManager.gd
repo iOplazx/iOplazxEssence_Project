@@ -60,7 +60,7 @@ static func _handle_internal_room_modes(room: int, mode: int, config: Dictionary
 	
 	match room:
 		GameIDs.RoomID.INITIAL_ROOM:
-			config["interaction_mode"] = 1
+			config["interaction_mode"] = mode
 		GameIDs.RoomID.ROOM_3_DOORS:
 			config["interaction_mode"] = 1 if mode == 1 else 2
 		GameIDs.RoomID.ROOM_1_DOOR, GameIDs.RoomID.PARK:

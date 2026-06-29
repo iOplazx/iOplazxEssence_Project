@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="2_36fp0"]
 [ext_resource type="PackedScene" uid="uid://buacpdfefp8fr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/TemplateGameplayDirector.tscn" id="3_aw23q"]
 [ext_resource type="PackedScene" uid="uid://7lbtoybnlsus" path="res://addons/iOplazxEssence/modules/base/ui/EssenceTutorialPanelUI.tscn" id="4_faggg"]
+[ext_resource type="Texture2D" uid="uid://clv7aarbj07d2" path="res://addons/iOplazxEssence/resources/images/icon/iconTouch.png" id="5_36fp0"]
 
 [node name="TestMainGame" type="Control" unique_id=153983025 node_paths=PackedStringArray("background_layer", "btn_return", "btn_save", "btn_load", "tutorial_panel", "ui_principal")]
 layout_mode = 3
@@ -113,5 +114,11 @@ text = "Quick Load"
 [node name="btnReturn" type="Button" parent="PanelControles/HBoxContainer" unique_id=1276848986]
 layout_mode = 2
 text = "Return Main Menu"
+
+[node name="spite_test" type="Sprite2D" parent="." unique_id=1011467131]
+visible = false
+position = Vector2(672, 398)
+scale = Vector2(0.5390625, 0.53125)
+texture = ExtResource("5_36fp0")
 
 [editable path="GameplayDirector"]
