@@ -486,7 +486,6 @@ func _apply_interaction_state(matrix_mode: int) -> void:
 		1, 2:
 			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 			
-
 ## CENTRAL AUTOMATION: Builds and validates all interactive elements declared in the room
 ## [param room_id]: The ID of the current scene (GameIDs.RoomID)
 ## [param current_layout_mode]: The current sub-mode or variant of the room (0, 1, 2, etc.)
@@ -494,50 +493,39 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 	# 1. CONSULTA: Obtenemos el arreglo de ítems que este escenario "desea" tener por diseño
 	var raw_items_list: Array = StageItemManager.ROOM_ITEM_MANIFESTO.get(room_id, [])
 	
-	#print("[Spawner] Revisando manifiesto para cuarto %d. Encontrados %d items." % [room_id, raw_items_list.size()])
-	
 	if raw_items_list.is_empty():
 		return # Habitación pasiva o puramente estática, nada que spawnear por código.
 		
 	# 2. PROCESAMIENTO Y FILTRADO POR CADA ELEMENTO
 	for item_data in raw_items_list:
 		var item_id: int = item_data["item_id"]
-		var item_variant_mode: int = item_data["mode"] 
 		var destination: int = item_data["destination"]
 		
-		# 🚨 MEJORA 1: FILTRO DE SINCRONIZACIÓN DE MODO
-		# Si el modo del ítem en el manifiesto no coincide con el modo actual de la habitación,
-		# lo ignoramos olímpicamente. Así la puerta (Modo 2) no nacerá en el Modo 1.
-		if item_variant_mode != current_layout_mode:
+		# 🚨 MEJORA 1 y 2 UNIFICADAS: OPTIMIZACIÓN Y PARSEO DE CONDICIONES
+		# Le enviamos el diccionario completo al mánager. Él internamente aplicará el enum 
+		# de operadores relacionales (EQUAL, GREATER_EQUAL, etc.) y cargará el preset si existe.
+		var placement: Dictionary = StageItemManager.get_item_placement(item_data, current_layout_mode)
+		
+		# Si las reglas de la historia no se cumplen, o el objeto no es visible, pasamos de largo
+		# SIN gastar memoria cargando ni instanciando recursos `.tscn`.
+		if not placement.get("is_visible", false):
 			continue
 		
-		# 🚨 FILTRO DE CONDICIONES (HOOK DE HISTORIA)
+		# 🚨 FILTRO DE CONDICIONES ADICIONALES (HOOK DE HISTORIA OPCIONAL)
 		if not _should_allow_item_spawn(room_id, item_id, current_layout_mode):
-			print("[%s/Spawner] Objeto ID %d RECHAZADO por condiciones del entorno (Modo: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
+			print("[%s/Spawner] Objeto ID %d RECHAZADO por condiciones adicionales del entorno (Modo: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
 			continue
 			
 		# 3. IDENTIFICACIÓN DE RUTA DE ASSET (.TSCN)
-		# Buscamos la escena física correspondiente en tu script centralizado de paths
 		var scene_path: String = ""
 		match item_id:
-			#GameIDs.ItemID.PHONE_ICON:    scene_path = DemoItemsRoute.ITEMPHONE_SCENE
-			#GameIDs.ItemID.BACKPACK_ICON: scene_path = DemoItemsRoute.ITEMBACKPACK_SCENE
-			#GameIDs.ItemID.NOTEBOOK:      scene_path = DemoItemsRoute.ITEMNOTEBOOK_SCENE
-			GameIDs.ItemID.DOOR_SPRITE:   scene_path = DemoItemsRoute.ITEMDOOR_SCENE
-			GameIDs.ItemID.HOUSE_SPRITE:  scene_path = DemoItemsRoute.ITEMHOUSE_SCENE # Tu casita del parque
-			GameIDs.ItemID.TOUCH_INDICATOR: scene_path = DemoItemsRoute.ITEMTOUCH_SCENE
+			GameIDs.ItemID.DOOR_SPRITE:      scene_path = DemoItemsRoute.ITEMDOOR_SCENE
+			GameIDs.ItemID.HOUSE_SPRITE:     scene_path = DemoItemsRoute.ITEMHOUSE_SCENE 
+			GameIDs.ItemID.TOUCH_INDICATOR:  scene_path = DemoItemsRoute.ITEMTOUCH_SCENE
 			
 		if scene_path == "" or not ResourceLoader.exists(scene_path):
 			push_error("[%s] Error crítico: No se encontró escena .tscn para el ItemID %d" % [ES_NAME_CLASS, item_id])
 			continue
-			
-		# 🚨 MEJORA 2: OPTIMIZACIÓN DE MEMORIA (PRE-CHECK DE VISIBILIDAD)
-		# En tu código viejo cargabas el archivo e instanciabas el nodo en memoria con el Director,
-		# para luego destruirlo inmediatamente con queue_free() si placement["is_visible"] era false.
-		# ¡Es mejor preguntar las coordenadas ANTES de gastar RAM instanciando el nodo!
-		var placement = StageItemManager.get_item_placement(room_id, item_id, item_variant_mode)
-		if not placement.get("is_visible", true):
-			continue # Si por coordenadas no debe verse, pasamos de largo sin crear nada.
 			
 		# 4. INSTANCIACIÓN Detrás de escena
 		var packed_item = load(scene_path) as PackedScene
@@ -547,7 +535,8 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 			push_error("[%s] El Director devolvió un nodo nulo para el ItemID %d" % [ES_NAME_CLASS, item_id])
 			continue
 			
-		# Forzamos los valores físicos espaciales antes de volverlo interactuable
+		# 5. TRANSFORMACIÓN FÍSICA
+		# Forzamos los valores físicos espaciales calculados automáticamente por presets o manuales
 		item_instance.position = placement["position"]
 		item_instance.scale = placement["scale"]
 		
@@ -568,12 +557,11 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 				# ACCIÓN DE VIAJE: Si el ítem amarra un destino, lo conectamos al flujo de la cortina negra
 				target_area.input_event.connect(_on_dynamic_door_clicked.bind(destination))
 			else:
-				# ACCIÓN DE UTILIDAD: Si es un ítem de interfaz (Celular, Mochila), detonará otra lógica en tu juego
-				# target_area.input_event.connect(_on_utility_interactable_clicked.bind(item_id))
+				# ACCIÓN DE UTILIDAD: Si no tiene destino (como el Touch Indicator), pasa limpiamente
 				pass
 		else:
 			push_warning("[%s] El item %d no posee un Area2D. Se instanció como elemento puramente visual." % [ES_NAME_CLASS, item_id])
-
+			
 ## INTERNAL VALIDATOR: Decides whether an item is eligible to enter based on the current rules
 func _should_allow_item_spawn(_room_id: int, _item_id: int, current_mode: int) -> bool:
 	# Rule filter example: If it's night mode (Mode 3), we could block non-bed items here

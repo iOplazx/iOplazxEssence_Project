@@ -2,103 +2,123 @@ class_name StageItemManager
 extends RefCounted
 
 # ==============================================================================
-# 📋 MANIFIESTO DE ESCENARIOS (Qué ítems existen en cada habitación)
+# 🎯 ENUM DE PRESETS VISUALES (Ubicaciones reutilizables)
 # ==============================================================================
-# Cambiamos las claves numéricas crudas por las constantes tipadas del archivo central.
+enum LayoutPreset {
+	NONE,         # 🚨 Útil para objetos únicos que pondrán sus coordenadas a mano
+	DOOR_LEFT,
+	DOOR_RIGHT,
+	DOOR_CENTER,
+	HUD_PHONE,
+	HUD_BACKPACK,
+	HUD_NOTEBOOK
+}
+
+# Geometría física mapeada directamente a los enums
+const LAYOUT_GEOMETRY = {
+	LayoutPreset.DOOR_LEFT:   {"position": Vector2(48, 593), "scale": Vector2(0.2, 0.2)},
+	LayoutPreset.DOOR_RIGHT:  {"position": Vector2(1223, 593), "scale": Vector2(0.2, 0.2)},
+	LayoutPreset.DOOR_CENTER: {"position": Vector2(640, 593), "scale": Vector2(0.2, 0.2)},
+	LayoutPreset.HUD_PHONE:    {"position": Vector2(1150, 80), "scale": Vector2(0.6, 0.6)},
+	LayoutPreset.HUD_BACKPACK: {"position": Vector2(1150, 200), "scale": Vector2(0.6, 0.6)},
+	LayoutPreset.HUD_NOTEBOOK: {"position": Vector2(80, 80), "scale": Vector2(0.5, 0.5)}
+}
+
+# ==============================================================================
+# 📋 MANIFIESTO ÚNICO (Con expresiones de modo, Enums e IDs Únicos)
+# ==============================================================================
 const ROOM_ITEM_MANIFESTO = {
 	GameIDs.RoomID.INITIAL_ROOM: [
-		#{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
-		#{"item_id": GameIDs.ItemID.NOTEBOOK, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 2, "destination": GameIDs.RoomID.ROOM_3_DOORS},
-		{"item_id": GameIDs.ItemID.TOUCH_INDICATOR, "mode": 1, "destination": -1}
+		{
+			"instance_id": 100,
+			"item_id": GameIDs.ItemID.TOUCH_INDICATOR,
+			"operator": GameIDs.StageCondition.EQUAL,
+			"stage_value": 1,
+			# 🚨 OBJETO ÚNICO: No usa preset, metemos sus coordenadas exclusivas aquí
+			"layout_preset": LayoutPreset.NONE, 
+			"position": Vector2(672, 398),
+			"scale": Vector2(0.54, 0.54),
+			"destination": -1
+		},
+		{
+			"instance_id": 101,
+			"item_id": GameIDs.ItemID.DOOR_SPRITE,
+			"operator": GameIDs.StageCondition.GREATER_EQUAL,
+			"stage_value": 2,
+			"layout_preset": LayoutPreset.DOOR_LEFT, # 🚨 Uso limpio del Enum
+			"destination": GameIDs.RoomID.ROOM_3_DOORS
+		}
 	],
+	
 	GameIDs.RoomID.ROOM_3_DOORS: [
-		#{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_1_DOOR}, # Puerta Izq
-		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 1, "destination": GameIDs.RoomID.INITIAL_ROOM} # Puerta Der
+		{"instance_id": 200, "item_id": GameIDs.ItemID.DOOR_SPRITE, "operator": GameIDs.StageCondition.GREATER_EQUAL, "stage_value": 1, "layout_preset": LayoutPreset.DOOR_LEFT, "destination": GameIDs.RoomID.ROOM_1_DOOR},
+		{"instance_id": 201, "item_id": GameIDs.ItemID.DOOR_SPRITE, "operator": GameIDs.StageCondition.GREATER_EQUAL, "stage_value": 1, "layout_preset": LayoutPreset.DOOR_RIGHT, "destination": GameIDs.RoomID.INITIAL_ROOM},
+		{"instance_id": 202, "item_id": GameIDs.ItemID.DOOR_SPRITE, "operator": GameIDs.StageCondition.GREATER_EQUAL, "stage_value": 1, "layout_preset": LayoutPreset.DOOR_CENTER, "destination": GameIDs.RoomID.PARK}
 	],
-	GameIDs.RoomID.ROOM_1_DOOR: [
-		#{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
-		#{"item_id": GameIDs.ItemID.BACKPACK_ICON, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.DOOR_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS}
-	],
+	
 	GameIDs.RoomID.PARK: [
-		#{"item_id": GameIDs.ItemID.PHONE_ICON, "mode": 0, "destination": -1},
-		{"item_id": GameIDs.ItemID.HOUSE_SPRITE, "mode": 0, "destination": GameIDs.RoomID.ROOM_3_DOORS} # Casita de regreso
-		
+		{
+			"instance_id": 300,
+			"item_id": GameIDs.ItemID.HOUSE_SPRITE,
+			"operator": GameIDs.StageCondition.EQUAL,
+			"stage_value": 1,
+			# 🚨 OTRO OBJETO ÚNICO: Al parque no le creamos preset, lo posicionamos directo
+			"layout_preset": LayoutPreset.NONE,
+			"position": Vector2(250, 480),
+			"scale": Vector2(1.0, 1.0),
+			"destination": GameIDs.RoomID.ROOM_3_DOORS
+		}
 	]
 }
 
 # ==============================================================================
-# 🎯 TABLA DE POSICIONES GLOBALES (VALORES FIJOS POR DEFECTO)
+# 📐 CALCULADOR DE POSICIÓN
 # ==============================================================================
-const GLOBAL_DEFAULTS = {
-	0: {"position": Vector2(1150, 80), "scale": Vector2(0.6, 0.6), "is_visible": true},  # PHONE_ICON
-	1: {"position": Vector2(1150, 200), "scale": Vector2(0.6, 0.6), "is_visible": true}, # BACKPACK_ICON
-	2: {"position": Vector2(80, 80), "scale": Vector2(0.5, 0.5), "is_visible": true}     # NOTEBOOK
-}
-
-## Returns layout configuration, prioritizing room overrides, falling back to global defaults.
-static func get_item_placement(room_id: int, item_id: int, mode: int) -> Dictionary:
+static func get_item_placement(item_data: Dictionary, current_room_mode: int) -> Dictionary:
 	var config: Dictionary = {
 		"position": Vector2.ZERO,
 		"scale": Vector2.ONE,
-		"is_visible": true #invisble = destroy
+		"is_visible": false
 	}
 	
-	if GLOBAL_DEFAULTS.has(item_id):
-		config = GLOBAL_DEFAULTS[item_id].duplicate()
+	# 1. ENVIAMOS LOS DOS PARAMETROS AL VALIDADOR INTERNO
+	var op: int = item_data.get("operator", GameIDs.StageCondition.EQUAL)
+	var target_val: int = item_data.get("stage_value", 1)
+	
+	if not _evaluate_operator_condition(current_room_mode, op, target_val):
+		config["is_visible"] = false
+		return config
+
+	# 2. CARGA DE PRESET
+	var preset = item_data.get("layout_preset", LayoutPreset.NONE)
+	if preset != LayoutPreset.NONE and LAYOUT_GEOMETRY.has(preset):
+		config["position"] = LAYOUT_GEOMETRY[preset]["position"]
+		config["scale"] = LAYOUT_GEOMETRY[preset]["scale"]
+		config["is_visible"] = true
+			
+	# 3. OVERRIDE MANUAL
+	if item_data.has("position"):
+		config["position"] = item_data["position"]
+		config["scale"] = item_data.get("scale", Vector2.ONE)
+		config["is_visible"] = true
 		
-	match room_id:
-		GameIDs.RoomID.INITIAL_ROOM:
-			match item_id:
-				GameIDs.ItemID.PHONE_ICON:
-					if mode == 1:
-						config["position"] = Vector2(640, 360)
-						config["scale"] = Vector2(1.0, 1.0)
-				GameIDs.ItemID.DOOR_SPRITE:			
-					if mode == 2: # La puerta ahora pertenece legalmente al Modo 2
-						config["position"] = Vector2(48, 593)
-						config["scale"] = Vector2(0.2, 0.2)
-						config["is_visible"] = true
-					else:
-						config["is_visible"] = false
-				GameIDs.ItemID.TOUCH_INDICATOR:
-					if mode == 1:
-						config["position"] = Vector2(672, 398) # Flotando arriba de la cabeza del actor
-						config["scale"] = Vector2(0.54, 0.54)
-					else:
-						# PROTECCIÓN CRUCIAL: Si nos consultan en cualquier otro modo, 
-						# apagamos la visibilidad para que el Spawner lo elimine de memoria de inmediato.
-						config["is_visible"] = false
-							
-		GameIDs.RoomID.ROOM_3_DOORS:
-			match item_id:
-				GameIDs.ItemID.BACKPACK_ICON:
-					if mode == 2: 
-						config["is_visible"] = false
-				GameIDs.ItemID.DOOR_SPRITE:
-					match mode:
-						0:
-							config["position"] = Vector2(48, 593)
-							config["scale"] = Vector2(0.2, 0.2)
-						1: 
-							config["position"] = Vector2(1223, 593)
-							config["scale"] = Vector2(0.2, 0.2)
-						2: 
-							config["position"] = Vector2(640, 593)
-							config["scale"] = Vector2(0.2, 0.2)
-
-		GameIDs.RoomID.ROOM_1_DOOR:
-			match item_id:
-				GameIDs.ItemID.DOOR_SPRITE:			
-					config["position"] = Vector2(1223, 593)
-					config["scale"] = Vector2(0.2, 0.2)
-
-		GameIDs.RoomID.PARK:
-			match item_id:
-				GameIDs.ItemID.HOUSE_SPRITE:
-					config["position"] = Vector2(250, 480)
-					config["scale"] = Vector2(1.0, 1.0)
-							
 	return config
+	
+# ===================================================================================
+# ⚙️ THE NEW TWO-PARAMETER METHOD (Zero Strings, Pure Enum Logic)
+# ==================================================================================
+## Compares the current mode of the room against the target value using the enum operator.
+static func _evaluate_operator_condition(current_mode: int, operator: int, target_value: int) -> bool:
+	match operator:
+		GameIDs.StageCondition.EQUAL:
+			return current_mode == target_value
+		GameIDs.StageCondition.GREATER:
+			return current_mode > target_value
+		GameIDs.StageCondition.GREATER_EQUAL:
+			return current_mode >= target_value
+		GameIDs.StageCondition.LESS:
+			return current_mode < target_value
+		GameIDs.StageCondition.LESS_EQUAL:
+			return current_mode <= target_value
+			
+	return false # Por seguridad si mandan un enum roto

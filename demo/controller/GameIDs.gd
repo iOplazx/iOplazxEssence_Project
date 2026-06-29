@@ -31,3 +31,12 @@ const ActorID = {
 	"PROTAGONIST" : 0,
 	"SECONDARY"   : 1
 }
+
+## Operadores lógicos para evaluar en qué momento de la historia vive el objeto
+enum StageCondition {
+	EQUAL,          # ==
+	GREATER,        # >
+	GREATER_EQUAL,  # >=
+	LESS,           # <
+	LESS_EQUAL      # <=
+}
