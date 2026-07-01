@@ -52,13 +52,16 @@ const ROOM_ITEM_MANIFESTO = {
 	
 	GameIDs.RoomID.ROOM_3_DOORS: [
 		{"instance_id": 200, "item_id": GameIDs.ItemID.DOOR_SPRITE, "operator": GameIDs.StageCondition.GREATER_EQUAL, "stage_value": 1, "layout_preset": LayoutPreset.DOOR_LEFT, "destination": GameIDs.RoomID.ROOM_1_DOOR},
-		{"instance_id": 201, "item_id": GameIDs.ItemID.DOOR_SPRITE, "operator": GameIDs.StageCondition.GREATER_EQUAL, "stage_value": 1, "layout_preset": LayoutPreset.DOOR_RIGHT, "destination": GameIDs.RoomID.INITIAL_ROOM},
-		{"instance_id": 202, "item_id": GameIDs.ItemID.DOOR_SPRITE, "operator": GameIDs.StageCondition.GREATER_EQUAL, "stage_value": 1, "layout_preset": LayoutPreset.DOOR_CENTER, "destination": GameIDs.RoomID.PARK}
+		{"instance_id": 201, "item_id": GameIDs.ItemID.DOOR_SPRITE, "operator": GameIDs.StageCondition.GREATER_EQUAL, "stage_value": 1, "layout_preset": LayoutPreset.DOOR_RIGHT, "destination": GameIDs.RoomID.INITIAL_ROOM}
+	],
+	
+	GameIDs.RoomID.ROOM_1_DOOR: [
+		{"instance_id": 300, "item_id": GameIDs.ItemID.DOOR_SPRITE, "operator": GameIDs.StageCondition.GREATER_EQUAL, "stage_value": 1, "layout_preset": LayoutPreset.DOOR_RIGHT, "destination": GameIDs.RoomID.ROOM_3_DOORS}
 	],
 	
 	GameIDs.RoomID.PARK: [
 		{
-			"instance_id": 300,
+			"instance_id": 400,
 			"item_id": GameIDs.ItemID.HOUSE_SPRITE,
 			"operator": GameIDs.StageCondition.EQUAL,
 			"stage_value": 1,
