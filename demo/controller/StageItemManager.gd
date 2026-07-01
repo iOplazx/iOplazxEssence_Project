@@ -5,7 +5,7 @@ extends RefCounted
 # 🎯 ENUM DE PRESETS VISUALES (Ubicaciones reutilizables)
 # ==============================================================================
 enum LayoutPreset {
-	NONE,         # 🚨 Útil para objetos únicos que pondrán sus coordenadas a mano
+	NONE,         # Útil para objetos únicos que pondrán sus coordenadas a mano
 	DOOR_LEFT,
 	DOOR_RIGHT,
 	DOOR_CENTER,
@@ -34,7 +34,7 @@ const ROOM_ITEM_MANIFESTO = {
 			"item_id": GameIDs.ItemID.TOUCH_INDICATOR,
 			"operator": GameIDs.StageCondition.EQUAL,
 			"stage_value": 1,
-			# 🚨 OBJETO ÚNICO: No usa preset, metemos sus coordenadas exclusivas aquí
+			# OBJETO ÚNICO: No usa preset, metemos sus coordenadas exclusivas aquí
 			"layout_preset": LayoutPreset.NONE, 
 			"position": Vector2(672, 398),
 			"scale": Vector2(0.54, 0.54),
@@ -45,7 +45,7 @@ const ROOM_ITEM_MANIFESTO = {
 			"item_id": GameIDs.ItemID.DOOR_SPRITE,
 			"operator": GameIDs.StageCondition.GREATER_EQUAL,
 			"stage_value": 2,
-			"layout_preset": LayoutPreset.DOOR_LEFT, # 🚨 Uso limpio del Enum
+			"layout_preset": LayoutPreset.DOOR_LEFT, # Uso limpio del Enum
 			"destination": GameIDs.RoomID.ROOM_3_DOORS
 		}
 	],
@@ -65,7 +65,7 @@ const ROOM_ITEM_MANIFESTO = {
 			"item_id": GameIDs.ItemID.HOUSE_SPRITE,
 			"operator": GameIDs.StageCondition.EQUAL,
 			"stage_value": 1,
-			# 🚨 OTRO OBJETO ÚNICO: Al parque no le creamos preset, lo posicionamos directo
+			# OTRO OBJETO ÚNICO: Al parque no le creamos preset, lo posicionamos directo
 			"layout_preset": LayoutPreset.NONE,
 			"position": Vector2(250, 480),
 			"scale": Vector2(1.0, 1.0),

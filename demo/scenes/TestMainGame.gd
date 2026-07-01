@@ -144,6 +144,10 @@ func _on_tutorial_finished() -> void:
 		
 		story_flags["is_first_time_here"] = false
 		
+		# DYNAMIC PROGRESSION LAYER
+		# We register that this specific room has successfully advanced to Modo 1
+		story_flags["room_mode_" + str(current_room_id)] = 1
+		
 		await get_tree().create_timer(0.6).timeout 
 		
 		_instanciar_actor_principal()
@@ -256,7 +260,7 @@ func _restaurar_partida_cargada() -> void:
 					await _on_ready_initialRoom(room_data, true)
 				GameIDs.RoomID.ROOM_3_DOORS:
 					await _on_ready_room3doors(room_data, true)
-				# 🚨 CONECTAMOS EL CASO PARA TU NUEVA HABITACIÓN:
+				# CONECTAMOS EL CASO PARA TU NUEVA HABITACIÓN:
 				GameIDs.RoomID.ROOM_1_DOOR:
 					print("[%s] Restaurador redirigiendo a la habitación de 1 puerta." % ES_NAME_CLASS)
 					await _on_ready_room1door(room_data, true) # Pasamos true en skip_animations
@@ -311,6 +315,10 @@ func _on_character_interacted() -> void:
 		# If the player hasn't triggered this event yet, we advance the layout state.
 		if not story_flags.get("has_touched_character", false):
 			story_flags["has_touched_character"] = true
+			
+			# DYNAMIC PROGRESSION LAYER
+			# We save that this room is now permanently in Modo 2 (Door unlocked and visible)
+			story_flags["room_mode_" + str(current_room_id)] = 2
 			
 			print("[%s] First-time interaction approved. Advancing Room to Modo 2..." % ES_NAME_CLASS)
 			
@@ -436,25 +444,31 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	if _check_room_interruptions(room_id):
 		return 
 		
-	# 2. NORMAL EXPLORATION FLOW
-	# Fetch the internal room configuration directly from the LevelManager.
-	var data = LevelManager.get_scenery_config(room_id, room_id, default_mode, true)
+	# 2. DYNAMIC MODE RESOLUTION (DATA-DRIVEN)
+	# Construct a generic key based on the current room ID (e.g., "room_mode_1")
+	var room_mode_key: String = "room_mode_" + str(room_id)
+	
+	# Fetch the saved mode for this room if it exists; otherwise, fall back to default_mode.
+	var final_mode: int = story_flags.get(room_mode_key, default_mode)
+	
+	# 3. NORMAL EXPLORATION FLOW
+	# Fetch the internal room configuration directly from the LevelManager using the resolved mode.
+	var data = LevelManager.get_scenery_config(room_id, room_id, final_mode, true)
 	if data["flag_error"]: 
 		return
 		
 	_apply_interaction_state(data["interaction_mode"])
 	
-	# 3. AUTOMATED STAGE CONSTRUCTION
+	# 4. AUTOMATED STAGE CONSTRUCTION
 	# The system reads the StageItemManager manifesto, processes filters, 
 	# and instantiates all floating buttons/interactables automatically.
 	_build_stage_interactables(room_id, data["interaction_mode"])
 	
-	# 4. EXCLUSIVE CHARACTER / ACTOR INITIALIZATION
-	# Hardcoded overrides are now strictly reserved for persistent narrative actors (like the protagonist).
-	match room_id:
-		GameIDs.RoomID.INITIAL_ROOM:
-			_instanciar_actor_principal(false) # TODO: Rename this method to English later if needed
-		
+	# 5. EXCLUSIVE CHARACTER / ACTOR INITIALIZATION
+	# Hardcoded overrides are now strictly reserved for persistent narrative actors.
+	if room_id == GameIDs.RoomID.INITIAL_ROOM:
+		_instanciar_actor_principal(false)
+
 ## Checks for pending story events in the given room.
 ## Returns TRUE if an event intercepted the flow, FALSE if the room is clear.
 func _check_room_interruptions(room_id: int) -> bool:
@@ -501,9 +515,6 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 		var item_id: int = item_data["item_id"]
 		var destination: int = item_data["destination"]
 		
-		# 🚨 MEJORA 1 y 2 UNIFICADAS: OPTIMIZACIÓN Y PARSEO DE CONDICIONES
-		# Le enviamos el diccionario completo al mánager. Él internamente aplicará el enum 
-		# de operadores relacionales (EQUAL, GREATER_EQUAL, etc.) y cargará el preset si existe.
 		var placement: Dictionary = StageItemManager.get_item_placement(item_data, current_layout_mode)
 		
 		# Si las reglas de la historia no se cumplen, o el objeto no es visible, pasamos de largo
@@ -511,7 +522,6 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 		if not placement.get("is_visible", false):
 			continue
 		
-		# 🚨 FILTRO DE CONDICIONES ADICIONALES (HOOK DE HISTORIA OPCIONAL)
 		if not _should_allow_item_spawn(room_id, item_id, current_layout_mode):
 			print("[%s/Spawner] Objeto ID %d RECHAZADO por condiciones adicionales del entorno (Modo: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
 			continue
