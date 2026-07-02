@@ -164,6 +164,12 @@ func _on_tutorial_finished() -> void:
 		if director:
 			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 			
+	# GAMEPLAY / SECOND TUTORIAL FLOW
+	elif current_phase == TestPhase.GAMEPLAY:
+		print("[%s] Second tutorial completed successfully by the player." % ES_NAME_CLASS)
+		# Save persistent flag so this tutorial never triggers again
+		story_flags["has_completed_touch_tutorial"] = true
+			
 ## Instantiates the main character and default room elements dynamically
 ## [param is_instant]: If true, skips spawn animations (perfect for loading saves)
 func _instanciar_actor_principal(is_instant: bool = false) -> void:
@@ -307,40 +313,39 @@ func _on_character_interacted() -> void:
 		return
 	
 	# 1. VALIDATION LAYER
-	# Ensure we are in the gameplay phase and the character is cleared for interactions.
 	if current_phase == TestPhase.GAMEPLAY and active_character.is_interactable:
+		# If the tutorial was already fully completed, do not trigger it again
+		if story_flags.get("has_completed_touch_tutorial", false):
+			print("[%s] Character clicked, but second tutorial is already completed." % ES_NAME_CLASS)
+			return
+			
 		print("[%s] Player interacted with character: %s" % [ES_NAME_CLASS, active_character.display_name])
 		
-		# 2. STATE CHECK (Check if this is the first interaction during Modo 2)
-		# If the player hasn't triggered this event yet, we advance the layout state.
+		# 2. STATE CHECK (First click transition to Mode 2)
 		if not story_flags.get("has_touched_character", false):
 			story_flags["has_touched_character"] = true
-			
-			# DYNAMIC PROGRESSION LAYER
-			# We save that this room is now permanently in Modo 2 (Door unlocked and visible)
 			story_flags["room_mode_" + str(current_room_id)] = 2
 			
 			print("[%s] First-time interaction approved. Advancing Room to Modo 2..." % ES_NAME_CLASS)
 			
-			# A. Request internal mode transition to Modo 3 (Exploration + Exit Enabled)
 			var data = LevelManager.get_scenery_config(current_room_id, current_room_id, 2, true)
-			
 			if not data["flag_error"]:
 				_apply_interaction_state(data["interaction_mode"])
-				
-				# B. Re-build stage layout: This wipes the Touch Indicator and spawns the Navigation Door
 				director.clear_item_stage()
 				_build_stage_interactables(current_room_id, data["interaction_mode"])
 		
-		# 3. INTERACTION FEEDBACK (UI Tutorial Panel)
-		# Trigger the next instruction set on the UI overlay
-		if tutorial_panel:
-			var interaction_messages: Array[String] = [
-				"Character Interaction Detected!",
-				"Try removing some of my clothes using the Inspector, or via code.",
-				"Then, save the game and load it to verify the Wardrobe System."
-			]
-			tutorial_panel.load_and_show_tutorial(interaction_messages)
+		# 3. INTERACTION FEEDBACK
+		_trigger_character_tutorial()
+
+## Launches the specific wardrobe and saving system tutorial overlay.
+func _trigger_character_tutorial() -> void:
+	if tutorial_panel:
+		var interaction_messages: Array[String] = [
+			"Character Interaction Detected!",
+			"Try removing some of my clothes using the Inspector, or via code.",
+			"Then, save the game and load it to verify the Wardrobe System."
+		]
+		tutorial_panel.load_and_show_tutorial(interaction_messages)
 			
 ## Instancia, posiciona y conecta al personaje. 
 ## [param is_instant]: Si es true, aparece de golpe (ideal para cargar partidas).
@@ -468,6 +473,12 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	# Hardcoded overrides are now strictly reserved for persistent narrative actors.
 	if room_id == GameIDs.RoomID.INITIAL_ROOM:
 		_instanciar_actor_principal(false)
+		
+		# 6. PENDING TUTORIAL RESTORATION
+		# If the room is loaded in Mode 2 but the tutorial wasn't finished, re-show it automatically.
+		if data["interaction_mode"] == 2 and not story_flags.get("has_completed_touch_tutorial", false):
+			print("[%s] Unfinished second tutorial detected. Re-triggering overlay..." % ES_NAME_CLASS)
+			_trigger_character_tutorial()
 
 ## Checks for pending story events in the given room.
 ## Returns TRUE if an event intercepted the flow, FALSE if the room is clear.
@@ -666,6 +677,8 @@ func _on_ready_initialRoom(data: Dictionary, skip_animations: bool = false) -> v
 ## Sets up the 3 doors room. If skip_animations is true, it builds instantly.
 func _on_ready_room3doors(data: Dictionary, skip_animations: bool = false) -> void:
 	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_3DOORS, DemoItemsRoute.TESTROOMDOOR_SCENE, skip_animations)
+	if tutorial_panel:
+		tutorial_panel.visible = false
 	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
 
 #########################
