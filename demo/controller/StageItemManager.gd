@@ -1,6 +1,10 @@
 class_name StageItemManager
 extends RefCounted
 
+const KEY_POSITION: String = "position"
+const KEY_SCALE: String = "scale"
+const KEY_IS_VISIBLE: String = "is_visible"
+
 # ==============================================================================
 # 🎯 ENUM DE PRESETS VISUALES (Ubicaciones reutilizables)
 # ==============================================================================
@@ -9,6 +13,7 @@ enum LayoutPreset {
 	DOOR_LEFT,
 	DOOR_RIGHT,
 	DOOR_CENTER,
+	HOUSE_RIGHT,
 	HUD_PHONE,
 	HUD_BACKPACK,
 	HUD_NOTEBOOK
@@ -16,12 +21,13 @@ enum LayoutPreset {
 
 # Geometría física mapeada directamente a los enums
 const LAYOUT_GEOMETRY = {
-	LayoutPreset.DOOR_LEFT:   {"position": Vector2(48, 593), "scale": Vector2(0.2, 0.2)},
-	LayoutPreset.DOOR_RIGHT:  {"position": Vector2(1223, 593), "scale": Vector2(0.2, 0.2)},
-	LayoutPreset.DOOR_CENTER: {"position": Vector2(640, 593), "scale": Vector2(0.2, 0.2)},
-	LayoutPreset.HUD_PHONE:    {"position": Vector2(1150, 80), "scale": Vector2(0.6, 0.6)},
-	LayoutPreset.HUD_BACKPACK: {"position": Vector2(1150, 200), "scale": Vector2(0.6, 0.6)},
-	LayoutPreset.HUD_NOTEBOOK: {"position": Vector2(80, 80), "scale": Vector2(0.5, 0.5)}
+	LayoutPreset.DOOR_LEFT:   {KEY_POSITION: Vector2(48, 593), KEY_SCALE: Vector2(0.2, 0.2)},
+	LayoutPreset.DOOR_RIGHT:  {KEY_POSITION: Vector2(1223, 593), KEY_SCALE: Vector2(0.2, 0.2)},
+	LayoutPreset.DOOR_CENTER: {KEY_POSITION: Vector2(640, 593), KEY_SCALE: Vector2(0.2, 0.2)},
+	LayoutPreset.HOUSE_RIGHT: {KEY_POSITION: Vector2(1209, 595), KEY_SCALE: Vector2(0.256, 0.256)},
+	LayoutPreset.HUD_PHONE:    {KEY_POSITION: Vector2(1150, 80), KEY_SCALE: Vector2(0.6, 0.6)},
+	LayoutPreset.HUD_BACKPACK: {KEY_POSITION: Vector2(1150, 200), KEY_SCALE: Vector2(0.6, 0.6)},
+	LayoutPreset.HUD_NOTEBOOK: {KEY_POSITION: Vector2(80, 80), KEY_SCALE: Vector2(0.5, 0.5)}
 }
 
 # ==============================================================================
@@ -36,8 +42,8 @@ const ROOM_ITEM_MANIFESTO = {
 			"stage_value": 1,
 			# OBJETO ÚNICO: No usa preset, metemos sus coordenadas exclusivas aquí
 			"layout_preset": LayoutPreset.NONE, 
-			"position": Vector2(672, 398),
-			"scale": Vector2(0.54, 0.54),
+			KEY_POSITION: Vector2(672, 398),
+			KEY_SCALE: Vector2(0.54, 0.54),
 			"destination": -1
 		},
 		{
@@ -65,10 +71,7 @@ const ROOM_ITEM_MANIFESTO = {
 			"item_id": GameIDs.ItemID.HOUSE_SPRITE,
 			"operator": GameIDs.StageCondition.EQUAL,
 			"stage_value": 1,
-			# OTRO OBJETO ÚNICO: Al parque no le creamos preset, lo posicionamos directo
-			"layout_preset": LayoutPreset.NONE,
-			"position": Vector2(250, 480),
-			"scale": Vector2(1.0, 1.0),
+			"layout_preset": LayoutPreset.DOOR_RIGHT,
 			"destination": GameIDs.RoomID.ROOM_3_DOORS
 		}
 	]
@@ -79,9 +82,9 @@ const ROOM_ITEM_MANIFESTO = {
 # ==============================================================================
 static func get_item_placement(item_data: Dictionary, current_room_mode: int) -> Dictionary:
 	var config: Dictionary = {
-		"position": Vector2.ZERO,
-		"scale": Vector2.ONE,
-		"is_visible": false
+		KEY_POSITION: Vector2.ZERO,
+		KEY_SCALE: Vector2.ONE,
+		KEY_IS_VISIBLE: false
 	}
 	
 	# 1. ENVIAMOS LOS DOS PARAMETROS AL VALIDADOR INTERNO
@@ -89,21 +92,21 @@ static func get_item_placement(item_data: Dictionary, current_room_mode: int) ->
 	var target_val: int = item_data.get("stage_value", 1)
 	
 	if not _evaluate_operator_condition(current_room_mode, op, target_val):
-		config["is_visible"] = false
+		config[KEY_IS_VISIBLE] = false
 		return config
 
 	# 2. CARGA DE PRESET
 	var preset = item_data.get("layout_preset", LayoutPreset.NONE)
 	if preset != LayoutPreset.NONE and LAYOUT_GEOMETRY.has(preset):
-		config["position"] = LAYOUT_GEOMETRY[preset]["position"]
-		config["scale"] = LAYOUT_GEOMETRY[preset]["scale"]
-		config["is_visible"] = true
+		config[KEY_POSITION] = LAYOUT_GEOMETRY[preset][KEY_POSITION]
+		config[KEY_SCALE] = LAYOUT_GEOMETRY[preset][KEY_SCALE]
+		config[KEY_IS_VISIBLE] = true
 			
 	# 3. OVERRIDE MANUAL
-	if item_data.has("position"):
-		config["position"] = item_data["position"]
-		config["scale"] = item_data.get("scale", Vector2.ONE)
-		config["is_visible"] = true
+	if item_data.has(KEY_POSITION):
+		config[KEY_POSITION] = item_data[KEY_POSITION]
+		config[KEY_SCALE] = item_data.get(KEY_SCALE, Vector2.ONE)
+		config[KEY_IS_VISIBLE] = true
 		
 	return config
 	

@@ -528,10 +528,13 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 		
 		var placement: Dictionary = StageItemManager.get_item_placement(item_data, current_layout_mode)
 		
-		# Si las reglas de la historia no se cumplen, o el objeto no es visible, pasamos de largo
-		# SIN gastar memoria cargando ni instanciando recursos `.tscn`.
-		if not placement.get("is_visible", false):
+		# 1. CORE PROPERTY PARSING
+		# Using strongly-typed constants ensures compile-time validation and speed.
+		if not placement.get(StageItemManager.KEY_IS_VISIBLE, false):
 			continue
+			
+		var spawn_position: Vector2 = placement.get(StageItemManager.KEY_POSITION, Vector2.ZERO)
+		var spawn_scale: Vector2 = placement.get(StageItemManager.KEY_SCALE, Vector2.ONE)
 		
 		if not _should_allow_item_spawn(room_id, item_id, current_layout_mode):
 			print("[%s/Spawner] Objeto ID %d RECHAZADO por condiciones adicionales del entorno (Modo: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
@@ -558,8 +561,8 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 			
 		# 5. TRANSFORMACIÓN FÍSICA
 		# Forzamos los valores físicos espaciales calculados automáticamente por presets o manuales
-		item_instance.position = placement["position"]
-		item_instance.scale = placement["scale"]
+		item_instance.position = spawn_position
+		item_instance.scale = spawn_scale
 		
 		# Guardamos la referencia para el recolector de basura al cambiar de habitación
 		spawned_items_in_room.append(item_instance)
@@ -696,6 +699,11 @@ func _on_ready_room1door(data: Dictionary, skip_animations: bool = false) -> voi
 func _on_ready_parkScene(data: Dictionary, skip_animations: bool = false) -> void:
 	await _build_room_base(data, EssencePaths.BACKGROUND_PARK, "", skip_animations)
 	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
+	
+# Inside your central Game Director / Main Game script when instantiating a room:
+func _register_room_signals(room_instance: EssenceNavigationRoom) -> void:
+	if not room_instance.navigation_requested.is_connected(_on_room_navigation_requested):
+		room_instance.navigation_requested.connect(_on_room_navigation_requested)
 
 ##############
 # Ejemplo

@@ -20,14 +20,22 @@ extends EssenceNavigationRoom
 #     └── ... (no uso)
 # ==
 
-## Sobrescribimos el clic para enviar los datos dinámicos correctos
+## Overrides the core hotspot interaction to route spatial navigation dynamically.
 func _on_hotspot_clicked(event: InputEvent, node: Area2D) -> void:
 	super._on_hotspot_clicked(event, node)
 	
-	if not environment_interactable: return
+	if not environment_interactable: 
+		return
 	
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		# Aquí interceptas qué nodo se tocó y mandas los 3 parámetros correspondientes
-		# Nota: Si usas '_spawn_navigation_door', el sistema ya le inyecta los destinos a los DynamicDoors,
-		# pero si tienes puertas estáticas, puedes mapearlas aquí mismo.
-		pass
+		# 1. NAVIGATION ROUTING
+		# Check if the clicked interactive element matches the specific door to the Park
+		if node.name == "ExampleDoor2":
+			print("[%s] Navigation triggered via ExampleDoor2. Target: PARK" % name)
+			
+			# 2. EMIT CORE NAVIGATION SIGNAL
+			# Parameters:
+			# - next_place: GameIDs.RoomID.PARK (The destination scene ID)
+			# - mode: 0 (Starts in Mode 0 as a clean slate / loading screen)
+			# - is_only_mode: false (It's a full room switch, not an internal layout change)
+			navigation_requested.emit(GameIDs.RoomID.PARK, 0, false)
