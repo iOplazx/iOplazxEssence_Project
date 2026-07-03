@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://bcvf50ewx78s8"]
 
+[ext_resource type="Script" uid="uid://xfhg3ixqj58d" path="res://addons/iOplazxEssence/scriptsItems/EssenceInteractableElement.gd" id="1_wg6q1"]
 [ext_resource type="Texture2D" uid="uid://ba3qksokc3fyv" path="res://addons/iOplazxEssence/resources/images/objects/item_house.png" id="1_whojl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ethqq"]
 size = Vector2(298.00018, 335.0002)
 
-[node name="ItemDoor" type="Area2D" unique_id=1115261331]
+[node name="ItemHouse" type="Area2D" unique_id=1115261331]
+script = ExtResource("1_wg6q1")
 
 [node name="ImgPuerta" type="Sprite2D" parent="." unique_id=1056738629]
 position = Vector2(-9.1552734e-05, -0.00024414063)

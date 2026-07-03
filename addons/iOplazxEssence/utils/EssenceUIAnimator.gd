@@ -162,3 +162,23 @@ static func _container_fallback(node: Control, anim_name: String, duration: floa
 	else:
 		print(msg)
 	return fade_in(node, duration)
+
+# ==========================================
+# INTERACTIVE CANVASITEM ANIMATIONS
+# ==========================================
+
+## Smoothly interpolates the scale of any CanvasItem (Node2D or Control).
+static func scale_to(node: CanvasItem, target_scale: Vector2, duration: float) -> Tween:
+	if not is_instance_valid(node): return null
+	
+	var tween = node.create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(node, "scale", target_scale, duration)
+	return tween
+
+## Smoothly interpolates the color modulation of any CanvasItem.
+static func modulate_to(node: CanvasItem, target_color: Color, duration: float) -> Tween:
+	if not is_instance_valid(node): return null
+	
+	var tween = node.create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(node, "modulate", target_color, duration)
+	return tween

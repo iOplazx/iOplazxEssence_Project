@@ -31,7 +31,7 @@ func _on_hotspot_clicked(event: InputEvent, node: Area2D) -> void:
 		# 1. NAVIGATION ROUTING
 		# Check if the clicked interactive element matches the specific door to the Park
 		if node.name == "ExampleDoor2":
-			print("[%s] Navigation triggered via ExampleDoor2. Target: PARK" % name)
+			#print("[%s] Navigation triggered via ExampleDoor2. Target: PARK" % name)
 			
 			# 2. EMIT CORE NAVIGATION SIGNAL
 			# Parameters:
