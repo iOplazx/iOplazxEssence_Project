@@ -42,7 +42,7 @@ const ROOM_ITEM_MANIFESTO = {
 			"stage_value": 1,
 			# OBJETO ÚNICO: No usa preset, metemos sus coordenadas exclusivas aquí
 			"layout_preset": LayoutPreset.NONE, 
-			KEY_POSITION: Vector2(672, 398),
+			KEY_POSITION: Vector2(641, 400),
 			KEY_SCALE: Vector2(0.54, 0.54),
 			"destination": -1
 		},

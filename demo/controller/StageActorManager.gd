@@ -27,7 +27,7 @@ enum Orientation_View {
 const _PROTAGONIST_INITIAL_DATA: Array = [
 	{
 		KEY_ACTOR_ID: GameIDs.ActorID.PROTAGONIST,
-		KEY_POSITION: Vector2(575, 180), # Put your newly verified feet position here
+		KEY_POSITION: Vector2(637, 893), 
 		KEY_SCALE: Vector2(0.5, 0.5),
 		KEY_ROTATION: 0,
 		KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
