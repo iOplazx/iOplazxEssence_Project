@@ -3,16 +3,19 @@
 [ext_resource type="Texture2D" uid="uid://dxxxtqn5kt12r" path="res://addons/iOplazxEssence/resources/images/background/background_generate_park.png" id="1_2vm2s"]
 [ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="1_pdi08"]
 [ext_resource type="Texture2D" uid="uid://ba3qksokc3fyv" path="res://addons/iOplazxEssence/resources/images/objects/item_house.png" id="2_xfmis"]
+[ext_resource type="PackedScene" uid="uid://d21xy7bwms1gu" path="res://demo/items/individual/ItemTouch.tscn" id="3_hfek6"]
 [ext_resource type="PackedScene" uid="uid://c2pv7r15ot7sa" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/GenericInteractiveCharacter.tscn" id="3_qvj7p"]
 [ext_resource type="PackedScene" uid="uid://x54s0atpf5hp" path="res://demo/items/individual/ItemDoor.tscn" id="4_hfek6"]
 [ext_resource type="Texture2D" uid="uid://b8ttw3wxra6f5" path="res://demo/non_own_resources/flutie8211-woman-8446935.png" id="5_7srvt"]
 [ext_resource type="Texture2D" uid="uid://cb0h8oadkyk8t" path="res://demo/non_own_resources/flutie8211-woman-9141199.png" id="6_8qgxj"]
 [ext_resource type="Texture2D" uid="uid://3t4a573upfxg" path="res://demo/non_own_resources/prawny-vintage-1892128.png" id="7_8qgxj"]
+[ext_resource type="PackedScene" uid="uid://bcvf50ewx78s8" path="res://demo/items/individual/ItemHouse.tscn" id="7_hfek6"]
 [ext_resource type="Texture2D" uid="uid://cdoakev0oxy15" path="res://demo/non_own_resources/thisisprabha-dog-7962236_convert_png.png" id="8_8p7q1"]
 
 [node name="TestViewElements" type="Node" unique_id=778837280]
 
 [node name="Node_initialRoom" type="Panel" parent="." unique_id=263414863]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -32,15 +35,18 @@ expand_mode = 1
 stretch_mode = 6
 
 [node name="CharacterRoot" parent="Node_initialRoom" unique_id=1680410021 instance=ExtResource("3_qvj7p")]
-position = Vector2(610, 897)
+position = Vector2(637, 893)
 scale = Vector2(0.5, 0.5)
 
-[node name="ItemDoor" parent="Node_initialRoom" unique_id=1115261331 instance=ExtResource("4_hfek6")]
+[node name="ItemTouch" parent="Node_initialRoom" unique_id=1115261331 instance=ExtResource("3_hfek6")]
+position = Vector2(641.00006, 400.00003)
+scale = Vector2(0.54, 0.54)
+
+[node name="ItemDoor" parent="Node_initialRoom" unique_id=171361550 instance=ExtResource("4_hfek6")]
 position = Vector2(1223, 593)
 scale = Vector2(0.2, 0.2)
 
 [node name="Node_Park" type="Panel" parent="." unique_id=1149338417]
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -60,9 +66,14 @@ expand_mode = 1
 stretch_mode = 6
 
 [node name="sprite_house" type="Sprite2D" parent="Node_Park" unique_id=571594556]
+visible = false
 position = Vector2(1198, 614)
 scale = Vector2(0.29376575, 0.3368125)
 texture = ExtResource("2_xfmis")
+
+[node name="ItemHouse" parent="Node_Park" unique_id=343310715 instance=ExtResource("7_hfek6")]
+position = Vector2(1217, 611.00006)
+scale = Vector2(0.294, 0.337)
 
 [node name="sprite_person_sit1" type="Sprite2D" parent="Node_Park" unique_id=1211194305]
 position = Vector2(286, 434)
@@ -84,3 +95,27 @@ texture = ExtResource("7_8qgxj")
 position = Vector2(780.00006, 470)
 scale = Vector2(0.043511625, 0.040406607)
 texture = ExtResource("8_8p7q1")
+
+[node name="ControlPanel_Example" type="Panel" parent="." unique_id=831380775]
+custom_minimum_size = Vector2(400, 50)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ControlPanel_Example" unique_id=881189752]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -282.0
+offset_top = -50.0
+offset_right = 282.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 6
+alignment = 1

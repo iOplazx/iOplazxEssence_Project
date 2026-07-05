@@ -24,7 +24,7 @@ const LAYOUT_GEOMETRY = {
 	LayoutPreset.DOOR_LEFT:   {KEY_POSITION: Vector2(48, 593), KEY_SCALE: Vector2(0.2, 0.2)},
 	LayoutPreset.DOOR_RIGHT:  {KEY_POSITION: Vector2(1223, 593), KEY_SCALE: Vector2(0.2, 0.2)},
 	LayoutPreset.DOOR_CENTER: {KEY_POSITION: Vector2(640, 593), KEY_SCALE: Vector2(0.2, 0.2)},
-	LayoutPreset.HOUSE_RIGHT: {KEY_POSITION: Vector2(1298, 614), KEY_SCALE: Vector2(0.294, 0.337)},
+	LayoutPreset.HOUSE_RIGHT: {KEY_POSITION: Vector2(1198, 614), KEY_SCALE: Vector2(0.294, 0.337)},
 	LayoutPreset.HUD_PHONE:    {KEY_POSITION: Vector2(1150, 80), KEY_SCALE: Vector2(0.6, 0.6)},
 	LayoutPreset.HUD_BACKPACK: {KEY_POSITION: Vector2(1150, 200), KEY_SCALE: Vector2(0.6, 0.6)},
 	LayoutPreset.HUD_NOTEBOOK: {KEY_POSITION: Vector2(80, 80), KEY_SCALE: Vector2(0.5, 0.5)}
@@ -71,7 +71,7 @@ const ROOM_ITEM_MANIFESTO = {
 			"item_id": GameIDs.ItemID.HOUSE_SPRITE,
 			"operator": GameIDs.StageCondition.EQUAL,
 			"stage_value": 1,
-			"layout_preset": LayoutPreset.DOOR_RIGHT,
+			"layout_preset": LayoutPreset.HOUSE_RIGHT,
 			"destination": GameIDs.RoomID.ROOM_3_DOORS
 		}
 	]
