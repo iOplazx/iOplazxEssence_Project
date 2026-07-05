@@ -2,7 +2,7 @@ class_name GameIDs
 extends RefCounted
 
 # ==============================================================================
-# 🚪 IDENTIFICADORES ÚNICOS DE ESCENARIOS
+# 🚪 UNIQUE SCENARIO IDENTIFIERS
 # ==============================================================================
 const RoomID = {
 	"INITIAL_ROOM" : 0,
@@ -12,8 +12,18 @@ const RoomID = {
 	"SAVE_SCENE"   : 29
 }
 
+# SCENARIO MODE IDENTIFIERS
+const RoomModeState= {
+	"DEFAULT_CINEMATIC": 0,
+	"INITIAL_ROOM_NORMAL": 1,
+	"INITIAL_ROOM_MODE_2": 2,
+	"ROOM_3_DOORS_NORMAL": 1,
+	"ROOM_1_DOORS_NORMAL" : 1,
+	"PARK_NORMAL": 1
+}
+
 # ==============================================================================
-# 🎯 IDENTIFICADORES ÚNICOS DE ÍTEMS INTERACTUABLES
+# 🎯 UNIQUE IDENTIFIERS OF INTERACTIVE ITEMS
 # ==============================================================================
 const ItemID = {
 	"PHONE_ICON"    : 0,
@@ -25,7 +35,7 @@ const ItemID = {
 }
 
 # ==============================================================================
-# 👥 IDENTIFICADORES ÚNICOS DE ACTORES / NPCS
+# 👥 UNIQUE ACTOR IDENTIFIERS / NPCS
 # ==============================================================================
 const ActorID = {
 	"PROTAGONIST" : 0,

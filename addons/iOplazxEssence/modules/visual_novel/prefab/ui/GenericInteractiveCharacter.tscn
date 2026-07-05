@@ -20,8 +20,10 @@ character_id = "chr01"
 display_name = "Main Character"
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1709483046]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = -181.0
+offset_top = -1484.0
+offset_right = 219.0
+offset_bottom = 80.0
 mouse_filter = 2
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=846808459]
@@ -31,7 +33,7 @@ size = Vector2i(400, 1500)
 render_target_update_mode = 4
 
 [node name="Visuals" type="Node2D" parent="SubViewportContainer/SubViewport" unique_id=1100217383]
-position = Vector2(170, 750)
+position = Vector2(170, 755)
 
 [node name="NormalPose" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals" unique_id=170860397]
 
@@ -64,7 +66,7 @@ texture = ExtResource("7_d7ygk")
 collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractArea" unique_id=201305753]
-position = Vector2(172, 734)
+position = Vector2(0, -747)
 shape = SubResource("CapsuleShape2D_y4k16")
 
 [connection signal="input_event" from="InteractArea" to="." method="_on_interact_area_input_event"]

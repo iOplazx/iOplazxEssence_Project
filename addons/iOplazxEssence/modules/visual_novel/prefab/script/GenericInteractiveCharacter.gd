@@ -1,5 +1,6 @@
 extends EssenceInteractiveActor
 class_name GenericInteractiveCharacter
+
 # ==
 # ESTRUCTURA DE LA ESCENA: GenericInteractiveCharacter (Base para Personajes)
 # ==
@@ -10,12 +11,14 @@ class_name GenericInteractiveCharacter
 # │   │       └── Pose_Normal (Node2D)         
 # │   │           ├── BaseBody (Sprite2D)     
 # │   │           └── Wardrobe (Node2D)        
-# │   │               ├── FemDibujoCamisa (Sprite2D)
-# │   │               └── FemDibujoPantalon (Sprite2D)
+# │   │               ├── GenericChrBelt (Sprite2D)
+# │   │               ├── GenericChrHat (Sprite2D)
+# │   │               └── ...
 # │   └── Effects (Node2D)                    
 # └── InteractArea (Area2D)                    
 #     └── CollisionShape2D
 # ==
+
 # ==========================================
 # NODOS Y EFECTOS ESPECÍFICOS DEL PERSONAJE
 # ==========================================

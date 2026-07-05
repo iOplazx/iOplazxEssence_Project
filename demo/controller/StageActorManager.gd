@@ -22,41 +22,27 @@ enum Orientation_View {
 	TO_DOWN
 }
 
+# 1. OPTIMIZATION LAYER: Define the shared layout data once in a local constant.
+# This prevents duplicating dictionaries in RAM for different modes.
+const _PROTAGONIST_INITIAL_DATA: Array = [
+	{
+		KEY_ACTOR_ID: GameIDs.ActorID.PROTAGONIST,
+		KEY_POSITION: Vector2(575, 180), # Put your newly verified feet position here
+		KEY_SCALE: Vector2(0.5, 0.5),
+		KEY_ROTATION: 0,
+		KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
+	}
+]
+
 ## Declarative database: Maps Room IDs to their respective Layout Modes and Actor blueprints.
 const ROOM_ACTOR_MANIFESTO: Dictionary = {
 	GameIDs.RoomID.INITIAL_ROOM: {
-		0: [ # Mode 0: Default Intro
-			{
-				KEY_ACTOR_ID: GameIDs.ActorID.PROTAGONIST,
-				KEY_POSITION: Vector2(575, 180),
-				KEY_SCALE: Vector2(0.5, 0.5),
-				KEY_ROTATION: 0,
-				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
-			}
-		],
-		1: [ # Mode 1: Post-Tutorial (Moved position)
-			{# quitar este ejemplo en el futuro
-				KEY_ACTOR_ID: GameIDs.ActorID.PROTAGONIST,
-				KEY_POSITION: Vector2(575, 180),
-				KEY_SCALE: Vector2(0.5, 0.5),
-				KEY_ROTATION: 0,
-				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
-			}
-		]
-	},
-	GameIDs.RoomID.ROOM_3_DOORS: {
-		0: [ # Mode 0: Default
-			{
-				KEY_ACTOR_ID: GameIDs.ActorID.PROTAGONIST,
-				KEY_POSITION: Vector2(640, 200),
-				KEY_SCALE: Vector2(0.6, 0.6),
-				KEY_ROTATION: 0,
-				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
-			}
-		]
+		# Both modes point to the exact same array reference in memory
+		GameIDs.RoomModeState.INITIAL_ROOM_NORMAL: _PROTAGONIST_INITIAL_DATA,
+		GameIDs.RoomModeState.INITIAL_ROOM_MODE_2: _PROTAGONIST_INITIAL_DATA
 	},
 	GameIDs.RoomID.PARK: {
-		0: [ # Mode 0: Default Park population
+		GameIDs.RoomModeState.PARK_NORMAL: [ 
 			{
 				KEY_ACTOR_ID: GameIDs.ActorID.PARK_PERSON_SIT_1,
 				KEY_POSITION: Vector2(286, 434),

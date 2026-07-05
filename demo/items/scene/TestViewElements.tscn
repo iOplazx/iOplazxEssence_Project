@@ -3,7 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://dxxxtqn5kt12r" path="res://addons/iOplazxEssence/resources/images/background/background_generate_park.png" id="1_2vm2s"]
 [ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="1_pdi08"]
 [ext_resource type="Texture2D" uid="uid://ba3qksokc3fyv" path="res://addons/iOplazxEssence/resources/images/objects/item_house.png" id="2_xfmis"]
-[ext_resource type="Texture2D" uid="uid://xv8v3b06d0dd" path="res://addons/iOplazxEssence/resources/images/objects/imgPuerta.png" id="4_pb135"]
+[ext_resource type="PackedScene" uid="uid://c2pv7r15ot7sa" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/GenericInteractiveCharacter.tscn" id="3_qvj7p"]
+[ext_resource type="PackedScene" uid="uid://x54s0atpf5hp" path="res://demo/items/individual/ItemDoor.tscn" id="4_hfek6"]
 [ext_resource type="Texture2D" uid="uid://b8ttw3wxra6f5" path="res://demo/non_own_resources/flutie8211-woman-8446935.png" id="5_7srvt"]
 [ext_resource type="Texture2D" uid="uid://cb0h8oadkyk8t" path="res://demo/non_own_resources/flutie8211-woman-9141199.png" id="6_8qgxj"]
 [ext_resource type="Texture2D" uid="uid://3t4a573upfxg" path="res://demo/non_own_resources/prawny-vintage-1892128.png" id="7_8qgxj"]
@@ -30,10 +31,13 @@ texture = ExtResource("1_pdi08")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="sprite_door" type="Sprite2D" parent="Node_initialRoom" unique_id=2007630902]
-position = Vector2(1200, 603)
+[node name="CharacterRoot" parent="Node_initialRoom" unique_id=1680410021 instance=ExtResource("3_qvj7p")]
+position = Vector2(610, 897)
+scale = Vector2(0.5, 0.5)
+
+[node name="ItemDoor" parent="Node_initialRoom" unique_id=1115261331 instance=ExtResource("4_hfek6")]
+position = Vector2(1223, 593)
 scale = Vector2(0.2, 0.2)
-texture = ExtResource("4_pb135")
 
 [node name="Node_Park" type="Panel" parent="." unique_id=1149338417]
 visible = false
