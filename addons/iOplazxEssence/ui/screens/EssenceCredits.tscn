@@ -25,7 +25,13 @@ game_credits = "Developer:
 DEVELOPER MAIN
 
 Music:
-Better Days - LAKEY INSPIRED"
+Better Days - LAKEY INSPIRED
+
+Other creators with free resources:
+[Images]
+flutie8211 - Pixabay
+Prawny - Pixabay
+thisisprabha - Pixabay"
 special_thanks = Array[String](["Acknowledgments to the Framework iOplazxEssence Engine "])
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1773158194]

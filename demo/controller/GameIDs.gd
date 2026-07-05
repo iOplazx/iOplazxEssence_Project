@@ -29,7 +29,11 @@ const ItemID = {
 # ==============================================================================
 const ActorID = {
 	"PROTAGONIST" : 0,
-	"SECONDARY"   : 1
+	"SECONDARY"   : 1,
+	"PARK_PERSON_SIT_1" : 100,
+	"PARK_PERSON_SIT_2" : 101,
+	"PARK_PERSON_SIT_3" : 102,
+	"PARK_DOG_1" : 103,
 }
 
 ## Operadores lógicos para evaluar en qué momento de la historia vive el objeto

@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://mq3dwbcvpss1"]
+
+[ext_resource type="Texture2D" uid="uid://dxxxtqn5kt12r" path="res://addons/iOplazxEssence/resources/images/background/background_generate_park.png" id="1_2vm2s"]
+[ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="1_pdi08"]
+[ext_resource type="Texture2D" uid="uid://ba3qksokc3fyv" path="res://addons/iOplazxEssence/resources/images/objects/item_house.png" id="2_xfmis"]
+[ext_resource type="Texture2D" uid="uid://xv8v3b06d0dd" path="res://addons/iOplazxEssence/resources/images/objects/imgPuerta.png" id="4_pb135"]
+[ext_resource type="Texture2D" uid="uid://b8ttw3wxra6f5" path="res://demo/non_own_resources/flutie8211-woman-8446935.png" id="5_7srvt"]
+[ext_resource type="Texture2D" uid="uid://cb0h8oadkyk8t" path="res://demo/non_own_resources/flutie8211-woman-9141199.png" id="6_8qgxj"]
+[ext_resource type="Texture2D" uid="uid://3t4a573upfxg" path="res://demo/non_own_resources/prawny-vintage-1892128.png" id="7_8qgxj"]
+[ext_resource type="Texture2D" uid="uid://cdoakev0oxy15" path="res://demo/non_own_resources/thisisprabha-dog-7962236_convert_png.png" id="8_8p7q1"]
+
+[node name="TestViewElements" type="Node" unique_id=778837280]
+
+[node name="Node_initialRoom" type="Panel" parent="." unique_id=263414863]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="testBgInitialRoom" type="TextureRect" parent="Node_initialRoom" unique_id=1979547169]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_pdi08")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="sprite_door" type="Sprite2D" parent="Node_initialRoom" unique_id=2007630902]
+position = Vector2(1200, 603)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("4_pb135")
+
+[node name="Node_Park" type="Panel" parent="." unique_id=1149338417]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="testBgPark" type="TextureRect" parent="Node_Park" unique_id=1995223992]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_2vm2s")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="sprite_house" type="Sprite2D" parent="Node_Park" unique_id=571594556]
+position = Vector2(1198, 614)
+scale = Vector2(0.29376575, 0.3368125)
+texture = ExtResource("2_xfmis")
+
+[node name="sprite_person_sit1" type="Sprite2D" parent="Node_Park" unique_id=1211194305]
+position = Vector2(286, 434)
+rotation = -0.2617994
+scale = Vector2(0.043237668, 0.044285715)
+texture = ExtResource("5_7srvt")
+
+[node name="sprite_person_sit2" type="Sprite2D" parent="Node_Park" unique_id=455032884]
+position = Vector2(981.99994, 363)
+scale = Vector2(0.01344104, 0.015705569)
+texture = ExtResource("6_8qgxj")
+
+[node name="sprite_person_sit3" type="Sprite2D" parent="Node_Park" unique_id=487794851]
+position = Vector2(75.00006, 471)
+scale = Vector2(0.043676473, 0.05231581)
+texture = ExtResource("7_8qgxj")
+
+[node name="sprite_dog_run" type="Sprite2D" parent="Node_Park" unique_id=441714136]
+position = Vector2(780.00006, 470)
+scale = Vector2(0.043511625, 0.040406607)
+texture = ExtResource("8_8p7q1")

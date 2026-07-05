@@ -55,7 +55,14 @@ var current_room_id: int = GameIDs.RoomID.INITIAL_ROOM
 # Diccionario de ejemplo para simular las condiciones de tu historia (Flags)
 var story_flags: Dictionary = {
 	"is_phone_event_active": false,   # La condición de tu ejemplo del teléfono
-	"is_first_time_here": true
+	"is_first_time_here": true,
+	
+	# PERSISTENT WARDROBE SYSTEM
+	# This holds the true state of the player's clothing across saves and room switches.
+	"player_wardrobe": {
+		"GenericChrHat": false,
+		"GenericChrSunglass": false
+	}
 }
 
 #####################################################
@@ -150,7 +157,7 @@ func _on_tutorial_finished() -> void:
 		
 		await get_tree().create_timer(0.6).timeout 
 		
-		_instanciar_actor_principal()
+		_initialize_main_character()
 		
 		var data = LevelManager.get_scenery_config(current_room_id, current_room_id, 1, true)
 		
@@ -176,10 +183,28 @@ func _instanciar_actor_principal(is_instant: bool = false) -> void:
 	# Invocamos al personaje usando la habitación en la que realmente estamos parado
 	_spawn_main_character(current_room_id, 0, is_instant)
 	
-	# Aplicamos los cambios de vestuario iniciales de Annie de forma segura
+	# Aplicamos los cambios de vestuario iniciales al actor por defecto de forma segura
 	if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
 		active_character.toggle_garment("GenericChrHat", false)
 		active_character.toggle_garment("GenericChrSunglass", false)
+
+## Instantiates the main character and applies saved wardrobe configurations dynamically.
+## [param is_instant]: If true, skips spawn animations (perfect for loading saves).
+func _initialize_main_character(is_instant: bool = false) -> void:
+	# 1. SPATIAL RESOLUTION
+	# Determine the real layout mode this room should adopt from the story state.
+	var current_layout_mode: int = story_flags.get("room_mode_" + str(current_room_id), 0)
+	_spawn_main_character(current_room_id, current_layout_mode, is_instant)
+	
+	# 2. PERSISTENT WARDROBE RESOLUTION
+	if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
+		# Fetch the global wardrobe registry safely from story data
+		var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
+		
+		# Iterate through all registered garments and inject their boolean status
+		for garment_id in wardrobe_data.keys():
+			var is_equipped: bool = wardrobe_data[garment_id]
+			active_character.toggle_garment(garment_id, is_equipped)
 	
 # ==========================================
 # BLINDAJE DE SEGURIDAD
@@ -472,7 +497,7 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	# 5. EXCLUSIVE CHARACTER / ACTOR INITIALIZATION
 	# Hardcoded overrides are now strictly reserved for persistent narrative actors.
 	if room_id == GameIDs.RoomID.INITIAL_ROOM:
-		_instanciar_actor_principal(false)
+		_initialize_main_character(false)
 		
 		# 6. PENDING TUTORIAL RESTORATION
 		# If the room is loaded in Mode 2 but the tutorial wasn't finished, re-show it automatically.
