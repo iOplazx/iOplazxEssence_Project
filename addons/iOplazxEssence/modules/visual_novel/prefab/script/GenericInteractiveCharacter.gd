@@ -25,10 +25,6 @@ class_name GenericInteractiveCharacter
 # (Nota: La ropa ya NO va aquí. La ropa la arrastras directo al array 
 # "Wardrobe Nodes" en el Inspector gracias a la clase padre).
 
-#@export_category("Unique Effects")
-#@export var marca_estado: Sprite2D
-#@export var fantasma_acechante: Sprite2D
-
 # ==========================================
 # INICIALIZACIÓN
 # ==========================================

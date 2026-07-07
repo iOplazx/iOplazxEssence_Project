@@ -489,7 +489,6 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 			continue
 			
 		# 5. DYNAMIC MEMORY LOADING VIA DIRECTOR
-		# We delegate instantiation to the Director to guarantee correct Z-indexing / layering
 		var actor_resource: PackedScene = load(scene_path) as PackedScene
 		var actor_instance: Node2D = director.add_actor_to_stage(actor_resource)
 		
@@ -502,44 +501,37 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 		actor_instance.scale = placement.get(StageActorManager.KEY_SCALE, Vector2.ONE)
 		actor_instance.rotation_degrees = placement.get(StageActorManager.KEY_ROTATION, 0.0)
 		
-		# 7. PROTAGONIST EXCLUSIVE PERSISTENT & ANIMATION LAYER
-		if actor_id == GameIDs.ActorID.PROTAGONIST:
-			active_character = actor_instance
-			
-			# Smart Input Binding: Connect the core click interaction signal safely
-			if actor_instance.has_signal("clicked_on_character"):
-				actor_instance.clicked_on_character.connect(_on_character_interacted)
-			
-			# Persistent Wardrobe Resolution
-			if actor_instance.has_method("toggle_garment"):
+		# 7. TYPE-SAFE SPECIALIZATION LAYER
+		# Reemplazamos la reflexión por texto por una evaluación de clases nativas en RAM
+		
+		if actor_instance is EssenceModularActor:
+			# Al verificar que es un actor modular, el compilador GARANTIZA que tiene 'toggle_garment'
+			if actor_id == GameIDs.ActorID.PROTAGONIST:
 				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
 				if wardrobe_data.is_empty():
-					# If no save data exists, force defaults off to prevent blueprint bleeding
 					actor_instance.toggle_garment("GenericChrHat", false)
 					actor_instance.toggle_garment("GenericChrSunglass", false)
 				else:
 					for garment_id in wardrobe_data.keys():
-						var is_equipped: bool = wardrobe_data[garment_id]
-						actor_instance.toggle_garment(garment_id, is_equipped)
+						actor_instance.toggle_garment(garment_id, wardrobe_data[garment_id])
+
+		if actor_instance is EssenceInteractiveActor:
+			# Al verificar que es un actor interactivo, el compilador GARANTIZA que tiene 'clicked_on_character'
+			if actor_id == GameIDs.ActorID.PROTAGONIST:
+				active_character = actor_instance
 			
-			# Visual appearance handling (Fade In vs Instant)
-			var container = actor_instance.get_node_or_null("SubViewportContainer")
-			if is_instant:
-				actor_instance.is_interactable = true
-				if container: 
-					container.modulate.a = 1.0
-			else:
-				actor_instance.is_interactable = false
-				if container:
-					container.modulate.a = 0.0
-					var fade = EssenceUIAnimator.fade_in_subviewport(container, 1.0)
-					if fade: 
-						await fade.finished
-				actor_instance.is_interactable = true
+			# Conexión limpia y directa sin strings mágicos intermedios
+			actor_instance.clicked_on_character.connect(_on_character_interacted)
 		
-		# 8. REGISTER TO LOCAL GARBAGE COLLECTOR
+		# 8. DELEGATED EXECUTION LAYER (Polymorphic Lifecycle Call)
+		# Replaces the massive manual fade block with a clean, type-safe enum call.
+		# This automatically applies smooth fades to NPCs and fade + click-locks to the protagonist.
+		var entry_mode: EssenceActor.TransitionType = EssenceActor.TransitionType.INSTANT if is_instant else EssenceActor.TransitionType.FADE
+		if actor_instance.has_method("enter_stage"):
+			actor_instance.enter_stage(entry_mode, 1.0)
+		
+		# 9. REGISTER TO LOCAL GARBAGE COLLECTOR
 		_spawned_actors_in_room.append(actor_instance)
-			
 		
 ## Evaluates global story flags to determine if a background actor is temporarily forbidden.
 func _should_allow_actor_spawn(room_id: int, actor_id: int, layout_mode: int) -> bool:
