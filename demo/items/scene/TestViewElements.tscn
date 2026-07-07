@@ -6,11 +6,11 @@
 [ext_resource type="PackedScene" uid="uid://d21xy7bwms1gu" path="res://demo/items/individual/ItemTouch.tscn" id="3_hfek6"]
 [ext_resource type="PackedScene" uid="uid://c2pv7r15ot7sa" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/GenericInteractiveCharacter.tscn" id="3_qvj7p"]
 [ext_resource type="PackedScene" uid="uid://x54s0atpf5hp" path="res://demo/items/individual/ItemDoor.tscn" id="4_hfek6"]
-[ext_resource type="Texture2D" uid="uid://b8ttw3wxra6f5" path="res://demo/non_own_resources/flutie8211-woman-8446935.png" id="5_7srvt"]
-[ext_resource type="Texture2D" uid="uid://cb0h8oadkyk8t" path="res://demo/non_own_resources/flutie8211-woman-9141199.png" id="6_8qgxj"]
-[ext_resource type="Texture2D" uid="uid://3t4a573upfxg" path="res://demo/non_own_resources/prawny-vintage-1892128.png" id="7_8qgxj"]
 [ext_resource type="PackedScene" uid="uid://bcvf50ewx78s8" path="res://demo/items/individual/ItemHouse.tscn" id="7_hfek6"]
-[ext_resource type="Texture2D" uid="uid://cdoakev0oxy15" path="res://demo/non_own_resources/thisisprabha-dog-7962236_convert_png.png" id="8_8p7q1"]
+[ext_resource type="PackedScene" uid="uid://b401fn7q0figc" path="res://demo/items/actors/ActorParkPersonSit1.tscn" id="8_hfek6"]
+[ext_resource type="PackedScene" uid="uid://c45ye0pk4eicu" path="res://demo/items/actors/ActorParkPersonSit2.tscn" id="9_hfek6"]
+[ext_resource type="PackedScene" uid="uid://diw2k3v4ecj6k" path="res://demo/items/actors/ActorParkPersonSit3.tscn" id="10_1oxh2"]
+[ext_resource type="PackedScene" uid="uid://qbkmsd2uknpl" path="res://demo/items/actors/ActorParkDogRun.tscn" id="11_yhaki"]
 
 [node name="TestViewElements" type="Node" unique_id=778837280]
 
@@ -75,26 +75,22 @@ texture = ExtResource("2_xfmis")
 position = Vector2(1217, 611.00006)
 scale = Vector2(0.294, 0.337)
 
-[node name="sprite_person_sit1" type="Sprite2D" parent="Node_Park" unique_id=1211194305]
-position = Vector2(286, 434)
-rotation = -0.2617994
-scale = Vector2(0.043237668, 0.044285715)
-texture = ExtResource("5_7srvt")
+[node name="ActorParkPersonSit1" parent="Node_Park" unique_id=1403296527 instance=ExtResource("8_hfek6")]
+position = Vector2(288.00003, 500)
+rotation = -0.19896753
+scale = Vector2(0.23, 0.23)
 
-[node name="sprite_person_sit2" type="Sprite2D" parent="Node_Park" unique_id=455032884]
-position = Vector2(981.99994, 363)
-scale = Vector2(0.01344104, 0.015705569)
-texture = ExtResource("6_8qgxj")
+[node name="ActorParkPersonSit2" parent="Node_Park" unique_id=805589566 instance=ExtResource("9_hfek6")]
+position = Vector2(988, 386)
+scale = Vector2(0.07, 0.07)
 
-[node name="sprite_person_sit3" type="Sprite2D" parent="Node_Park" unique_id=487794851]
-position = Vector2(75.00006, 471)
-scale = Vector2(0.043676473, 0.05231581)
-texture = ExtResource("7_8qgxj")
+[node name="ActorParkPersonSit3" parent="Node_Park" unique_id=1785036450 instance=ExtResource("10_1oxh2")]
+position = Vector2(83, 573)
+scale = Vector2(0.25, 0.25)
 
-[node name="sprite_dog_run" type="Sprite2D" parent="Node_Park" unique_id=441714136]
-position = Vector2(780.00006, 470)
-scale = Vector2(0.043511625, 0.040406607)
-texture = ExtResource("8_8p7q1")
+[node name="ActorParkDogRun" parent="Node_Park" unique_id=2039770915 instance=ExtResource("11_yhaki")]
+position = Vector2(802, 497)
+scale = Vector2(0.2, 0.2)
 
 [node name="ControlPanel_Example" type="Panel" parent="." unique_id=831380775]
 custom_minimum_size = Vector2(400, 50)
@@ -102,6 +98,7 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = -57.0
 grow_horizontal = 2
 grow_vertical = 0
 

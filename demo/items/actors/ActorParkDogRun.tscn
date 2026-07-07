@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://qbkmsd2uknpl"]
+
+[ext_resource type="Script" uid="uid://b15qk6il5k2ii" path="res://addons/iOplazxEssence/modules/visual_novel/character/EssenceActor.gd" id="1_q2y84"]
+[ext_resource type="Texture2D" uid="uid://cdoakev0oxy15" path="res://demo/non_own_resources/thisisprabha-dog-7962236_convert_png.png" id="2_q2y84"]
+
+[node name="ActorParkDogRun" type="Node2D" unique_id=1403296527]
+script = ExtResource("1_q2y84")
+character_id = "park_dog_run"
+display_name = "ParkDogRun"
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1107096158]
+offset_left = -212.0
+offset_top = -1506.0
+offset_right = 225.0
+offset_bottom = -6.0
+mouse_filter = 2
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1435796302]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(400, 1500)
+render_target_update_mode = 4
+
+[node name="BaseBody" type="Sprite2D" parent="SubViewportContainer/SubViewport" unique_id=2020979947]
+position = Vector2(213.00002, 1329)
+scale = Vector2(0.16, 0.22596492)
+texture = ExtResource("2_q2y84")

@@ -45,29 +45,29 @@ const ROOM_ACTOR_MANIFESTO: Dictionary = {
 		GameIDs.RoomModeState.PARK_NORMAL: [ 
 			{
 				KEY_ACTOR_ID: GameIDs.ActorID.PARK_PERSON_SIT_1,
-				KEY_POSITION: Vector2(286, 434),
-				KEY_SCALE: Vector2(0.043, 0.044),
-				KEY_ROTATION: -15,
+				KEY_POSITION: Vector2(288, 500),
+				KEY_SCALE: Vector2(0.23, 0.23),
+				KEY_ROTATION: -11.4, #-11.4°
 				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
 			},
 			{
 				KEY_ACTOR_ID: GameIDs.ActorID.PARK_PERSON_SIT_2,
-				KEY_POSITION: Vector2(982, 363),
-				KEY_SCALE: Vector2(0.043, 0.044),
+				KEY_POSITION: Vector2(988, 386),
+				KEY_SCALE: Vector2(0.07, 0.07),
 				KEY_ROTATION: 0,
 				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
 			},
 			{
 				KEY_ACTOR_ID: GameIDs.ActorID.PARK_PERSON_SIT_3,
-				KEY_POSITION: Vector2(75, 471),
-				KEY_SCALE: Vector2(0.044, 0.052),
+				KEY_POSITION: Vector2(83, 573),
+				KEY_SCALE: Vector2(0.25, 0.25),
 				KEY_ROTATION: 0,
 				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
 			},
 			{
 				KEY_ACTOR_ID: GameIDs.ActorID.PARK_DOG_1,
-				KEY_POSITION: Vector2(780, 470),
-				KEY_SCALE: Vector2(0.044, 0.04),
+				KEY_POSITION: Vector2(802, 497),
+				KEY_SCALE: Vector2(0.2, 0.2),
 				KEY_ROTATION: 0,
 				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
 			}

@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://c45ye0pk4eicu"]
+
+[ext_resource type="Texture2D" uid="uid://cb0h8oadkyk8t" path="res://demo/non_own_resources/flutie8211-woman-9141199.png" id="1_lia4x"]
+[ext_resource type="Script" uid="uid://b15qk6il5k2ii" path="res://addons/iOplazxEssence/modules/visual_novel/character/EssenceActor.gd" id="1_mxcxi"]
+
+[node name="ActorParkPersonSit2" type="Node2D" unique_id=1403296527]
+script = ExtResource("1_mxcxi")
+character_id = "park_person_sit_2"
+display_name = "ParkPersonSit2"
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1107096158]
+offset_left = -273.0
+offset_top = -1375.0
+offset_right = 164.0
+offset_bottom = 125.0
+mouse_filter = 2
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1435796302]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(400, 1500)
+render_target_update_mode = 4
+
+[node name="BaseBody" type="Sprite2D" parent="SubViewportContainer/SubViewport" unique_id=2020979947]
+position = Vector2(205, 1044)
+scale = Vector2(0.16, 0.22596492)
+texture = ExtResource("1_lia4x")

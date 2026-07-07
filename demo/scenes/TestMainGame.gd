@@ -77,6 +77,9 @@ var spawned_doors_in_room: Array[Node2D] = []
 ## Array to massively clean all floating elements when changing rooms
 var spawned_items_in_room: Array[Node2D] = []
 
+## Array to keep track of active background and secondary actors for clean garbage collection.
+var _spawned_actors_in_room: Array[Node2D] = []
+
 ######################################
 # SECTION (ALL SCENES IN THIS TSCN)  #
 ######################################
@@ -494,16 +497,93 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	# and instantiates all floating buttons/interactables automatically.
 	_build_stage_interactables(room_id, data["interaction_mode"])
 	
-	# 5. EXCLUSIVE CHARACTER / ACTOR INITIALIZATION
-	# Hardcoded overrides are now strictly reserved for persistent narrative actors.
+	# 5. AUTOMATED SECONDARY ACTORS CONSTRUCTION
+	# Automatically handles layout fillers like the park NPCs or dogs
+	_build_stage_actors(room_id, data["interaction_mode"])
+	
+	# 6. EXCLUSIVE CHARACTER / ACTOR INITIALIZATION
 	if room_id == GameIDs.RoomID.INITIAL_ROOM:
 		_initialize_main_character(false)
 		
-		# 6. PENDING TUTORIAL RESTORATION
-		# If the room is loaded in Mode 2 but the tutorial wasn't finished, re-show it automatically.
+		# 7. PENDING TUTORIAL RESTORATION
 		if data["interaction_mode"] == 2 and not story_flags.get("has_completed_touch_tutorial", false):
 			print("[%s] Unfinished second tutorial detected. Re-triggering overlay..." % ES_NAME_CLASS)
 			_trigger_character_tutorial()
+			
+## CENTRAL AUTOMATION: Instantiates and positions all secondary or background actors dynamically.
+## [param room_id]: The active Room ID from GameIDs.RoomID.
+## [param current_layout_mode]: The active interaction variant of the room.
+func _build_stage_actors(room_id: int, current_layout_mode: int) -> void:
+	# 1. CLEANUP LAYER: Safely queue_free previous secondary nodes to prevent memory leaks
+	for actor in _spawned_actors_in_room:
+		if is_instance_valid(actor):
+			actor.queue_free()
+	_spawned_actors_in_room.clear()
+	
+	# 2. MANIFESTO QUERY
+	var modes_dict: Dictionary = StageActorManager.ROOM_ACTOR_MANIFESTO.get(room_id, {})
+	var actors_to_spawn: Array = modes_dict.get(current_layout_mode, [])
+	
+	if actors_to_spawn.is_empty():
+		return
+		
+	# 3. AUTOMATED INSTANTIATION LOOP
+	for actor_data in actors_to_spawn:
+		var actor_id: int = actor_data.get(StageActorManager.KEY_ACTOR_ID, -1)
+		
+		# Skip the main character here, as it has its own specialized persistent initialization
+		if actor_id == GameIDs.ActorID.PROTAGONIST:
+			continue
+			
+		# Narrative filter verification (Allow unless forbidden check)
+		if not _should_allow_actor_spawn(room_id, actor_id, current_layout_mode):
+			continue
+			
+		# Fetch the precise physical transformation blueprint from the manager
+		var placement: Dictionary = StageActorManager.get_actor_placement(room_id, actor_id, current_layout_mode)
+		if not placement.get(StageActorManager.KEY_IS_VISIBLE, false):
+			continue
+			
+		# 4. IDENTIFICATION OF ASSET PATH (.TSCN)
+		# Inline match block mapping IDs directly to DemoItemsRoute constants
+		var scene_path: String = ""
+		match actor_id:
+			GameIDs.ActorID.PARK_PERSON_SIT_1: 
+				scene_path = DemoItemsRoute.ACTOR_PARK_PERSON_SIT_1_SCENE
+			GameIDs.ActorID.PARK_PERSON_SIT_2: 
+				scene_path = DemoItemsRoute.ACTOR_PARK_PERSON_SIT_2_SCENE
+			GameIDs.ActorID.PARK_PERSON_SIT_3: 
+				scene_path = DemoItemsRoute.ACTOR_PARK_PERSON_SIT_3_SCENE
+			GameIDs.ActorID.PARK_DOG_1:        
+				scene_path = DemoItemsRoute.ACTOR_PARK_DOG_RUN_SCENE
+				
+		if scene_path == "" or not ResourceLoader.exists(scene_path):
+			push_error("[%s] Error crítico: No se encontró escena .tscn para el ActorID %d" % [ES_NAME_CLASS, actor_id])
+			continue
+			
+		# 5. DYNAMIC MEMORY LOADING AND INSTANTIATION
+		var actor_resource: PackedScene = load(scene_path)
+		var actor_instance: Node2D = actor_resource.instantiate() as Node2D
+		if not actor_instance:
+			continue
+			
+		# 6. PHYSICAL TRANSFORMATIONS (Clean foot-pivot alignment)
+		actor_instance.position = placement.get(StageActorManager.KEY_POSITION, Vector2.ZERO)
+		actor_instance.scale = placement.get(StageActorManager.KEY_SCALE, Vector2.ONE)
+		actor_instance.rotation_degrees = placement.get(StageActorManager.KEY_ROTATION, 0.0)
+		
+		# 7. REGISTER AND ATTACH TO SCENE TREE
+		_spawned_actors_in_room.append(actor_instance)
+		add_child(actor_instance)
+		
+## Evaluates global story flags to determine if a background actor is temporarily forbidden.
+func _should_allow_actor_spawn(room_id: int, actor_id: int, layout_mode: int) -> bool:
+	# Example override: If a special story event empties the park, block all filler NPCs
+	if room_id == GameIDs.RoomID.PARK:
+		if story_flags.get("is_park_emptied_by_story", false):
+			return false # Forbidden to spawn
+			
+	return true # Allowed by default if declared in the manifesto
 
 ## Checks for pending story events in the given room.
 ## Returns TRUE if an event intercepted the flow, FALSE if the room is clear.
