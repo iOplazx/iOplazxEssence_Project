@@ -153,62 +153,27 @@ func _on_tutorial_finished() -> void:
 		current_phase = TestPhase.GAMEPLAY
 		
 		story_flags["is_first_time_here"] = false
-		
-		# DYNAMIC PROGRESSION LAYER
-		# We register that this specific room has successfully advanced to Modo 1
 		story_flags["room_mode_" + str(current_room_id)] = 1
 		
 		await get_tree().create_timer(0.6).timeout 
 		
-		_initialize_main_character()
-		
 		var data = LevelManager.get_scenery_config(current_room_id, current_room_id, 1, true)
 		
 		if not data["flag_error"]:
-			# Aplicamos las reglas del Modo 1 (Habilitar clicks globales en el escenario)
 			_apply_interaction_state(data["interaction_mode"])
-			
 			_build_stage_interactables(current_room_id, data["interaction_mode"])
 			
-		# 4. Le devolvemos el control físico del mouse y movimiento al jugador
+			# DYNAMIC ACTOR REFRESH
+			# Automatically spawns the protagonist in their Mode 1 physical position and garments
+			_build_stage_actors(current_room_id, data["interaction_mode"], false)
+			
 		if director:
 			director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 			
-	# GAMEPLAY / SECOND TUTORIAL FLOW
 	elif current_phase == TestPhase.GAMEPLAY:
 		print("[%s] Second tutorial completed successfully by the player." % ES_NAME_CLASS)
-		# Save persistent flag so this tutorial never triggers again
 		story_flags["has_completed_touch_tutorial"] = true
 			
-## Instantiates the main character and default room elements dynamically
-## [param is_instant]: If true, skips spawn animations (perfect for loading saves)
-func _instanciar_actor_principal(is_instant: bool = false) -> void:
-	# Invocamos al personaje usando la habitación en la que realmente estamos parado
-	_spawn_main_character(current_room_id, 0, is_instant)
-	
-	# Aplicamos los cambios de vestuario iniciales al actor por defecto de forma segura
-	if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
-		active_character.toggle_garment("GenericChrHat", false)
-		active_character.toggle_garment("GenericChrSunglass", false)
-
-## Instantiates the main character and applies saved wardrobe configurations dynamically.
-## [param is_instant]: If true, skips spawn animations (perfect for loading saves).
-func _initialize_main_character(is_instant: bool = false) -> void:
-	# 1. SPATIAL RESOLUTION
-	# Determine the real layout mode this room should adopt from the story state.
-	var current_layout_mode: int = story_flags.get("room_mode_" + str(current_room_id), 0)
-	_spawn_main_character(current_room_id, current_layout_mode, is_instant)
-	
-	# 2. PERSISTENT WARDROBE RESOLUTION
-	if is_instance_valid(active_character) and active_character.has_method("toggle_garment"):
-		# Fetch the global wardrobe registry safely from story data
-		var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
-		
-		# Iterate through all registered garments and inject their boolean status
-		for garment_id in wardrobe_data.keys():
-			var is_equipped: bool = wardrobe_data[garment_id]
-			active_character.toggle_garment(garment_id, is_equipped)
-	
 # ==========================================
 # BLINDAJE DE SEGURIDAD
 # ==========================================
@@ -375,35 +340,6 @@ func _trigger_character_tutorial() -> void:
 		]
 		tutorial_panel.load_and_show_tutorial(interaction_messages)
 			
-## Instancia, posiciona y conecta al personaje. 
-## [param is_instant]: Si es true, aparece de golpe (ideal para cargar partidas).
-func _spawn_main_character(room_id: int, mode: int, is_instant: bool = false) -> void:
-	if is_instance_valid(active_character): return # Ya está en escena
-	
-	var actor_scene = load(CHARACTER_ROOT_SCENE) as PackedScene
-	active_character = director.add_actor_to_stage(actor_scene)
-	
-	var placement = StageActorManager.get_actor_placement(room_id, GameIDs.ActorID.PROTAGONIST, mode)
-	
-	active_character.position = placement["position"]
-	active_character.scale = placement["scale"]
-	
-	active_character.clicked_on_character.connect(_on_character_interacted)
-	# ==========================================================
-	
-	# Manejo visual (Fade In vs Aparición instantánea)
-	var container = active_character.get_node_or_null("SubViewportContainer")
-	if is_instant:
-		active_character.is_interactable = true
-		if container: container.modulate.a = 1.0
-	else:
-		active_character.is_interactable = false
-		if container:
-			container.modulate.a = 0.0
-			var fade = EssenceUIAnimator.fade_in_subviewport(container, 1.0)
-			if fade: 
-				await fade.finished
-		active_character.is_interactable = true
 		
 ## Central listener that processes all navigation signals coming from inside the active rooms.
 ## [param next_place]: The RoomID destination.
@@ -499,22 +435,19 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	
 	# 5. AUTOMATED SECONDARY ACTORS CONSTRUCTION
 	# Automatically handles layout fillers like the park NPCs or dogs
-	_build_stage_actors(room_id, data["interaction_mode"])
+	_build_stage_actors(room_id, data["interaction_mode"], false)
 	
 	# 6. EXCLUSIVE CHARACTER / ACTOR INITIALIZATION
-	if room_id == GameIDs.RoomID.INITIAL_ROOM:
-		_initialize_main_character(false)
+	if data["interaction_mode"] == 2 and not story_flags.get("has_completed_touch_tutorial", false):
+		print("[%s] Unfinished second tutorial detected. Re-triggering overlay..." % ES_NAME_CLASS)
+		_trigger_character_tutorial()
 		
-		# 7. PENDING TUTORIAL RESTORATION
-		if data["interaction_mode"] == 2 and not story_flags.get("has_completed_touch_tutorial", false):
-			print("[%s] Unfinished second tutorial detected. Re-triggering overlay..." % ES_NAME_CLASS)
-			_trigger_character_tutorial()
-			
-## CENTRAL AUTOMATION: Instantiates and positions all secondary or background actors dynamically.
+## CENTRAL AUTOMATION: Instantiates and positions all actors dynamically via the Gameplay Director.
 ## [param room_id]: The active Room ID from GameIDs.RoomID.
 ## [param current_layout_mode]: The active interaction variant of the room.
-func _build_stage_actors(room_id: int, current_layout_mode: int) -> void:
-	# 1. CLEANUP LAYER: Safely queue_free previous secondary nodes to prevent memory leaks
+## [param is_instant]: If true, skips appearance animations (perfect for loading saves).
+func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: bool = false) -> void:
+	# 1. CLEANUP LAYER: Safely queue_free previous nodes to prevent memory leaks
 	for actor in _spawned_actors_in_room:
 		if is_instance_valid(actor):
 			actor.queue_free()
@@ -530,10 +463,6 @@ func _build_stage_actors(room_id: int, current_layout_mode: int) -> void:
 	# 3. AUTOMATED INSTANTIATION LOOP
 	for actor_data in actors_to_spawn:
 		var actor_id: int = actor_data.get(StageActorManager.KEY_ACTOR_ID, -1)
-		
-		# Skip the main character here, as it has its own specialized persistent initialization
-		if actor_id == GameIDs.ActorID.PROTAGONIST:
-			continue
 			
 		# Narrative filter verification (Allow unless forbidden check)
 		if not _should_allow_actor_spawn(room_id, actor_id, current_layout_mode):
@@ -545,9 +474,10 @@ func _build_stage_actors(room_id: int, current_layout_mode: int) -> void:
 			continue
 			
 		# 4. IDENTIFICATION OF ASSET PATH (.TSCN)
-		# Inline match block mapping IDs directly to DemoItemsRoute constants
 		var scene_path: String = ""
 		match actor_id:
+			GameIDs.ActorID.PROTAGONIST:
+				scene_path = EssencePaths.ITEM_GENERIC_INTERACTIVE_CHARACTER 
 			GameIDs.ActorID.PARK_PERSON_SIT_1: 
 				scene_path = DemoItemsRoute.ACTOR_PARK_PERSON_SIT_1_SCENE
 			GameIDs.ActorID.PARK_PERSON_SIT_2: 
@@ -561,10 +491,13 @@ func _build_stage_actors(room_id: int, current_layout_mode: int) -> void:
 			push_error("[%s] Error crítico: No se encontró escena .tscn para el ActorID %d" % [ES_NAME_CLASS, actor_id])
 			continue
 			
-		# 5. DYNAMIC MEMORY LOADING AND INSTANTIATION
-		var actor_resource: PackedScene = load(scene_path)
-		var actor_instance: Node2D = actor_resource.instantiate() as Node2D
-		if not actor_instance:
+		# 5. DYNAMIC MEMORY LOADING VIA DIRECTOR
+		# We delegate instantiation to the Director to guarantee correct Z-indexing / layering
+		var actor_resource: PackedScene = load(scene_path) as PackedScene
+		var actor_instance: Node2D = director.add_actor_to_stage(actor_resource)
+		
+		if not is_instance_valid(actor_instance):
+			push_error("[%s] El Director devolvió un nodo nulo para el ActorID %d" % [ES_NAME_CLASS, actor_id])
 			continue
 			
 		# 6. PHYSICAL TRANSFORMATIONS (Clean foot-pivot alignment)
@@ -572,9 +505,44 @@ func _build_stage_actors(room_id: int, current_layout_mode: int) -> void:
 		actor_instance.scale = placement.get(StageActorManager.KEY_SCALE, Vector2.ONE)
 		actor_instance.rotation_degrees = placement.get(StageActorManager.KEY_ROTATION, 0.0)
 		
-		# 7. REGISTER AND ATTACH TO SCENE TREE
+		# 7. PROTAGONIST EXCLUSIVE PERSISTENT & ANIMATION LAYER
+		if actor_id == GameIDs.ActorID.PROTAGONIST:
+			active_character = actor_instance
+			
+			# Smart Input Binding: Connect the core click interaction signal safely
+			if actor_instance.has_signal("clicked_on_character"):
+				actor_instance.clicked_on_character.connect(_on_character_interacted)
+			
+			# Persistent Wardrobe Resolution
+			if actor_instance.has_method("toggle_garment"):
+				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
+				if wardrobe_data.is_empty():
+					# If no save data exists, force defaults off to prevent blueprint bleeding
+					actor_instance.toggle_garment("GenericChrHat", false)
+					actor_instance.toggle_garment("GenericChrSunglass", false)
+				else:
+					for garment_id in wardrobe_data.keys():
+						var is_equipped: bool = wardrobe_data[garment_id]
+						actor_instance.toggle_garment(garment_id, is_equipped)
+			
+			# Visual appearance handling (Fade In vs Instant)
+			var container = actor_instance.get_node_or_null("SubViewportContainer")
+			if is_instant:
+				actor_instance.is_interactable = true
+				if container: 
+					container.modulate.a = 1.0
+			else:
+				actor_instance.is_interactable = false
+				if container:
+					container.modulate.a = 0.0
+					var fade = EssenceUIAnimator.fade_in_subviewport(container, 1.0)
+					if fade: 
+						await fade.finished
+				actor_instance.is_interactable = true
+		
+		# 8. REGISTER TO LOCAL GARBAGE COLLECTOR
 		_spawned_actors_in_room.append(actor_instance)
-		add_child(actor_instance)
+			
 		
 ## Evaluates global story flags to determine if a background actor is temporarily forbidden.
 func _should_allow_actor_spawn(room_id: int, actor_id: int, layout_mode: int) -> bool:
