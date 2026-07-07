@@ -71,9 +71,6 @@ var story_flags: Dictionary = {
 var active_character: GenericInteractiveCharacter = null
 const CHARACTER_ROOT_SCENE = EssencePaths.ITEM_GENERIC_INTERACTIVE_CHARACTER
 
-const DOOR_ITEM_SCENE = DemoItemsRoute.ITEMDOOR_SCENE
-var spawned_doors_in_room: Array[Node2D] = []
-
 ## Array to massively clean all floating elements when changing rooms
 var spawned_items_in_room: Array[Node2D] = []
 
@@ -380,8 +377,8 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 		GameIDs.RoomID.SAVE_SCENE:
 			print("[%s] Interceptando viaje técnico. Saltando a la pantalla de guardado..." % ES_NAME_CLASS)
 			
-			# 1. Ejecutamos la limpieza física del escenario para no dejar "fugas" de memoria
-			spawned_doors_in_room.clear()
+			# 1. Clear the unified array registry to avoid memory leaks
+			spawned_items_in_room.clear()
 			if director: 
 				director.unload_location()
 			
@@ -687,7 +684,7 @@ func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: in
 		
 		if not data["flag_error"]:
 			# Al cambiar de cuarto, vaciamos nuestra lista de referencias e indicamos al Director que limpie la pantalla
-			spawned_doors_in_room.clear()
+			spawned_items_in_room.clear()
 			director.clear_item_stage() 
 			
 			# Redirigimos el resultado al callback central que ya construiste
@@ -704,12 +701,14 @@ func _build_room_base(data: Dictionary, background_path: String, interactive_sce
 		var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
 		if fade_out_tween: await fade_out_tween.finished
 	
-	# 2. LIMPIEZA TOTAL CENTRALIZADA
+	# 2. TOTAL CENTRALIZED CLEANUP
 	director.clear_character_stage()
 	active_character = null
 	director.clear_item_stage()
-	spawned_doors_in_room.clear()
-	director.unload_location() # Aseguramos que descargue el anterior siempre
+	# We now clear the single unified items collection
+	spawned_items_in_room.clear() 
+	
+	director.unload_location()
 	
 	# 3. Asignación del Fondo
 	if background_path != "":
