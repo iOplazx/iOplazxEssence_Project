@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://c45ye0pk4eicu" path="res://demo/items/actors/ActorParkPersonSit2.tscn" id="9_hfek6"]
 [ext_resource type="PackedScene" uid="uid://diw2k3v4ecj6k" path="res://demo/items/actors/ActorParkPersonSit3.tscn" id="10_1oxh2"]
 [ext_resource type="PackedScene" uid="uid://qbkmsd2uknpl" path="res://demo/items/actors/ActorParkDogRun.tscn" id="11_yhaki"]
+[ext_resource type="PackedScene" uid="uid://bw5w3adys2wnp" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/GenericModularCharacter.tscn" id="12_1oxh2"]
 
 [node name="TestViewElements" type="Node" unique_id=778837280]
 
@@ -91,6 +92,10 @@ scale = Vector2(0.25, 0.25)
 [node name="ActorParkDogRun" parent="Node_Park" unique_id=2039770915 instance=ExtResource("11_yhaki")]
 position = Vector2(802, 497)
 scale = Vector2(0.2, 0.2)
+
+[node name="CharacterModularRoot" parent="Node_Park" unique_id=560429094 instance=ExtResource("12_1oxh2")]
+position = Vector2(724, 712.00006)
+scale = Vector2(0.3, 0.3)
 
 [node name="ControlPanel_Example" type="Panel" parent="." unique_id=831380775]
 custom_minimum_size = Vector2(400, 50)

@@ -146,7 +146,7 @@ func _setup_initial_room_layout():
 ## Callback triggered when the intro tutorial panel is closed.
 func _on_tutorial_finished() -> void:
 	if current_phase == TestPhase.INTRO:
-		print("[%s] Tutorial Intro terminado. Esperando cierre de UI..." % ES_NAME_CLASS)
+		#print("[%s] Tutorial Intro terminado. Esperando cierre de UI..." % ES_NAME_CLASS)
 		current_phase = TestPhase.GAMEPLAY
 		
 		story_flags["is_first_time_here"] = false
@@ -231,7 +231,7 @@ func _preparar_datos_para_menu() -> void:
 	SaveManager.cache_current_state(current_game_data, current_meta_data)
 
 func _restaurar_partida_cargada() -> void:
-	print("[%s] Restaurando datos cargados." % ES_NAME_CLASS)
+	#print("[%s] Restaurando datos cargados." % ES_NAME_CLASS)
 	var datos = SaveManager.loaded_game_data
 	
 	current_phase = int(datos.get("fase_actual", 0)) as TestPhase
@@ -258,7 +258,7 @@ func _restaurar_partida_cargada() -> void:
 					await _on_ready_room3doors(room_data, true)
 				# CONECTAMOS EL CASO PARA TU NUEVA HABITACIÓN:
 				GameIDs.RoomID.ROOM_1_DOOR:
-					print("[%s] Restaurador redirigiendo a la habitación de 1 puerta." % ES_NAME_CLASS)
+					#print("[%s] Restaurador redirigiendo a la habitación de 1 puerta." % ES_NAME_CLASS)
 					await _on_ready_room1door(room_data, true) # Pasamos true en skip_animations
 		
 		if is_instance_valid(active_character):
@@ -309,14 +309,14 @@ func _on_character_interacted() -> void:
 			print("[%s] Character clicked, but second tutorial is already completed." % ES_NAME_CLASS)
 			return
 			
-		print("[%s] Player interacted with character: %s" % [ES_NAME_CLASS, active_character.display_name])
+		#print("[%s] Player interacted with character: %s" % [ES_NAME_CLASS, active_character.display_name])
 		
 		# 2. STATE CHECK (First click transition to Mode 2)
 		if not story_flags.get("has_touched_character", false):
 			story_flags["has_touched_character"] = true
 			story_flags["room_mode_" + str(current_room_id)] = 2
 			
-			print("[%s] First-time interaction approved. Advancing Room to Modo 2..." % ES_NAME_CLASS)
+			#print("[%s] First-time interaction approved. Advancing Room to Modo 2..." % ES_NAME_CLASS)
 			
 			var data = LevelManager.get_scenery_config(current_room_id, current_room_id, 2, true)
 			if not data["flag_error"]:
@@ -375,7 +375,7 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 			_on_ready_parkScene(data, true)
 			
 		GameIDs.RoomID.SAVE_SCENE:
-			print("[%s] Interceptando viaje técnico. Saltando a la pantalla de guardado..." % ES_NAME_CLASS)
+			#print("[%s] Interceptando viaje técnico. Saltando a la pantalla de guardado..." % ES_NAME_CLASS)
 			
 			# 1. Clear the unified array registry to avoid memory leaks
 			spawned_items_in_room.clear()
@@ -476,6 +476,8 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 		match actor_id:
 			GameIDs.ActorID.PROTAGONIST:
 				scene_path = EssencePaths.ITEM_GENERIC_INTERACTIVE_CHARACTER 
+			GameIDs.ActorID.SECONDARY:
+				scene_path = EssencePaths.ITEM_GENERIC_MODULAR_CHARACTER
 			GameIDs.ActorID.PARK_PERSON_SIT_1: 
 				scene_path = DemoItemsRoute.ACTOR_PARK_PERSON_SIT_1_SCENE
 			GameIDs.ActorID.PARK_PERSON_SIT_2: 

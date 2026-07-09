@@ -70,6 +70,13 @@ const ROOM_ACTOR_MANIFESTO: Dictionary = {
 				KEY_SCALE: Vector2(0.2, 0.2),
 				KEY_ROTATION: 0,
 				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
+			},
+			{
+				KEY_ACTOR_ID: GameIDs.ActorID.SECONDARY,
+				KEY_POSITION: Vector2(724, 712),
+				KEY_SCALE: Vector2(0.3, 0.3),
+				KEY_ROTATION: 0,
+				KEY_ORIENTATION_VIEW: Orientation_View.NORMAL
 			}
 		]
 	}

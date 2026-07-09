@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://bw5w3adys2wnp"]
+
+[ext_resource type="Script" uid="uid://dif8mcfuiibbr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/script/GenericModularCharacter.gd" id="1_xaq2m"]
+[ext_resource type="Texture2D" uid="uid://ddba3a0fhjg8t" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_base.png" id="2_05b7m"]
+[ext_resource type="Texture2D" uid="uid://b7fnbcqtglls4" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_belt.png" id="3_xaq2m"]
+[ext_resource type="Texture2D" uid="uid://g2mg46lbf826" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_pant.png" id="5_4kq68"]
+[ext_resource type="Texture2D" uid="uid://cym5fc1fcav0n" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_shoes.png" id="7_i6q1k"]
+[ext_resource type="Texture2D" uid="uid://b4xj6wjhu1xi6" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_jacket_1.png" id="9_17vx4"]
+[ext_resource type="Texture2D" uid="uid://bcw8pr710gkog" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_jacket_2.png" id="10_i6q1k"]
+[ext_resource type="Texture2D" uid="uid://clpm6v5ccgkfb" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_jacket_3.png" id="11_ht6hp"]
+[ext_resource type="Texture2D" uid="uid://b4ktc77oaupga" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_jacket_4.png" id="12_ofk1b"]
+[ext_resource type="Texture2D" uid="uid://djtt26ywfkbd7" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_moustache.png" id="13_e0h68"]
+
+[node name="CharacterModularRoot" type="Node2D" unique_id=1680410021 node_paths=PackedStringArray("wardrobe_nodes")]
+script = ExtResource("1_xaq2m")
+wardrobe_nodes = [NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrBelt"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrPant"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrShoes"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrJacket1"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrJacket2"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrJacket3"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrJacket4"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrMoustache")]
+character_id = "chr_02"
+display_name = "Personaje Extra"
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1709483046]
+offset_left = -181.0
+offset_top = -1484.0
+offset_right = 219.0
+offset_bottom = 80.0
+mouse_filter = 2
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=846808459]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(400, 1500)
+render_target_update_mode = 4
+
+[node name="Visuals" type="Node2D" parent="SubViewportContainer/SubViewport" unique_id=1100217383]
+position = Vector2(170, 755)
+
+[node name="NormalPose" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals" unique_id=170860397]
+
+[node name="BaseBody" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose" unique_id=413827466]
+texture = ExtResource("2_05b7m")
+
+[node name="Wardrobe" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose" unique_id=888979199]
+
+[node name="GenericChrBelt" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=2131330393]
+texture = ExtResource("3_xaq2m")
+
+[node name="GenericChrPant" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=1408931492]
+texture = ExtResource("5_4kq68")
+
+[node name="GenericChrShoes" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=498943442]
+texture = ExtResource("7_i6q1k")
+
+[node name="GenericChrJacket1" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=1517965807]
+texture = ExtResource("9_17vx4")
+
+[node name="GenericChrJacket2" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=1622225480]
+texture = ExtResource("10_i6q1k")
+
+[node name="GenericChrJacket3" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=2116408545]
+texture = ExtResource("11_ht6hp")
+
+[node name="GenericChrJacket4" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=1567763322]
+texture = ExtResource("12_ofk1b")
+
+[node name="GenericChrMoustache" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=1319959971]
+texture = ExtResource("13_e0h68")
+
+[node name="Effects" type="Node2D" parent="SubViewportContainer" unique_id=575122504]
