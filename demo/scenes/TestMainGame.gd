@@ -435,9 +435,10 @@ func _evaluate_room_narrative_entry(room_id: int, default_mode: int) -> void:
 	_build_stage_actors(room_id, data["interaction_mode"], false)
 	
 	# 6. EXCLUSIVE CHARACTER / ACTOR INITIALIZATION
-	if data["interaction_mode"] == 2 and not story_flags.get("has_completed_touch_tutorial", false):
-		print("[%s] Unfinished second tutorial detected. Re-triggering overlay..." % ES_NAME_CLASS)
-		_trigger_character_tutorial()
+	if room_id == GameIDs.RoomID.INITIAL_ROOM:
+		if data["interaction_mode"] == 2 and not story_flags.get("has_completed_touch_tutorial", false):
+			print("[%s] Unfinished second tutorial detected. Re-triggering overlay..." % ES_NAME_CLASS)
+			_trigger_character_tutorial()
 		
 ## CENTRAL AUTOMATION: Instantiates and positions all actors dynamically via the Gameplay Director.
 ## [param room_id]: The active Room ID from GameIDs.RoomID.
@@ -490,7 +491,8 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 			
 		# 5. DYNAMIC MEMORY LOADING VIA DIRECTOR
 		var actor_resource: PackedScene = load(scene_path) as PackedScene
-		var actor_instance: Node2D = director.add_actor_to_stage(actor_resource)
+		# Cambiamos el tipo de variable y el casteo para activar la optimización en compilación
+		var actor_instance: EssenceActor = director.add_actor_to_stage(actor_resource) as EssenceActor
 		
 		if not is_instance_valid(actor_instance):
 			push_error("[%s] El Director devolvió un nodo nulo para el ActorID %d" % [ES_NAME_CLASS, actor_id])
@@ -525,16 +527,15 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 		
 		# 8. DELEGATED EXECUTION LAYER (Polymorphic Lifecycle Call)
 		# Replaces the massive manual fade block with a clean, type-safe enum call.
-		# This automatically applies smooth fades to NPCs and fade + click-locks to the protagonist.
+		# Totalmente optimizado: sin búsquedas de strings ni ifs innecesarios en ejecución.
 		var entry_mode: EssenceActor.TransitionType = EssenceActor.TransitionType.INSTANT if is_instant else EssenceActor.TransitionType.FADE
-		if actor_instance.has_method("enter_stage"):
-			actor_instance.enter_stage(entry_mode, 1.0)
+		actor_instance.enter_stage(entry_mode, 1.0)
 		
 		# 9. REGISTER TO LOCAL GARBAGE COLLECTOR
 		_spawned_actors_in_room.append(actor_instance)
 		
 ## Evaluates global story flags to determine if a background actor is temporarily forbidden.
-func _should_allow_actor_spawn(room_id: int, actor_id: int, layout_mode: int) -> bool:
+func _should_allow_actor_spawn(room_id: int, _actor_id: int, _layout_mode: int) -> bool:
 	# Example override: If a special story event empties the park, block all filler NPCs
 	if room_id == GameIDs.RoomID.PARK:
 		if story_flags.get("is_park_emptied_by_story", false):
