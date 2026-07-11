@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://7lbtoybnlsus"]
 
 [ext_resource type="PackedScene" uid="uid://m2obut6r5np8" path="res://addons/iOplazxEssence/modules/base/ui/EssenceSimpleLateralPanelUI.tscn" id="1_ahv5y"]
-[ext_resource type="Script" uid="uid://dq3okcwuc4h65" path="res://addons/iOplazxEssence/modules/base/script/EssenceTutorialPanel.gd" id="2_xapdg"]
+[ext_resource type="Script" uid="uid://dq3okcwuc4h65" path="res://addons/iOplazxEssence/modules/base/script/child/EssenceTutorialPanel.gd" id="2_xapdg"]
 
 [node name="TutorialPanelUI" unique_id=806485748 instance=ExtResource("1_ahv5y")]
 script = ExtResource("2_xapdg")

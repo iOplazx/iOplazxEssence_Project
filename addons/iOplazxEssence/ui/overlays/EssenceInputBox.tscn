@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bocmcorhh81jm"]
 
-[ext_resource type="Script" uid="uid://cwmxkr6j4nc6c" path="res://addons/iOplazxEssence/scriptsItems/EssenceInputBox.gd" id="1_4yr6g"]
+[ext_resource type="Script" uid="uid://cwmxkr6j4nc6c" path="res://addons/iOplazxEssence/scriptsItems/items/EssenceInputBox.gd" id="1_4yr6g"]
 
 [node name="EssenceInputBox" type="Control" unique_id=1346954466 node_paths=PackedStringArray("lbl_title", "lbl_msg", "input_text", "btn_confirm", "btn_cancel")]
 layout_mode = 3

@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://ctwx75uoljnxe"]
+
+[ext_resource type="Script" uid="uid://cj2hdb5iuebpc" path="res://addons/iOplazxEssence/modules/base/script/child/EssenceDemoInteractionButton.gd" id="1_7rojv"]
+[ext_resource type="Texture2D" uid="uid://c5trtif8v0i2u" path="res://addons/iOplazxEssence/resources/images/objects/ButtonMenuArrow_pressed.png" id="2_tl888"]
+[ext_resource type="Texture2D" uid="uid://bq8ax2u4rsmei" path="res://addons/iOplazxEssence/resources/images/objects/ButtonMenuArrow_hover.png" id="3_vtcue"]
+[ext_resource type="Texture2D" uid="uid://crvywnkd60rvy" path="res://addons/iOplazxEssence/resources/images/objects/ButtonMenuArrow_normal.png" id="4_2i13v"]
+[ext_resource type="Texture2D" uid="uid://chd24ssdbmshn" path="res://addons/iOplazxEssence/resources/images/objects/ArrowMenuHexagonIndicator.png" id="5_4xbxs"]
+[ext_resource type="BitMap" uid="uid://dphkwthpyks3n" path="res://addons/iOplazxEssence/resources/images/objects/ButtonMenuArrow_toBitmap.png" id="5_vtcue"]
+
+[node name="EssenceDemoInteractionButton" type="Control" unique_id=2095072604]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 128.0
+offset_bottom = 128.0
+script = ExtResource("1_7rojv")
+
+[node name="Btn" type="TextureButton" parent="." unique_id=1994304375]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("4_2i13v")
+texture_pressed = ExtResource("2_tl888")
+texture_hover = ExtResource("3_vtcue")
+texture_click_mask = ExtResource("5_vtcue")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1012147771]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 3
+
+[node name="HoverArrow" type="Sprite2D" parent="." unique_id=367406665]
+unique_name_in_owner = true
+position = Vector2(64, -15)
+texture = ExtResource("5_4xbxs")

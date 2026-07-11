@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d21xy7bwms1gu"]
 
-[ext_resource type="Script" uid="uid://xfhg3ixqj58d" path="res://addons/iOplazxEssence/scriptsItems/EssenceInteractableElement.gd" id="1_gswga"]
+[ext_resource type="Script" uid="uid://xfhg3ixqj58d" path="res://addons/iOplazxEssence/scriptsItems/items/EssenceInteractableElement.gd" id="1_gswga"]
 [ext_resource type="Texture2D" uid="uid://clv7aarbj07d2" path="res://addons/iOplazxEssence/resources/images/icon/iconTouch.png" id="1_yf7q6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ethqq"]

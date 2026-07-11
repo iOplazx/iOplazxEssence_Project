@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cyidwruwavaao"]
 
 [ext_resource type="Texture2D" uid="uid://dghx0okrwlnrv" path="res://addons/iOplazxEssence/resources/images/icon/icon_warning.png" id="1_ffojj"]
-[ext_resource type="Script" uid="uid://rmrfvh3sfqsn" path="res://addons/iOplazxEssence/scriptsItems/EssenceWarningOverlay.gd" id="1_p1p13"]
+[ext_resource type="Script" uid="uid://rmrfvh3sfqsn" path="res://addons/iOplazxEssence/scriptsItems/items/EssenceWarningOverlay.gd" id="1_p1p13"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark"]
 bg_color = Color(0.0784314, 0.0784314, 0.0784314, 0.901961)

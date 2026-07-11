@@ -50,6 +50,8 @@ var current_phase: TestPhase = TestPhase.INTRO
 const ROUTES_PATH = "res://_static/RouteConfig.tres"
 var routes: EssenceRouteConfig
 
+var _cached_interaction_menu: EssenceBaseInteractionMenu = null
+
 # Variable global para saber en qué ID de habitación numérica estamos parados
 var current_room_id: int = GameIDs.RoomID.INITIAL_ROOM
 # Diccionario de ejemplo para simular las condiciones de tu historia (Flags)
@@ -69,7 +71,6 @@ var story_flags: Dictionary = {
 # SECTION declaration of characters and items tscn  #
 #####################################################
 var active_character: GenericInteractiveCharacter = null
-const CHARACTER_ROOT_SCENE = EssencePaths.ITEM_GENERIC_INTERACTIVE_CHARACTER
 
 ## Array to massively clean all floating elements when changing rooms
 var spawned_items_in_room: Array[Node2D] = []
@@ -91,7 +92,7 @@ func _ready() -> void:
 	# Conectamos la señal de cuando el tutorial se cierra
 	if tutorial_panel:
 		tutorial_panel.tutorial_finished.connect(_on_tutorial_finished)
-	
+		
 	_cargar_configuracion()
 	_check_security_nodes()
 	_config_buttons()
@@ -304,19 +305,15 @@ func _on_character_interacted() -> void:
 	
 	# 1. VALIDATION LAYER
 	if current_phase == TestPhase.GAMEPLAY and active_character.is_interactable:
-		# If the tutorial was already fully completed, do not trigger it again
+		# MODIFICACIÓN: Si el tutorial ya se completó, abrimos el menú y salimos del flujo del tutorial
 		if story_flags.get("has_completed_touch_tutorial", false):
-			print("[%s] Character clicked, but second tutorial is already completed." % ES_NAME_CLASS)
+			_open_interaction_menu()
 			return
 			
-		#print("[%s] Player interacted with character: %s" % [ES_NAME_CLASS, active_character.display_name])
-		
 		# 2. STATE CHECK (First click transition to Mode 2)
 		if not story_flags.get("has_touched_character", false):
 			story_flags["has_touched_character"] = true
 			story_flags["room_mode_" + str(current_room_id)] = 2
-			
-			#print("[%s] First-time interaction approved. Advancing Room to Modo 2..." % ES_NAME_CLASS)
 			
 			var data = LevelManager.get_scenery_config(current_room_id, current_room_id, 2, true)
 			if not data["flag_error"]:
@@ -336,6 +333,58 @@ func _trigger_character_tutorial() -> void:
 			"Then, save the game and load it to verify the Wardrobe System."
 		]
 		tutorial_panel.load_and_show_tutorial(interaction_messages)
+		
+## Prepara las opciones y despliega el menú cargándolo dinámicamente si no existe en memoria.
+func _open_interaction_menu() -> void:
+	# 1. TRUCO DE OPTIMIZACIÓN EXTREMA: Si no se ha instanciado nunca, lo cargamos en caliente
+	if not is_instance_valid(_cached_interaction_menu):
+		print("[%s] Primera interacción detectada. Cargando interfaz desde disco..." % ES_NAME_CLASS)
+		
+		# Leemos la ruta de la constante exactamente igual que con los personajes
+		var menu_route: String = EssencePaths.MENU_HEXAGONAL_INTERFACE
+		var menu_resource: PackedScene = load(menu_route) as PackedScene
+		
+		if menu_resource:
+			# Instanciamos el nodo y lo agregamos dinámicamente al HUD de forma oculta
+			_cached_interaction_menu = menu_resource.instantiate() as EssenceBaseInteractionMenu
+			$GameplayDirector/HUD_Layer.add_child(_cached_interaction_menu)
+			
+			# Conectamos su señal centralizada al receptor del Main
+			_cached_interaction_menu.accion_seleccionada.connect(_on_menu_action_selected)
+		else:
+			push_error("[%s] Error Crítico: No se pudo cargar el recurso del menú." % ES_NAME_CLASS)
+			return
+
+	# 2. CONFIGURACIÓN DATA-DRIVEN DE ACCIONES
+	var datos_acciones: Array = [
+		[
+			{"id": "talk", "descripcion": "Hablar con el personaje", "icono": null},
+			{"id": "examine", "descripcion": "Inspeccionar ropa", "icono": null},
+			{"id": "wardrobe", "descripcion": "Cambiar atuendo", "icono": null}
+		]
+	]
+	
+	# 3. EJECUCIÓN DEL FLUJO
+	# El menú ya existe en el HUD (ya sea porque se acaba de crear o porque se recicló), lo activamos.
+	_cached_interaction_menu.configurar_menu(datos_acciones)
+	_cached_interaction_menu.abrir_menu(get_global_mouse_position())
+
+## Receptor de la señal del menú hexagonal. Ejecuta la lógica del botón pulsado.
+func _on_menu_action_selected(accion: String) -> void:
+	print("[%s] Procesando acción del menú: %s" % [ES_NAME_CLASS, accion])
+	
+	match accion:
+		"talk":
+			print("-> Iniciando secuencia de diálogo con: ", active_character.display_name)
+			# Aquí disparas tu DialogBoxUI
+		"examine":
+			print("-> El jugador está examinando al personaje.")
+		"wardrobe":
+			print("-> Abriendo interfaz de vestidor.")
+			
+	# Cerramos el menú con animación una vez resuelta la acción
+	if is_instance_valid(_cached_interaction_menu):
+		_cached_interaction_menu.cerrar_menu()
 			
 		
 ## Central listener that processes all navigation signals coming from inside the active rooms.

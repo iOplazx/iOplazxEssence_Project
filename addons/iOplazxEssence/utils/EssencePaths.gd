@@ -99,6 +99,8 @@ const INTERNAL_IMAGES = {
 # ==========================================
 const MODULE_ROUTE = BASE_ROUTE + "modules/"
 const MODULE_VISUALNOVEL_ROUTE = MODULE_ROUTE + "visual_novel/"
+const MODULE_BASE_ROUTE = MODULE_ROUTE + "base/"
+const MODULE_BASE_UI_ROUTE = MODULE_BASE_ROUTE + "ui/"
 const PREFAB_UI_ROUTE = MODULE_VISUALNOVEL_ROUTE + "prefab/ui/"
 
 const BACKGROUND_ROOM_INITIAL = PATH_IMAGES_BACKGROUND + "background_room_ai_1" + EXTENSION_PNG
@@ -108,3 +110,5 @@ const BACKGROUND_PARK = PATH_IMAGES_BACKGROUND + "background_generate_park" + EX
 
 const ITEM_GENERIC_INTERACTIVE_CHARACTER = PREFAB_UI_ROUTE + "GenericInteractiveCharacter" + EXTENSION_TSCN
 const ITEM_GENERIC_MODULAR_CHARACTER = PREFAB_UI_ROUTE + "GenericModularCharacter" + EXTENSION_TSCN
+
+const MENU_HEXAGONAL_INTERFACE = MODULE_BASE_UI_ROUTE + "EssenceHexagonMenu" + EXTENSION_TSCN

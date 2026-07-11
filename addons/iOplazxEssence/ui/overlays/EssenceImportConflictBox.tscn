@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dh2bwd6pwl2ug"]
 
-[ext_resource type="Script" uid="uid://dklboil4ojqcb" path="res://addons/iOplazxEssence/scriptsItems/EssenceImportConflictBox.gd" id="1_7mmy3"]
+[ext_resource type="Script" uid="uid://dklboil4ojqcb" path="res://addons/iOplazxEssence/scriptsItems/items/EssenceImportConflictBox.gd" id="1_7mmy3"]
 
 [node name="EssenceImportConflictBox" type="CanvasLayer" unique_id=462659900 node_paths=PackedStringArray("label_msg", "chk_apply_all", "btn_omit", "btn_overwrite", "btn_new")]
 script = ExtResource("1_7mmy3")

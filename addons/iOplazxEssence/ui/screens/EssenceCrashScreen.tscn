@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b7mf7uki5rbir"]
 
-[ext_resource type="Script" uid="uid://ps8gvcgkco6w" path="res://addons/iOplazxEssence/scriptsItems/EssenceCrashScreen.gd" id="1_fdgaj"]
+[ext_resource type="Script" uid="uid://ps8gvcgkco6w" path="res://addons/iOplazxEssence/scriptsItems/items/EssenceCrashScreen.gd" id="1_fdgaj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_Bg"]
 bg_color = Color(0.0588235, 0.0588235, 0.0588235, 0.941176)

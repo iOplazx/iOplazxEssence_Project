@@ -1,0 +1,16 @@
+[remap]
+
+importer="bitmap"
+type="BitMap"
+uid="uid://dphkwthpyks3n"
+path="res://.godot/imported/ButtonMenuArrow_toBitmap.png-a4cfb9a3a1211d9fc1174a74f7a319d7.res"
+
+[deps]
+
+source_file="res://addons/iOplazxEssence/resources/images/objects/ButtonMenuArrow_toBitmap.png"
+dest_files=["res://.godot/imported/ButtonMenuArrow_toBitmap.png-a4cfb9a3a1211d9fc1174a74f7a319d7.res"]
+
+[params]
+
+create_from=0
+threshold=0.5
