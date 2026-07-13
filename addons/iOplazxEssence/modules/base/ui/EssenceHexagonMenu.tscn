@@ -15,10 +15,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_t350g")
-boton_escena = ExtResource("2_s86xh")
-icono_desconocido = ExtResource("3_4qjco")
-icono_prev = ExtResource("4_4v5n8")
-icono_next = ExtResource("5_72mp6")
+button_scene = ExtResource("2_s86xh")
+unknown_icon = ExtResource("3_4qjco")
+icon_prev = ExtResource("4_4v5n8")
+icon_next = ExtResource("5_72mp6")
 
 [node name="Anchor" type="Marker2D" parent="." unique_id=1336350027]
 
