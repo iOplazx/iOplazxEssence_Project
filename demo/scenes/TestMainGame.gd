@@ -305,12 +305,8 @@ func _on_character_interacted() -> void:
 	
 	# 1. VALIDATION LAYER
 	if current_phase == TestPhase.GAMEPLAY and active_character.is_interactable:
-		# MODIFICACIÓN: Si el tutorial ya se completó, abrimos el menú y salimos del flujo del tutorial
-		if story_flags.get("has_completed_touch_tutorial", false):
-			_open_interaction_menu()
-			return
-			
-		# 2. STATE CHECK (First click transition to Mode 2)
+		
+		# 2. STATE CHECK (Transición inicial a Modo 2 en el primer clic de la partida)
 		if not story_flags.get("has_touched_character", false):
 			story_flags["has_touched_character"] = true
 			story_flags["room_mode_" + str(current_room_id)] = 2
@@ -321,8 +317,14 @@ func _on_character_interacted() -> void:
 				director.clear_item_stage()
 				_build_stage_interactables(current_room_id, data["interaction_mode"])
 		
-		# 3. INTERACTION FEEDBACK
-		_trigger_character_tutorial()
+		# 3. INTERACTION FLOW (El menú se abre SIEMPRE)
+		# Esto garantiza que el jugador siempre vea la animación de los triángulos naranjas
+		_open_interaction_menu()
+		
+		# 4. TUTORIAL LAYER (Condicional)
+		# Si NO ha completado el segundo tutorial, abrimos el panel explicativo encima
+		if not story_flags.get("has_completed_touch_tutorial", false):
+			_trigger_character_tutorial()
 
 ## Launches the specific wardrobe and saving system tutorial overlay.
 func _trigger_character_tutorial() -> void:

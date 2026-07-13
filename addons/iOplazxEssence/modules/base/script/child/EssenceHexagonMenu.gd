@@ -6,10 +6,10 @@ extends EssenceBaseInteractionMenu
 #==
 #HexagonMenu.tscn
 #==
-#HexagonMenu (Control) [Script: HexagonMenu]
-#├──  Anchor (Marker2D)
-#└── ButtonsContainer (Control)
-#==
+#EssenceHexagonMenu (Control) [Script: HexagonMenu]
+#└── Anchor (Marker2D)
+#    ├── HexagonFrame (TextureRect)   
+#    └── ButtonsContainer (Control)  
 
 
 @export_category("Geometría Hexagonal")
