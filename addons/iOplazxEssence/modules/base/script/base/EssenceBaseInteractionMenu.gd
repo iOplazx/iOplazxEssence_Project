@@ -66,39 +66,46 @@ func configure_menu(data_by_pages: Array) -> void:
 
 ## Processes the visibility and icons of the buttons based on the currently active page.
 func _update_page_view() -> void:
-	if paginas_acciones.is_empty(): 
-		return
-	
-	var datos_pagina = paginas_acciones[pagina_actual]
+	var datos_pagina = paginas_acciones[pagina_actual] if not paginas_acciones.is_empty() else []
 	
 	# 1. Update standard action buttons
 	for i in range(botones_accion.size()):
 		var btn = botones_accion[i]
+		if not is_instance_valid(btn): 
+			continue
 		
 		if i < datos_pagina.size() and datos_pagina[i].get("id", "") != "":
 			var action_data = datos_pagina[i]
-			if is_instance_valid(btn):
-				btn.nombre_accion = action_data.get("id", "")
-				btn.get_node("Icon").texture = action_data.get("icono", unknown_icon)
-				btn.modulate.a = 1.0 
-				_configure_interaction(btn, action_data.get("descripcion", ""), true)
+			btn.nombre_accion = action_data.get("id", "")
+			btn.get_node("Icon").texture = action_data.get("icono", unknown_icon) if action_data.get("icono", null) != null else unknown_icon
+			btn.modulate.a = 1.0 
+			_configure_interaction(btn, action_data.get("descripcion", ""), true)
 		else:
+			# Instead of hiding, transition to an empty disabled state showing '?'
 			_deactivate_button(btn)
 			_configure_interaction(btn, "", false)
 
-	# 2. Pagination arrows control with null-safe guards
-	_manage_pagination_button(btn_prev, "pagina_anterior", pagina_actual > 0, tr("RADIAL_MENU_PREV_PAGE"))
-	_manage_pagination_button(btn_next, "pagina_siguiente", pagina_actual < paginas_acciones.size() - 1, tr("RADIAL_MENU_NEXT_PAGE"))
+	# 2. Pagination controls evaluation
+	var has_prev: bool = pagina_actual > 0
+	var has_next: bool = pagina_actual < paginas_acciones.size() - 1 if not paginas_acciones.is_empty() else false
 	
+	_manage_pagination_button(btn_prev, "pagina_anterior", has_prev, tr("RADIAL_MENU_PREV_PAGE"), icon_prev)
+	_manage_pagination_button(btn_next, "pagina_siguiente", has_next, tr("RADIAL_MENU_NEXT_PAGE"), icon_next)
 
 ## Manages visibility and interactions for a specific pagination button safely.
-func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String, condition: bool, tooltip: String) -> void:
+## [param btn]: The interaction button instance.
+## [param action]: The internal pagination action string.
+## [param condition]: True if the button should be active, false to show as an empty slot.
+## [param active_icon]: The default texture asset to apply when enabled.
+func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String, condition: bool, tooltip: String, active_icon: Texture2D) -> void:
 	if not is_instance_valid(btn): 
-		return # Prevents cascading crashes if initialization failed early
+		return
 		
 	if condition:
 		btn.nombre_accion = action
 		btn.modulate.a = 1.0
+		if active_icon:
+			btn.get_node("Icon").texture = active_icon
 		_configure_interaction(btn, tooltip, true)
 	else:
 		_deactivate_button(btn)
@@ -118,15 +125,17 @@ func _configure_interaction(btn_raiz: Control, text: String, activated: bool) ->
 	else:
 		btn_raiz.mouse_filter = filtro_deseado
 
-## Resets and hides a button, disabling all mouse filtering interactions.
+## Resets and disables a button safely, showing the unknown icon instead of hiding it.
+## [param btn]: The target button instance to format as empty.
 func _deactivate_button(btn: EssenceBaseInteractionButton) -> void:
-	# CRITICAL FIX: Safety check to avoid writing properties on a Nil object
 	if not is_instance_valid(btn): 
 		return
 		
 	btn.nombre_accion = ""
-	btn.modulate.a = 0.0 
-	btn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	btn.modulate.a = 1.0 # Keeps the node fully visible to preserve the layout structure
+	
+	if unknown_icon:
+		btn.get_node("Icon").texture = unknown_icon
 
 ## PUBLIC API: Smoothly deploys the menu by interpolating buttons to their calculated geometric target coordinates.
 func open_menu(global_click_position: Vector2) -> void:

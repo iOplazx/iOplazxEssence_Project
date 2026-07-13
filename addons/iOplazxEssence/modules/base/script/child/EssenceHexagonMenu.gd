@@ -29,39 +29,43 @@ func _generate_geometric_structure() -> void:
 	var h_offset: float = cell_spacing * 0.866025 # Internal height of the hex triangle
 	var v_offset: float = cell_spacing * 0.5      # Half of the radius
 	
-	var hex_positions: Array[Vector2] = [
-		Vector2(0, -cell_spacing),      # 1. Top Center
-		Vector2(h_offset, -v_offset),    # 2. Top Right
-		Vector2(h_offset, v_offset),     # 3. Bottom Right
-		Vector2(0, cell_spacing),       # 4. Bottom Center
-		Vector2(-h_offset, v_offset),    # 5. Bottom Left
-		Vector2(-h_offset, -v_offset)    # 6. Top Left
-	]
-	
-	# Manual correction for mathematical precision and hardware compression alignment
-	hex_positions[5] = Vector2(-h_offset, -v_offset)
+	# Define the exact 6 positions of a pointy-topped hexagon ring
+	var pos_top_center: Vector2 = Vector2(0, -cell_spacing)
+	var pos_top_right: Vector2 = Vector2(h_offset, -v_offset)
+	var pos_bottom_right: Vector2 = Vector2(h_offset, v_offset)  # Dedicated to NEXT PAGE
+	var pos_bottom_center: Vector2 = Vector2(0, cell_spacing)
+	var pos_bottom_left: Vector2 = Vector2(-h_offset, v_offset)   # Dedicated to PREV PAGE
+	var pos_top_left: Vector2 = Vector2(-h_offset, -v_offset)
 
-	# 2. ASSIGNMENT OF THE 6 CENTRAL ACTION SLOTS
-	for pos in hex_positions:
+	# 2. REGISTER THE 4 STANDARD ACTION SLOTS
+	# We map these 4 layout positions for dynamic gameplay choices (e.g. Talk, Examine)
+	var action_positions: Array[Vector2] = [
+		pos_top_center,
+		pos_top_right,
+		pos_bottom_center,
+		pos_top_left
+	]
+
+	for pos in action_positions:
 		var btn = _instance_slot(pos, "vacio")
 		if unknown_icon:
 			btn.get_node("Icon").texture = unknown_icon
 			
-		# Rotates the button to face outward from the center
+		# Rotate button to face outward from the center
 		# Add 90 degrees in radians because the base triangle asset faces North.
 		btn.rotation = pos.angle() + deg_to_rad(90)
 		
 		botones_accion.append(btn)
 
-	# 3. PAGINATION ARROWS POSITIONING (Horizontal outer wings)
-	# Placed symmetrically on the sides of the hexagon for a sci-fi console layout look
-	var pos_prev: Vector2 = Vector2(-h_offset * 1.8, 0.0)
-	var pos_next: Vector2 = Vector2(h_offset * 1.8, 0.0)
-
-	btn_prev = _instance_slot(pos_prev, "pagina_anterior")
+	# 3. REGISTER THE 2 PAGINATION SLOTS AT THE BOTTOM CORNERS
+	# Bottom Left Slot (Previous Page)
+	btn_prev = _instance_slot(pos_bottom_left, "pagina_anterior")
+	btn_prev.rotation = pos_bottom_left.angle() + deg_to_rad(90)
 	if icon_prev: 
 		btn_prev.get_node("Icon").texture = icon_prev
 
-	btn_next = _instance_slot(pos_next, "pagina_siguiente")
+	# Bottom Right Slot (Next Page)
+	btn_next = _instance_slot(pos_bottom_right, "pagina_siguiente")
+	btn_next.rotation = pos_bottom_right.angle() + deg_to_rad(90)
 	if icon_next: 
 		btn_next.get_node("Icon").texture = icon_next
