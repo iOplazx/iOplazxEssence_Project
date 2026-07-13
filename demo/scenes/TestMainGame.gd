@@ -257,14 +257,13 @@ func _restaurar_partida_cargada() -> void:
 					await _on_ready_initialRoom(room_data, true)
 				GameIDs.RoomID.ROOM_3_DOORS:
 					await _on_ready_room3doors(room_data, true)
-				# CONECTAMOS EL CASO PARA TU NUEVA HABITACIÓN:
 				GameIDs.RoomID.ROOM_1_DOOR:
 					#print("[%s] Restaurador redirigiendo a la habitación de 1 puerta." % ES_NAME_CLASS)
 					await _on_ready_room1door(room_data, true) # Pasamos true en skip_animations
 		
 		if is_instance_valid(active_character):
 			var ropa_guardada = datos.get("ropa_estado_personaje", {})
-			active_character.load_clothing_state(ropa_guardada)
+			active_character.apply_clothing_state(ropa_guardada)
 			
 	else:
 		_setup_initial_room_layout() #validar TODO
