@@ -108,7 +108,13 @@ func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String
 			btn.get_node("Icon").texture = active_icon
 		_configure_interaction(btn, tooltip, true)
 	else:
-		_deactivate_button(btn)
+		# SPECIAL PAGINATION DISABLE LAYER:
+		# Keeps the original arrow icon texture instead of replacing it with the '?' mark.
+		# Dims the opacity and disables collision input to indicate it is inactive.
+		btn.nombre_accion = ""
+		btn.modulate.a = 0.3 # Semi-transparent disabled visual state
+		if active_icon:
+			btn.get_node("Icon").texture = active_icon
 		_configure_interaction(btn, "", false)
 
 
