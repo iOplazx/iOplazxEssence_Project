@@ -252,14 +252,8 @@ func _restaurar_partida_cargada() -> void:
 		var room_data = LevelManager.get_scenery_config(room_saved_id, room_saved_id, 1, true)
 		
 		if not room_data["flag_error"]:
-			match room_saved_id:
-				GameIDs.RoomID.INITIAL_ROOM:
-					await _on_ready_initialRoom(room_data, true)
-				GameIDs.RoomID.ROOM_3_DOORS:
-					await _on_ready_room3doors(room_data, true)
-				GameIDs.RoomID.ROOM_1_DOOR:
-					#print("[%s] Restaurador redirigiendo a la habitación de 1 puerta." % ES_NAME_CLASS)
-					await _on_ready_room1door(room_data, true) # Pasamos true en skip_animations
+			# FIXED: Delegating routing and dynamically supporting the PARK scene lifecycle
+			await _route_room_initialization(room_saved_id, room_data, true)
 		
 		if is_instance_valid(active_character):
 			var ropa_guardada = datos.get("ropa_estado_personaje", {})
@@ -416,37 +410,18 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 			# Escondemos el juego detrás del muro negro antes de mover un solo pixel
 			await curtain_tween.finished 
 			
-	# Ahora que la pantalla está TOTALMENTE negra y segura,
-	# ejecutamos la carga pesada. Nadie notará si el fondo se borra o parpadea gris.
-	match data["id_room"]:
-		GameIDs.RoomID.INITIAL_ROOM:
-			# Pasamos 'true' en skip_animations porque el director ya cerró la cortina,
-			# no necesitamos que la habitación intente hacer otro fundido interno.
-			_on_ready_initialRoom(data, true)
-		GameIDs.RoomID.ROOM_3_DOORS:
-			_on_ready_room3doors(data, true)
-		GameIDs.RoomID.ROOM_1_DOOR:
-			_on_ready_room1door(data, true)
-		GameIDs.RoomID.PARK:
-			_on_ready_parkScene(data, true)
-			
-		GameIDs.RoomID.SAVE_SCENE:
-			#print("[%s] Interceptando viaje técnico. Saltando a la pantalla de guardado..." % ES_NAME_CLASS)
-			
-			# 1. Clear the unified array registry to avoid memory leaks
-			spawned_items_in_room.clear()
-			if director: 
-				director.unload_location()
-			
-			# 2. Esperamos a que el motor asiente la destrucción de nodos
-			await get_tree().process_frame
-			
-			# 3. Viajamos físicamente usando tu constante centralizada 
-			get_tree().change_scene_to_file(DemoItemsRoute.TESTSAVESCENE_SCENE)
-			
-			return # CRÍTICO: Hacemos un return aquí para que la función muera 
-				   # y no intente ejecutar el open_curtain de abajo, ya que cambiamos de escena.
+	# TECHNICAL INTERCEPT: Handle the application scene-swap separately
+	if data["id_room"] == GameIDs.RoomID.SAVE_SCENE:
+		spawned_items_in_room.clear()
+		if director: 
+			director.unload_location()
+		await get_tree().process_frame
+		get_tree().change_scene_to_file(DemoItemsRoute.TESTSAVESCENE_SCENE)
+		return
 
+	# STANDARD ROOM FLOW: Safely initialize standard game rooms through our router
+	await _route_room_initialization(data["id_room"], data, true)
+	
 	if director:
 		# Esperamos un frame de estabilización para que el motor termine de renderizar el mapa
 		await get_tree().process_frame
@@ -783,6 +758,23 @@ func _build_room_base(data: Dictionary, background_path: String, interactive_sce
 		background_layer.modulate.a = 1.0
 		
 	return current_loc
+	
+## Route and execute the specific setup pipeline for a room layout based on its unique ID.
+## [param room_id]: The target RoomID from GameIDs tracking enum.
+## [param scenery_data]: The validated layout configuration dictionary from LevelManager.
+## [param skip_animations]: True to force immediate state placement without transitions.
+func _route_room_initialization(room_id: int, scenery_data: Dictionary, skip_animations: bool) -> void:
+	match room_id:
+		GameIDs.RoomID.INITIAL_ROOM:
+			await _on_ready_initialRoom(scenery_data, skip_animations)
+		GameIDs.RoomID.ROOM_3_DOORS:
+			await _on_ready_room3doors(scenery_data, skip_animations)
+		GameIDs.RoomID.ROOM_1_DOOR:
+			await _on_ready_room1door(scenery_data, skip_animations)
+		GameIDs.RoomID.PARK:
+			await _on_ready_parkScene(scenery_data, skip_animations)
+		_:
+			push_error("[TestMainGame] Failed to route initialization: Unknown RoomID %d" % room_id)
 
 #########################
 # SECTION Initial Room  #
