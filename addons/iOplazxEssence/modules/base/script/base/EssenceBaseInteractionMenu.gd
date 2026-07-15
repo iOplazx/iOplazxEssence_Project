@@ -43,20 +43,22 @@ var btn_next: EssenceBaseInteractionButton
 ## Safety flag that blocks inputs and new interactions while visual transitions are active.
 var is_animating: bool = false
 
+
 ## Base initialization lifecycle for the interaction menu container.
 func _ready() -> void:
-	# 1. VERIFIED RADIAL BLUEPRINT: Set root to PASS so children receive inputs first.
+	# 1. VERIFIED RADIAL BLUEPRINT: Set root to PASS so children receive inputs first[cite: 8].
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	visible = false
 	modulate.a = 0.0 
 	
+	# CRITICAL INPUT PICKING FIX: Force Anchor to IGNORE so Godot evaluates 
+	# its children even if the mouse falls outside the parent's local 0x0 boundary.
 	if is_instance_valid(anchor):
+		anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		anchor.scale = Vector2(0.1, 0.1)
 	
-	# 2. CRITICAL CONTAINER NORMALIZATION LAYER:
-	# Forcibly strips any 40x40 editor sizing artifacts from the container node[cite: 6].
-	# This aligns the physical collision system 1:1 with visual canvas space calculations.
+	# 2. CONTAINER NORMALIZATION LAYER: Strip dimensions and set to IGNORE[cite: 6, 8].
 	if is_instance_valid(buttons_container):
 		buttons_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		buttons_container.custom_minimum_size = Vector2.ZERO
@@ -125,7 +127,7 @@ func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String
 		_configure_interaction(btn, tooltip, true)
 	else:
 		btn.action_name = ""
-		btn.modulate.a = 0.3 # Semi-transparent disabled visual state
+		btn.modulate.a = 0.3
 		if active_icon:
 			btn.get_node("Icon").texture = active_icon
 		_configure_interaction(btn, "", false)
@@ -143,6 +145,12 @@ func _configure_interaction(btn_raiz: Control, text: String, activated: bool) ->
 		btn_raiz.mouse_filter = Control.MOUSE_FILTER_PASS 
 	else:
 		btn_raiz.mouse_filter = filtro_deseado
+		
+	# CRITICAL INTERACTION FIX: Force the overlay icon to always IGNORE mouse focus.
+	# This prevents the TextureRect from visually stealing hovers/clicks from the underlying Btn.
+	var nodo_icono = btn_raiz.get_node_or_null("Icon")
+	if is_instance_valid(nodo_icono) and nodo_icono is Control:
+		nodo_icono.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
 ## Resets and disables a button safely, showing the unknown icon instead of hiding it.
@@ -241,7 +249,6 @@ func _instance_slot(local_position: Vector2, initial_action: String) -> EssenceB
 	buttons_container.add_child(btn)
 	btn.scale = Vector2(button_scale, button_scale)
 	
-	# Center the button pivot according to the mathematically calculated local coordinates[cite: 8]
 	var slot_size = _get_slot_size(btn)
 	btn.set_meta("pos_final", local_position - (slot_size / 2.0))
 	btn.action_name = initial_action
