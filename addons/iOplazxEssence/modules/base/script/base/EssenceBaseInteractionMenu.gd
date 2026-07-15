@@ -46,19 +46,26 @@ var is_animating: bool = false
 
 ## Base initialization lifecycle for the interaction menu container.
 func _ready() -> void:
-	# 1. VERIFIED RADIAL BLUEPRINT: Set root to PASS so children receive inputs first[cite: 8].
+	# 1. VERIFIED RADIAL BLUEPRINT FIXED LAYER: 
+	# Forcibly expands the root menu to occupy 100% of the screen viewport size.
+	# This ensures the mouse pointer is ALWAYS within parent boundaries, unblocking child input picking.
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	visible = false
 	modulate.a = 0.0 
 	
-	# CRITICAL INPUT PICKING FIX: Force Anchor to IGNORE so Godot evaluates 
-	# its children even if the mouse falls outside the parent's local 0x0 boundary.
+	# Elevate parent canvas priority dynamically if available
+	var parent_canvas = get_parent() as CanvasLayer
+	if parent_canvas:
+		parent_canvas.visible = true
+		parent_canvas.layer = 100
+	
 	if is_instance_valid(anchor):
 		anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		anchor.scale = Vector2(0.1, 0.1)
 	
-	# 2. CONTAINER NORMALIZATION LAYER: Strip dimensions and set to IGNORE[cite: 6, 8].
+	# 2. CONTAINER NORMALIZATION LAYER: Strip sizes and set to IGNORE.
 	if is_instance_valid(buttons_container):
 		buttons_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		buttons_container.custom_minimum_size = Vector2.ZERO
@@ -70,13 +77,6 @@ func _ready() -> void:
 		
 	# 3. VIRTUAL CALL: Execute child geometric arrangement (e.g., Hexagonal layout)
 	_generate_geometric_structure()
-
-
-## Captures global clicks that bypassed the UI to close the menu dynamically.
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if not is_animating and visible:
-			close_menu()
 
 
 ## PUBLIC API: Configures the action page matrix sent by the Gameplay Director.
@@ -146,8 +146,6 @@ func _configure_interaction(btn_raiz: Control, text: String, activated: bool) ->
 	else:
 		btn_raiz.mouse_filter = filtro_deseado
 		
-	# CRITICAL UI INTERACTION FIX: Force the overlay icon to always IGNORE mouse events.
-	# This prevents the dynamically assigned TextureRect from stealing hovers/clicks from Btn.
 	var nodo_icono = btn_raiz.get_node_or_null("Icon")
 	if is_instance_valid(nodo_icono) and nodo_icono is Control:
 		nodo_icono.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -170,24 +168,13 @@ func _get_slot_size(btn: EssenceBaseInteractionButton) -> Vector2:
 		return btn.custom_minimum_size
 	return btn.size
 
+
+## PUBLIC API: Smoothly deploys the menu by interpolating buttons to their calculated geometric target coordinates.
 func open_menu(global_click_position: Vector2) -> void:
 	if is_animating or visible: 
 		return
 		
 	is_animating = true
-	
-	# =================================================================
-	# MODULAR HIERARCHY SELF-DEFENSE LAYER
-	# =================================================================
-	# Detects if the menu was injected inside a CanvasLayer container.
-	# Automatically forces it to be visible and elevates its render/input 
-	# priority to layer 100, bypassing any blocking panels (e.g., PanelControles).
-	var parent_canvas = get_parent() as CanvasLayer
-	if parent_canvas:
-		parent_canvas.visible = true
-		parent_canvas.layer = 100
-	# =================================================================
-	
 	anchor.position = make_canvas_position_local(global_click_position)
 	visible = true
 	modulate.a = 0.0
@@ -223,14 +210,9 @@ func close_menu() -> void:
 	tween.chain().tween_callback(func():
 		visible = false
 		is_animating = false
-		
-		# OPTIONAL clean-up: If you want the HUD layer to hide itself again after 
-		# the menu closes, you can toggle it here. Otherwise, leave it active.
-		# var parent_canvas = get_parent() as CanvasLayer
-		# if parent_canvas: parent_canvas.visible = false
-		
 		menu_closed.emit()
 	)
+
 
 ## Callback receiver for button selection signals. Coordinates pagination or forwards structural actions.
 func _on_action_button(action: String) -> void:
