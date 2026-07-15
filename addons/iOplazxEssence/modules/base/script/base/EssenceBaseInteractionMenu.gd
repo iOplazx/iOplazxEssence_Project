@@ -43,7 +43,6 @@ var btn_next: EssenceBaseInteractionButton
 ## Safety flag that blocks inputs and new interactions while visual transitions are active.
 var is_animating: bool = false
 
-
 ## Base initialization lifecycle for the interaction menu container.
 func _ready() -> void:
 	# 1. VERIFIED RADIAL BLUEPRINT: Set root to PASS so children receive inputs first.
@@ -55,13 +54,27 @@ func _ready() -> void:
 	if is_instance_valid(anchor):
 		anchor.scale = Vector2(0.1, 0.1)
 	
-	# 2. Clean up design-time placeholder nodes from the editor container
+	# 2. CRITICAL CONTAINER NORMALIZATION LAYER:
+	# Forcibly strips any 40x40 editor sizing artifacts from the container node[cite: 6].
+	# This aligns the physical collision system 1:1 with visual canvas space calculations.
 	if is_instance_valid(buttons_container):
+		buttons_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		buttons_container.custom_minimum_size = Vector2.ZERO
+		buttons_container.size = Vector2.ZERO
+		buttons_container.position = Vector2.ZERO
+		
 		for child in buttons_container.get_children():
 			child.queue_free()
 		
 	# 3. VIRTUAL CALL: Execute child geometric arrangement (e.g., Hexagonal layout)
 	_generate_geometric_structure()
+
+
+## Captures global clicks that bypassed the UI to close the menu dynamically.
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if not is_animating and visible:
+			close_menu()
 
 
 ## PUBLIC API: Configures the action page matrix sent by the Gameplay Director.
@@ -88,7 +101,6 @@ func _update_page_view() -> void:
 			btn.modulate.a = 1.0 
 			_configure_interaction(btn, action_data.get("descripcion", ""), true)
 		else:
-			# Instead of hiding, transition to an empty disabled state showing '?'
 			_deactivate_button(btn)
 			_configure_interaction(btn, "", false)
 
@@ -112,7 +124,6 @@ func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String
 			btn.get_node("Icon").texture = active_icon
 		_configure_interaction(btn, tooltip, true)
 	else:
-		# SPECIAL PAGINATION DISABLE LAYER: Keeps the original arrow icon texture.
 		btn.action_name = ""
 		btn.modulate.a = 0.3 # Semi-transparent disabled visual state
 		if active_icon:
@@ -140,12 +151,12 @@ func _deactivate_button(btn: EssenceBaseInteractionButton) -> void:
 		return
 		
 	btn.action_name = ""
-	btn.modulate.a = 1.0 # Keeps the node fully visible to preserve the layout structure
+	btn.modulate.a = 1.0 
 	if unknown_icon:
 		btn.get_node("Icon").texture = unknown_icon
 
 
-## Helper utility to safely extract the actual dimensions of a slot node.
+## Helper utility to safely extract the actual dimensions of a slot node dynamically.
 func _get_slot_size(btn: EssenceBaseInteractionButton) -> Vector2:
 	if btn.custom_minimum_size != Vector2.ZERO:
 		return btn.custom_minimum_size
@@ -230,7 +241,7 @@ func _instance_slot(local_position: Vector2, initial_action: String) -> EssenceB
 	buttons_container.add_child(btn)
 	btn.scale = Vector2(button_scale, button_scale)
 	
-	# HARDENED DIMENSION LOGIC: Resolves the 128x128 bounding box center flawlessly
+	# Center the button pivot according to the mathematically calculated local coordinates[cite: 8]
 	var slot_size = _get_slot_size(btn)
 	btn.set_meta("pos_final", local_position - (slot_size / 2.0))
 	btn.action_name = initial_action
