@@ -146,8 +146,8 @@ func _configure_interaction(btn_raiz: Control, text: String, activated: bool) ->
 	else:
 		btn_raiz.mouse_filter = filtro_deseado
 		
-	# CRITICAL INTERACTION FIX: Force the overlay icon to always IGNORE mouse focus.
-	# This prevents the TextureRect from visually stealing hovers/clicks from the underlying Btn.
+	# CRITICAL UI INTERACTION FIX: Force the overlay icon to always IGNORE mouse events.
+	# This prevents the dynamically assigned TextureRect from stealing hovers/clicks from Btn.
 	var nodo_icono = btn_raiz.get_node_or_null("Icon")
 	if is_instance_valid(nodo_icono) and nodo_icono is Control:
 		nodo_icono.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -170,13 +170,24 @@ func _get_slot_size(btn: EssenceBaseInteractionButton) -> Vector2:
 		return btn.custom_minimum_size
 	return btn.size
 
-
-## PUBLIC API: Smoothly deploys the menu by interpolating buttons to their calculated geometric target coordinates.
 func open_menu(global_click_position: Vector2) -> void:
 	if is_animating or visible: 
 		return
 		
 	is_animating = true
+	
+	# =================================================================
+	# MODULAR HIERARCHY SELF-DEFENSE LAYER
+	# =================================================================
+	# Detects if the menu was injected inside a CanvasLayer container.
+	# Automatically forces it to be visible and elevates its render/input 
+	# priority to layer 100, bypassing any blocking panels (e.g., PanelControles).
+	var parent_canvas = get_parent() as CanvasLayer
+	if parent_canvas:
+		parent_canvas.visible = true
+		parent_canvas.layer = 100
+	# =================================================================
+	
 	anchor.position = make_canvas_position_local(global_click_position)
 	visible = true
 	modulate.a = 0.0
@@ -212,9 +223,14 @@ func close_menu() -> void:
 	tween.chain().tween_callback(func():
 		visible = false
 		is_animating = false
+		
+		# OPTIONAL clean-up: If you want the HUD layer to hide itself again after 
+		# the menu closes, you can toggle it here. Otherwise, leave it active.
+		# var parent_canvas = get_parent() as CanvasLayer
+		# if parent_canvas: parent_canvas.visible = false
+		
 		menu_closed.emit()
 	)
-
 
 ## Callback receiver for button selection signals. Coordinates pagination or forwards structural actions.
 func _on_action_button(action: String) -> void:
