@@ -1,6 +1,6 @@
 ## [EssenceBaseInteractionButton]
 ## Abstract parent class for all buttons in the interaction menu.
-## Controls input cycle, mass click blocking, and standard hover effects.
+## Controls input cycle, mass click blocking, and standard hover effects directly.
 class_name EssenceBaseInteractionButton
 extends Control
 
@@ -8,53 +8,50 @@ extends Control
 signal action_chosen(action_name: String)
 
 @export_category("Base Configuration")
-## The unique string identifier for this button's action.
 @export var action_name: String = "empty" 
-## Default texture resource used for this slot's graphical icon.
 @export var icon_texture: Texture2D 
 
-var btn: TextureButton
 var icon: TextureRect
 var base_scale: Vector2 
 var can_be_pressed: bool = true 
+
 
 func _ready() -> void:
 	# 1. Configure the geometric center for elastic animations 
 	pivot_offset = size / 2.0
 	
-	# 2. Type-safe node lookup to decouple the node tree structure
-	btn = get_node_or_null("Btn") as TextureButton
-	icon = get_node_or_null("Icon") as TextureRect
+	# 2. Connect internal hover events directly to this root control node
+	mouse_entered.connect(_on_hover_enter)
+	mouse_exited.connect(_on_hover_exit)
 	
-	# 3. CRITICAL UI INTERACTION HARDENING:
-	# Force the invisible TextureButton to expand and occupy 100% of the parent container's area.
-	# This prevents the button from collapsing to a 0x0 size when it holds no custom textures.
-	if btn:
-		btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		btn.mouse_filter = Control.MOUSE_FILTER_STOP # Ensures the button consumes and stops the click event
-		
-		# Safe connection of internal Godot interaction signals
-		btn.pressed.connect(_on_btn_pressed)
-		btn.mouse_entered.connect(_on_hover_enter)
-		btn.mouse_exited.connect(_on_hover_exit)
-		
-	# 4. SILENT GRAPHICAL PASS-THROUGH:
-	# Force the Icon overlay to always ignore mouse inputs, letting interactions fall through to the button.
+	# 3. Hardware graphical pass-through safety
+	icon = get_node_or_null("Icon") as TextureRect
 	if icon:
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if icon_texture:
 			icon.texture = icon_texture
+			
+	# 4. Force the old sub-button to stand down and not conflict with picking
+	var old_btn = get_node_or_null("Btn") as Control
+	if old_btn:
+		old_btn.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
-	call_deferred("_save_base_scale")
+	call_deferred("_save_base_scale") 
 
 
 func _save_base_scale() -> void:
 	base_scale = scale 
 
 
-## ANTI-SPAM COOLDOWN: Prevents accidental multiple click exploitation.
-func _on_btn_pressed() -> void:
-	if not can_be_pressed: 
+## Direct UI Input interception for handling clicks reliably on the Control node itself.
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_handle_click_activation()
+
+
+## Processes the core action dispatching with anti-spam cooldown measures.
+func _handle_click_activation() -> void:
+	if not can_be_pressed or action_name == "empty" or action_name == "": 
 		return 
 		
 	can_be_pressed = false 
@@ -66,11 +63,11 @@ func _on_btn_pressed() -> void:
 
 ## VIRTUAL VISUAL EFFECTS: Open for override in specialized child classes.
 func _on_hover_enter() -> void:
-	var tween = create_tween()
-	tween.tween_property(self, "scale", base_scale * 1.1, 0.1).set_trans(Tween.TRANS_SINE) 
+	if action_name != "empty" and action_name != "":
+		var tween = create_tween()
+		tween.tween_property(self, "scale", base_scale * 1.1, 0.1).set_trans(Tween.TRANS_SINE) 
 
 
 func _on_hover_exit() -> void:
 	var tween = create_tween()
 	tween.tween_property(self, "scale", base_scale, 0.1).set_trans(Tween.TRANS_SINE)
-	

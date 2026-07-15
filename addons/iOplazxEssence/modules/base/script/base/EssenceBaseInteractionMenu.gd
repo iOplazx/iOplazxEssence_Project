@@ -132,24 +132,22 @@ func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String
 			btn.get_node("Icon").texture = active_icon
 		_configure_interaction(btn, "", false)
 
-
 ## Configures the mouse filtering rules and tooltips for interaction buttons.
 func _configure_interaction(btn_raiz: Control, text: String, activated: bool) -> void:
 	btn_raiz.tooltip_text = text
-	var nodo_hijo = btn_raiz.get_node_or_null("Btn")
 	var filtro_deseado = Control.MOUSE_FILTER_STOP if activated else Control.MOUSE_FILTER_IGNORE
 	
+	# THE SLOT IS NOW THE KING: The root control node handles the interaction area directly
+	btn_raiz.mouse_filter = filtro_deseado
+	
+	# GHOST LAYER: We force all visual child nodes to IGNORE inputs so they don't block the root rect
+	var nodo_hijo = btn_raiz.get_node_or_null("Btn")
 	if nodo_hijo:
-		nodo_hijo.tooltip_text = text
-		nodo_hijo.mouse_filter = filtro_deseado
-		btn_raiz.mouse_filter = Control.MOUSE_FILTER_PASS 
-	else:
-		btn_raiz.mouse_filter = filtro_deseado
+		nodo_hijo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		
 	var nodo_icono = btn_raiz.get_node_or_null("Icon")
 	if is_instance_valid(nodo_icono) and nodo_icono is Control:
 		nodo_icono.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
 
 ## Resets and disables a button safely, showing the unknown icon instead of hiding it.
 func _deactivate_button(btn: EssenceBaseInteractionButton) -> void:
