@@ -23,10 +23,11 @@ icon_next = ExtResource("5_72mp6")
 [node name="Anchor" type="Marker2D" parent="." unique_id=1336350027]
 
 [node name="HexagonFrame" type="TextureRect" parent="Anchor" unique_id=2045549031]
-offset_left = -256.0
-offset_top = -256.0
-offset_right = 256.0
-offset_bottom = 256.0
+offset_left = -209.0
+offset_top = -209.0
+offset_right = 303.0
+offset_bottom = 303.0
+scale = Vector2(0.8, 0.8)
 texture = ExtResource("3_nojbw")
 
 [node name="ButtonsContainer" type="Control" parent="Anchor" unique_id=184227855]
