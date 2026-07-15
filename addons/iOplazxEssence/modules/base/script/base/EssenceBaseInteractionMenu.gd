@@ -43,9 +43,10 @@ var btn_next: EssenceBaseInteractionButton
 ## Safety flag that blocks inputs and new interactions while visual transitions are active.
 var is_animating: bool = false
 
+
 ## Base initialization lifecycle for the interaction menu container.
 func _ready() -> void:
-	# 1. VERIFIED RADIAL BLUEPRINT FIX: Set root to PASS so children receive inputs first.
+	# 1. VERIFIED RADIAL BLUEPRINT: Set root to PASS so children receive inputs first.
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	visible = false
@@ -111,8 +112,7 @@ func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String
 			btn.get_node("Icon").texture = active_icon
 		_configure_interaction(btn, tooltip, true)
 	else:
-		# SPECIAL PAGINATION DISABLE LAYER:
-		# Keeps the original arrow icon texture instead of replacing it with the '?' mark.
+		# SPECIAL PAGINATION DISABLE LAYER: Keeps the original arrow icon texture.
 		btn.action_name = ""
 		btn.modulate.a = 0.3 # Semi-transparent disabled visual state
 		if active_icon:
@@ -145,6 +145,13 @@ func _deactivate_button(btn: EssenceBaseInteractionButton) -> void:
 		btn.get_node("Icon").texture = unknown_icon
 
 
+## Helper utility to safely extract the actual dimensions of a slot node.
+func _get_slot_size(btn: EssenceBaseInteractionButton) -> Vector2:
+	if btn.custom_minimum_size != Vector2.ZERO:
+		return btn.custom_minimum_size
+	return btn.size
+
+
 ## PUBLIC API: Smoothly deploys the menu by interpolating buttons to their calculated geometric target coordinates.
 func open_menu(global_click_position: Vector2) -> void:
 	if is_animating or visible: 
@@ -161,7 +168,8 @@ func open_menu(global_click_position: Vector2) -> void:
 	tween.tween_property(anchor, "scale", Vector2(1.0, 1.0), animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	
 	for btn in buttons_container.get_children():
-		btn.position = -(btn.custom_minimum_size / 2.0)
+		var slot_size = _get_slot_size(btn)
+		btn.position = -(slot_size / 2.0)
 		var pos_final = btn.get_meta("pos_final", Vector2.ZERO)
 		tween.tween_property(btn, "position", pos_final, animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
@@ -179,7 +187,8 @@ func close_menu() -> void:
 	tween.tween_property(anchor, "scale", Vector2(0.1, 0.1), animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	
 	for btn in buttons_container.get_children():
-		tween.tween_property(btn, "position", -(btn.custom_minimum_size / 2.0), animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		var slot_size = _get_slot_size(btn)
+		tween.tween_property(btn, "position", -(slot_size / 2.0), animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	
 	tween.chain().tween_callback(func():
 		visible = false
@@ -205,7 +214,6 @@ func _on_action_button(action: String) -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
-	# Closes the menu when a physical left click registers outside the button boundaries
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if not is_animating:
 			close_menu()
@@ -222,8 +230,9 @@ func _instance_slot(local_position: Vector2, initial_action: String) -> EssenceB
 	buttons_container.add_child(btn)
 	btn.scale = Vector2(button_scale, button_scale)
 	
-	# VERIFIED RADIAL BLUEPRINT FIX: Use custom_minimum_size to avoid 0x0 scale faults at runtime.
-	btn.set_meta("pos_final", local_position - (btn.custom_minimum_size / 2.0))
+	# HARDENED DIMENSION LOGIC: Resolves the 128x128 bounding box center flawlessly
+	var slot_size = _get_slot_size(btn)
+	btn.set_meta("pos_final", local_position - (slot_size / 2.0))
 	btn.action_name = initial_action
 	btn.action_chosen.connect(_on_action_button)
 	return btn
