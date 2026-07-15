@@ -1,63 +1,76 @@
-## [Essence Base Interaction Button]
+## [EssenceBaseInteractionButton]
 ## Abstract parent class for all buttons in the interaction menu.
 ## Controls input cycle, mass click blocking, and standard hover effects.
-
 class_name EssenceBaseInteractionButton
 extends Control
 
+## Official signal to notify the manager which action was selected.
+signal action_chosen(action_name: String)
 
-## Señal oficial para notificar al mánager qué acción fue seleccionada 
-signal accion_elegida(nombre_accion: String)
-
-@export_category("Configuración Base")
-@export var nombre_accion: String = "vacio" 
-@export var textura_icono: Texture2D 
+@export_category("Base Configuration")
+## The unique string identifier for this button's action.
+@export var action_name: String = "empty" 
+## Default texture resource used for this slot's graphical icon.
+@export var icon_texture: Texture2D 
 
 var btn: TextureButton
 var icon: TextureRect
-var escala_base: Vector2 
-var puede_pulsarse: bool = true 
+var base_scale: Vector2 
+var can_be_pressed: bool = true 
 
 func _ready() -> void:
-	# 1. Configurar el centro geométrico para animaciones elásticas 
+	# 1. Configure the geometric center for elastic animations 
 	pivot_offset = size / 2.0
 	
-	# 2. Búsqueda segura por tipado para desacoplar el árbol de nodos
+	# 2. Type-safe node lookup to decouple the node tree structure
 	btn = get_node_or_null("Btn") as TextureButton
 	icon = get_node_or_null("Icon") as TextureRect
 	
-	# 3. Inicialización pasiva de texturas 
-	if textura_icono and icon:
-		icon.texture = textura_icono
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		
-	# 4. Conexión segura de señales internas de Godot 
+	# 3. CRITICAL UI INTERACTION HARDENING:
+	# Force the invisible TextureButton to expand and occupy 100% of the parent container's area.
+	# This prevents the button from collapsing to a 0x0 size when it holds no custom textures.
 	if btn:
+		btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		btn.mouse_filter = Control.MOUSE_FILTER_STOP # Ensures the button consumes and stops the click event
+		
+		# Safe connection of internal Godot interaction signals
 		btn.pressed.connect(_on_btn_pressed)
 		btn.mouse_entered.connect(_on_hover_enter)
 		btn.mouse_exited.connect(_on_hover_exit)
 		
-	call_deferred("_guardar_escala_base") 
+	# 4. SILENT GRAPHICAL PASS-THROUGH:
+	# Force the Icon overlay to always ignore mouse inputs, letting interactions fall through to the button.
+	if icon:
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if icon_texture:
+			icon.texture = icon_texture
+		
+	call_deferred("_save_base_scale")
 
-func _guardar_escala_base() -> void:
-	escala_base = scale 
 
-## ANTI-SPAM COOLDOWN: Previene la explotación de múltiples clicks accidentales 
+func _save_base_scale() -> void:
+	base_scale = scale 
+
+
+## ANTI-SPAM COOLDOWN: Prevents accidental multiple click exploitation.
 func _on_btn_pressed() -> void:
-	if not puede_pulsarse: 
+	if not can_be_pressed: 
 		return 
 		
-	puede_pulsarse = false 
-	accion_elegida.emit(nombre_accion) 
+	can_be_pressed = false 
+	action_chosen.emit(action_name) 
 	
-	# Desbloqueo automatizado mediante hilos de tiempo nativos
-	get_tree().create_timer(0.3).timeout.connect(func(): puede_pulsarse = true) 
+	# Automated unlock via native time yields
+	get_tree().create_timer(0.3).timeout.connect(func(): can_be_pressed = true) 
 
-## EFECTOS VISUALES VIRTUALES: Abiertos para sobreescritura en clases hijas 
+
+## VIRTUAL VISUAL EFFECTS: Open for override in specialized child classes.
 func _on_hover_enter() -> void:
 	var tween = create_tween()
-	tween.tween_property(self, "scale", escala_base * 1.1, 0.1).set_trans(Tween.TRANS_SINE) 
+	tween.tween_property(self, "scale", base_scale * 1.1, 0.1).set_trans(Tween.TRANS_SINE) 
+
 
 func _on_hover_exit() -> void:
 	var tween = create_tween()
-	tween.tween_property(self, "scale", escala_base, 0.1).set_trans(Tween.TRANS_SINE) 
+	tween.tween_property(self, "scale", base_scale, 0.1).set_trans(Tween.TRANS_SINE)
+	

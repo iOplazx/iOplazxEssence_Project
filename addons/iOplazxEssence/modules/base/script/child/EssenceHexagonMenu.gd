@@ -7,10 +7,9 @@ extends EssenceBaseInteractionMenu
 # HexagonMenu.tscn
 # ==
 # EssenceHexagonMenu (Control) [Script: HexagonMenu]
-# └── Anchor (Marker2D)
+# └── Anchor (Control)
 #     ├── HexagonFrame (TextureRect)   
 #     └── ButtonsContainer (Control)  
-
 
 @export_category("Hexagonal Geometry")
 ## Distance from the center of the menu to the center of each hexagonal cell.

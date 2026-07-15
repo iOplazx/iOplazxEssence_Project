@@ -14,15 +14,19 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("1_t350g")
 button_scene = ExtResource("2_s86xh")
 unknown_icon = ExtResource("3_4qjco")
 icon_prev = ExtResource("4_4v5n8")
 icon_next = ExtResource("5_72mp6")
 
-[node name="Anchor" type="Marker2D" parent="." unique_id=1336350027]
+[node name="Anchor" type="Control" parent="." unique_id=288588710]
+anchors_preset = 0
+mouse_filter = 2
 
 [node name="HexagonFrame" type="TextureRect" parent="Anchor" unique_id=2045549031]
+layout_mode = 0
 offset_left = -209.0
 offset_top = -209.0
 offset_right = 303.0
@@ -31,7 +35,6 @@ scale = Vector2(0.8, 0.8)
 texture = ExtResource("3_nojbw")
 
 [node name="ButtonsContainer" type="Control" parent="Anchor" unique_id=184227855]
-layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0

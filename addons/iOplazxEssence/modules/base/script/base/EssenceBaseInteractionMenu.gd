@@ -26,7 +26,7 @@ signal menu_closed()
 ## Texture for the next page pagination button.
 @export var icon_next: Texture2D 
 
-@onready var anchor: Marker2D = $Anchor
+@onready var anchor: Control = $Anchor
 @onready var buttons_container: Control = $Anchor/ButtonsContainer
 
 # Internal pagination tracking data structures
@@ -43,17 +43,23 @@ var btn_next: EssenceBaseInteractionButton
 ## Safety flag that blocks inputs and new interactions while visual transitions are active.
 var is_animating: bool = false
 
-
+## Base initialization lifecycle for the interaction menu container.
 func _ready() -> void:
+	# 1. VERIFIED RADIAL BLUEPRINT FIX: Set root to PASS so children receive inputs first.
+	mouse_filter = Control.MOUSE_FILTER_PASS
+	
 	visible = false
 	modulate.a = 0.0 
-	anchor.scale = Vector2(0.1, 0.1)
 	
-	# Clean up design-time placeholder nodes from the editor container
-	for child in buttons_container.get_children():
-		child.queue_free()
+	if is_instance_valid(anchor):
+		anchor.scale = Vector2(0.1, 0.1)
+	
+	# 2. Clean up design-time placeholder nodes from the editor container
+	if is_instance_valid(buttons_container):
+		for child in buttons_container.get_children():
+			child.queue_free()
 		
-	# VIRTUAL CALL: Each child menu class will implement its own geometric arrangement
+	# 3. VIRTUAL CALL: Execute child geometric arrangement (e.g., Hexagonal layout)
 	_generate_geometric_structure()
 
 
@@ -76,7 +82,7 @@ func _update_page_view() -> void:
 		
 		if i < datos_pagina.size() and datos_pagina[i].get("id", "") != "":
 			var action_data = datos_pagina[i]
-			btn.nombre_accion = action_data.get("id", "")
+			btn.action_name = action_data.get("id", "")
 			btn.get_node("Icon").texture = action_data.get("icono", unknown_icon) if action_data.get("icono", null) != null else unknown_icon
 			btn.modulate.a = 1.0 
 			_configure_interaction(btn, action_data.get("descripcion", ""), true)
@@ -92,17 +98,14 @@ func _update_page_view() -> void:
 	_manage_pagination_button(btn_prev, "pagina_anterior", has_prev, tr("RADIAL_MENU_PREV_PAGE"), icon_prev)
 	_manage_pagination_button(btn_next, "pagina_siguiente", has_next, tr("RADIAL_MENU_NEXT_PAGE"), icon_next)
 
+
 ## Manages visibility and interactions for a specific pagination button safely.
-## [param btn]: The interaction button instance.
-## [param action]: The internal pagination action string.
-## [param condition]: True if the button should be active, false to show as an empty slot.
-## [param active_icon]: The default texture asset to apply when enabled.
 func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String, condition: bool, tooltip: String, active_icon: Texture2D) -> void:
 	if not is_instance_valid(btn): 
 		return
 		
 	if condition:
-		btn.nombre_accion = action
+		btn.action_name = action
 		btn.modulate.a = 1.0
 		if active_icon:
 			btn.get_node("Icon").texture = active_icon
@@ -110,8 +113,7 @@ func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String
 	else:
 		# SPECIAL PAGINATION DISABLE LAYER:
 		# Keeps the original arrow icon texture instead of replacing it with the '?' mark.
-		# Dims the opacity and disables collision input to indicate it is inactive.
-		btn.nombre_accion = ""
+		btn.action_name = ""
 		btn.modulate.a = 0.3 # Semi-transparent disabled visual state
 		if active_icon:
 			btn.get_node("Icon").texture = active_icon
@@ -131,21 +133,20 @@ func _configure_interaction(btn_raiz: Control, text: String, activated: bool) ->
 	else:
 		btn_raiz.mouse_filter = filtro_deseado
 
+
 ## Resets and disables a button safely, showing the unknown icon instead of hiding it.
-## [param btn]: The target button instance to format as empty.
 func _deactivate_button(btn: EssenceBaseInteractionButton) -> void:
 	if not is_instance_valid(btn): 
 		return
 		
-	btn.nombre_accion = ""
+	btn.action_name = ""
 	btn.modulate.a = 1.0 # Keeps the node fully visible to preserve the layout structure
-	
 	if unknown_icon:
 		btn.get_node("Icon").texture = unknown_icon
 
+
 ## PUBLIC API: Smoothly deploys the menu by interpolating buttons to their calculated geometric target coordinates.
 func open_menu(global_click_position: Vector2) -> void:
-	# Reject execution if an animation is currently active or the menu is already visible
 	if is_animating or visible: 
 		return
 		
@@ -160,17 +161,15 @@ func open_menu(global_click_position: Vector2) -> void:
 	tween.tween_property(anchor, "scale", Vector2(1.0, 1.0), animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	
 	for btn in buttons_container.get_children():
-		btn.position = -(btn.size / 2.0)
+		btn.position = -(btn.custom_minimum_size / 2.0)
 		var pos_final = btn.get_meta("pos_final", Vector2.ZERO)
 		tween.tween_property(btn, "position", pos_final, animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
-	# Release the animation lock once the transitions finish
 	tween.chain().tween_callback(func(): is_animating = false)
 
 
 ## PUBLIC API: Smoothly retracts and hides the menu using a scale down transition, resetting interaction locks.
 func close_menu() -> void:
-	# Reject execution if an animation is currently active or the menu is already hidden
 	if is_animating or not visible: 
 		return
 		
@@ -180,9 +179,8 @@ func close_menu() -> void:
 	tween.tween_property(anchor, "scale", Vector2(0.1, 0.1), animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	
 	for btn in buttons_container.get_children():
-		tween.tween_property(btn, "position", -(btn.size / 2.0), animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		tween.tween_property(btn, "position", -(btn.custom_minimum_size / 2.0), animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	
-	# Clean up visibility states and emit the notification signal upon sequence completion
 	tween.chain().tween_callback(func():
 		visible = false
 		is_animating = false
@@ -224,8 +222,64 @@ func _instance_slot(local_position: Vector2, initial_action: String) -> EssenceB
 	buttons_container.add_child(btn)
 	btn.scale = Vector2(button_scale, button_scale)
 	
-	# Center the button pivot according to the mathematically calculated local coordinates
-	btn.set_meta("pos_final", local_position - (btn.size / 2.0))
-	btn.nombre_accion = initial_action
-	btn.accion_elegida.connect(_on_action_button)
+	# VERIFIED RADIAL BLUEPRINT FIX: Use custom_minimum_size to avoid 0x0 scale faults at runtime.
+	btn.set_meta("pos_final", local_position - (btn.custom_minimum_size / 2.0))
+	btn.action_name = initial_action
+	btn.action_chosen.connect(_on_action_button)
 	return btn
+	
+
+# ==========================================
+# TEMPORARY UI TELEMETRY DIAGNOSTIC LAYER
+# ==========================================
+
+var _debug_time_accumulator: float = 0.0
+
+func _process(delta: float) -> void:
+	if not visible:
+		return
+		
+	_debug_time_accumulator += delta
+	if _debug_time_accumulator >= 0.5:
+		_debug_time_accumulator = 0.0
+		_run_mouse_diagnostic()
+
+
+func _run_mouse_diagnostic() -> void:
+	var global_mouse_pos: Vector2 = get_global_mouse_position()
+	
+	print("\n--- [UI MOUSE DIAGNOSTIC START] ---")
+	print("Global Mouse Position: ", global_mouse_pos)
+	print("Menu Root | Visible: ", visible, " | Filter: ", mouse_filter)
+	
+	if is_instance_valid(buttons_container):
+		print("ButtonsContainer | Filter: ", buttons_container.mouse_filter, " | Size: ", buttons_container.size, " | Global Pos: ", buttons_container.global_position)
+	
+	var inspect_slot = func(slot_label: String, slot_control: Control) -> void:
+		if not is_instance_valid(slot_control):
+			print("  [", slot_label, "] State: NULL / INVALID NODE")
+			return
+			
+		var slot_rect: Rect2 = slot_control.get_global_rect()
+		var is_inside_slot: bool = slot_rect.has_point(global_mouse_pos)
+		
+		print("  [", slot_label, "] Visible: ", slot_control.visible, 
+			" | Filter: ", slot_control.mouse_filter, 
+			" | Rect: ", slot_rect, 
+			" | Mouse Inside Rect: ", is_inside_slot)
+			
+		var internal_btn = slot_control.get_node_or_null("Btn") as TextureButton
+		if is_instance_valid(internal_btn):
+			var btn_rect: Rect2 = internal_btn.get_global_rect()
+			print("    └── Sub-Btn | Filter: ", internal_btn.mouse_filter, 
+				" | Rect: ", btn_rect, 
+				" | Engine Hovered: ", internal_btn.is_hovered())
+		else:
+			print("    └── Warning: Internal 'Btn' node missing or structural type mismatch.")
+
+	for i in range(botones_accion.size()):
+		inspect_slot.call("Action_Slot_" + str(i), botones_accion[i])
+		
+	inspect_slot.call("Pagination_Prev", btn_prev)
+	inspect_slot.call("Pagination_Next", btn_next)
+	print("--- [UI MOUSE DIAGNOSTIC END] ---\n")
