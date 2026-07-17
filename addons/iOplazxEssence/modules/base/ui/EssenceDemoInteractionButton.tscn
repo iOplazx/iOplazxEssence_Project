@@ -45,5 +45,5 @@ stretch_mode = 3
 
 [node name="HoverArrow" type="Sprite2D" parent="." unique_id=367406665]
 unique_name_in_owner = true
-position = Vector2(64, -15)
+position = Vector2(64, 25)
 texture = ExtResource("5_4xbxs")
