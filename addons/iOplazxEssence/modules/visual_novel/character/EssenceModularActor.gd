@@ -26,12 +26,19 @@ func _sync_modular_initial_state() -> void:
 		if is_instance_valid(pose_node):
 			pose_node.visible = (pose_id == current_pose_id)
 			
-	# Hornear inventario inicial analizando qué dejamos encendido en el editor
 	var active_pose = poses_registry.get(current_pose_id)
 	if active_pose:
+		# 1. Hornear inventario local de la pose
 		for item_id in active_pose.registry.keys():
 			if active_pose.registry[item_id].visible:
 				_equipped_items.append(item_id)
+				
+		# 2. ¡NUEVO! Hornear inventario del grupo fijo común si la pose lo incluye
+		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
+			var shared = active_pose.shared_clothing_group
+			for item_id in shared.registry.keys():
+				if shared.registry[item_id].visible and not item_id in _equipped_items:
+					_equipped_items.append(item_id)
 
 
 ## PUBLIC API: Cambia la postura usando identificadores numéricos puros.
@@ -42,14 +49,25 @@ func change_pose(target_pose_id: int) -> void:
 	var old_pose = poses_registry.get(current_pose_id)
 	var new_pose = poses_registry.get(target_pose_id)
 	
+	# Interceptamos y gestionamos los grupos comunes vinculados a las poses
+	var old_shared = old_pose.shared_clothing_group if (old_pose and "shared_clothing_group" in old_pose) else null
+	var new_shared = new_pose.shared_clothing_group if (new_pose and "shared_clothing_group" in new_pose) else null
+	
 	if old_pose: old_pose.visible = false
 	if new_pose: new_pose.visible = true
+	
+	if old_shared and old_shared != new_shared: old_shared.visible = false
+	if new_shared: new_shared.visible = true
 	
 	current_pose_id = target_pose_id
 	
 	if new_pose:
 		new_pose.hide_all_registered()
 		new_pose.sync_equipped_items(_equipped_items)
+	# ¡NUEVO! Sincronizar el contenedor fijo común de la nueva pose
+	if new_shared:
+		new_shared.hide_all_registered()
+		new_shared.sync_equipped_items(_equipped_items)
 
 
 ## PUBLIC API: Modifica el estado de una prenda en el inventario lógico.
@@ -62,6 +80,9 @@ func modify_clothing(item_id: int, is_equipped: bool) -> void:
 	var active_pose = poses_registry.get(current_pose_id)
 	if active_pose:
 		active_pose.sync_equipped_items(_equipped_items)
+		# ¡FIX CRÍTICO! Le avisamos al grupo fijo común de la pose que se actualice también
+		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
+			active_pose.shared_clothing_group.sync_equipped_items(_equipped_items)
 
 
 # ==========================================
