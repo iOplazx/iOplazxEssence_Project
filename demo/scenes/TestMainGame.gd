@@ -540,16 +540,25 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 		# Reemplazamos la reflexión por texto por una evaluación de clases nativas en RAM
 		
 		if actor_instance is EssenceModularActor:
-			# Al verificar que es un actor modular, el compilador GARANTIZA que tiene 'toggle_garment'
+			# Al ser un actor modular, interactivo o no, ahora usamos el sistema inmutable de enteros
 			if actor_id == GameIDs.ActorID.PROTAGONIST:
 				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
+				
 				if wardrobe_data.is_empty():
-					actor_instance.toggle_garment("GenericChrHat", false)
-					actor_instance.toggle_garment("GenericChrSunglass", false)
+					# ESTADO INICIAL/POR DEFECTO:
+					# Nativamente usamos los Enums seguros del archivo IDsGIC del protagonista
+					actor_instance.modify_clothing(IDsGIC.Items.HAT_1, false) 
+					actor_instance.modify_clothing(IDsGIC.Items.SUNGLASS_1, false) 
 				else:
-					for garment_id in wardrobe_data.keys():
-						actor_instance.toggle_garment(garment_id, wardrobe_data[garment_id])
-
+					# RESTAURACIÓN POR FLAGS DE HISTORIA:
+					for garment_key in wardrobe_data.keys():
+						# PROTECCIÓN JSON: Forzamos la llave a int porque JSON convierte las llaves numéricas a String
+						var item_id: int = int(garment_key)
+						var is_equipped: bool = bool(wardrobe_data[garment_key])
+						
+						# Impactamos directamente el inventario lógico y visual del framework base 
+						actor_instance.modify_clothing(item_id, is_equipped) 
+				
 		if actor_instance is EssenceInteractiveActor:
 			# Al verificar que es un actor interactivo, el compilador GARANTIZA que tiene 'clicked_on_character'
 			if actor_id == GameIDs.ActorID.PROTAGONIST:

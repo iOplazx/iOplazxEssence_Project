@@ -1,62 +1,101 @@
 ## [EssenceModularActor]
-## Handles modular visual parts like clothing, accessories, or visual variations.
-## Automatically registers nodes added to the 'Wardrobe Nodes' array.
+## Clase base del framework encargada de la gestión modular de apariencias,
+## control seguro de posturas y sincronización de prendas mediante IDs inmutables.
 class_name EssenceModularActor
 extends EssenceActor
 
-## Drag and drop clothing or expression nodes directly from the Inspector.
-@export var wardrobe_nodes: Array[Node2D] = []
+@export_category("Base Modular Configuration")
+## La pose entera activa inicial.
+@export var current_pose_id: int = 1
 
-## Internal lookup table to resolve garment visibility changes in O(1) time.
-var _wardrobe_map: Dictionary = {}
+## Registro visual indexado por enteros (Pose ID -> Nodo del Grupo Visual)
+@export var poses_registry: Dictionary[int, EssenceWardrobeGroup] = {}
+
+## Lista maestra que guarda los enteros de la ropa que el personaje lleva puesta (Save State).
+var _equipped_items: Array[int] = []
 
 
 func _ready() -> void:
-	# 1. Call parent (EssenceActor) initialization if needed
 	super._ready()
-	
-	# 2. Automatically bake the array into a high-performance hash map
-	_build_wardrobe_map()
+	_sync_modular_initial_state()
 
 
-## Converts the inspector array into a fast-lookup dictionary using node names as keys.
-func _build_wardrobe_map() -> void:
-	for node in wardrobe_nodes:
-		if is_instance_valid(node):
-			_wardrobe_map[node.name] = node
-
-
-## Toggles the visibility of a specific garment or accessory instantly.
-## [param garment_id]: The exact name of the node in the wardrobe map.
-## [param is_enabled]: True to show, False to hide.
-func toggle_garment(garment_id: String, is_enabled: bool) -> void:
-	if _wardrobe_map.has(garment_id):
-		_wardrobe_map[garment_id].visible = is_enabled
-	else:
-		push_warning("[%s] Wardrobe Warning: Garment '%s' not found in registry." % [name, garment_id])
-
-
-# ==========================================
-# PUBLIC STATE SERIALIZATION (SAVE & LOAD)
-# ==========================================
-
-## PUBLIC API: Serializes the current visibility state of all modular wardrobe items.
-## Returns a Dictionary mapping garment node names to their boolean visibility states.
-func get_clothing_state() -> Dictionary:
-	var state: Dictionary = {}
-	
-	for garment_id in _wardrobe_map.keys():
-		var garment_node = _wardrobe_map[garment_id]
-		if is_instance_valid(garment_node):
-			state[garment_id] = garment_node.visible
+func _sync_modular_initial_state() -> void:
+	for pose_id in poses_registry.keys():
+		var pose_node = poses_registry[pose_id]
+		if is_instance_valid(pose_node):
+			pose_node.visible = (pose_id == current_pose_id)
 			
-	return state
+	# Hornear inventario inicial analizando qué dejamos encendido en el editor
+	var active_pose = poses_registry.get(current_pose_id)
+	if active_pose:
+		for item_id in active_pose.registry.keys():
+			if active_pose.registry[item_id].visible:
+				_equipped_items.append(item_id)
 
 
-## PUBLIC API: Restores the visibility states of the wardrobe items from a saved state dictionary.
-## [param state]: A Dictionary mapping garment names to their target boolean visibility states.
+## PUBLIC API: Cambia la postura usando identificadores numéricos puros.
+func change_pose(target_pose_id: int) -> void:
+	if not poses_registry.has(target_pose_id) or target_pose_id == current_pose_id:
+		return
+		
+	var old_pose = poses_registry.get(current_pose_id)
+	var new_pose = poses_registry.get(target_pose_id)
+	
+	if old_pose: old_pose.visible = false
+	if new_pose: new_pose.visible = true
+	
+	current_pose_id = target_pose_id
+	
+	if new_pose:
+		new_pose.hide_all_registered()
+		new_pose.sync_equipped_items(_equipped_items)
+
+
+## PUBLIC API: Modifica el estado de una prenda en el inventario lógico.
+func modify_clothing(item_id: int, is_equipped: bool) -> void:
+	if is_equipped and not item_id in _equipped_items:
+		_equipped_items.append(item_id)
+	elif not is_equipped and item_id in _equipped_items:
+		_equipped_items.erase(item_id)
+		
+	var active_pose = poses_registry.get(current_pose_id)
+	if active_pose:
+		active_pose.sync_equipped_items(_equipped_items)
+
+
+# ==========================================
+# SERIALIZACIÓN DE ESTADO (SAVE & LOAD)
+# ==========================================
+
+## PUBLIC API: Serializa el estado actual del guardarropa y la postura.
+## Devuelve un diccionario limpio con puros IDs numéricos estables.
+func get_clothing_state() -> Dictionary:
+	return {
+		"current_pose_id": current_pose_id,
+		"equipped_ids": _equipped_items.duplicate()
+	}
+
+
+## PUBLIC API: Restaura la postura y las prendas equipadas desde el archivo de guardado.
+## Sanitiza automáticamente los números float que genera el formato JSON nativo de Godot.
 func apply_clothing_state(state: Dictionary) -> void:
-	for garment_id in state.keys():
-		var is_enabled: bool = state[garment_id]
-		# Reuses the optimized O(1) toggle method to apply the loaded visibility state
-		toggle_garment(garment_id, is_enabled)
+	if state.is_empty():
+		return
+		
+	# 1. Extraer y sanitizar la lista de ropa equipada (Bypass de floats a int)
+	if state.has("equipped_ids"):
+		_equipped_items.clear()
+		for id in state["equipped_ids"]:
+			_equipped_items.append(int(id))
+			
+	# 2. Procesar el cambio seguro de postura
+	if state.has("current_pose_id"):
+		var target_pose = int(state["current_pose_id"])
+		change_pose(target_pose)
+	else:
+		# Si la partida no guardó una pose, forzamos la sincronización de la pose actual
+		var active_pose = poses_registry.get(current_pose_id)
+		if active_pose:
+			active_pose.hide_all_registered()
+			active_pose.sync_equipped_items(_equipped_items)

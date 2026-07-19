@@ -2,62 +2,102 @@
 
 [ext_resource type="Script" uid="uid://duv0k0proe7fr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/script/GenericInteractiveCharacter.gd" id="1_84ggt"]
 [ext_resource type="Texture2D" uid="uid://ddba3a0fhjg8t" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_base.png" id="1_y4k16"]
+[ext_resource type="Script" uid="uid://c7bfqfaiypcxq" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/script/GICPoseComponent.gd" id="2_48b3o"]
 [ext_resource type="Texture2D" uid="uid://b7fnbcqtglls4" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_belt.png" id="2_84ggt"]
 [ext_resource type="Texture2D" uid="uid://dpkcijcider0l" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_hat.png" id="3_6fi35"]
 [ext_resource type="Texture2D" uid="uid://g2mg46lbf826" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_pant.png" id="4_5wcuj"]
+[ext_resource type="Texture2D" uid="uid://bmngs08sbh7fk" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_v2.png" id="5_48b3o"]
 [ext_resource type="Texture2D" uid="uid://b0631km86e6tw" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_shirt.png" id="5_r3stj"]
+[ext_resource type="Texture2D" uid="uid://u35724lawdif" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_shirt_v2.png" id="6_jlson"]
 [ext_resource type="Texture2D" uid="uid://cym5fc1fcav0n" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_shoes.png" id="6_uf5u5"]
 [ext_resource type="Texture2D" uid="uid://cgt4awyjtklfk" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_sunglass.png" id="7_d7ygk"]
+[ext_resource type="Script" uid="uid://bcw8mk7bnl662" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/script/GICWardrobeGroup.gd" id="7_jlson"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_y4k16"]
 radius = 98.0
 height = 994.0
 
-[node name="CharacterRoot" type="Node2D" unique_id=1680410021 node_paths=PackedStringArray("wardrobe_nodes")]
+[node name="CharacterRoot" type="Node2D" unique_id=1680410021 node_paths=PackedStringArray("poses_registry")]
 script = ExtResource("1_84ggt")
-wardrobe_nodes = [NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrBelt"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrHat"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrPant"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrShirt"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrShoes"), NodePath("SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe/GenericChrSunglass")]
+poses_registry = {
+1: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Normal"),
+2: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Action")
+}
 character_id = "chr01"
 display_name = "Main Character"
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=1709483046]
-offset_left = -181.0
+offset_left = -327.0
 offset_top = -1484.0
-offset_right = 219.0
+offset_right = 297.0
 offset_bottom = 80.0
 mouse_filter = 2
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=846808459]
 transparent_bg = true
 handle_input_locally = false
-size = Vector2i(400, 1500)
+size = Vector2i(700, 1500)
 render_target_update_mode = 4
 
 [node name="Visuals" type="Node2D" parent="SubViewportContainer/SubViewport" unique_id=1100217383]
 position = Vector2(170, 755)
 
-[node name="NormalPose" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals" unique_id=170860397]
+[node name="Pose_Normal" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals" unique_id=170860397 node_paths=PackedStringArray("shared_clothing_group", "local_wardrobe")]
+position = Vector2(165, -14)
+script = ExtResource("2_48b3o")
+shared_clothing_group = NodePath("../CommonClothes/Group_Normal_Action")
+local_wardrobe = {
+10: NodePath("Wardrobe/Shirt")
+}
 
-[node name="BaseBody" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose" unique_id=413827466]
+[node name="BaseBody" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/Pose_Normal" unique_id=413827466]
 texture = ExtResource("1_y4k16")
 
-[node name="Wardrobe" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose" unique_id=888979199]
+[node name="Wardrobe" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals/Pose_Normal" unique_id=888979199]
 
-[node name="GenericChrBelt" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=2131330393]
-texture = ExtResource("2_84ggt")
-
-[node name="GenericChrHat" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=597078295]
-texture = ExtResource("3_6fi35")
-
-[node name="GenericChrPant" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=1408931492]
-texture = ExtResource("4_5wcuj")
-
-[node name="GenericChrShirt" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=34606274]
+[node name="Shirt" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/Pose_Normal/Wardrobe" unique_id=34606274]
 texture = ExtResource("5_r3stj")
 
-[node name="GenericChrShoes" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=498943442]
+[node name="Pose_Action" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals" unique_id=1588158918 node_paths=PackedStringArray("shared_clothing_group")]
+script = ExtResource("2_48b3o")
+shared_clothing_group = NodePath("../CommonClothes/Group_Normal_Action")
+
+[node name="GenericChrV2" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/Pose_Action" unique_id=1469448029]
+position = Vector2(163, -10)
+texture = ExtResource("5_48b3o")
+
+[node name="Wardrobe" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals/Pose_Action" unique_id=2007816966]
+
+[node name="Shirt_V2" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/Pose_Action/Wardrobe" unique_id=34602381]
+position = Vector2(160, -11)
+texture = ExtResource("6_jlson")
+
+[node name="CommonClothes" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals" unique_id=1012862769]
+position = Vector2(160, -11)
+
+[node name="Group_Normal_Action" type="Node2D" parent="SubViewportContainer/SubViewport/Visuals/CommonClothes" unique_id=969160326 node_paths=PackedStringArray("local_wardrobe")]
+script = ExtResource("7_jlson")
+local_wardrobe = {
+20: NodePath("Pant"),
+30: NodePath("Belt"),
+40: NodePath("Hat"),
+50: NodePath("Sunglass"),
+60: NodePath("Shoes")
+}
+
+[node name="Belt" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/CommonClothes/Group_Normal_Action" unique_id=2131330393]
+texture = ExtResource("2_84ggt")
+
+[node name="Hat" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/CommonClothes/Group_Normal_Action" unique_id=597078295]
+texture = ExtResource("3_6fi35")
+
+[node name="Pant" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/CommonClothes/Group_Normal_Action" unique_id=1408931492]
+texture = ExtResource("4_5wcuj")
+
+[node name="Shoes" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/CommonClothes/Group_Normal_Action" unique_id=498943442]
 texture = ExtResource("6_uf5u5")
 
-[node name="GenericChrSunglass" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/NormalPose/Wardrobe" unique_id=1184219910]
+[node name="Sunglass" type="Sprite2D" parent="SubViewportContainer/SubViewport/Visuals/CommonClothes/Group_Normal_Action" unique_id=1184219910]
 texture = ExtResource("7_d7ygk")
 
 [node name="Effects" type="Node2D" parent="SubViewportContainer" unique_id=575122504]
