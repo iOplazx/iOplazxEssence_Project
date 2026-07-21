@@ -27,7 +27,12 @@ class_name GenericInteractiveCharacter
 #                    ├── Shoes (Sprite2D)
 #                    └── Sunglass (Sprite2D)
 
+@export_category("GIC Pose Configuration")
+## ¡Desplegable limpio en el Inspector con IDsGIC.Poses!
+@export var gic_poses: Dictionary[IDsGIC.Poses, GICPoseComponent] = {}
+
 func _ready() -> void:
+	poses_registry = gic_poses
 	# Llama al inicializador maestro del padre (EssenceModularActor)
 	# para que construya el inventario inicial e inicialice las poses.
 	super._ready() 	

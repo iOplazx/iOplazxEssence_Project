@@ -12,8 +12,11 @@
 [ext_resource type="Texture2D" uid="uid://b4ktc77oaupga" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_jacket_4.png" id="12_ofk1b"]
 [ext_resource type="Texture2D" uid="uid://djtt26ywfkbd7" path="res://addons/iOplazxEssence/resources/images/character/GenericMan/genericChr_moustache.png" id="13_e0h68"]
 
-[node name="CharacterModularRoot" type="Node2D" unique_id=1680410021]
+[node name="CharacterModularRoot" type="Node2D" unique_id=1680410021 node_paths=PackedStringArray("npc_poses")]
 script = ExtResource("1_xaq2m")
+npc_poses = {
+1: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Normal")
+}
 character_id = "chr_02"
 display_name = "Personaje Extra"
 

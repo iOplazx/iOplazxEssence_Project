@@ -15,8 +15,15 @@ func hide_all_registered() -> void:
 
 
 func sync_equipped_items(equipped_list: Array) -> void:
+	print("   -> [WardrobeGroup] Sincronizando prendas. Lista equipada recibida: ", equipped_list)
+	print("   -> [WardrobeGroup] Nodos registrados en el diccionario 'registry': ", registry.keys())
+	
 	for item_id in registry.keys():
 		var node = registry[item_id]
 		if is_instance_valid(node):
-			# Forzamos la comparación a entero por seguridad con los Enums
-			node.visible = int(item_id) in equipped_list
+			var should_be_visible: bool = int(item_id) in equipped_list
+			node.visible = should_be_visible
+			print("      * Nodo '%s' (ID: %d) -> visible = %s" % [node.name, int(item_id), should_be_visible])
+		else:
+			print("      ⚠️ ERROR: El nodo para el ID %d es NULO o Inválido." % int(item_id))
+			

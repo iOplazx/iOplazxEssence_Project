@@ -17,9 +17,9 @@
 radius = 98.0
 height = 994.0
 
-[node name="CharacterRoot" type="Node2D" unique_id=1680410021 node_paths=PackedStringArray("poses_registry")]
+[node name="CharacterRoot" type="Node2D" unique_id=1680410021 node_paths=PackedStringArray("gic_poses")]
 script = ExtResource("1_84ggt")
-poses_registry = {
+gic_poses = {
 1: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Normal"),
 2: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Action")
 }
