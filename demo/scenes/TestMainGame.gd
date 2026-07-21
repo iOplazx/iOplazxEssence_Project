@@ -359,9 +359,9 @@ func _open_interaction_menu() -> void:
 	# 2. DATA-DRIVEN ACTION INTERFACE CONFIGURATION
 	var datos_acciones: Array = [
 		[
-			{"id": "talk", "descripcion": "Hablar con el personaje", "icono": null},
-			{"id": "examine", "descripcion": "Inspeccionar ropa", "icono": null},
-			{"id": "wardrobe", "descripcion": "Cambiar atuendo", "icono": null}
+			{"id": "talk", "descripcion": "Talk to the character", "icono": null},
+			{"id": "examine", "descripcion": "Inspect clothing", "icono": null},
+			{"id": "wardrobe", "descripcion": "Change outfit", "icono": EssencePaths.ICON_SHIRT}
 		]
 	]
 	
@@ -377,12 +377,30 @@ func _on_menu_action_selected(action: String) -> void:
 	
 	match action:
 		"talk":
-			print("-> Iniciando secuencia de diálogo con: ", active_character.display_name)
+			print("-> Iniciando secuencia de diálogo con: ", active_character.name)
 			# Trigger your DialogBoxUI pipeline here
 		"examine":
 			print("-> El jugador está examinando al personaje.")
 		"wardrobe":
-			print("-> Abriendo interfaz de vestidor.")
+			print("-> Alternando visibilidad de accesorios (Gorra y Lentes)...")
+			
+			if is_instance_valid(active_character) and active_character is EssenceModularActor:
+				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
+				
+				# 1. Leemos el estado actual (si no existe en el diccionario, asumimos false)
+				var is_currently_equipped: bool = bool(wardrobe_data.get(IDsGIC.Items.HAT_1, false))
+				var target_state: bool = not is_currently_equipped
+				
+				# 2. Impactamos los gráficos en vivo del personaje en pantalla
+				active_character.modify_clothing(IDsGIC.Items.HAT_1, target_state)
+				active_character.modify_clothing(IDsGIC.Items.SUNGLASS_1, target_state)
+				
+				# 3. Guardamos la nueva verdad en story_flags para persistencia y guardado
+				wardrobe_data[IDsGIC.Items.HAT_1] = target_state
+				wardrobe_data[IDsGIC.Items.SUNGLASS_1] = target_state
+				story_flags["player_wardrobe"] = wardrobe_data
+				
+				print("-> ¡Accesorios cambiados a: %s!" % target_state)
 			
 	# Smoothly retract the interface once the requested action is resolved
 	if is_instance_valid(_cached_interaction_menu):

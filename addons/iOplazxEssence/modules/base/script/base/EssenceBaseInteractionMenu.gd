@@ -85,7 +85,6 @@ func configure_menu(data_by_pages: Array) -> void:
 	pagina_actual = 0
 	_update_page_view()
 
-
 ## Processes the visibility and icons of the buttons based on the currently active page.
 func _update_page_view() -> void:
 	var datos_pagina = paginas_acciones[pagina_actual] if not paginas_acciones.is_empty() else []
@@ -99,7 +98,26 @@ func _update_page_view() -> void:
 		if i < datos_pagina.size() and datos_pagina[i].get("id", "") != "":
 			var action_data = datos_pagina[i]
 			btn.action_name = action_data.get("id", "")
-			btn.get_node("Icon").texture = action_data.get("icono", unknown_icon) if action_data.get("icono", null) != null else unknown_icon
+			
+			# ===================================================================
+			# RESOLUCIÓN DE TEXTURA (Soporta objetos Texture2D y rutas String)
+			# ===================================================================
+			var raw_icon = action_data.get("icono", null)
+			var resolved_texture: Texture2D = unknown_icon
+			
+			if raw_icon is Texture2D:
+				resolved_texture = raw_icon
+			elif raw_icon is String and not raw_icon.is_empty():
+				if ResourceLoader.exists(raw_icon):
+					resolved_texture = load(raw_icon) as Texture2D
+				else:
+					push_warning("[%s] ⚠️ No se encontró la textura en la ruta: %s" % [name, raw_icon])
+			
+			var icon_node = btn.get_node_or_null("Icon") as TextureRect
+			if is_instance_valid(icon_node):
+				icon_node.texture = resolved_texture
+			# ===================================================================
+			
 			btn.modulate.a = 1.0 
 			_configure_interaction(btn, action_data.get("descripcion", ""), true)
 		else:
@@ -112,8 +130,7 @@ func _update_page_view() -> void:
 	
 	_manage_pagination_button(btn_prev, "pagina_anterior", has_prev, tr("RADIAL_MENU_PREV_PAGE"), icon_prev)
 	_manage_pagination_button(btn_next, "pagina_siguiente", has_next, tr("RADIAL_MENU_NEXT_PAGE"), icon_next)
-
-
+	
 ## Manages visibility and interactions for a specific pagination button safely.
 func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String, condition: bool, tooltip: String, active_icon: Texture2D) -> void:
 	if not is_instance_valid(btn): 

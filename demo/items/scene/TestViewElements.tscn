@@ -35,9 +35,13 @@ texture = ExtResource("1_pdi08")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="CharacterRoot" parent="Node_initialRoom" unique_id=1680410021 instance=ExtResource("3_qvj7p")]
+[node name="CharacterRoot" parent="Node_initialRoom" unique_id=1680410021 node_paths=PackedStringArray("gic_poses") instance=ExtResource("3_qvj7p")]
 position = Vector2(637, 893)
 scale = Vector2(0.5, 0.5)
+gic_poses = {
+1: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Normal"),
+2: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Action")
+}
 
 [node name="ItemTouch" parent="Node_initialRoom" unique_id=1115261331 instance=ExtResource("3_hfek6")]
 position = Vector2(641.00006, 400.00003)
@@ -93,9 +97,12 @@ scale = Vector2(0.25, 0.25)
 position = Vector2(802, 497)
 scale = Vector2(0.2, 0.2)
 
-[node name="CharacterModularRoot" parent="Node_Park" unique_id=560429094 instance=ExtResource("12_1oxh2")]
+[node name="CharacterModularRoot" parent="Node_Park" unique_id=560429094 node_paths=PackedStringArray("npc_poses") instance=ExtResource("12_1oxh2")]
 position = Vector2(724, 712.00006)
 scale = Vector2(0.3, 0.3)
+npc_poses = {
+1: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Normal")
+}
 
 [node name="ControlPanel_Example" type="Panel" parent="." unique_id=831380775]
 custom_minimum_size = Vector2(400, 50)
