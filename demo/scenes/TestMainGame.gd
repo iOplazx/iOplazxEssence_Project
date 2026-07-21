@@ -62,8 +62,8 @@ var story_flags: Dictionary = {
 	# PERSISTENT WARDROBE SYSTEM
 	# This holds the true state of the player's clothing across saves and room switches.
 	"player_wardrobe": {
-		"GenericChrHat": false,
-		"GenericChrSunglass": false
+		IDsGIC.Items.HAT_1: false,
+		IDsGIC.Items.SUNGLASS_1: false
 	}
 }
 
@@ -493,11 +493,9 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 	for actor_data in actors_to_spawn:
 		var actor_id: int = actor_data.get(StageActorManager.KEY_ACTOR_ID, -1)
 			
-		# Narrative filter verification (Allow unless forbidden check)
 		if not _should_allow_actor_spawn(room_id, actor_id, current_layout_mode):
 			continue
 			
-		# Fetch the precise physical transformation blueprint from the manager
 		var placement: Dictionary = StageActorManager.get_actor_placement(room_id, actor_id, current_layout_mode)
 		if not placement.get(StageActorManager.KEY_IS_VISIBLE, false):
 			continue
@@ -524,52 +522,44 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 			
 		# 5. DYNAMIC MEMORY LOADING VIA DIRECTOR
 		var actor_resource: PackedScene = load(scene_path) as PackedScene
-		# Cambiamos el tipo de variable y el casteo para activar la optimización en compilación
 		var actor_instance: EssenceActor = director.add_actor_to_stage(actor_resource) as EssenceActor
 		
 		if not is_instance_valid(actor_instance):
 			push_error("[%s] El Director devolvió un nodo nulo para el ActorID %d" % [ES_NAME_CLASS, actor_id])
 			continue
 			
-		# 6. PHYSICAL TRANSFORMATIONS (Clean foot-pivot alignment)
+		# 6. PHYSICAL TRANSFORMATIONS
 		actor_instance.position = placement.get(StageActorManager.KEY_POSITION, Vector2.ZERO)
 		actor_instance.scale = placement.get(StageActorManager.KEY_SCALE, Vector2.ONE)
 		actor_instance.rotation_degrees = placement.get(StageActorManager.KEY_ROTATION, 0.0)
 		
 		# 7. TYPE-SAFE SPECIALIZATION LAYER
-		# Reemplazamos la reflexión por texto por una evaluación de clases nativas en RAM
-		
 		if actor_instance is EssenceModularActor:
-			# Al ser un actor modular, interactivo o no, ahora usamos el sistema inmutable de enteros
 			if actor_id == GameIDs.ActorID.PROTAGONIST:
 				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
 				
 				if wardrobe_data.is_empty():
-					# ESTADO INICIAL/POR DEFECTO:
-					# Nativamente usamos los Enums seguros del archivo IDsGIC del protagonista
+					# Configuración fallback si el diccionario llegase a estar vacío
 					actor_instance.modify_clothing(IDsGIC.Items.HAT_1, false) 
 					actor_instance.modify_clothing(IDsGIC.Items.SUNGLASS_1, false) 
 				else:
-					# RESTAURACIÓN POR FLAGS DE HISTORIA:
+					# Procesamiento dinámico de prendas equipado/desequipado
 					for garment_key in wardrobe_data.keys():
-						# PROTECCIÓN JSON: Forzamos la llave a int porque JSON convierte las llaves numéricas a String
-						var item_id: int = int(garment_key)
-						var is_equipped: bool = bool(wardrobe_data[garment_key])
+						var key_str: String = str(garment_key)
 						
-						# Impactamos directamente el inventario lógico y visual del framework base 
-						actor_instance.modify_clothing(item_id, is_equipped) 
+						# Válido para Enums numéricos e IDs serializados de JSON (ej: "40")
+						if key_str.is_valid_int():
+							var item_id: int = key_str.to_int()
+							var is_equipped: bool = bool(wardrobe_data[garment_key])
+							actor_instance.modify_clothing(item_id, is_equipped)
 				
 		if actor_instance is EssenceInteractiveActor:
-			# Al verificar que es un actor interactivo, el compilador GARANTIZA que tiene 'clicked_on_character'
 			if actor_id == GameIDs.ActorID.PROTAGONIST:
 				active_character = actor_instance
 			
-			# Conexión limpia y directa sin strings mágicos intermedios
 			actor_instance.clicked_on_character.connect(_on_character_interacted)
 		
-		# 8. DELEGATED EXECUTION LAYER (Polymorphic Lifecycle Call)
-		# Replaces the massive manual fade block with a clean, type-safe enum call.
-		# Totalmente optimizado: sin búsquedas de strings ni ifs innecesarios en ejecución.
+		# 8. DELEGATED EXECUTION LAYER
 		var entry_mode: EssenceActor.TransitionType = EssenceActor.TransitionType.INSTANT if is_instant else EssenceActor.TransitionType.FADE
 		actor_instance.enter_stage(entry_mode, 1.0)
 		
