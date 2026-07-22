@@ -293,6 +293,9 @@ func _on_return_pressed() -> void:
 
 ## Triggered when the user performs a physical left-click interaction over the active character.
 func _on_character_interacted() -> void:
+	# GUARDIA: Si no estamos en exploración (estamos en cinemática o diálogo), ignorar clics[cite: 5]
+	if director.current_state != EssenceGameplayDirector.GameState.EXPLORATION:
+		return
 	if not is_instance_valid(active_character): 
 		return
 		
@@ -749,7 +752,9 @@ func _should_allow_item_spawn(_room_id: int, _item_id: int, current_mode: int) -
 func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, next_room_id: int) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		#print("[Framework] ¡Puerta cruzada! Viajando hacia la habitación ID: ", next_room_id)
-		
+		# GUARDIA: No permitir cambiar de habitación si hay una cinemática activa[cite: 5]
+		if director.current_state != EssenceGameplayDirector.GameState.EXPLORATION:
+			return
 		# Consultamos la matriz del LevelManager con el destino que venía amarrado en la puerta
 		var data = LevelManager.get_scenery_config(current_room_id, next_room_id, 0, false)
 		
