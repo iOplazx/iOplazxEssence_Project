@@ -361,7 +361,8 @@ func _open_interaction_menu() -> void:
 		[
 			{"id": "talk", "descripcion": "Talk to the character", "icono": null},
 			{"id": "examine", "descripcion": "Inspect clothing", "icono": null},
-			{"id": "wardrobe", "descripcion": "Change outfit", "icono": EssencePaths.ICON_SHIRT}
+			{"id": "wardrobe", "descripcion": "Change outfit", "icono": EssencePaths.ICON_SHIRT},
+			{"id": "stretch", "descripcion": "Stretch arms", "icono": null}
 		]
 	]
 	
@@ -373,7 +374,7 @@ func _open_interaction_menu() -> void:
 
 ## Callback receiver for the interaction menu selection signal. Processes the corresponding action logic.
 func _on_menu_action_selected(action: String) -> void:
-	print("[%s] Processing menu action: %s" % [ES_NAME_CLASS, action])
+	#print("[%s] Processing menu action: %s" % [ES_NAME_CLASS, action])
 	
 	match action:
 		"talk":
@@ -382,7 +383,7 @@ func _on_menu_action_selected(action: String) -> void:
 		"examine":
 			print("-> El jugador está examinando al personaje.")
 		"wardrobe":
-			print("-> Alternando visibilidad de accesorios (Gorra y Lentes)...")
+			#rint("-> Alternando visibilidad de accesorios (Gorra y Lentes)...")
 			
 			if is_instance_valid(active_character) and active_character is EssenceModularActor:
 				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
@@ -400,11 +401,38 @@ func _on_menu_action_selected(action: String) -> void:
 				wardrobe_data[IDsGIC.Items.SUNGLASS_1] = target_state
 				story_flags["player_wardrobe"] = wardrobe_data
 				
-				print("-> ¡Accesorios cambiados a: %s!" % target_state)
+				#print("-> ¡Accesorios cambiados a: %s!" % target_state)
+		"stretch":
+			print("-> [MODO CINEMÁTICA] Ejecutando pose temporal de estiramiento...")
+			_ejecutar_animacion_pose_temporal()
 			
 	# Smoothly retract the interface once the requested action is resolved
 	if is_instance_valid(_cached_interaction_menu):
 		_cached_interaction_menu.close_menu()
+		
+## Ejecuta la secuencia asíncrona de cambio de pose con bloqueo total de interfaz
+func _ejecutar_animacion_pose_temporal() -> void:
+	if not is_instance_valid(active_character) or not (active_character is EssenceModularActor):
+		return
+		
+	# 1. ENTRAR EN MODO CINEMÁTICA
+	# Desactiva interacción con hotspots, puertas y botones del HUD
+	director.change_game_state(EssenceGameplayDirector.GameState.CUTSCENE)
+	
+	# 2. CAMBIAR A LA POSE DE ACCIÓN / LEVANTAR BRAZOS
+	# change_pose() se encarga solo de apagar la pose anterior y sincronizar la ropa equipada
+	active_character.change_pose(IDsGIC.Poses.ARMS_OUT)
+	
+	# 3. ESPERAR 2 SEGUNDOS DE ANIMACIÓN/TEMPORIZADOR
+	await get_tree().create_timer(2.0).timeout
+	
+	# 4. REGRESAR A LA POSE NORMAL
+	active_character.change_pose(IDsGIC.Poses.BASE_BODY)
+	
+	# 5. RESTAURAR CONTROL Y SALIR DEL MODO CINEMÁTICA
+	director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
+	print("-> [MODO EXPLORACIÓN] Secuencia finalizada. Interacción restaurada.")
+	
 		
 ## Central listener that processes all navigation signals coming from inside the active rooms.
 ## [param next_place]: The RoomID destination.
