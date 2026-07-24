@@ -381,8 +381,19 @@ func _on_menu_action_selected(action: String) -> void:
 	
 	match action:
 		"talk":
-			print("-> Iniciando secuencia de diálogo con: ", active_character.name)
-			# Trigger your DialogBoxUI pipeline here
+			print("-> Invocando diálogo desde el GameplayDirector...")
+			
+			if is_instance_valid(director):
+				director.play_dialogue([
+					{
+						"speaker": active_character.display_name if "display_name" in active_character else "Protagonist",
+						"text": "This is a test."
+					},
+					{
+						"speaker": "Narrator",
+						"text": "Yes, it's a test."
+					}
+				])
 		"examine":
 			print("-> El jugador está examinando al personaje.")
 		"wardrobe":
