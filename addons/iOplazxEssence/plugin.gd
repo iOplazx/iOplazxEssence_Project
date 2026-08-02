@@ -55,7 +55,7 @@ func _enter_tree() -> void:
 	# 3. Apply Optimal Project Settings
 	_setup_project_settings()
 	
-	print("iOplazxEssence: Framework v0.1.1 activated and deployed successfully.")
+	print("iOplazxEssence: Framework v0.1.4 activated and deployed successfully.")
 
 func _exit_tree() -> void:
 	# Safe Cleanup: Only remove settings that actually exist
