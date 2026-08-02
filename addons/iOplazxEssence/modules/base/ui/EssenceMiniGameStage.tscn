@@ -13,8 +13,7 @@ grow_vertical = 2
 script = ExtResource("1_tv6pr")
 
 [node name="DimmerOverlay" parent="." unique_id=1581998541 instance=ExtResource("2_saeqs")]
-layout_mode = 0
-anchors_preset = 0
+layout_mode = 1
 
 [node name="GameContainer" type="CenterContainer" parent="." unique_id=932762689]
 layout_mode = 1

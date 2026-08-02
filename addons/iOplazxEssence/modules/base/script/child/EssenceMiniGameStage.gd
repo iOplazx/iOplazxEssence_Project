@@ -64,16 +64,25 @@ func launch_minigame_scene(minigame_scene: PackedScene, init_data: Dictionary = 
 	return result
 
 
-## Triggers entry animation via the Dimmer Overlay
+## Triggers entry animation via the Dimmer Overlay and stage opacity
 func _animate_in() -> void:
+	modulate.a = 0.0
 	if is_instance_valid(dimmer_overlay):
-		await dimmer_overlay.fade_in().finished
+		dimmer_overlay.fade_in(0.25)
+		
+	var tween = create_tween()
+	tween.tween_property(self, "modulate:a", 1.0, 0.25)
+	await tween.finished
 
 
-## Triggers exit animation via the Dimmer Overlay
+## Triggers exit animation via the Dimmer Overlay and stage opacity
 func _animate_out() -> void:
 	if is_instance_valid(dimmer_overlay):
-		await dimmer_overlay.fade_out().finished
+		dimmer_overlay.fade_out(0.25)
+		
+	var tween = create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, 0.25)
+	await tween.finished
 
 
 func _on_minigame_finished(result_data: Dictionary) -> void:
