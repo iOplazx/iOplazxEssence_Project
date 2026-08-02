@@ -240,3 +240,34 @@ func clear_item_stage() -> void:
 	if not item_stage: return
 	for child in item_stage.get_children():
 		child.queue_free()
+		
+# Modal and warning
+## Invocación dinámicamente transparente para modales y avisos
+func show_modal_prompt(title: String, body: String, preset: EssenceBaseModalPrompt.ButtonPreset = EssenceBaseModalPrompt.ButtonPreset.OK) -> String:
+	if not is_instance_valid(hud_layer):
+		push_error("[%s] Error: 'hud_layer' no está asignado en el GameplayDirector." % name)
+		return ""
+		
+	# 1. Obtenemos la ruta centralizada desde EssencePaths
+	var scene_path: String = EssencePaths.ESSENCE_MODULAR_PROMPT_INTERFACE
+	
+	if not ResourceLoader.exists(scene_path):
+		push_error("[%s] Error: No se encontró la escena modal en la ruta: %s" % [name, scene_path])
+		return ""
+		
+	# 2. Carga e instanciación dinámica
+	var modal_resource = load(scene_path) as PackedScene
+	var modal_instance = modal_resource.instantiate() as EssenceBaseModalPrompt
+	
+	# 3. Lo añadimos al HUD_Layer
+	hud_layer.add_child(modal_instance)
+	
+	# 4. Bloqueamos el escenario y esperamos la respuesta del usuario
+	change_game_state(GameState.CUTSCENE)
+	var user_choice: String = await modal_instance.show_prompt(title, body, preset)
+	
+	# 5. Limpieza automática y restauración del estado de exploración
+	modal_instance.queue_free()
+	change_game_state(GameState.EXPLORATION)
+	
+	return user_choice

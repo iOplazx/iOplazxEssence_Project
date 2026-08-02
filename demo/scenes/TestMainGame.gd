@@ -127,19 +127,27 @@ func _cargar_configuracion() -> void:
 
 func _iniciar_secuencia_intro() -> void:
 	current_phase = TestPhase.INTRO
+	director.change_game_state(EssenceGameplayDirector.GameState.CUTSCENE)
 	
-	# Pequeña pausa antes de que salte el tutorial para que no sea tan brusco
-	await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(0.3).timeout
 	
-	var intro_messages: Array[String] = [
-		"Welcome to the Essence Framework sandbox.",
-		"Please note: This is strictly a controls test and technical demo, not the actual game.",
-		"Here we will test the rendering, saving systems, and interactive actors.",
-		"Click 'Understood' to begin the test."
-	]
+	# Invocación directa y limpia a través del Director
+	await director.show_modal_prompt(
+		"Notice",
+		"This is strictly a controls test and technical demo for the iOplazxEssence addon, not the actual game.",
+		EssenceBaseModalPrompt.ButtonPreset.OK
+	)
 	
+	# 2. PASO 2: Tutorial multipágina si existe
 	if tutorial_panel:
+		var intro_messages: Array[String] = [
+			"Welcome to the Essence Framework sandbox.",
+			"Here we will test the rendering, saving systems, and interactive actors.",
+			"Click 'Understood' to begin the test."
+		]
 		tutorial_panel.load_and_show_tutorial(intro_messages)
+	else:
+		director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 		
 func _setup_initial_room_layout():
 	director.clear_item_stage()
