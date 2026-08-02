@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://bupervnh0hpah"]
+
+[ext_resource type="Script" uid="uid://bms1afpeqrl28" path="res://addons/iOplazxEssence/modules/base/script/child/EssenceModalPrompt.gd" id="1_y3l1u"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_fkxsl"]
+font_size = 28
+font_color = Color(0.960784, 0.960784, 0.960784, 1)
+
+[node name="EssenceModalPrompt" type="Control" unique_id=1376502870]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_y3l1u")
+
+[node name="DimmerOverlay" type="ColorRect" parent="." unique_id=1998924085]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="PromptPanel" type="PanelContainer" parent="." unique_id=1258150408]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -80.0
+offset_right = 220.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PromptPanel" unique_id=1694244364]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PromptPanel/MarginContainer" unique_id=402020234]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="PromptPanel/MarginContainer/VBoxContainer" unique_id=38978634]
+layout_mode = 2
+text = "Modal Title"
+label_settings = SubResource("LabelSettings_fkxsl")
+horizontal_alignment = 1
+
+[node name="BodyLabel" type="RichTextLabel" parent="PromptPanel/MarginContainer/VBoxContainer" unique_id=299567872]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 20
+theme_override_font_sizes/bold_font_size = 20
+bbcode_enabled = true
+text = "This is a sample prompt message."
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="PromptPanel/MarginContainer/VBoxContainer" unique_id=881420047]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1

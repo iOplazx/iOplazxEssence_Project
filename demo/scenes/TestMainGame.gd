@@ -397,7 +397,7 @@ func _on_menu_action_selected(action: String) -> void:
 		"examine":
 			print("-> El jugador está examinando al personaje.")
 		"wardrobe":
-			#rint("-> Alternando visibilidad de accesorios (Gorra y Lentes)...")
+			#print("-> Alternando visibilidad de accesorios (Gorra y Lentes)...")
 			
 			if is_instance_valid(active_character) and active_character is EssenceModularActor:
 				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
@@ -417,7 +417,7 @@ func _on_menu_action_selected(action: String) -> void:
 				
 				#print("-> ¡Accesorios cambiados a: %s!" % target_state)
 		"stretch":
-			print("-> [MODO CINEMÁTICA] Ejecutando pose temporal de estiramiento...")
+			#print("-> [MODO CINEMÁTICA] Ejecutando pose temporal de estiramiento...")
 			_ejecutar_animacion_pose_temporal()
 			
 	# Smoothly retract the interface once the requested action is resolved
@@ -445,7 +445,7 @@ func _ejecutar_animacion_pose_temporal() -> void:
 	
 	# 5. RESTAURAR CONTROL Y SALIR DEL MODO CINEMÁTICA
 	director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
-	print("-> [MODO EXPLORACIÓN] Secuencia finalizada. Interacción restaurada.")
+	#print("-> [MODO EXPLORACIÓN] Secuencia finalizada. Interacción restaurada.")
 	
 		
 ## Central listener that processes all navigation signals coming from inside the active rooms.
