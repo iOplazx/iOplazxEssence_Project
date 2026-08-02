@@ -34,6 +34,8 @@ const ACTOR_PARK_PERSON_SIT_1_SCENE = DEMO_ITEMS_ACTOR_ROUTE + "ActorParkPersonS
 const ACTOR_PARK_PERSON_SIT_2_SCENE = DEMO_ITEMS_ACTOR_ROUTE + "ActorParkPersonSit2.tscn"
 const ACTOR_PARK_PERSON_SIT_3_SCENE = DEMO_ITEMS_ACTOR_ROUTE + "ActorParkPersonSit3.tscn"
 
+const TEST_SHIRT_MINIGAME_SCENE = DEMO_ROUTE + "TestShirtMinigame" + EXTENSION_TSCN
+
 # ==========================================
 # RESOURCE Non Own
 # ==========================================

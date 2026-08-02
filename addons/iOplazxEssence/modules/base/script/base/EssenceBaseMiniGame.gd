@@ -10,7 +10,6 @@ signal minigame_completed(result_data: Dictionary)
 ## Emitir si el jugador abandona o cierra el minijuego sin terminarlo
 signal minigame_cancelled
 
-
 ## Finaliza el minijuego informando victoria o derrota
 func finish_minigame(is_victory: bool, extra_data: Dictionary = {}) -> void:
 	var result: Dictionary = {

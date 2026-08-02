@@ -242,7 +242,7 @@ func clear_item_stage() -> void:
 		child.queue_free()
 		
 # Modal and warning
-## Invocación dinámicamente transparente para modales y avisos
+## Dynamically transparent invocation for modals and notices
 func show_modal_prompt(title: String, body: String, preset: EssenceBaseModalPrompt.ButtonPreset = EssenceBaseModalPrompt.ButtonPreset.OK) -> String:
 	if not is_instance_valid(hud_layer):
 		push_error("[%s] Error: 'hud_layer' no está asignado en el GameplayDirector." % name)
@@ -271,3 +271,42 @@ func show_modal_prompt(title: String, body: String, preset: EssenceBaseModalProm
 	change_game_state(GameState.EXPLORATION)
 	
 	return user_choice
+
+# ==========================================
+# MINIGAME STAGE SYSTEM
+# ==========================================
+
+## Launches a modal minigame scene, disables background interactions, and returns execution result via await.
+func launch_minigame(minigame_scene_path: String, init_data: Dictionary = {}) -> Dictionary:
+	if not is_instance_valid(hud_layer):
+		push_error("[%s] Error: 'hud_layer' is not assigned in GameplayDirector." % name)
+		return {"victory": false, "cancelled": true}
+		
+	# 1. Get the container stage scene path from EssencePaths
+	var stage_path: String = EssencePaths.ESSENCE_MINIGAME_STAGE_INTERFACE
+	
+	if not ResourceLoader.exists(stage_path):
+		push_error("[%s] Error: MiniGameStage scene not found at path: %s" % [name, stage_path])
+		return {"victory": false, "cancelled": true}
+		
+	if not ResourceLoader.exists(minigame_scene_path):
+		push_error("[%s] Error: Target minigame scene not found at path: %s" % [name, minigame_scene_path])
+		return {"victory": false, "cancelled": true}
+
+	# 2. Instantiate the MiniGameStage host inside HUD_Layer
+	var stage_resource = load(stage_path) as PackedScene
+	var stage_instance = stage_resource.instantiate() as EssenceMiniGameStage
+	hud_layer.add_child(stage_instance)
+
+	# 3. Block background interaction while minigame is active
+	change_game_state(GameState.CUTSCENE)
+
+	# 4. Load the minigame scene and wait asynchronously for its completion
+	var minigame_resource = load(minigame_scene_path) as PackedScene
+	var result: Dictionary = await stage_instance.launch_minigame_scene(minigame_resource, init_data)
+
+	# 5. Clean up host instance and restore exploration state
+	stage_instance.queue_free()
+	change_game_state(GameState.EXPLORATION)
+
+	return result

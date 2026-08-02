@@ -403,7 +403,22 @@ func _on_menu_action_selected(action: String) -> void:
 					}
 				])
 		"examine":
-			print("-> El jugador está examinando al personaje.")
+			print("-> Player is examining the character. Launching shirt minigame...")
+			
+			if is_instance_valid(director):
+				# 1. Launch the minigame scene and wait for completion
+				var minigame_path: String = DemoItemsRoute.TEST_SHIRT_MINIGAME_SCENE
+				var result: Dictionary = await director.launch_minigame(minigame_path)
+				
+				# 2. If the player won the minigame, show the success modal prompt
+				if result.get("victory", false):
+					await director.show_modal_prompt(
+						"Minigame Completed",
+						"You successfully examined and selected all 3 shirts!",
+						EssenceBaseModalPrompt.ButtonPreset.OK
+					)
+				else:
+					print("Minigame was cancelled or failed.")
 		"wardrobe":
 			#print("-> Alternando visibilidad de accesorios (Gorra y Lentes)...")
 			
