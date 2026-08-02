@@ -1,6 +1,6 @@
 ## [EssenceBaseModalPrompt]
-## Clase base para cuadros modales, alertas y diálogos de confirmación.
-## Bloquea la interacción del fondo y permite respuesta asíncrona vía await.
+## Base class for modal windows, alerts, and confirmation prompts.
+## Blocks background interaction and provides async responses via await.
 class_name EssenceBaseModalPrompt
 extends Control
 
@@ -20,17 +20,11 @@ var _selected_action: String = ""
 
 
 func _ready() -> void:
-	# Aseguramos que el nodo raíz y el dimmer bloqueen eventos del mouse
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	hide()
 
 
-# ==========================================
-# PUBLIC API: Muestra el Modal y Espera Respuesta
-# ==========================================
-
-## Muestra un modal en pantalla y RETORNA la acción elegida por el usuario usando await.
-## Ejemplo: var result = await prompt.show_prompt("Atención", "¿Guardar cambios?", ButtonPreset.YES_NO)
+## Displays a modal prompt and returns the chosen action via await.
 func show_prompt(title: String, body: String, preset: ButtonPreset = ButtonPreset.OK, custom_buttons: Array = []) -> String:
 	_selected_action = ""
 	
@@ -38,48 +32,49 @@ func show_prompt(title: String, body: String, preset: ButtonPreset = ButtonPrese
 	_set_body_text(tr(body))
 	_build_buttons(preset, custom_buttons)
 	
-	# Mostrar con animación de entrada
 	show()
-	modulate.a = 0.0
-	var tween = create_tween()
-	tween.tween_property(self, "modulate:a", 1.0, fade_duration)
+	await _animate_in()
 	
-	# Esperar hasta que se emita la señal de respuesta
 	await action_selected
 	
-	# Ocultar con animación de salida
-	var fade_out = create_tween()
-	fade_out.tween_property(self, "modulate:a", 0.0, fade_duration)
-	await fade_out.finished
+	await _animate_out()
 	hide()
 	
 	return _selected_action
 
 
-# ==========================================
-# MÉTODOS VIRTUALES (Sobreescribir en Subclase)
-# ==========================================
+## Virtual method for entry animation (can be overridden by subclasses)
+func _animate_in() -> void:
+	modulate.a = 0.0
+	var tween = create_tween()
+	tween.tween_property(self, "modulate:a", 1.0, fade_duration)
+	await tween.finished
+
+
+## Virtual method for exit animation (can be overridden by subclasses)
+func _animate_out() -> void:
+	var tween = create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, fade_duration)
+	await tween.finished
+
 
 func _set_title_text(_text: String) -> void:
 	pass
 
+
 func _set_body_text(_text: String) -> void:
 	pass
+
 
 func _get_button_container() -> Container:
 	return null
 
-
-# ==========================================
-# CONSTRUCCIÓN DINÁMICA DE BOTONES
-# ==========================================
 
 func _build_buttons(preset: ButtonPreset, custom_buttons: Array) -> void:
 	var container = _get_button_container()
 	if not is_instance_valid(container):
 		return
 		
-	# Limpiar botones anteriores
 	for child in container.get_children():
 		child.queue_free()
 		
@@ -102,7 +97,6 @@ func _build_buttons(preset: ButtonPreset, custom_buttons: Array) -> void:
 		ButtonPreset.CUSTOM:
 			button_configs = custom_buttons
 			
-	# Instanciar botones físicamente
 	for config in button_configs:
 		var btn = Button.new()
 		btn.text = config.get("label", "Button")

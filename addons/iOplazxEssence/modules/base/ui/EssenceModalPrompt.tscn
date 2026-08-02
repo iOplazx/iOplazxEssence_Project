@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bupervnh0hpah"]
 
 [ext_resource type="Script" uid="uid://bms1afpeqrl28" path="res://addons/iOplazxEssence/modules/base/script/child/EssenceModalPrompt.gd" id="1_y3l1u"]
+[ext_resource type="PackedScene" uid="uid://ftxprivp7m3g" path="res://addons/iOplazxEssence/modules/base/ui/EssenceDimmerOverlay.tscn" id="2_gk6re"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_fkxsl"]
 font_size = 28
@@ -15,14 +16,13 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_y3l1u")
 
-[node name="DimmerOverlay" type="ColorRect" parent="." unique_id=1998924085]
+[node name="DimmerOverlay" parent="." unique_id=1581998541 instance=ExtResource("2_gk6re")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.65)
 
 [node name="PromptPanel" type="PanelContainer" parent="." unique_id=1258150408]
 custom_minimum_size = Vector2(440, 0)

@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://joeb0cyf4dac"]
+
+[ext_resource type="Script" uid="uid://biqj55xu8pm2e" path="res://addons/iOplazxEssence/modules/base/script/child/EssenceMiniGameStage.gd" id="1_tv6pr"]
+[ext_resource type="PackedScene" uid="uid://ftxprivp7m3g" path="res://addons/iOplazxEssence/modules/base/ui/EssenceDimmerOverlay.tscn" id="2_saeqs"]
+
+[node name="EssenceMiniGameStage" type="Control" unique_id=1617544758]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tv6pr")
+
+[node name="DimmerOverlay" parent="." unique_id=1581998541 instance=ExtResource("2_saeqs")]
+layout_mode = 0
+anchors_preset = 0
+
+[node name="GameContainer" type="CenterContainer" parent="." unique_id=932762689]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
