@@ -6,6 +6,8 @@
 class_name EssenceLocation
 extends Node2D
 
+const ES_NAME_CLASS = "EssenceLocation"
+
 #@export_category("Datos del Escenario")
 @export var location_id: String = "zona_generica"
 @export var location_name: String = "Zona Desconocida"
@@ -16,8 +18,12 @@ extends Node2D
 
 func _ready() -> void:
 	if not stage_background:
-		push_warning("[%s] Alerta: No se asignó un Sprite2D para el fondo." % location_id)
-	#print("[EssenceLocation] Escenario cargado: %s (%s)" % [location_name, location_id])
+		EssenceReportUtils.warning(
+			"Location Setup Warning",
+			"No Sprite2D background assigned for location '%s'." % location_id
+		)
+		
+	EssenceLogger.system_info("[%s] Location loaded: %s (%s)" % [ES_NAME_CLASS, location_name, location_id])
 
 ## Changes the current background texture.
 ## Ideal for time transitions (e.g., Day -> Night) if no filters are used.

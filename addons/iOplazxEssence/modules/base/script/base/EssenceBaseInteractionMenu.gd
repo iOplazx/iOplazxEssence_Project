@@ -117,7 +117,10 @@ func _update_page_view() -> void:
 				if ResourceLoader.exists(raw_icon):
 					resolved_texture = load(raw_icon) as Texture2D
 				else:
-					push_warning("[%s] ⚠️ Texture not found at path: %s" % [name, raw_icon])
+					EssenceReportUtils.warning(
+						"Texture Load Warning",
+						"Texture not found at path '%s' in %s." % [raw_icon, name]
+					)
 			
 			var icon_node = btn.get_node_or_null("Icon") as TextureRect
 			if is_instance_valid(icon_node):

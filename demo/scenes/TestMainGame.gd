@@ -93,7 +93,7 @@ func _ready() -> void:
 	if tutorial_panel:
 		tutorial_panel.tutorial_finished.connect(_on_tutorial_finished)
 		
-	_cargar_configuracion()
+	_load_configuration()
 	_check_security_nodes()
 	_config_buttons()
 	
@@ -114,15 +114,18 @@ func _ready() -> void:
 		
 	EssenceLogger.system_info("[%s/_ready] Main scene initialized." % ES_NAME_CLASS)
 	
-## Carga el archivo .tres en memoria
-func _cargar_configuracion() -> void:
+## Load the .tres file into memory
+func _load_configuration() -> void:
 	if ResourceLoader.exists(ROUTES_PATH):
 		routes = load(ROUTES_PATH) as EssenceRouteConfig
 	else:
-		push_error("[%s] ERROR: RouteConfig.tres was not found in %s" % ["TestMainGame", ROUTES_PATH])
+		EssenceReportUtils.critical(
+			"Resource Error",
+			"RouteConfig.tres was not found at path: %s in %s." % [ROUTES_PATH, ES_NAME_CLASS]
+		)
 		
 # ==========================================
-# LÓGICA DE FLUJO (TUTORIALES Y EVENTOS)
+# FLOW LOGIC (TUTORIALS AND EVENTS)
 # ==========================================
 
 func _iniciar_secuencia_intro() -> void:
@@ -192,7 +195,7 @@ func _check_security_nodes() -> void:
 	
 	if missing.size() > 0:
 		var msg = "Faltan nodos exportados en %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		push_error(msg)
+		EssenceReportUtils.warning("UI Setup Warning", msg)
 
 # ==========================================
 # CONFIGURATION
@@ -268,7 +271,7 @@ func _restaurar_partida_cargada() -> void:
 			active_character.apply_clothing_state(ropa_guardada)
 			
 	else:
-		_setup_initial_room_layout() #validar TODO
+		_setup_initial_room_layout() #val TODO
 		_iniciar_secuencia_intro()
 		
 	# We clear the cache immediately to leave the loader ready for the next time.
@@ -364,7 +367,10 @@ func _open_interaction_menu() -> void:
 			# Connect its centralized notification signal to the Main script receiver
 			_cached_interaction_menu.action_selected.connect(_on_menu_action_selected)
 		else:
-			push_error("[%s] Critical Error: Failed to load the interaction menu resource." % ES_NAME_CLASS)
+			EssenceReportUtils.critical(
+				"Interface Error",
+				"Failed to load the interaction menu resource in %s." % ES_NAME_CLASS
+			)
 			return
 
 	# 2. DATA-DRIVEN ACTION INTERFACE CONFIGURATION
@@ -479,7 +485,10 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 	var data = LevelManager.get_scenery_config(current_room_id, next_place, mode, is_only_mode)
 	
 	if data["flag_error"]:
-		push_error("[TestMainGame] Illegal transition requested by room layout.")
+		EssenceReportUtils.critical(
+			"Navigation Error",
+			"Illegal transition requested by room layout in %s." % ES_NAME_CLASS
+		)
 		return
 		
 	if is_only_mode:
@@ -600,7 +609,10 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 				scene_path = DemoItemsRoute.ACTOR_PARK_DOG_RUN_SCENE
 				
 		if scene_path == "" or not ResourceLoader.exists(scene_path):
-			push_error("[%s] Critical error: No .tscn scene found for ActorID. %d" % [ES_NAME_CLASS, actor_id])
+			EssenceReportUtils.critical(
+				"Actor Setup Error",
+				"No .tscn scene found for ActorID %d in %s." % [actor_id, ES_NAME_CLASS]
+			)
 			continue
 			
 		# 5. DYNAMIC MEMORY LOADING VIA DIRECTOR
@@ -608,7 +620,10 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 		var actor_instance: EssenceActor = director.add_actor_to_stage(actor_resource) as EssenceActor
 		
 		if not is_instance_valid(actor_instance):
-			push_error("[%s] The Director returned a null node for the ActorID. %d" % [ES_NAME_CLASS, actor_id])
+			EssenceReportUtils.critical(
+				"Actor Instantiation Error",
+				"Director returned a null node for ActorID %d in %s." % [actor_id, ES_NAME_CLASS]
+			)
 			continue
 			
 		# 6. PHYSICAL TRANSFORMATIONS
@@ -726,15 +741,21 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 			GameIDs.ItemID.TOUCH_INDICATOR:  scene_path = DemoItemsRoute.ITEMTOUCH_SCENE
 			
 		if scene_path == "" or not ResourceLoader.exists(scene_path):
-			push_error("[%s] Critical error: .tscn scene not found for ItemID %d" % [ES_NAME_CLASS, item_id])
+			EssenceReportUtils.critical(
+				"Item Setup Error",
+				"Scene .tscn not found for ItemID %d in %s." % [item_id, ES_NAME_CLASS]
+			)
 			continue
 			
-		# 4. INSTANCIACIÓN Detrás de escena
+		# 4. INSTANTIATION Behind the scenes
 		var packed_item = load(scene_path) as PackedScene
 		var item_instance = director.add_item_to_stage(packed_item)
 		
 		if not is_instance_valid(item_instance):
-			push_error("[%s] The Director returned a null node for ItemID %d." % [ES_NAME_CLASS, item_id])
+			EssenceReportUtils.critical(
+				"Item Instantiation Error",
+				"Director returned a null node for ItemID %d in %s." % [item_id, ES_NAME_CLASS]
+			)
 			continue
 			
 		# 5. PHYSICAL TRANSFORMATION
@@ -762,7 +783,10 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 				# UTILITY ACTION: If it has no destination (such as the Touch Indicator), it passes cleanly
 				pass
 		else:
-			push_warning("[%s] Item %d does not have an Area2D. It was instantiated as a purely visual element." % [ES_NAME_CLASS, item_id])
+			EssenceReportUtils.warning(
+				"Item Area Warning",
+				"Item %d does not have an Area2D in %s. It was instantiated as a purely visual element." % [item_id, ES_NAME_CLASS]
+			)
 			
 ## INTERNAL VALIDATOR: Decides whether an item is eligible to enter based on the current rules
 func _should_allow_item_spawn(_room_id: int, _item_id: int, current_mode: int) -> bool:
@@ -858,7 +882,10 @@ func _route_room_initialization(room_id: int, scenery_data: Dictionary, skip_ani
 		GameIDs.RoomID.PARK:
 			await _on_ready_parkScene(scenery_data, skip_animations)
 		_:
-			push_error("[TestMainGame] Failed to route initialization: Unknown RoomID %d" % room_id)
+			EssenceReportUtils.critical(
+				"Routing Error",
+				"Failed to route initialization: Unknown RoomID %d in %s." % [room_id, ES_NAME_CLASS]
+			)
 
 #########################
 # SECTION Initial Room  #

@@ -113,18 +113,22 @@ static func cascade_fade_in(nodes: Array, duration: float, stagger: float, start
 ## Smoothly fades in a SubViewportContainer (ideal for 3D character previews).
 ## Ensures the internal Viewport doesn't look transparent or glitchy.
 static func fade_in_subviewport(node: Node, duration: float) -> Tween:
-	if not is_instance_valid(node): return null
+	if not is_instance_valid(node):
+		return null
 	
-	var container = node if node is SubViewportContainer else node.get_node_or_null("SubViewportContainer")
+	var container: Node = node if node is SubViewportContainer else node.get_node_or_null("SubViewportContainer")
 	
-	if container and container is SubViewportContainer:
+	if is_instance_valid(container) and container is SubViewportContainer:
 		container.modulate.a = 0.0
-		var tween = container.create_tween()
+		var tween: Tween = container.create_tween()
 		tween.bind_node(container)
 		tween.tween_property(container, "modulate:a", 1.0, duration).set_trans(Tween.TRANS_SINE)
 		return tween
 	
-	push_warning("[%s] fade_in_subviewport: No SubViewportContainer found." % LOG_TAG)
+	EssenceReportUtils.warning(
+		"UI Animation Warning",
+		"fade_in_subviewport failed: No SubViewportContainer found on target node."
+	)
 	return null
 
 ## Slides a Node2D (like a Character Sprite) from a side while fading in.

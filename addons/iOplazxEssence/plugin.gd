@@ -43,19 +43,22 @@ func _enter_tree() -> void:
 	_deploy_user_scaffolding()
 	
 	# 2. Secure Autoload Registration
-	for autoload_name in AUTOLOADS:
-		var path = AUTOLOADS[autoload_name]
+	for autoload_name: String in AUTOLOADS:
+		var path: String = AUTOLOADS[autoload_name]
 		
 		# Optimization: Only register if the file actually exists to avoid compiler hangs
 		if FileAccess.file_exists(path):
 			add_autoload_singleton(autoload_name, path)
 		else:
-			push_warning("iOplazxEssence: Could not find " + autoload_name + " at " + path)
+			EssenceReportUtils.warning(
+				"Autoload Setup Warning",
+				"Could not find Autoload '%s' at path: %s." % [autoload_name, path]
+			)
 	
 	# 3. Apply Optimal Project Settings
 	_setup_project_settings()
 	
-	print("iOplazxEssence: Framework v0.1.4 activated and deployed successfully.")
+	EssenceLogger.system_info("[%s] Framework activated and deployed successfully." % ES_NAME_CLASS)
 
 func _exit_tree() -> void:
 	# Safe Cleanup: Only remove settings that actually exist

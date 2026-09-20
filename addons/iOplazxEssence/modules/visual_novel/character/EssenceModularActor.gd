@@ -22,7 +22,10 @@ func _ready() -> void:
 ## Validates at design time or runtime whether the developer forgot to connect the pose.
 func _validate_poses_registry() -> void:
 	if poses_registry.is_empty():
-		push_warning("[%s] ⚠️ WARNING: 'poses_registry' is EMPTY in the Inspector. The character will not be able to update their clothing or change their pose." % name)
+		EssenceReportUtils.warning(
+			"Actor Pose Registry Empty",
+			"'poses_registry' is empty in the Inspector for %s. The character will not be able to update clothing or change poses." % name
+		)
 		
 
 func _sync_modular_initial_state() -> void:
@@ -95,7 +98,10 @@ func modify_clothing(item_id: int, is_equipped: bool) -> void:
 		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
 			active_pose.shared_clothing_group.sync_equipped_items(_equipped_items)
 	else:
-		push_warning("[%s] ⚠️ WARNING: Pose ID %d not found in 'poses_registry'. Check the Inspector." % [name, current_pose_id])
+		EssenceReportUtils.warning(
+			"Pose Not Found",
+			"Pose ID %d not found in 'poses_registry' for %s. Check the Inspector configuration." % [current_pose_id, name]
+		)
 					
 
 # ==========================================

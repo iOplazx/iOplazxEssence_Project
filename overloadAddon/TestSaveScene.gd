@@ -48,11 +48,8 @@ func _check_security_nodes() -> void:
 	if not btn_warning: missing.append("btn_warning")
 	
 	if missing.size() > 0:
-		var msg = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		if is_instance_valid(EssenceError) and EssenceError.has_method("report"):
-			EssenceError.report("UI Setup Warning", msg, EssenceError.Severity.WARNING)
-		else:
-			push_error(msg)
+		var msg: String = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
+		EssenceReportUtils.warning("UI Setup Warning", msg)
 
 # ==========================================
 # BUTTON CONFIGURATION
@@ -124,7 +121,10 @@ func _fallback_to_main_menu() -> void:
 	if has_node("/root/SceneManager") or is_instance_valid(SceneManager):
 		SceneManager.goto_main_menu()
 	else:
-		push_error("[%s] SceneManager unavailable for fallback." % ES_NAME_CLASS)
+		EssenceReportUtils.critical(
+			"Fallback Error",
+			"SceneManager unavailable for fallback in %s." % ES_NAME_CLASS
+		)
 
 # ==========================================
 # EVENT HANDLERS
@@ -154,7 +154,10 @@ func _on_return_pressed() -> void:
 	if target_scene != "" and ResourceLoader.exists(target_scene):
 		get_tree().change_scene_to_file(target_scene)
 	else:
-		push_error("[%s] Error: Main scene not found." % ES_NAME_CLASS)
+		EssenceReportUtils.critical(
+			"Navigation Error",
+			"Main game scene not found at path '%s' in %s." % [target_scene, ES_NAME_CLASS]
+		)
 		_fallback_to_main_menu()
 
 func _on_no_implement_pressed() -> void:

@@ -3,7 +3,7 @@ extends RefCounted
 
 # --- DECLARATIVE NAVIGATION GRAPH ---
 # Registers which rooms are legally connected to each other.
-const NAVIGATION_MAP = {
+const NAVIGATION_MAP: Dictionary = {
 	GameIDs.RoomID.INITIAL_ROOM: [GameIDs.RoomID.ROOM_3_DOORS],
 	GameIDs.RoomID.ROOM_3_DOORS: [GameIDs.RoomID.INITIAL_ROOM, GameIDs.RoomID.ROOM_1_DOOR, GameIDs.RoomID.PARK], 
 	GameIDs.RoomID.ROOM_1_DOOR:  [GameIDs.RoomID.ROOM_3_DOORS, GameIDs.RoomID.SAVE_SCENE],  
@@ -14,7 +14,7 @@ const NAVIGATION_MAP = {
 ## [param current_place]: The ID of the room where the player is currently located.
 ## [param next_place]: The ID of the room the player wants to navigate to.
 ## [param mode]: The specific sub-mode or layout variant to apply within the room.
-## [param is_only_change_mode]: If true, skips room reloading and only updates the internal interaction rules.
+## [param is_only_change_mode]: If true, skips room reloading and only updates internal interaction rules.
 static func get_scenery_config(current_place: int, next_place: int, mode: int, is_only_change_mode: bool) -> Dictionary:
 	var config: Dictionary = {
 		"id_room": next_place,         
@@ -26,14 +26,20 @@ static func get_scenery_config(current_place: int, next_place: int, mode: int, i
 	# Case A: Internal room modification (Sub-modes/Variants)
 	if is_only_change_mode:
 		if current_place != next_place:
-			push_error("[LevelManager] Error: Cannot change mode while attempting to switch rooms.")
+			EssenceReportUtils.critical(
+				"Level Navigation Error",
+				"Cannot change mode while attempting to switch rooms from %d to %d." % [current_place, next_place]
+			)
 			config["flag_error"] = true
 			return config
 		return _handle_internal_room_modes(current_place, mode, config)
 		
 	# Case B: Standard navigation between different rooms
 	if current_place == next_place:
-		push_error("[LevelManager] Error: Already in this room. Use is_only_change_mode=true instead.")
+		EssenceReportUtils.critical(
+			"Level Navigation Error",
+			"Already in Room %d. Use is_only_change_mode = true instead." % current_place
+		)
 		config["flag_error"] = true
 		return config
 		
@@ -50,7 +56,10 @@ static func _handle_room_transitions(origin: int, destination: int, config: Dict
 		config["id_background_scene"] = destination 
 		return config
 		
-	push_error("[LevelManager] Error: Illegal route requested from Room %d to Room %d" % [origin, destination])
+	EssenceReportUtils.critical(
+		"Illegal Route",
+		"Illegal route requested from Room %d to Room %d." % [origin, destination]
+	)
 	config["flag_error"] = true
 	return config
 
@@ -66,6 +75,10 @@ static func _handle_internal_room_modes(room: int, mode: int, config: Dictionary
 		GameIDs.RoomID.ROOM_1_DOOR, GameIDs.RoomID.PARK:
 			config["interaction_mode"] = 1
 		_:
+			EssenceReportUtils.warning(
+				"Unknown Room Mode",
+				"Attempted to process internal mode for unhandled Room ID: %d." % room
+			)
 			config["flag_error"] = true
 	return config
 

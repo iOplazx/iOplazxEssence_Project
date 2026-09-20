@@ -21,19 +21,25 @@ signal on_load_completed(slot_id: String, data: Dictionary)
 signal on_save_error(slot_id: String, error_msg: String)
 
 func _ready():
-	_verificar_config()
+	_verify_config()
 	_cargar_llave_secreta()
 	_configurar_directorio_usuario()
 	
-func _verificar_config():
-	# change to EssenceMasterConfig
-	_config = load(EssencePaths.CARPET_STATIC+"EssenceMasterConfig.tres") as EssenceMasterConfig
+## Validates and loads the master configuration resource into memory.
+func _verify_config() -> void:
+	var config_path: String = EssencePaths.CARPET_STATIC + "EssenceMasterConfig.tres"
+	
+	if ResourceLoader.exists(config_path):
+		_config = load(config_path) as EssenceMasterConfig
 	
 	if not _config:
-		push_warning("iOplazxEssence: No se encontró EssenceMasterConfig.tres. Usando valores por defecto.")
+		EssenceReportUtils.warning(
+			"Missing Master Config",
+			"EssenceMasterConfig.tres was not found at path '%s'. Falling back to default values." % config_path
+		)
 
 # ==========================================
-# INYECCIÓN DE DEPENDENCIAS
+# DEPENDENCY INJECTION
 # ==========================================
 
 func _cargar_llave_secreta():
@@ -644,12 +650,9 @@ func _safe_log(msg: String) -> void:
 	else:
 		print("Fallback Log: ", msg)
 
-func _safe_error(title: String, msg: String, severity: int = 1) -> void:
-	var err_handler = get_tree().root.get_node_or_null("EssenceError")
-	if is_instance_valid(err_handler) and err_handler.has_method("report"):
-		err_handler.report(title, msg, severity) 
-	else:
-		push_warning("Fallback Error [" + title + "]: " + msg)
+## Safely forwards reporting calls to EssenceReportUtils without direct Autoload or scene tree coupling.
+func _safe_error(title: String, msg: String, severity: Variant = "WARNING") -> void:
+	EssenceReportUtils.report(title, msg, severity)
 
 func _safe_get_pref(section: String, key: String, default_val: Variant) -> Variant:
 	var prefs = get_tree().root.get_node_or_null("Preferences")
