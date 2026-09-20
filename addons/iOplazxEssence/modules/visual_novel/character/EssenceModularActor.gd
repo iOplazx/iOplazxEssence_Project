@@ -1,17 +1,17 @@
 ## [EssenceModularActor]
-## Clase base del framework encargada de la gestión modular de apariencias,
-## control seguro de posturas y sincronización de prendas mediante IDs inmutables.
+## Framework base class responsible for modular appearance management,
+## safe pose control, and garment synchronization using immutable IDs.
 class_name EssenceModularActor
 extends EssenceActor
 
 @export_category("Base Modular Configuration")
-## La pose entera activa inicial.
+## The initial active full pose.
 @export var current_pose_id: int = 1
 
-## Registro visual indexado por enteros (Pose ID -> Nodo del Grupo Visual)
+## Visual registry indexed by integers (Pose ID -> Visual Group Node)
 var poses_registry: Dictionary = {}
 
-## Lista maestra que guarda los enteros de la ropa que el personaje lleva puesta (Save State).
+## Master list storing the integers representing the clothing the character is wearing (Save State).
 var _equipped_items: Array[int] = []
 
 
@@ -19,10 +19,10 @@ func _ready() -> void:
 	super._ready()
 	_sync_modular_initial_state()
 
-## Valida en tiempo de diseño/ejecución si el desarrollador olvidó conectar la pose.
+## Validates at design time or runtime whether the developer forgot to connect the pose.
 func _validate_poses_registry() -> void:
 	if poses_registry.is_empty():
-		push_warning("[%s] ⚠️ WARNING: 'poses_registry' está VACÍO en el Inspector. El personaje no podrá actualizar su ropa ni cambiar de pose." % name)
+		push_warning("[%s] ⚠️ WARNING: 'poses_registry' is EMPTY in the Inspector. The character will not be able to update their clothing or change their pose." % name)
 		
 
 func _sync_modular_initial_state() -> void:
@@ -35,25 +35,25 @@ func _sync_modular_initial_state() -> void:
 			
 	var active_pose = poses_registry.get(current_pose_id)
 	if active_pose:
-		# 1. Hornear inventario local forzando enteros primitivos
+		# 1. Bake local inventory by forcing primitive integers
 		for item_id in active_pose.registry.keys():
 			if active_pose.registry[item_id].visible:
 				_equipped_items.append(int(item_id))
 				
-		# 2. Hornear inventario compartido forzando enteros primitivos
+		# 2. Bake shared inventory, forcing primitive integers
 		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
 			var shared = active_pose.shared_clothing_group
 			for item_id in shared.registry.keys():
 				if shared.registry[item_id].visible and not int(item_id) in _equipped_items:
 					_equipped_items.append(int(item_id))
 					
-		# ¡CORRECCIÓN CRÍTICA!: Forzar la primera sincronización visual en el arranque
-		# Esto sobreescribe cualquier estado manual que haya quedado visible en el editor.
+		# C,RITICAL FIX!: Force the first visual sync on startup
+		# This overwrites any manual state left visible in the editor.
 		active_pose.sync_equipped_items(_equipped_items)
 		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
 			active_pose.shared_clothing_group.sync_equipped_items(_equipped_items)
 
-## PUBLIC API: Cambia la postura usando identificadores numéricos puros.
+## PUBLIC API: Changes the posture using pure numeric identifiers.
 func change_pose(target_pose_id: int) -> void:
 	var target_id: int = int(target_pose_id)
 	if not poses_registry.has(target_id) or target_id == current_pose_id:
@@ -80,7 +80,7 @@ func change_pose(target_pose_id: int) -> void:
 		new_shared.hide_all_registered()
 		new_shared.sync_equipped_items(_equipped_items)
 
-## PUBLIC API: Modifica el estado de una prenda en el inventario lógico.
+## PUBLIC API: Modifies the status of an item in the logical inventory.
 func modify_clothing(item_id: int, is_equipped: bool) -> void:
 	var target_id: int = int(item_id)
 	
@@ -95,15 +95,15 @@ func modify_clothing(item_id: int, is_equipped: bool) -> void:
 		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
 			active_pose.shared_clothing_group.sync_equipped_items(_equipped_items)
 	else:
-		push_warning("[%s] ⚠️ WARNING: No se encontró la pose ID %d en 'poses_registry'. Revisa el Inspector." % [name, current_pose_id])
+		push_warning("[%s] ⚠️ WARNING: Pose ID %d not found in 'poses_registry'. Check the Inspector." % [name, current_pose_id])
 					
 
 # ==========================================
-# SERIALIZACIÓN DE ESTADO (SAVE & LOAD)
+# STATE SERIALIZATION (SAVE & LOAD)
 # ==========================================
 
-## PUBLIC API: Serializa el estado actual del guardarropa y la postura.
-## Devuelve un diccionario limpio con puros IDs numéricos estables.
+## PUBLIC API: Serializes the current state of the wardrobe and pose.
+## Returns a clean dictionary containing only stable numeric IDs.
 func get_clothing_state() -> Dictionary:
 	return {
 		"equipped_ids": _equipped_items.duplicate(),
@@ -111,13 +111,13 @@ func get_clothing_state() -> Dictionary:
 	}
 
 
-## PUBLIC API: Restaura la postura y las prendas equipadas desde el archivo de guardado.
-## Sanitiza automáticamente los números float que genera el formato JSON nativo de Godot.
+## PUBLIC API: Restores the pose and equipped items from the save file.
+## Automatically sanitizes float numbers generated by Godot's native JSON format.
 func apply_clothing_state(state: Dictionary) -> void:
 	if state.has("equipped_ids"):
 		_equipped_items.clear()
 		for id in state["equipped_ids"]:
-			_equipped_items.append(int(id)) # Limpieza de flotantes JSON
+			_equipped_items.append(int(id)) # JSON Floating-Point Cleanup
 			
 	if state.has("current_pose"):
 		var target_pose_id: int = int(state["current_pose"])

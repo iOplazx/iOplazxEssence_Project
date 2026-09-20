@@ -2,7 +2,7 @@ class_name EssenceSaveManager extends Node
 const ES_NAME_CLASS = "EssenceSaveManager"
 
 # ==========================================
-# CONFIGURACIÓN DINÁMICA DEL FRAMEWORK
+# DYNAMIC FRAMEWORK CONFIGURATION
 # ==========================================
 var _save_dir: String = "user://saves/"
 var _encryption_key: String = "iOplazx_Default_Insecure_Key_!#"
@@ -13,9 +13,9 @@ const KEY_META = "essence_meta"
 var _config: EssenceMasterConfig
 
 var _action_points: int = 0
-var _points_to_save: int = 5 # Cuántos puntos detonarán el guardado
+var _points_to_save: int = 5 # How many points will trigger the save
 
-# Señales para comunicar al UI o al juego que algo terminó
+# Signals to notify the UI or the game that something has finished
 signal on_save_completed(slot_id: String)
 signal on_load_completed(slot_id: String, data: Dictionary)
 signal on_save_error(slot_id: String, error_msg: String)
@@ -26,7 +26,7 @@ func _ready():
 	_configurar_directorio_usuario()
 	
 func _verificar_config():
-	# cambio a EssenceMasterConfig
+	# change to EssenceMasterConfig
 	_config = load(EssencePaths.CARPET_STATIC+"EssenceMasterConfig.tres") as EssenceMasterConfig
 	
 	if not _config:
@@ -38,7 +38,7 @@ func _verificar_config():
 
 func _cargar_llave_secreta():
 	var env_path = "res://.env"
-	_encryption_key = "iOplazx_Default_Insecure_Key_!#" # Fallback de seguridad
+	_encryption_key = "iOplazx_Default_Insecure_Key_!#" # Security fallback
 	
 	if FileAccess.file_exists(env_path):
 		var file = FileAccess.open(env_path, FileAccess.READ)
@@ -50,10 +50,10 @@ func _cargar_llave_secreta():
 		file.close()
 
 func _configurar_directorio_usuario() -> void:
-	# LATE BINDING: Usamos el wrapper en lugar de llamar a Preferences directamente
+	# LATE BINDING: We use the wrapper instead of calling Preferences directly.
 	var save_location: int = _safe_get_pref("game", "save_location", 0)
 	
-	# 1. Definimos la ruta principal según la preferencia
+	# 1. We define the main route based on preference.
 	if save_location == 1 and not OS.has_feature("editor"):
 		var exe_folder = OS.get_executable_path().get_base_dir()
 		_save_dir = exe_folder.path_join("saves/")
@@ -64,24 +64,24 @@ func _configurar_directorio_usuario() -> void:
 		DirAccess.make_dir_recursive_absolute(_save_dir)
 		_safe_log("[%s/setup] Save folder created at %s" % [ES_NAME_CLASS, _save_dir])
 
-	# 2. SIEMPRE creamos la ruta temporal en local (AppData) 
+	# 2. We ALWAYS create the temporary path locally (AppData).
 	var temp_dir = "user://saves/temp/"
 	if not DirAccess.dir_exists_absolute(temp_dir):
 		DirAccess.make_dir_recursive_absolute(temp_dir)
 		
 # ==========================================
-# RUTAS DINÁMICAS
+# DYNAMIC ROUTES
 # ==========================================
-# Le agregamos un valor por defecto (false) para no romper el resto de tu código
+# We're adding a default value (false) so we don't break the rest of your code.
 func get_file_path(slot_id: String, is_temp: bool = false) -> String:
 	if is_temp:
 		return "user://saves/temp/".path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
 	
-	# Si no es temporal, respeta la configuración global/remota
+	# If not temporary, respect the global/remote configuration
 	return _save_dir.path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
 
 # ==========================================
-# ESCRITURA Y CIFRADO
+# NOTATION AND CHORD SYMBOLS
 # ==========================================
 func save_game(slot_id: String, save_object: EssenceSaveData, is_temp: bool = false) -> bool:
 	var path = get_file_path(slot_id, is_temp)
@@ -97,13 +97,13 @@ func save_game(slot_id: String, save_object: EssenceSaveData, is_temp: bool = fa
 			"Could not create save file. Code: %s" % err, 
 			2
 		)
-		on_save_error.emit(slot_id, "No se pudo escribir en el disco")
+		on_save_error.emit(slot_id, "Could not write to the disk.")
 		return false
 		
 	file.store_string(json_string)
 	file.close()
 	
-	# Actualizamos el archivo invisible
+	# We are updating the invisible file
 	_update_save_index(slot_id, false)
 	
 	var log_msg = "[%s/commit_save] Game saved successfully at %s" % [ES_NAME_CLASS, path]
@@ -112,7 +112,7 @@ func save_game(slot_id: String, save_object: EssenceSaveData, is_temp: bool = fa
 	return true
 	
 # ==========================================
-# LECTURA Y DESCIFRADO
+# READING AND DECODING
 # ==========================================
 func load_game(slot_id: String) -> Dictionary:
 	var path = get_file_path(slot_id)
@@ -147,30 +147,30 @@ func load_game(slot_id: String) -> Dictionary:
 	on_load_completed.emit(slot_id, final_data)
 	return final_data
 	
-# LECTURA Y FUSION
+# READING AND FUSION
 ## Takes the current state from the temporary cache (_temp_game_data) and overwrites a dictionary of modifications without altering the rest of the keys.
 ## Designed for technical transitions (e.g., returning from in-game menus while maintaining the state).
 func patch_cache_and_prepare_load(overrides: Dictionary) -> void:
-	# 1. Si por alguna razón la caché interna está vacía, inicializamos un mapa seguro
+	# 1. If for some reason the internal cache is empty, we initialize a thread-safe map.
 	if _temp_game_data == null:
 		_temp_game_data = {}
 		
-	# 2. Duplicamos en profundidad para no romper referencias de memoria
+	# 2. We perform a deep copy to avoid breaking memory references.
 	var final_data = _temp_game_data.duplicate(true)
 	
-	# 3. FUSIÓN GENÉRICA (Merge)
-	# Recorremos el diccionario de cambios externos. Si la llave existe, la pisa; si no, la crea.
+	# 3. GENERIC MERGE
+	# Iterate through the external changes dictionary. If the key exists, overwrite it; otherwise, create it.
 	for key in overrides.keys():
 		final_data[key] = overrides[key]
 		
-	# 4. Exponemos el resultado al cargador del juego
+	# 4. We pass the result to the game loader.
 	loaded_game_data = final_data
 	
 	_safe_log("[%s] Temporal cache genéricamente fusionada y lista para restauración." % ES_NAME_CLASS)
 	
 
 # ==========================================
-# UTILIDADES DE UI
+# UI UTILITIES
 # ==========================================
 func get_all_metadata() -> Dictionary:
 	var all_saves = {}
@@ -190,7 +190,7 @@ func get_all_metadata() -> Dictionary:
 	return all_saves
 
 # ==========================================
-# FACTORY: CONTROL DE VERSIONES
+# FACTORY: VERSION CONTROL
 # ==========================================
 func _run_migrations(package: Dictionary) -> Dictionary:
 	var meta = package.get("essence_meta", {})
@@ -206,10 +206,10 @@ func _run_migrations(package: Dictionary) -> Dictionary:
 	return package
 	
 # ==========================================
-# LÓGICA DEL ÍNDICE (MANIFEST)
+# INDEX LOGIC (MANIFEST)
 # ==========================================
 
-# Lee el archivo invisible. Si no existe, lo crea.
+# Read the hidden file. If it does not exist, create it.
 func _get_save_index() -> Dictionary:
 	var path = _save_dir + INDEX_FILE
 	if FileAccess.file_exists(path):
@@ -217,94 +217,94 @@ func _get_save_index() -> Dictionary:
 		var data = JSON.parse_string(file.get_as_text())
 		file.close()
 		if typeof(data) == TYPE_DICTIONARY:
-			# Parche de seguridad: Si el archivo viejo no tiene la llave, la inyectamos en RAM
+			# Security patch: If the old file lacks the key, we inject it into RAM.
 			if not data.has("last_export_path"):
 				data["last_export_path"] = ""
 			return data
 			
-	# Diccionario base actualizado
+	# Updated base dictionary
 	return {"latest_save": "", "last_export_path": "", "used_slots": []}
 
-# Actualiza el archivo invisible después de guardar o borrar
+# Update the hidden file after saving or deleting
 func _update_save_index(slot_id: String, is_deleting: bool = false):
 	var index = _get_save_index()
 	var path = _save_dir + INDEX_FILE
 	
 	if is_deleting:
 		index["used_slots"].erase(slot_id)
-		# Si borramos el más reciente, limpiamos el latest_save (o retrocedemos al anterior)
+		# If we delete the most recent one, we clear the latest_save (or revert to the previous one)
 		if index["latest_save"] == slot_id:
 			index["latest_save"] = index["used_slots"].back() if index["used_slots"].size() > 0 else ""
 	else:
 		if not index["used_slots"].has(slot_id):
 			index["used_slots"].append(slot_id)
-		index["latest_save"] = slot_id # Este es el último guardado real
+		index["latest_save"] = slot_id # This is the last actual save
 		
 	var file = FileAccess.open(path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(index))
 	file.close()
 	
-## Verifica de forma ultra-rápida si el archivo físico de un slot existe
+## Ultra-fast check of whether the physical file for a slot exists
 func save_exists(slot_id: String) -> bool:
 	if slot_id == "": return false
 	var path = _save_dir.path_join(slot_id + GameConstants.EXTENSION_SAVE_FILE)
 	return FileAccess.file_exists(path)
 
 # ==========================================
-# AYUDANTES PARA LA UI MODERNA Y CLÁSICA
+# HELPERS FOR MODERN AND CLASSIC UI
 # ==========================================
 
-# El modo Moderno llama a esto para saber qué ID usar al crear una NUEVA partida
+# Modern mode calls this to determine which ID to use when creating a NEW game.
 func get_next_available_slot(slots_per_page: int = 6) -> String:
 	var index = _get_save_index()
-	# Forzamos a que Godot sepa que esto es un Array para evitar otros warnings
+	# We force Godot to recognize this as an Array to avoid other warnings.
 	var used: Array = index.get("used_slots", [])
 	
-	# Buscamos huecos vacíos desde la página 1, slot 1 en adelante
+	# We look for empty slots starting from page 1, slot 1.
 	var current_page: int = 1
 	var current_slot: int = 1
 	
-	# Límite de seguridad de 99 páginas para evitar que la PC se congele si algo sale mal
+	# 99-page safety limit to prevent the PC from freezing if something goes wrong
 	while current_page < 100:
 		var test_id = "save_" + str(current_page) + "_" + str(current_slot)
 		if not used.has(test_id):
-			return test_id # ¡Encontramos el primer hueco vacío!
+			return test_id # We found the first empty spot!
 			
 		current_slot += 1
 		if current_slot > slots_per_page:
 			current_slot = 1
 			current_page += 1
 			
-	# Esta línea nunca debería alcanzarse, pero quita el error del compilador
+	# This line should never be reached, but it eliminates the compiler error.
 	return "save_99_99"
 
-# Retorna cuál fue el último archivo modificado (útil para el botón "Continuar" del Menú Principal)
+# Returns the last modified file (useful for the "Continue" button on the Main Menu)
 func get_latest_save_id() -> String:
 	var latest_id = _get_save_index().get("latest_save", "")
 	
 	if latest_id == "":
 		return ""
 		
-	# BLINDAJE: Verificamos físicamente en el disco si el archivo "fantasma" aún existe
-	var save_path = "user://saves/".path_join(latest_id + GameConstants.EXTENSION_SAVE_FILE) # Ajusta la ruta a tu constante real
+	# SHIELDING: We physically verify on the disk whether the "ghost" file still exists.
+	var save_path = "user://saves/".path_join(latest_id + GameConstants.EXTENSION_SAVE_FILE) # Adjust the path to your actual constant
 	
 	if not FileAccess.file_exists(save_path):
 		_safe_log("[%s] Referencia fantasma detectada: El archivo %s ya no existe." % [ES_NAME_CLASS, latest_id])
-		# Idealmente, aquí podrías llamar a una función que recalcule el último guardado,
-		# pero devolver "" es el parche seguro inmediato.
+		# Ideally, here you could call a function to recalculate the last save,
+		# but returning "" is the safe, immediate workaround.
 		return ""
 		
 	return latest_id
 	
-# Obtiene la última ruta de exportación guardada
+# Gets the last saved export path
 func get_last_export_path() -> String:
 	return _get_save_index().get("last_export_path", "")
 	
 # ==========================================
-# SISTEMA DE SCREENSHOTS (SNAPSHOT)
+# SCREENSHOTS SYSTEM (SNAPSHOT)
 # ==========================================
 func take_and_save_screenshot(slot_id: String) -> void:
-	# 1. Esperamos al final del frame para que la pantalla esté completamente dibujada
+	# 1. We wait until the end of the frame so that the screen is fully drawn.
 	await RenderingServer.frame_post_draw
 	
 	# 2. Capturamos la textura del Viewport principal
@@ -315,11 +315,11 @@ func take_and_save_screenshot(slot_id: String) -> void:
 		_safe_error("Snapshot capture error.","Error capturing the screen.", 1)
 		return
 		
-	# 3. OPTIMIZACIÓN: Achicamos la imagen para no saturar el disco duro
-	# 320x180 mantiene la relación de aspecto 16:9 estándar
+	# 3. OPTIMIZATION: We downsize the image to avoid filling up the hard drive
+	# 320x180 maintains the standard 16:9 aspect ratio
 	img.resize(320, 180, Image.INTERPOLATE_BILINEAR)
 	
-	# 4. Guardamos como .webp en la misma carpeta que el archivo .ess
+	# 4. Save as .webp in the same folder as the .ess file
 	var image_path =  _save_dir.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
 	var err = img.save_webp(image_path)
 	
@@ -334,18 +334,18 @@ func take_and_save_screenshot(slot_id: String) -> void:
 		)
 
 # ==========================================
-# CACHÉ TEMPORAL (Para transiciones de escena)
+# TEMPORARY CACHE (For scene transitions)
 # ==========================================
 var _temp_game_data: Dictionary = {}
 var _temp_meta_data: Dictionary = {}
-var loaded_game_data: Dictionary = {} # Para cuando carguemos una partida
+var loaded_game_data: Dictionary = {} # For when we load a game
 
-# El juego llama a esto ANTES de ir a la pantalla de Guardar
+# The game calls this BEFORE going to the Save screen.
 func cache_current_state(game_data: Dictionary, meta_data: Dictionary):
 	_temp_game_data = game_data
 	_temp_meta_data = meta_data
 
-# Toma la foto y la guarda como archivo temporal
+# Takes the photo and saves it as a temporary file
 func take_temp_screenshot() -> void:
 	await RenderingServer.frame_post_draw
 	var img = get_viewport().get_texture().get_image()
@@ -353,11 +353,11 @@ func take_temp_screenshot() -> void:
 		img.resize(320, 180, Image.INTERPOLATE_BILINEAR)
 		img.save_webp(_save_dir + "temp_snap" + GameConstants.EXTENSION_IMAGE)
 
-# La UI llama a esto cuando el jugador elige un Slot
+# The UI calls this when the player selects a slot.
 func commit_save(slot_id: String, is_temp: bool = false) -> bool:
-	# === HOOK DE INTEGRACIÓN ===
-	# Le damos al dev una última oportunidad de modificar o inyectar datos 
-	# justo antes de que se congelen en el disco (ej: Tiempo de juego exacto).
+	# === INTEGRATION HOOK ===
+	# We give the dev one last chance to modify or inject data 
+	# right before it is frozen to disk (e.g., exact playtime).
 	_on_before_save_hook(_temp_game_data, _temp_meta_data)
 	
 	if _temp_game_data.is_empty() and _temp_meta_data.is_empty(): return false
@@ -365,33 +365,33 @@ func commit_save(slot_id: String, is_temp: bool = false) -> bool:
 	var path = get_file_path(slot_id)
 	var save_obj = EssenceSaveFactory.create_save_instance(_config)
 	
-	# Verificamos la INTENCIÓN (Create vs Overwrite)
+	# We verify the INTENT (Create vs. Overwrite)
 	if FileAccess.file_exists(path):
 		var old_data = load_game(slot_id)
-		# Le decimos al objeto que se fusione con lo viejo
+		# We tell the object to merge with the old one.
 		save_obj.prepare_as_overwrite(old_data, _temp_meta_data, _temp_game_data)
 	else:
-		# Le decimos al objeto que nazca desde cero
+		# We tell the object to be created from scratch
 		save_obj.prepare_as_new(_temp_meta_data, _temp_game_data)
 		
-		# Si es nuevo, sacamos la página y slot del ID
+		# If it is new, we extract the page and slot from the ID.
 		var parts = slot_id.split("_")
 		if parts.size() >= 3:
 			save_obj.page = int(parts[1])
 			save_obj.slot_number = int(parts[2])
 	
-	# El Manager solo se encarga de guardar en disco
+	# The Manager is only responsible for saving to disk.
 	var success = save_game(slot_id, save_obj, is_temp)
 	
 	if success:
-		# 1. Definimos las rutas completas para no dejar dudas
+		# 1. We define the full paths to avoid any ambiguity.
 		var source_path = _save_dir.path_join("temp_snap" + GameConstants.EXTENSION_IMAGE)
 		var target_folder = "user://saves/temp/" if is_temp else _save_dir
 		var target_path = target_folder.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
 
-		# 2. Verificamos si la foto temporal realmente existe antes de copiar
+		# 2. We verify whether the temporary photo actually exists before copying.
 		if FileAccess.file_exists(source_path):
-			# USAMOS copy_absolute para evitar el Error 7
+			# We use copy_absolute to avoid Error 7
 			var err = DirAccess.copy_absolute(source_path, target_path)
 				
 			if err == OK:
@@ -404,7 +404,7 @@ func commit_save(slot_id: String, is_temp: bool = false) -> bool:
 					1
 				)
 		else:
-			# Si llegamos aquí, es que take_temp_screenshot() no ha terminado o no se llamó
+			# If we reach this point, it means take_temp_screenshot() hasn't finished or wasn't called.
 			_safe_error(
 				"Missing Snapshot",
 				"Could not copy the photo because %s does not exist yet." % source_path, 
@@ -413,7 +413,7 @@ func commit_save(slot_id: String, is_temp: bool = false) -> bool:
 			
 	return success
 
-# Borra el archivo .ess, su foto y lo quita del index
+# Deletes the .ess file and its photo, and removes it from the index
 func delete_save(slot_id: String):
 	var dir = DirAccess.open(_save_dir)
 	if dir:
@@ -422,17 +422,17 @@ func delete_save(slot_id: String):
 		if dir.file_exists(slot_id + GameConstants.EXTENSION_IMAGE):
 			dir.remove(slot_id + GameConstants.EXTENSION_IMAGE)
 			
-	_update_save_index(slot_id, true) # true = está borrando
+	_update_save_index(slot_id, true) # true = is deleting
 	var log_msg = "[%s/delete_save] Game successfully deleted -> %s" % [ES_NAME_CLASS, slot_id]
 	_safe_log(log_msg)
 
-# Actualiza solo el título en la metadata sin afectar los datos del juego
+# Update only the title in the metadata without affecting the game data
 func update_save_title(slot_id: String, new_title: String):
-	# Usamos tu propia función get_file_path para asegurar la extensión correcta
+	# We use your own get_file_path function to ensure the correct extension
 	var path = get_file_path(slot_id) 
 	
 	if FileAccess.file_exists(path):
-		# 1. ABRIR CON CONTRASEÑA (Igual que en load_game)
+		# 1. OPEN WITH PASSWORD (Same as in load_game)
 		var file_read = FileAccess.open_encrypted_with_pass(path, FileAccess.READ, _encryption_key)
 		if file_read == null: 
 			_safe_error(
@@ -445,17 +445,17 @@ func update_save_title(slot_id: String, new_title: String):
 		var json_string = file_read.get_as_text()
 		file_read.close()
 		
-		# 2. PARSEAR EL JSON DESENCRIPTADO
+		# 2. PARSE THE DECRYPTED JSON
 		var save_data = JSON.parse_string(json_string)
 		
-		# 3. MODIFICAR EL DICCIONARIO USANDO LA CONSTANTE
+		# 3. Modify the dictionary using the constant
 		if typeof(save_data) == TYPE_DICTIONARY:
 			if save_data.has(KEY_META):
 				save_data[KEY_META]["title"] = new_title
 			else:
 				save_data["title"] = new_title # Fallback por si la estructura cambia
 				
-			# 4. VOLVER A GUARDAR ENCRIPTADO (Igual que en save_game)
+			# 4. SAVE AGAIN, ENCRYPTED (Same as in save_game)
 			var file_write = FileAccess.open_encrypted_with_pass(path, FileAccess.WRITE, _encryption_key)
 			if file_write:
 				file_write.store_string(JSON.stringify(save_data))
@@ -469,11 +469,11 @@ func update_save_title(slot_id: String, new_title: String):
 					1
 				)
 				
-## Retorna true si hay datos de una partida en vivo listos para procesarse
+## Returns true if live match data is ready to be processed
 func has_live_session() -> bool:
 	return not _temp_game_data.is_empty()
 	
-## Busca el primer slot disponible en el índice
+## Find the first available slot in the index
 func get_next_free_slot(current_meta: Dictionary) -> String:
 	var max_pages = 50 
 	var max_slots_per_page = 10 
@@ -485,10 +485,10 @@ func get_next_free_slot(current_meta: Dictionary) -> String:
 			if not current_meta.has(test_id):
 				return test_id
 				
-	push_error("iOplazxEssence: No hay slots libres disponibles.")
+	push_error("iOplazxEssence: No free slots available.")
 	return ""
 
-## Ejecuta la copia física pura y dura (sin UI)
+## Executes the raw physical copy (without UI)
 func import_physical_file(source_ess: String, source_webp: String, target_slot_id: String) -> bool:
 	var target_ess = _save_dir.path_join(target_slot_id + GameConstants.EXTENSION_SAVE_FILE)
 	var target_webp = _save_dir.path_join(target_slot_id + GameConstants.EXTENSION_IMAGE)
@@ -503,7 +503,7 @@ func import_physical_file(source_ess: String, source_webp: String, target_slot_i
 		
 	return success
 	
-## Actualiza exclusivamente la ruta de exportación en el índice
+## Updates only the export path in the index
 func update_last_export_path(dir_path: String):
 	var index = _get_save_index()
 	index["last_export_path"] = dir_path
@@ -515,7 +515,7 @@ func update_last_export_path(dir_path: String):
 	
 func mark_save_as_latest_played(slot_id: String):
 	var index = _get_save_index()
-	# Solo actualizamos si realmente hay un cambio, para ahorrar escrituras en disco
+	# We only update if there is an actual change, to save on disk writes.
 	if index["latest_save"] != slot_id:
 		index["latest_save"] = slot_id
 		
@@ -525,7 +525,7 @@ func mark_save_as_latest_played(slot_id: String):
 		file.close()
 
 # ==========================================
-# LIMPIEZA DE MEMORIA
+# MEMORY CLEARING
 # ==========================================
 func delete_temp_screenshot():
 	var dir = DirAccess.open(_save_dir)
@@ -547,28 +547,28 @@ func clear_all_temp():
 # ==========================================
 # CHECKPOINTS INVISIBLES (BACKGROUND SAVING)
 # ==========================================
-var _action_threshold: int = 5 # Puntos para detonar guardado
+var _action_threshold: int = 5 # Trigger points for saving
 const SLOT_CP_ACTION = "checkpoint_action"
 const SLOT_CP_SCENE = "checkpoint_scene"
 
-# 1. Guardado por acciones (Ej: moverse 5 veces en el MoveMapControl)
+# 1. Saved by actions (e.g., moving 5 times in the MoveMapControl)
 func save_action_checkpoint(weight: int = 1):
 	_action_points += weight
 	
 	if _action_points >= _action_threshold:
-		_action_points = 0 # Reiniciamos el contador
-		_create_checkpoint(SLOT_CP_ACTION, "Punto de Control (Acción)")
+		_action_points = 0 # We are resetting the counter
+		_create_checkpoint(SLOT_CP_ACTION, "Checkpoint (Action)")
 		var log_msg = "[%s/save_action_checkpoint] Action checkpoint generated." % ES_NAME_CLASS
 		_safe_log(log_msg)
 
-# 2. Guardado por cambio de escena (Se llamará desde tu futuro SceneManager)
+# 2. Saved on scene change (To be called from your future SceneManager)
 func save_scene_checkpoint():
-	_create_checkpoint(SLOT_CP_SCENE, "Punto de Control (Escena)")
+	_create_checkpoint(SLOT_CP_SCENE, "Checkpoint (Scene)")
 
 func _create_checkpoint(slot_id: String, cp_title: String):
 	var temp_meta = {
 		"title": cp_title,
-		"description": "Auto-save de seguridad",
+		"description": "Safety auto-save",
 		"is_auto": true,
 		"is_checkpoint": true
 	}
@@ -584,26 +584,26 @@ func _create_checkpoint(slot_id: String, cp_title: String):
 	
 
 # ==========================================
-# Metodo Auxiliar
+# Auxiliary Method
 # ==========================================
-# Actualiza únicamente el puntero de "Continuar" sin alterar las fechas de las partidas
+# Updates only the "Continue" pointer without altering the save game dates.
 func _marcar_como_ultimo_jugado(slot_id: String):
 	var index = _get_save_index()
 	
-	# Solo actualizamos si realmente es diferente, para ahorrar escrituras en disco
+	# We only update if it is actually different, to save on disk writes.
 	if index.get("latest_save", "") != slot_id:
 		index["latest_save"] = slot_id
 		
-		# Guardamos el índice modificado en el disco
+		# We save the modified index to disk
 		var file = FileAccess.open("user://saves/save_index.json", FileAccess.WRITE)
 		if file:
 			file.store_string(JSON.stringify(index))
 			file.close()
-			_safe_log("[%s] El puntero de 'Continue' ahora apunta a: %s" % [ES_NAME_CLASS, slot_id])
+			_safe_log("[%s] The 'Continue' pointer now points to: %s" % [ES_NAME_CLASS, slot_id])
 			
 
 # ==========================================
-# MÉTODOS PARA LA PANTALLA DE ERROR (BACK)
+# METHODS FOR THE ERROR SCREEN (BACK)
 # ==========================================
 
 func has_action_checkpoint() -> bool:
@@ -619,22 +619,22 @@ func load_scene_checkpoint() -> Dictionary:
 	return load_game(SLOT_CP_SCENE)
 
 # ==============================================================================
-# HOOKS DE INTEGRACIÓN (PARA EL DESARROLLADOR)
+# INTEGRATION HOOKS (FOR THE DEVELOPER)
 # ==============================================================================
 
-## El framework usará este método para recolectar datos en segundo plano
+## The framework will use this method to collect data in the background.
 func gather_all_game_data() -> Dictionary:
 	var collected_data = {}
-	# Aquí es donde pedirás al SceneTree que te dé los datos.
-	# Ejemplo: get_tree().call_group("Persist", "save_data", collected_data)
+	# This is where you will ask the SceneTree to provide the data.
+	# Example: get_tree().call_group("Persist", "save_data", collected_data)
 	return collected_data
 
-## Se ejecuta un milisegundo antes de que los datos temporales se escriban en el archivo .ess.
+## It executes one millisecond before the temporary data is written to the .ess file.
 func _on_before_save_hook(game_data: Dictionary, meta_data: Dictionary):
 	pass
 
 # ==============================================================================
-# WRAPPERS DE SEGURIDAD (Desacoplamiento Total)
+# S,ECURITY WRAPPERS (Total Decoupling)
 # ==============================================================================
 
 func _safe_log(msg: String) -> void:

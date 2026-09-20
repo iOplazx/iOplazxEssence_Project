@@ -46,7 +46,7 @@ const ActorID = {
 	"PARK_DOG_1" : 103,
 }
 
-## Operadores lógicos para evaluar en qué momento de la historia vive el objeto
+## Logical operators to evaluate the point in history at which the object exists
 enum StageCondition {
 	EQUAL,          # ==
 	GREATER,        # >

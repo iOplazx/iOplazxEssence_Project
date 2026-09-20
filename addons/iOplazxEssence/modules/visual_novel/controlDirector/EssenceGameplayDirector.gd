@@ -29,13 +29,13 @@ var current_state: GameState = GameState.CUTSCENE
 @export var hud_layer: CanvasLayer
 
 @export_category("UI Customization (Optional)")
-## Si el usuario arrastra su propia interfaz (que herede de EssenceBaseDialogBox), se usará esa.
-## Si se deja vacío (<null>), el Director cargará automáticamente la interfaz por defecto del Addon.
+## If the user drags their own interface (inheriting from EssenceBaseDialogBox), that will be used.
+## If left empty (<null>), the Director will automatically load the Addon's default interface.
 @export var custom_dialog_box: EssenceBaseDialogBox
 
-# Referencia interna activa al cuadro de diálogo
+# Active internal reference to the dialog box
 var active_dialog_box: EssenceBaseDialogBox
-# Variable interna para rastrear la habitación instanciada actualmente
+# Internal variable to track the currently instantiated room
 var current_location_node: EssenceLocation
 
 func _ready() -> void:
@@ -51,18 +51,18 @@ func _ready() -> void:
 # ==========================================
 
 func _setup_dialog_system() -> void:
-	# 1. OPCIÓN A: El usuario asignó una interfaz explícita en el Inspector
+	# 1. OPTION A: The user assigned an explicit interface in the Inspect.or
 	if is_instance_valid(custom_dialog_box):
 		active_dialog_box = custom_dialog_box
 	
-	# 2. OPCIÓN B: Buscamos si ya existe algún nodo que herede de EssenceBaseDialogBox dentro de HUD_Layer
+	# 2. OPTION B: Check if a node inheriting from EssenceBaseDialogBox already exists within HUD_Layer.
 	elif is_instance_valid(hud_layer):
 		for child in hud_layer.get_children():
 			if child is EssenceBaseDialogBox:
 				active_dialog_box = child
 				break
 				
-	# 3. OPCIÓN C (FALLBACK AUTOMÁTICO): Cargamos la interfaz empaquetada por defecto del Addon
+	# 3. OPTION C (AUTOMATIC FALLBACK): We load the Addon's default packaged interface.
 	if not is_instance_valid(active_dialog_box):
 		var default_dialog_path: String = EssencePaths.ESSENCE_DIALOG_BOX_INTERFACE
 		if ResourceLoader.exists(default_dialog_path):
@@ -74,7 +74,7 @@ func _setup_dialog_system() -> void:
 				else:
 					add_child(active_dialog_box)
 
-	# 4. Conexión de señales de término
+	# 4. Termination signal connection
 	if is_instance_valid(active_dialog_box):
 		if not active_dialog_box.dialogue_finished.is_connected(_on_dialogue_sequence_finished):
 			active_dialog_box.dialogue_finished.connect(_on_dialogue_sequence_finished)
@@ -184,7 +184,7 @@ func unload_location() -> void:
 ## API PÚBLICA: Inicia una secuencia de diálogo directa pasando un arreglo de líneas.
 func play_dialogue(lines: Array) -> void:
 	if not is_instance_valid(active_dialog_box):
-		push_error("[%s] Error: No hay ninguna interfaz de diálogo configurada o instanciada." % name)
+		push_error("[%s] Error: No dialog interface is configured or instantiated." % name)
 		return
 		
 	change_game_state(GameState.DIALOGUE)
@@ -194,7 +194,7 @@ func play_dialogue(lines: Array) -> void:
 ## Receiver automático que reestablece el control al terminar la conversación.
 func _on_dialogue_sequence_finished() -> void:
 	change_game_state(GameState.EXPLORATION)
-	print("[%s] Diálogo completado. Estado restaurado a EXPLORATION." % name)
+	print("[%s] Dialogue completed. State restored to EXPLORATION." % name)
 
 
 ## Método legado de compatibilidad para guiones traducidos.
@@ -204,7 +204,7 @@ func initialize_dialog_sequence(sequence_id: String) -> void:
 	print("=============================================")
 	
 	change_game_state(GameState.CUTSCENE)
-	# TODO: En el futuro el TranslationManager resolverá el ID y llamará a play_dialogue()
+	# TODO: In the future, the TranslationManager will resolve the ID and call play_dialogue()
 
 
 # ==========================================
@@ -245,28 +245,28 @@ func clear_item_stage() -> void:
 ## Dynamically transparent invocation for modals and notices
 func show_modal_prompt(title: String, body: String, preset: EssenceBaseModalPrompt.ButtonPreset = EssenceBaseModalPrompt.ButtonPreset.OK) -> String:
 	if not is_instance_valid(hud_layer):
-		push_error("[%s] Error: 'hud_layer' no está asignado en el GameplayDirector." % name)
+		push_error("[%s] Error: 'hud_layer' It is not assigned in the GameplayDirector." % name)
 		return ""
 		
-	# 1. Obtenemos la ruta centralizada desde EssencePaths
+	# 1. We obtain the centralized path from EssencePaths.
 	var scene_path: String = EssencePaths.ESSENCE_MODULAR_PROMPT_INTERFACE
 	
 	if not ResourceLoader.exists(scene_path):
-		push_error("[%s] Error: No se encontró la escena modal en la ruta: %s" % [name, scene_path])
+		push_error("[%s] Error: The modal scene was not found at the path: %s" % [name, scene_path])
 		return ""
 		
-	# 2. Carga e instanciación dinámica
+	# 2. Dynamic loading and instantiation
 	var modal_resource = load(scene_path) as PackedScene
 	var modal_instance = modal_resource.instantiate() as EssenceBaseModalPrompt
 	
-	# 3. Lo añadimos al HUD_Layer
+	# 3. We add it to the HUD_Layer.
 	hud_layer.add_child(modal_instance)
 	
-	# 4. Bloqueamos el escenario y esperamos la respuesta del usuario
+	# 4. We block the scenario and wait for the user's response.
 	change_game_state(GameState.CUTSCENE)
 	var user_choice: String = await modal_instance.show_prompt(title, body, preset)
 	
-	# 5. Limpieza automática y restauración del estado de exploración
+	# 5. Automatic cleanup and restoration of the scan state
 	modal_instance.queue_free()
 	change_game_state(GameState.EXPLORATION)
 	

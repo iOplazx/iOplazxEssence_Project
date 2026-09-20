@@ -1,6 +1,6 @@
 ## [GenericInteractiveCharacter]
-## Componente interactivo especializado. Mantiene limpia su abstracción 
-## delegando toda la gestión visual y de guardarropa a su clase padre.
+## Specialized interactive component. Keeps its abstraction clean
+## by delegating all visual and wardrobe management to its pad class
 extends EssenceInteractiveActor
 class_name GenericInteractiveCharacter
 
@@ -28,24 +28,24 @@ class_name GenericInteractiveCharacter
 #                    └── Sunglass (Sprite2D)
 
 @export_category("GIC Pose Configuration")
-## ¡Desplegable limpio en el Inspector con IDsGIC.Poses!
+## Clean dropdown in the Inspector with IDsGIC.Poses!
 @export var gic_poses: Dictionary[IDsGIC.Poses, GICPoseComponent] = {}
 
 func _ready() -> void:
 	poses_registry = gic_poses
-	# Llama al inicializador maestro del padre (EssenceModularActor)
-	# para que construya el inventario inicial e inicialice las poses.
+	# Call the parent's master initializer (EssenceModularActor)
+	# to build the initial inventory and initialize the poses.
 	super._ready() 	
 
 
 # ==========================================
-# DETECCIÓN DE CLIC EN EL ÁREA
+# AREA CLICK DETECTION
 # ==========================================
 func _on_interact_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if is_interactable:
-			# Emitimos la señal oficial del Framework
+			# We are broadcasting the official Framework signal.
 			clicked_on_character.emit()
 			
-			# Consumimos el clic para que no siga traspasando la pantalla
+			# We consume the click so it doesn't keep passing through the screen.
 			get_viewport().set_input_as_handled()

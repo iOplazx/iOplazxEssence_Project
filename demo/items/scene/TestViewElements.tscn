@@ -16,7 +16,6 @@
 [node name="TestViewElements" type="Node" unique_id=778837280]
 
 [node name="Node_initialRoom" type="Panel" parent="." unique_id=263414863]
-visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -52,6 +51,7 @@ position = Vector2(1223, 593)
 scale = Vector2(0.2, 0.2)
 
 [node name="Node_Park" type="Panel" parent="." unique_id=1149338417]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

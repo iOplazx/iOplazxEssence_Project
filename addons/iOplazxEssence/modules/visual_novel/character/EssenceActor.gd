@@ -20,7 +20,7 @@ enum TransitionType {
 @export var display_name: String = "Unknown Character"
 
 # ==========================================
-# INICIALIZACIÓN
+# INITIALIZATION
 # ==========================================
 func _ready() -> void:
 	pass
@@ -52,5 +52,5 @@ func enter_stage(entry_type: TransitionType = TransitionType.FADE, duration: flo
 ## [param exit_type]: The type of animation ("fade", "slide_right", etc.).
 ## [param duration]: How long the transition lasts.
 func exit_stage(exit_type: String = "fade", duration: float = 0.5) -> void:
-	# Lógica a implementar conectada con EssenceUIAnimator
+	# Logic to be implemented, connected to EssenceUIAnimator
 	pass

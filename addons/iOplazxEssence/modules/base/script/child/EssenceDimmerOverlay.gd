@@ -10,29 +10,29 @@ extends ColorRect
 # ├── Color: Color(0, 0, 0, 0.65)
 # └── Mouse Filter: Stop
 
-## Emitido si el usuario hace clic sobre el área oscura (útil para cerrar modales al hacer clic afuera)
+## Emitted if the user clicks on the dark area (useful for closing modals by clicking outside)
 signal overlay_clicked
 
 @export_category("Overlay Settings")
-## Tiempo por defecto de las animaciones de entrada/salida.
+## Default duration for entrance/exit animations.
 @export var default_fade_duration: float = 0.25
-## Color y opacidad objetivo cuando la cortina está totalmente desplegada.
+## Target color and opacity when the curtain is fully extended.
 @export var target_color: Color = Color(0.0, 0.0, 0.0, 0.65)
-## Si es verdadero, el overlay absorberá los clics e impedirá que pasen al fondo.
+## If true, the overlay will absorb clicks and prevent them from passing through to the background.
 @export var block_mouse_input: bool = true
 
 
 func _ready() -> void:
-	# Forzamos el ajuste a pantalla completa y el filtro de mouse
+	# Force full-screen fit and mouse filtering
 	anchors_preset = Control.PRESET_FULL_RECT
 	color = target_color
 	mouse_filter = Control.MOUSE_FILTER_STOP if block_mouse_input else Control.MOUSE_FILTER_IGNORE
 	
-	# Detectar clics en el fondo si se requiere la señal
+	# Detect clicks on the background if the signal is required
 	gui_input.connect(_on_gui_input)
 
 
-## Muestra el overlay ejecutando un fundido de entrada (Fade In).
+## Shows the overlay with a fade-in effect (Fade In).
 func fade_in(duration: float = -1.0) -> Tween:
 	var anim_time: float = duration if duration >= 0.0 else default_fade_duration
 	show()
@@ -46,7 +46,7 @@ func fade_in(duration: float = -1.0) -> Tween:
 	return tween
 
 
-## Oculta el overlay ejecutando un fundido de salida (Fade Out).
+## Hides the overlay by fading it out (Fade Out).
 func fade_out(duration: float = -1.0) -> Tween:
 	var anim_time: float = duration if duration >= 0.0 else default_fade_duration
 	

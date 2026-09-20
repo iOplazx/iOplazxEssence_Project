@@ -1,4 +1,4 @@
-## [IDsGIC] - Solo cosas del personaje interactivo principal
+## [IDsGIC] - Only items for the main interactive character
 class_name IDsGIC
 extends RefCounted
 

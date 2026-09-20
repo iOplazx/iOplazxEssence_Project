@@ -1,5 +1,5 @@
 ## [EssenceDialogBox]
-## Implementación concreta adaptada para la estructura del .tscn de Vessel Voyager / iOplazx Essence.
+## Concrete implementation adapted for the .tscn structure of Vessel Voyager / iOplazx Essence.
 class_name EssenceDialogBox
 extends EssenceBaseDialogBox
 
@@ -25,14 +25,14 @@ func _ready() -> void:
 
 
 # ==========================================
-# VINCULACIÓN CON LA CLASE BASE
+# LINKING TO THE BASE CLASS
 # ==========================================
 
 func _set_speaker_name(name_text: String, line_data: Dictionary) -> void:
 	if is_instance_valid(nombre_label):
 		nombre_label.text = name_text
 		
-		# BONUS: Si la línea especifica un color para el hablante, lo aplicamos
+		# BONUS: If the line specifies a color for the speaker, we apply it.
 		if line_data.has("color"):
 			nombre_label.add_theme_color_override("font_color", line_data["color"])
 

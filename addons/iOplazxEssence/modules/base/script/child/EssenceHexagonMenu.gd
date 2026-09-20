@@ -61,7 +61,7 @@ func _generate_geometric_structure() -> void:
 
 	# 3. REGISTER THE 2 PAGINATION SLOTS AT THE BOTTOM CORNERS
 	# Bottom Left Slot (Previous Page)
-	btn_prev = _instance_slot(pos_bottom_left, "pagina_anterior")
+	btn_prev = _instance_slot(pos_bottom_left, ACTION_PREV_PAGE)
 	btn_prev.rotation = pos_bottom_left.angle() + deg_to_rad(90)
 	
 	var prev_icon_node = btn_prev.get_node_or_null("Icon") as Control
@@ -72,7 +72,7 @@ func _generate_geometric_structure() -> void:
 			prev_icon_node.texture = icon_prev
 
 	# Bottom Right Slot (Next Page)
-	btn_next = _instance_slot(pos_bottom_right, "pagina_siguiente")
+	btn_next = _instance_slot(pos_bottom_right, ACTION_NEXT_PAGE)
 	btn_next.rotation = pos_bottom_right.angle() + deg_to_rad(90)
 	
 	var next_icon_node = btn_next.get_node_or_null("Icon") as Control

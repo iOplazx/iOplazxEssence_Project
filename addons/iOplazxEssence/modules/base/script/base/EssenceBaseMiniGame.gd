@@ -1,26 +1,26 @@
 ## [EssenceBaseMiniGame]
-## Clase base de la que heredarán todos los minijuegos del proyecto.
+## Base class from which all the project's minigames will inherit.
 class_name EssenceBaseMiniGame
 extends Control
 
-## Emitir cuando el minijuego termine.
-## [param result_data]: Diccionario con el estado final (ej: {"victory": true, "score": 100})
+## Emit when the minigame ends.
+## [param result_data]: Dictionary containing the final state (e.g., {"victory": true, "score": 100})
 signal minigame_completed(result_data: Dictionary)
 
-## Emitir si el jugador abandona o cierra el minijuego sin terminarlo
+## Emit if the player leaves or closes the minigame without finishing it
 signal minigame_cancelled
 
-## Finaliza el minijuego informando victoria o derrota
+## The minigame ends by reporting a victory or defeat.
 func finish_minigame(is_victory: bool, extra_data: Dictionary = {}) -> void:
 	var result: Dictionary = {
 		"victory": is_victory
 	}
-	# Mezclamos datos adicionales si los hay (puntos, tiempo, ítems ganados, etc.)
+	# We mix in additional data if available (points, time, items earned, etc.)
 	result.merge(extra_data, true)
 	
 	minigame_completed.emit(result)
 
 
-## Cancela la ejecución del minijuego
+## Cancels the execution of the minigame
 func cancel_minigame() -> void:
 	minigame_cancelled.emit()

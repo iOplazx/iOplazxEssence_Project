@@ -1,6 +1,6 @@
 ## [GenericModularCharacter]
-## Actor pasivo de relleno. Utiliza su propio archivo de IDs
-## y aprovecha la constante de agrupación para cambiar de color al azar.
+## Passive filler actor. Uses its own ID file
+## and leverages the grouping constant to randomly change color.
 class_name GenericModularCharacter
 extends EssenceModularActor
 
@@ -20,11 +20,11 @@ extends EssenceModularActor
 #                    └── Mustache (Sprite2D)
 
 @export_category("NPC Pose Configuration")
-## ¡Desplegable limpio en el Inspector con IDsNPCModular.Poses!
+
 @export var npc_poses: Dictionary[IDsNPCModular.Poses, NPCWardrobeGroup] = {}
 
 func _ready() -> void:
-	# Transmitimos el diccionario exclusivo de NPCs al padre
+	# We transmit the exclusive NPC dictionary to the father.
 	poses_registry = npc_poses
 	super._ready()
 	_randomize_appearance()

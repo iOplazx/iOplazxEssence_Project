@@ -1,4 +1,4 @@
-## [IDsNPCModular] - Solo cosas del pool de NPCs de relleno
+## [IDsNPCModular] - Only items from the filler NPC pool
 class_name IDsNPCModular
 extends RefCounted
 
@@ -12,9 +12,9 @@ enum Items {
 	JACKET_4    = 1004
 }
 
-## LA SUB-CONSTANTE DE AGRUPACIÓN:
-## Tal como dijiste, es la misma chamarra pero cambia el color.
-## Esta lista nos permite agruparlas lógicamente para aleatorizarlas en una sola línea.
+## THE GROUPING SUB-CONSTANT:
+## As you said, it's the same jacket, but the color changes.
+## This list allows us to group them logically so we can randomize them in a single line.
 const JACKET_COLOR_GROUP = [
 	Items.JACKET_1,
 	Items.JACKET_2,

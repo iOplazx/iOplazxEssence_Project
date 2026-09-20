@@ -45,7 +45,7 @@ signal page_changed(page: int)
 var _current_page: int = 0
 var _ocultar_al_terminar: bool = true
 
-# Referencias a la UI (Asegúrate de tener el % en la escena)
+# UI References (Make sure you have the % in the scene)
 @onready var rich_text_tutorial: RichTextLabel = %TextoExplicativo
 @onready var btn_prev: Button = %BtnAnterior
 @onready var btn_next: Button = %BtnSiguiente
@@ -56,14 +56,14 @@ var _ocultar_al_terminar: bool = true
 func _ready() -> void:
 	super._ready() 
 	
-	# Aplicar los anclajes verticales personalizados al iniciar
+	# Apply custom vertical anchors on startup
 	_update_custom_layout()
 	
-	# Borrar texto de prueba del editor
+	# Delete test text from the editor
 	if rich_text_tutorial: 
 		rich_text_tutorial.text = ""
 	
-	# Conectar botones propios del tutorial
+	# Connect the tutorial's own buttons
 	if btn_prev: 
 		btn_prev.pressed.connect(prev_page)
 		btn_prev.focus_mode = Control.FOCUS_NONE
@@ -75,16 +75,16 @@ func _ready() -> void:
 	_update_ui()
 
 # ==========================================
-# MÉTODOS PÚBLICOS (API del Tutorial)
+#PUBLIC METHODS (Tutorial API)
 # ==========================================
 func load_and_show_tutorial(messages: Array[String], ocultar: bool = true) -> void:
-	_ocultar_al_terminar = ocultar # Guardamos la preferencia
+	_ocultar_al_terminar = ocultar # We save the preference
 	_setup_new_tutorial(messages)
 	
-	show() # Nos aseguramos de encender el nodo en el motor
+	show() # We ensure the node is turned on in the engine.
 	
 	if not is_open:
-		toggle() # Animación de entrada
+		toggle() # Entrance animation
 
 func load_tutorial_silently(messages: Array[String]) -> void:
 	_setup_new_tutorial(messages)
@@ -94,16 +94,16 @@ func next_page() -> void:
 		_current_page += 1
 		_update_ui()
 	else:
-		# para que se guarde de forma elegante en la pantalla.
+		# so that it is stored elegantly on the screen.
 		if is_open:
-			toggle() # Esto ejecuta tu Tween hacia la posición X de minimizado
+			toggle() # This runs your tween to the minimized X position.
 		
-		# esperamos el temporizador y lo apagamos del motor.
+		# We wait for the timer and turn off the motor.
 		if _ocultar_al_terminar:
 			await get_tree().create_timer(anim_duration).timeout
 			visible = false
 		
-		# Emitimos la señal para que el juego principal continúe
+		# We transmit the signal so that the main game continues.
 		tutorial_finished.emit()
 
 func prev_page() -> void:
@@ -112,7 +112,7 @@ func prev_page() -> void:
 		_update_ui()
 
 # ==========================================
-# MÉTODOS PRIVADOS
+# PRIVATE METHODS
 # ==========================================
 func _update_custom_layout() -> void:
 	if cajon:
@@ -131,11 +131,11 @@ func _update_ui() -> void:
 	if tutorial_pages.is_empty(): 
 		return
 		
-	# Actualizar texto
+	# Update text
 	if rich_text_tutorial: 
 		rich_text_tutorial.text = tutorial_pages[_current_page]
 		
-	# Actualizar estado de los botones
+	# Update button states
 	if btn_prev:
 		btn_prev.disabled = (_current_page == 0)
 		btn_prev.text = tr("ESS_BUTTON_PREV_TUTORIAL")

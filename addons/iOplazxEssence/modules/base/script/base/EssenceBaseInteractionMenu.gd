@@ -37,12 +37,18 @@ var botones_accion: Array[EssenceBaseInteractionButton] = []
 var btn_prev: EssenceBaseInteractionButton
 var btn_next: EssenceBaseInteractionButton
 
+## System action identifiers
+const ACTION_PREV_PAGE: String = "previous_page"
+const ACTION_NEXT_PAGE: String = "next_page"
+const ACTION_EMPTY_SLOT: String = "empty"
+## Node animation metadata
+const META_TARGET_POSITION: String = "target_position"
+
 # ==========================================
 # PUBLIC CONTROL & ANIMATION STATE
 # ==========================================
 ## Safety flag that blocks inputs and new interactions while visual transitions are active.
 var is_animating: bool = false
-
 
 ## Base initialization lifecycle for the interaction menu container.
 func _ready() -> void:
@@ -100,7 +106,7 @@ func _update_page_view() -> void:
 			btn.action_name = action_data.get("id", "")
 			
 			# ===================================================================
-			# RESOLUCIÓN DE TEXTURA (Soporta objetos Texture2D y rutas String)
+			# TEXTURE RESOLUTION (Supports Texture2D objects and String paths)
 			# ===================================================================
 			var raw_icon = action_data.get("icono", null)
 			var resolved_texture: Texture2D = unknown_icon
@@ -111,7 +117,7 @@ func _update_page_view() -> void:
 				if ResourceLoader.exists(raw_icon):
 					resolved_texture = load(raw_icon) as Texture2D
 				else:
-					push_warning("[%s] ⚠️ No se encontró la textura en la ruta: %s" % [name, raw_icon])
+					push_warning("[%s] ⚠️ Texture not found at path: %s" % [name, raw_icon])
 			
 			var icon_node = btn.get_node_or_null("Icon") as TextureRect
 			if is_instance_valid(icon_node):
@@ -128,8 +134,8 @@ func _update_page_view() -> void:
 	var has_prev: bool = pagina_actual > 0
 	var has_next: bool = pagina_actual < paginas_acciones.size() - 1 if not paginas_acciones.is_empty() else false
 	
-	_manage_pagination_button(btn_prev, "pagina_anterior", has_prev, tr("RADIAL_MENU_PREV_PAGE"), icon_prev)
-	_manage_pagination_button(btn_next, "pagina_siguiente", has_next, tr("RADIAL_MENU_NEXT_PAGE"), icon_next)
+	_manage_pagination_button(btn_prev, ACTION_PREV_PAGE, has_prev, tr("RADIAL_MENU_PREV_PAGE"), icon_prev)
+	_manage_pagination_button(btn_next, ACTION_NEXT_PAGE, has_next, tr("RADIAL_MENU_NEXT_PAGE"), icon_next)
 	
 ## Manages visibility and interactions for a specific pagination button safely.
 func _manage_pagination_button(btn: EssenceBaseInteractionButton, action: String, condition: bool, tooltip: String, active_icon: Texture2D) -> void:
@@ -202,7 +208,7 @@ func open_menu(global_click_position: Vector2) -> void:
 	for btn in buttons_container.get_children():
 		var slot_size = _get_slot_size(btn)
 		btn.position = -(slot_size / 2.0)
-		var pos_final = btn.get_meta("pos_final", Vector2.ZERO)
+		var pos_final = btn.get_meta(META_TARGET_POSITION, Vector2.ZERO)
 		tween.tween_property(btn, "position", pos_final, animation_time).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
 	tween.chain().tween_callback(func(): is_animating = false)
@@ -233,11 +239,11 @@ func close_menu() -> void:
 func _on_action_button(action: String) -> void:
 	if action == "": return
 	
-	if action == "pagina_anterior":
+	if action == ACTION_PREV_PAGE:
 		pagina_actual = max(0, pagina_actual - 1)
 		_update_page_view()
 		return
-	if action == "pagina_siguiente":
+	if action == ACTION_NEXT_PAGE:
 		pagina_actual = min(paginas_acciones.size() - 1, pagina_actual + 1)
 		_update_page_view()
 		return
@@ -263,7 +269,7 @@ func _instance_slot(local_position: Vector2, initial_action: String) -> EssenceB
 	btn.scale = Vector2(button_scale, button_scale)
 	
 	var slot_size = _get_slot_size(btn)
-	btn.set_meta("pos_final", local_position - (slot_size / 2.0))
+	btn.set_meta(META_TARGET_POSITION, local_position - (slot_size / 2.0))
 	btn.action_name = initial_action
 	btn.action_chosen.connect(_on_action_button)
 	return btn

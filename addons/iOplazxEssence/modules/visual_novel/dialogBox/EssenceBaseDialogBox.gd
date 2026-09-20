@@ -1,11 +1,11 @@
 ## [EssenceBaseDialogBox]
-## Clase base agnóstica para cajas de diálogo.
-## Maneja colas de líneas, efecto máquina de escribir, omisión por clic y señales.
+## Agnostic base class for dialog boxes.
+## Handles line queues, typewriter effect, click-to-skip, and signals.
 class_name EssenceBaseDialogBox
 extends PanelContainer
 
 # ==========================================
-# SEÑALES DEL FRAMEWORK
+# FRAMEWORK SIGNALS
 # ==========================================
 signal dialogue_started
 signal line_started(line_data: Dictionary)
@@ -13,16 +13,16 @@ signal line_completed
 signal dialogue_finished
 
 # ==========================================
-# CONFIGURACIÓN
+# CONFIGURATION
 # ==========================================
 @export_category("Typewriter Settings")
-## Velocidad de revelado en segundos por carácter.
+## Development speed in seconds per character.
 @export var character_reveal_delay: float = 0.025
-## Si es verdadero, procesará las cadenas con tr() automáticamente.
+## If true, it will automatically process strings with tr().
 @export var enable_auto_translation: bool = true
 
 # ==========================================
-# ESTADO INTERNO
+# INTERNAL STATE
 # ==========================================
 var _dialogue_queue: Array = []
 var _current_line: Dictionary = {}
@@ -35,11 +35,11 @@ func _ready() -> void:
 
 
 # ==========================================
-# PUBLIC API: Control de Flujo
+# PUBLIC API: Flow Control
 # ==========================================
 
-## Inicia una secuencia de diálogo pasando un arreglo de diccionarios.
-## Ejemplo: [{"nombre": "Annie", "texto": "LINE_1"}, ...]
+## Starts a dialogue sequence by passing an array of dictionaries.
+## Example: [{"nombre": "Annie", "texto": "LINE_1"}, ...]
 func start_dialogue(lines: Array) -> void:
 	_dialogue_queue = lines.duplicate()
 	show()
@@ -47,47 +47,46 @@ func start_dialogue(lines: Array) -> void:
 	advance_dialogue()
 
 
-## Avanza a la siguiente línea o completa el texto en pantalla si aún se está escribiendo.
+## Advance to the next line or complete the on-screen text if it is still being typed.
 func advance_dialogue() -> void:
-	# 1. Si el texto se está escribiendo en pantalla, el clic lo completa de golpe
+	# 1. If the text is being written on the screen, clicking completes it instantly.
 	if _is_typing:
 		_complete_typewriter_instant()
 		return
 		
-	# 2. Si la cola está vacía, cerramos la interfaz
+	# 2. If the queue is empty, we close the interface.
 	if _dialogue_queue.is_empty():
 		_finish_dialogue()
 		return
 		
-	# 3. Extraemos y procesamos la siguiente línea
+	# 3. We extract and process the following line
 	_current_line = _dialogue_queue.pop_front()
 	_process_current_line(_current_line)
 
 
 # ==========================================
-# MÉTODOS VIRTUALES (Para sobreescribir en subclases)
+# VIRTUAL METHODS (To be overridden in subclasses)
 # ==========================================
 
-## Sobreescribir en la subclase para asignar el nombre al Label correspondiente.
+## Override in the subclass to assign the name to the corresponding Label.
 func _set_speaker_name(_name_text: String, _line_data: Dictionary) -> void:
 	pass
 
-
-## Sobreescribir en la subclase para devolver el nodo RichTextLabel/Label del texto.
+## Override in the subclass to return the RichTextLabel/Label node for the text.
 func _get_text_label_node() -> Control:
 	return null
 
 
 # ==========================================
-# LÓGICA INTERNA Y TYPEWRITER
+# INTERNAL LOGIC AND TYPEWRITER
 # ==========================================
 
 func _process_current_line(line_data: Dictionary) -> void:
 	line_started.emit(line_data)
 	
 	# ===================================================================
-	# BÚSQUEDA FLEXIBLE: Prioriza inglés ("speaker"/"name", "text") 
-	# y mantiene fallback a español ("nombre", "texto") por compatibilidad.
+	# FLEXIBLE SEARCH: Prioritizes English ("speaker"/"name", "text") 
+	# and maintains a fallback to Spanish ("nombre", "texto") for compatibility.
 	# ===================================================================
 	var raw_speaker: String = line_data.get("speaker", line_data.get("name", line_data.get("nombre", "Narrator")))
 	var raw_text: String = line_data.get("text", line_data.get("texto", "..."))
@@ -95,10 +94,10 @@ func _process_current_line(line_data: Dictionary) -> void:
 	var final_speaker: String = tr(raw_speaker) if enable_auto_translation else raw_speaker
 	var final_text: String = tr(raw_text) if enable_auto_translation else raw_text
 	
-	# Transmitir el nombre a la UI
+	# Pass the name to the UI
 	_set_speaker_name(final_speaker, line_data)
 	
-	# Iniciar efecto typewriter
+	# Start typewriter effect
 	var label_node = _get_text_label_node()
 	if label_node:
 		_start_typewriter_effect(label_node, final_text)

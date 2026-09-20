@@ -26,13 +26,13 @@ extends Control
 const ES_NAME_CLASS = "TestMainGame"
 
 # ==========================================
-# GESTIÓN DEL FLUJO
+# FLOW MANAGEMENT
 # ==========================================
 enum TestPhase { INTRO, GAMEPLAY }
 var current_phase: TestPhase = TestPhase.INTRO
 
 # ==========================================
-# CONEXIONES DE UI Y MUNDO
+# UI AND WORLD CONNECTIONS
 # ==========================================
 @export_category("UI Connections")
 @export var background_layer: TextureRect
@@ -42,7 +42,7 @@ var current_phase: TestPhase = TestPhase.INTRO
 @export var tutorial_panel: EssenceTutorialPanel 
 @export var ui_principal: Control 
 
-# Usamos % en lugar de $ para acceder al instante sin importar la jerarquía
+# We use % instead of $ for instant access, regardless of hierarchy.
 @onready var director: EssenceGameplayDirector = %GameplayDirector
 @onready var active_location_container: Node2D = %GameplayDirector/ActiveLocation
 @onready var item_stage_container: Node2D = %GameplayDirector/ItemStage
@@ -52,11 +52,11 @@ var routes: EssenceRouteConfig
 
 var _cached_interaction_menu: EssenceBaseInteractionMenu = null
 
-# Variable global para saber en qué ID de habitación numérica estamos parados
+# Global variable to track the current numeric room ID
 var current_room_id: int = GameIDs.RoomID.INITIAL_ROOM
-# Diccionario de ejemplo para simular las condiciones de tu historia (Flags)
+# Example dictionary to simulate your story's conditions (Flags)
 var story_flags: Dictionary = {
-	"is_phone_event_active": false,   # La condición de tu ejemplo del teléfono
+	"is_phone_event_active": false,   # The condition in your phone example
 	"is_first_time_here": true,
 	
 	# PERSISTENT WARDROBE SYSTEM
@@ -83,13 +83,13 @@ var _spawned_actors_in_room: Array[Node2D] = []
 ######################################
 
 # ==========================================
-# INICIALIZACIÓN
+# INITIALIZATION
 # ==========================================
 func _ready() -> void:
 	director.clear_character_stage()
 	director.clear_item_stage()
 	
-	# Conectamos la señal de cuando el tutorial se cierra
+	# Connect the signal for when the tutorial closes
 	if tutorial_panel:
 		tutorial_panel.tutorial_finished.connect(_on_tutorial_finished)
 		
@@ -97,29 +97,29 @@ func _ready() -> void:
 	_check_security_nodes()
 	_config_buttons()
 	
-	# 2. Revisamos si venimos de Cargar una Partida o de presionar "Back" en el menú
+	# 2. We check whether we are coming from loading a game or from pressing "Back" in the menu.
 	if is_instance_valid(SaveManager) and not SaveManager.loaded_game_data.is_empty():
-		# Entramos directo al sistema de restauración
+		# We go straight into the restore system.
 		_restaurar_partida_cargada()
 	else:
-		# Si es un juego 100% nuevo
+		# If it is a 100% new game
 		#_setup_initial_room_layout()
 		director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 		
-		# Si es juego nuevo, abrimos la cortina suavemente
+		# If it is a new game, we gently open the curtain.
 		var fade = director.open_curtain(0.4)
 		if fade: await fade.finished
 		
 		_iniciar_secuencia_intro()
 		
-	EssenceLogger.system_info("[%s/_ready] Escena principal inicializada." % ES_NAME_CLASS)
+	EssenceLogger.system_info("[%s/_ready] Main scene initialized." % ES_NAME_CLASS)
 	
 ## Carga el archivo .tres en memoria
 func _cargar_configuracion() -> void:
 	if ResourceLoader.exists(ROUTES_PATH):
 		routes = load(ROUTES_PATH) as EssenceRouteConfig
 	else:
-		push_error("[%s] ERROR: No se encontró RouteConfig.tres en %s" % ["TestMainGame", ROUTES_PATH])
+		push_error("[%s] ERROR: RouteConfig.tres was not found in %s" % ["TestMainGame", ROUTES_PATH])
 		
 # ==========================================
 # LÓGICA DE FLUJO (TUTORIALES Y EVENTOS)
@@ -131,14 +131,14 @@ func _iniciar_secuencia_intro() -> void:
 	
 	await get_tree().create_timer(0.3).timeout
 	
-	# Invocación directa y limpia a través del Director
+	# Direct and clean invocation via the Director
 	await director.show_modal_prompt(
 		"Notice",
 		"This is strictly a controls test and technical demo for the iOplazxEssence addon, not the actual game.",
 		EssenceBaseModalPrompt.ButtonPreset.OK
 	)
 	
-	# 2. PASO 2: Tutorial multipágina si existe
+	# 2. STEP 2: Multi-page tutorial (if available)
 	if tutorial_panel:
 		var intro_messages: Array[String] = [
 			"Welcome to the Essence Framework sandbox.",
@@ -181,7 +181,7 @@ func _on_tutorial_finished() -> void:
 		story_flags["has_completed_touch_tutorial"] = true
 			
 # ==========================================
-# BLINDAJE DE SEGURIDAD
+# S,ECURITY ARMORING
 # ==========================================
 func _check_security_nodes() -> void:
 	var missing = []
@@ -195,7 +195,7 @@ func _check_security_nodes() -> void:
 		push_error(msg)
 
 # ==========================================
-# CONFIGURACIÓN
+# CONFIGURATION
 # ==========================================
 func _config_buttons() -> void:
 	if btn_return: btn_return.pressed.connect(func(): _play_sfx(); _on_return_pressed())
@@ -208,17 +208,17 @@ func _play_sfx() -> void:
 		AudioManager.play_ui_sfx()
 
 # ==========================================
-# LÓGICA DE GUARDADO / CARGA
+# SAVE/LOAD LOGIC
 # ==========================================
 func _preparar_datos_para_menu() -> void:
-	print("[%s] Capturando pantalla y preparando datos..." % ES_NAME_CLASS)
+	print("[%s] Capturing screen and preparing data..." % ES_NAME_CLASS)
 	
 	await get_tree().process_frame
 	await SaveManager.take_temp_screenshot()
 	await get_tree().create_timer(0.1).timeout
 	
 	# ==========================================
-	# DICCIONARIO PARA LA INTERFAZ / CACHÉ
+	# INTERFACE / CACHE DICTIONARY
 	# ==========================================
 	var current_game_data = {
 		"escena_actual": "MainRoom",
@@ -229,11 +229,11 @@ func _preparar_datos_para_menu() -> void:
 	}
 	
 	var room_key = GameIDs.RoomID.find_key(current_room_id)
-	var room_name = room_key.capitalize().replace("_", " ") if room_key else "Habitación Desconocida"
+	var room_name = room_key.capitalize().replace("_", " ") if room_key else "Unknown Room"
 	
 	var current_meta_data = {
-		"title": "Prueba de Framework",
-		"description": "Lugar: %s | Fase: %s" % [room_name, ("Intro" if current_phase == TestPhase.INTRO else "Gameplay")],
+		"title": "Framework Test",
+		"description": "Place: %s | Phase: %s" % [room_name, ("Intro" if current_phase == TestPhase.INTRO else "Gameplay")],
 		"play_time": "00:01:00"
 	}
 	
@@ -249,7 +249,7 @@ func _restaurar_partida_cargada() -> void:
 	if datos.has("story_flags"):
 		story_flags = datos.get("story_flags").duplicate()
 	
-	# El motor se estabiliza. El jugador solo ve negro porque forzamos Color.BLACK en el _ready o en el Director
+	# The engine stabilizes. The player sees only black because we force Color.BLACK in `_ready` or in the Director.
 	await get_tree().process_frame 
 	
 	if current_phase == TestPhase.GAMEPLAY:
@@ -271,15 +271,15 @@ func _restaurar_partida_cargada() -> void:
 		_setup_initial_room_layout() #validar TODO
 		_iniciar_secuencia_intro()
 		
-	# Limpiamos la caché inmediatamente para dejar el cargador listo para la siguiente vez
+	# We clear the cache immediately to leave the loader ready for the next time.
 	SaveManager.loaded_game_data.clear()
 	
-	# Abrimos la cortina de forma automática e impecable
+	# We open the curtain automatically and flawlessly.
 	var fade_in = director.open_curtain(0.5)
 	if fade_in: 
 		await fade_in.finished
 		
-	print("[%s] ¡Carga completada y filtro de pantalla iluminado!" % ES_NAME_CLASS)
+	print("[%s] Charging complete and screen filter illuminated!" % ES_NAME_CLASS)
 	
 # ==========================================
 # EVENTOS DE BOTONES
@@ -301,13 +301,13 @@ func _on_return_pressed() -> void:
 
 ## Triggered when the user performs a physical left-click interaction over the active character.
 func _on_character_interacted() -> void:
-	# GUARDIA: Si no estamos en exploración (estamos en cinemática o diálogo), ignorar clics[cite: 5]
+	# GUARD: If not in exploration mode (i.e., in a cutscene or dialogue), ignore clicks.
 	if director.current_state != EssenceGameplayDirector.GameState.EXPLORATION:
 		return
 	if not is_instance_valid(active_character): 
 		return
 		
-	# DEBOUNCE ANTI-SPAM PROTECTION:
+	# DEBOUNCE ANTI-SPAM PROTECTION: 
 	# Rejects character interaction if the menu layer is active or playing a transition.
 	if is_instance_valid(_cached_interaction_menu):
 		if _cached_interaction_menu.visible or _cached_interaction_menu.is_animating:
@@ -316,7 +316,7 @@ func _on_character_interacted() -> void:
 	# 1. VALIDATION LAYER
 	if current_phase == TestPhase.GAMEPLAY and active_character.is_interactable:
 		
-		# 2. STATE CHECK (Transición inicial a Modo 2 en el primer clic de la partida)
+		# 2. STATE CHECK (Initial transition to Mode 2 on the first click of the game)
 		if not story_flags.get("has_touched_character", false):
 			story_flags["has_touched_character"] = true
 			story_flags["room_mode_" + str(current_room_id)] = 2
@@ -327,12 +327,12 @@ func _on_character_interacted() -> void:
 				director.clear_item_stage()
 				_build_stage_interactables(current_room_id, data["interaction_mode"])
 		
-		# 3. INTERACTION FLOW (El menú se abre SIEMPRE)
-		# Esto garantiza que el jugador siempre vea la animación de los triángulos naranjas
+		# 3. INTERACTION FLOW (The menu ALWAYS opens)
+		# This ensures the player always sees the orange triangle animation.
 		_open_interaction_menu()
 		
-		# 4. TUTORIAL LAYER (Condicional)
-		# Si NO ha completado el segundo tutorial, abrimos el panel explicativo encima
+		# 4. TUTORIAL LAYER (Conditional)
+		# If the second tutorial has NOT been completed, we open the explanatory panel on top.
 		if not story_flags.get("has_completed_touch_tutorial", false):
 			_trigger_character_tutorial()
 
@@ -425,15 +425,15 @@ func _on_menu_action_selected(action: String) -> void:
 			if is_instance_valid(active_character) and active_character is EssenceModularActor:
 				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
 				
-				# 1. Leemos el estado actual (si no existe en el diccionario, asumimos false)
+				# 1. Read the current state (if it does not exist in the dictionary, assume false)
 				var is_currently_equipped: bool = bool(wardrobe_data.get(IDsGIC.Items.HAT_1, false))
 				var target_state: bool = not is_currently_equipped
 				
-				# 2. Impactamos los gráficos en vivo del personaje en pantalla
+				# 2. We affect the on-screen character's live graphics.
 				active_character.modify_clothing(IDsGIC.Items.HAT_1, target_state)
 				active_character.modify_clothing(IDsGIC.Items.SUNGLASS_1, target_state)
 				
-				# 3. Guardamos la nueva verdad en story_flags para persistencia y guardado
+				# 3. We store the new truth in story_flags for persistence and saving.
 				wardrobe_data[IDsGIC.Items.HAT_1] = target_state
 				wardrobe_data[IDsGIC.Items.SUNGLASS_1] = target_state
 				story_flags["player_wardrobe"] = wardrobe_data
@@ -447,26 +447,26 @@ func _on_menu_action_selected(action: String) -> void:
 	if is_instance_valid(_cached_interaction_menu):
 		_cached_interaction_menu.close_menu()
 		
-## Ejecuta la secuencia asíncrona de cambio de pose con bloqueo total de interfaz
+## Executes the asynchronous pose-changing sequence with a full interface lock
 func _ejecutar_animacion_pose_temporal() -> void:
 	if not is_instance_valid(active_character) or not (active_character is EssenceModularActor):
 		return
 		
-	# 1. ENTRAR EN MODO CINEMÁTICA
-	# Desactiva interacción con hotspots, puertas y botones del HUD
+	# 1. ENTER CINEMATIC MODE
+	# Disables interaction with hotspots, doors, and HUD buttons
 	director.change_game_state(EssenceGameplayDirector.GameState.CUTSCENE)
 	
-	# 2. CAMBIAR A LA POSE DE ACCIÓN / LEVANTAR BRAZOS
-	# change_pose() se encarga solo de apagar la pose anterior y sincronizar la ropa equipada
+	# 2. SWITCH TO ACTION POSE / RAISE ARMS
+	# change_pose() handles only turning off the previous pose and synchronizing the equipped clothing
 	active_character.change_pose(IDsGIC.Poses.ARMS_OUT)
 	
-	# 3. ESPERAR 2 SEGUNDOS DE ANIMACIÓN/TEMPORIZADOR
+	# 3. WAIT 2 SECONDS FOR ANIMATION/TIMER
 	await get_tree().create_timer(2.0).timeout
 	
-	# 4. REGRESAR A LA POSE NORMAL
+	# 4. RETURN TO THE NORMAL POSE
 	active_character.change_pose(IDsGIC.Poses.BASE_BODY)
 	
-	# 5. RESTAURAR CONTROL Y SALIR DEL MODO CINEMÁTICA
+	# 5. RESTORE CONTROL AND EXIT CINEMATIC MODE
 	director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 	#print("-> [MODO EXPLORACIÓN] Secuencia finalizada. Interacción restaurada.")
 	
@@ -487,10 +487,10 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 		return
 		
 	if director:
-		# Le pedimos al director que cierre su cortina negra de inmediato (en 0.25s)
+		# We ask the director to close their black curtain immediately (within 0.25s)
 		var curtain_tween = director.close_curtain(0.25)
 		if curtain_tween:
-			# Escondemos el juego detrás del muro negro antes de mover un solo pixel
+			# We hide the game behind the black wall before moving a single pixel.
 			await curtain_tween.finished 
 			
 	# TECHNICAL INTERCEPT: Handle the application scene-swap separately
@@ -506,10 +506,10 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 	await _route_room_initialization(data["id_room"], data, true)
 	
 	if director:
-		# Esperamos un frame de estabilización para que el motor termine de renderizar el mapa
+		# We wait for a stabilization frame so the engine finishes rendering the map.
 		await get_tree().process_frame
 		
-		# Abrimos la cortina suavemente para revelar el nuevo escenario
+		# We gently open the curtain to reveal the new stage.
 		var open_tween = director.open_curtain(0.4)
 		if open_tween:
 			await open_tween.finished
@@ -565,7 +565,7 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 			actor.queue_free()
 	_spawned_actors_in_room.clear()
 	
-	# 2. MANIFESTO QUERY
+	# 2. MANIFEST QUERY
 	var modes_dict: Dictionary = StageActorManager.ROOM_ACTOR_MANIFESTO.get(room_id, {})
 	var actors_to_spawn: Array = modes_dict.get(current_layout_mode, [])
 	
@@ -600,7 +600,7 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 				scene_path = DemoItemsRoute.ACTOR_PARK_DOG_RUN_SCENE
 				
 		if scene_path == "" or not ResourceLoader.exists(scene_path):
-			push_error("[%s] Error crítico: No se encontró escena .tscn para el ActorID %d" % [ES_NAME_CLASS, actor_id])
+			push_error("[%s] Critical error: No .tscn scene found for ActorID. %d" % [ES_NAME_CLASS, actor_id])
 			continue
 			
 		# 5. DYNAMIC MEMORY LOADING VIA DIRECTOR
@@ -608,7 +608,7 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 		var actor_instance: EssenceActor = director.add_actor_to_stage(actor_resource) as EssenceActor
 		
 		if not is_instance_valid(actor_instance):
-			push_error("[%s] El Director devolvió un nodo nulo para el ActorID %d" % [ES_NAME_CLASS, actor_id])
+			push_error("[%s] The Director returned a null node for the ActorID. %d" % [ES_NAME_CLASS, actor_id])
 			continue
 			
 		# 6. PHYSICAL TRANSFORMATIONS
@@ -622,15 +622,15 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 				var wardrobe_data: Dictionary = story_flags.get("player_wardrobe", {})
 				
 				if wardrobe_data.is_empty():
-					# Configuración fallback si el diccionario llegase a estar vacío
+					# Fallback configuration in case the dictionary turns out to be empty
 					actor_instance.modify_clothing(IDsGIC.Items.HAT_1, false) 
 					actor_instance.modify_clothing(IDsGIC.Items.SUNGLASS_1, false) 
 				else:
-					# Procesamiento dinámico de prendas equipado/desequipado
+					# Dynamic garment equipping/unequipping processing
 					for garment_key in wardrobe_data.keys():
 						var key_str: String = str(garment_key)
 						
-						# Válido para Enums numéricos e IDs serializados de JSON (ej: "40")
+						# Valid for numeric Enums and serialized JSON IDs (ex: "40")
 						if key_str.is_valid_int():
 							var item_id: int = key_str.to_int()
 							var is_equipped: bool = bool(wardrobe_data[garment_key])
@@ -663,7 +663,7 @@ func _should_allow_actor_spawn(room_id: int, _actor_id: int, _layout_mode: int) 
 func _check_room_interruptions(room_id: int) -> bool:
 	# Si ya estamos en Gameplay, NINGÚN evento inicial o tutorial viejo debe colarse.
 	if current_phase == TestPhase.GAMEPLAY:
-		return false # ✅ No hay interrupción, continúa libremente
+		return false # There is no interruption; it continues freely.
 		
 	match room_id:
 		GameIDs.RoomID.INITIAL_ROOM:
@@ -693,13 +693,13 @@ func _apply_interaction_state(matrix_mode: int) -> void:
 ## [param room_id]: The ID of the current scene (GameIDs.RoomID)
 ## [param current_layout_mode]: The current sub-mode or variant of the room (0, 1, 2, etc.)
 func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
-	# 1. CONSULTA: Obtenemos el arreglo de ítems que este escenario "desea" tener por diseño
+	# 1. QUERY: We obtain the array of items that this scenario "wants" to have by design.
 	var raw_items_list: Array = StageItemManager.ROOM_ITEM_MANIFESTO.get(room_id, [])
 	
 	if raw_items_list.is_empty():
-		return # Habitación pasiva o puramente estática, nada que spawnear por código.
+		return # Passive or purely static room; nothing to be spawned via code.
 		
-	# 2. PROCESAMIENTO Y FILTRADO POR CADA ELEMENTO
+	# 2. PROCESSING AND FILTERING BY ELEMENT
 	for item_data in raw_items_list:
 		var item_id: int = item_data["item_id"]
 		var destination: int = item_data["destination"]
@@ -715,10 +715,10 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 		var spawn_scale: Vector2 = placement.get(StageItemManager.KEY_SCALE, Vector2.ONE)
 		
 		if not _should_allow_item_spawn(room_id, item_id, current_layout_mode):
-			print("[%s/Spawner] Objeto ID %d RECHAZADO por condiciones adicionales del entorno (Modo: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
+			print("[%s/Spawner] Object ID %d REJECTED due to additional environment conditions (Mode: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
 			continue
 			
-		# 3. IDENTIFICACIÓN DE RUTA DE ASSET (.TSCN)
+		# 3. ASSET PATH IDENTIFICATION (.TSCN)
 		var scene_path: String = ""
 		match item_id:
 			GameIDs.ItemID.DOOR_SPRITE:      scene_path = DemoItemsRoute.ITEMDOOR_SCENE
@@ -726,7 +726,7 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 			GameIDs.ItemID.TOUCH_INDICATOR:  scene_path = DemoItemsRoute.ITEMTOUCH_SCENE
 			
 		if scene_path == "" or not ResourceLoader.exists(scene_path):
-			push_error("[%s] Error crítico: No se encontró escena .tscn para el ItemID %d" % [ES_NAME_CLASS, item_id])
+			push_error("[%s] Critical error: .tscn scene not found for ItemID %d" % [ES_NAME_CLASS, item_id])
 			continue
 			
 		# 4. INSTANCIACIÓN Detrás de escena
@@ -734,18 +734,18 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 		var item_instance = director.add_item_to_stage(packed_item)
 		
 		if not is_instance_valid(item_instance):
-			push_error("[%s] El Director devolvió un nodo nulo para el ItemID %d" % [ES_NAME_CLASS, item_id])
+			push_error("[%s] The Director returned a null node for ItemID %d." % [ES_NAME_CLASS, item_id])
 			continue
 			
-		# 5. TRANSFORMACIÓN FÍSICA
-		# Forzamos los valores físicos espaciales calculados automáticamente por presets o manuales
+		# 5. PHYSICAL TRANSFORMATION
+		# Override the spatial physical values ​​automatically calculated by presets or manual settings.
 		item_instance.position = spawn_position
 		item_instance.scale = spawn_scale
 		
-		# Guardamos la referencia para el recolector de basura al cambiar de habitación
+		# We keep the reference for the garbage collector when changing rooms.
 		spawned_items_in_room.append(item_instance)
 		
-		# 6. CONFIGURAR LA ACCIÓN (Smart Input Binding)
+		# 6. CONFIGURE THE ACTION (Smart Input Binding)
 		var target_area: Area2D = item_instance if item_instance is Area2D else null
 		if not target_area:
 			for child in item_instance.get_children():
@@ -753,51 +753,51 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 					target_area = child
 					break
 					
-		# 7. CONEXIÓN Y REVELACIÓN FINAL
+		# 7. CONNECTION AND FINAL REVELATION
 		if target_area:
 			if destination != -1:
-				# ACCIÓN DE VIAJE: Si el ítem amarra un destino, lo conectamos al flujo de la cortina negra
+				# TRAVEL ACTION: If the item links to a destination, we connect it to the flow of the black curtain.
 				target_area.input_event.connect(_on_dynamic_door_clicked.bind(destination))
 			else:
-				# ACCIÓN DE UTILIDAD: Si no tiene destino (como el Touch Indicator), pasa limpiamente
+				# UTILITY ACTION: If it has no destination (such as the Touch Indicator), it passes cleanly
 				pass
 		else:
-			push_warning("[%s] El item %d no posee un Area2D. Se instanció como elemento puramente visual." % [ES_NAME_CLASS, item_id])
+			push_warning("[%s] Item %d does not have an Area2D. It was instantiated as a purely visual element." % [ES_NAME_CLASS, item_id])
 			
 ## INTERNAL VALIDATOR: Decides whether an item is eligible to enter based on the current rules
 func _should_allow_item_spawn(_room_id: int, _item_id: int, current_mode: int) -> bool:
 	# Rule filter example: If it's night mode (Mode 3), we could block non-bed items here
 	if current_mode == 0:
-		# NOTA: Si necesitas usarlas dentro de un 'if' más adelante, 
-		# solo les quitas el guion bajo y listo. Por ahora, si solo usas current_mode,
-		# el filtro funciona igual de bien.
+		# NOTE: If you need to use them inside an 'if' statement later,
+		# Just remove the underscore and you're done. For now, if you're only using current_mode,
+		# The filter works just as well.
 		pass
 		
-	# Ejemplo de la regla que sugeriste: Si es de noche (supongamos Modo 3), bloqueamos todo excepto la cama
-	if current_mode == 3: # Filtro de Noche ficticio para pruebas
-		# Si estamos en la habitación inicial de noche y el ítem no es el que queremos, lo bloqueamos
+	# Example of the rule you suggested: If it is nighttime (let's assume Mode 3), we block everything except the bed.
+	if current_mode == 3: # Dummy Night Filter for testing
+		# If we are in the starting room at night and the item isn't the one we want, we block it.
 		# if item_id != GameIDs.ItemID.BED_ITEM: return false
 		pass
 		
-	# Por defecto, si no hay ninguna regla de la historia o fase que lo prohíba, el objeto entra libre
+	# By default, unless a story rule or phase prohibits it, the object enters freely.
 	return true
 		
 ## Processes the click of any dynamic door and requests navigation to its bound destination.
 func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: int, next_room_id: int) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		#print("[Framework] ¡Puerta cruzada! Viajando hacia la habitación ID: ", next_room_id)
-		# GUARDIA: No permitir cambiar de habitación si hay una cinemática activa[cite: 5]
+		#print("[Framework] Crossed door! Traveling to room ID: ", next_room_id)
+		# GUARD: Do not allow room changes while a cutscene is active.
 		if director.current_state != EssenceGameplayDirector.GameState.EXPLORATION:
 			return
-		# Consultamos la matriz del LevelManager con el destino que venía amarrado en la puerta
+		# We query the LevelManager matrix using the destination that was linked to the door.
 		var data = LevelManager.get_scenery_config(current_room_id, next_room_id, 0, false)
 		
 		if not data["flag_error"]:
-			# Al cambiar de cuarto, vaciamos nuestra lista de referencias e indicamos al Director que limpie la pantalla
+			# When changing rooms, we clear our list of references and instruct the Director to clear the screen.
 			spawned_items_in_room.clear()
 			director.clear_item_stage() 
 			
-			# Redirigimos el resultado al callback central que ya construiste
+			# We redirect the result to the central callback you already built.
 			_on_room_navigation_requested(next_room_id, 0, false)
 			
 ## BASE GENERIC METHOD (The Framework's Build Engine)
@@ -806,7 +806,7 @@ func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: in
 func _build_room_base(data: Dictionary, background_path: String, interactive_scene_path: String, skip_animations: bool) -> Node2D:
 	current_room_id = data["id_room"]
 	
-	# 1. Animación de salida (Si aplica)
+	# 1. Exit animation (if applicable)
 	if not skip_animations:
 		var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
 		if fade_out_tween: await fade_out_tween.finished
@@ -820,11 +820,11 @@ func _build_room_base(data: Dictionary, background_path: String, interactive_sce
 	
 	director.unload_location()
 	
-	# 3. Asignación del Fondo
+	# 3. Fund Allocation
 	if background_path != "":
 		background_layer.texture = load(background_path)
 		
-	# 4. Carga de la Escena Interactiva (Hotspots, colisiones, puertas)
+	# 4. Loading the Interactive Scene (Hotspots, collisions, doors)
 	var current_loc: Node2D = null
 	if interactive_scene_path != "":
 		var interactive_scene = load(interactive_scene_path) as PackedScene
@@ -834,7 +834,7 @@ func _build_room_base(data: Dictionary, background_path: String, interactive_sce
 			if current_loc and current_loc.has_signal("navigation_requested"):
 				current_loc.navigation_requested.connect(_on_room_navigation_requested)
 				
-	# 5. Animación de entrada (Si aplica)
+	# 5. Entrance animation (if applicable)
 	if not skip_animations:
 		var fade_in_tween: Tween = EssenceUIAnimator.fade_in(background_layer, 0.5)
 		if fade_in_tween: await fade_in_tween.finished
@@ -867,9 +867,10 @@ func _route_room_initialization(room_id: int, scenery_data: Dictionary, skip_ani
 ## Sets up the initial room layout. If skip_animations is true, it builds instantly.
 func _on_ready_initialRoom(data: Dictionary, skip_animations: bool = false) -> void:
 	# Llamamos a la base (pasamos "" en la escena interactiva porque no lleva)
+	# comentario en español xd
 	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_INITIAL, "", skip_animations)
 	
-	# Fin de transición
+	# End of transition
 	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
 
 #########################
@@ -908,21 +909,21 @@ func _register_room_signals(room_instance: EssenceNavigationRoom) -> void:
 # Ejemplo
 #############
 func _on_ready_habitacion_secreta(data: Dictionary, skip_animations: bool = false) -> void:
-	# 🟢 Código ESPECÍFICO ANTES de cargar:
+	# SPECIFIC code BEFORE loading:
 	print("¡Alerta! El jugador entró a una zona peligrosa. Modificando música...")
 	#AudioManager.play_music("Musica_Tension")
 	
-	# 🛠️ Ejecutamos la carga base común y atrapamos el nodo que genera
+	# We execute the common base load and capture the node it generates.
 	var locacion_actual = await _build_room_base(data, "res://FondoSecreto.tscn", "res://ColisionesSecretas.tscn", skip_animations)
 	
-	# 🔵 Código ESPECÍFICO DESPUÉS de cargar (Modificar cosas dentro del cuarto):
+	# SPECIFIC code AFTER loading (Modify things inside the room):
 	if is_instance_valid(locacion_actual):
-		# Buscamos un cofre que solo existe en esta habitación y lo alteramos por código
+		# We are looking for a chest that exists only in this room, and we are altering it via code.
 		var cofre = locacion_actual.get_node_or_null("CofreOculto")
 		if cofre:
 			print("x")
 		#if cofre and GlobalSave.ya_abrio_cofre:
-		#	cofre.queue_free() # Borramos el cofre si ya lo usó
+		#	cofre.queue_free() # We delete the chest if it has already been used.
 			
-	# Pasamos el control narrativo normal
+	# We move past the standard narrative check
 	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])

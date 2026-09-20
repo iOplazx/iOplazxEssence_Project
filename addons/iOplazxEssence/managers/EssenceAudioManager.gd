@@ -2,34 +2,34 @@ extends Node
 
 const ES_NAME_CLASS = "EssenceAudioManager"
 
-# Reproductores dedicados
+# Dedicated players
 var music_player_1: AudioStreamPlayer
 var music_player_2: AudioStreamPlayer
 var _active_music_player: AudioStreamPlayer
 var sfx_player: AudioStreamPlayer
 var ui_player: AudioStreamPlayer
 
-# Animador para las transiciones suaves
+# Animator for smooth transitions
 var _fade_tween: Tween
 
-# Nuestra Caja Fuerte para la RAM
+# Our Safe for the RAM
 var _audio_cache: Dictionary = {}
 
-# Precargamos usando las constantes (EssencePaths no es Autoload, es seguro)
+# We preload using the constants (EssencePaths is not an Autoload; it is safe)
 var ui_sound_space = preload(EssencePaths.AUDIO_UI_SPACE)
 var ui_sound_bubble = preload(EssencePaths.AUDIO_UI_BUBBLE)
 
-# 0 = Space, 1 = Bubble, 2 = Silencio
+#0 = Space, 1 = Bubble, 2 = Silence
 var current_ui_theme: int = 0
 
-# Configuración extra
+# Additional configuration
 var mute_on_focus_loss: bool = false
 var _was_muted_manually: bool = false 
 
 signal fade_completed
 
 func _ready() -> void:
-	# Creamos los nodos al vuelo
+	# We create the nodes on the fly
 	music_player_1 = AudioStreamPlayer.new()
 	music_player_1.bus = "Music" 
 	add_child(music_player_1)
@@ -50,13 +50,13 @@ func _ready() -> void:
 	
 	load_audio_settings()
 	
-	# Conexión segura a Preferences usando Late Binding
+	# Secure connection to Preferences using late binding
 	var prefs = get_tree().root.get_node_or_null("Preferences")
 	if is_instance_valid(prefs) and prefs.has_signal("settings_restored"):
 		prefs.settings_restored.connect(_on_settings_restored)
 
 # ==========================================
-# MÉTODOS PÚBLICOS PARA EL USUARIO
+# PUBLIC METHODS FOR THE USER
 # ==========================================
 
 func play_sfx(stream: AudioStream) -> void:
@@ -135,7 +135,7 @@ func play_music(stream: AudioStream, crossfade_duration: float = 1.0) -> void:
 	_active_music_player = next_player
 
 # ==========================================
-# MÉTODOS PRIVADOS Y DE CACHÉ
+# PRIVATE AND CACHE METHODS
 # ==========================================
 
 func _on_settings_restored() -> void:
@@ -143,7 +143,7 @@ func _on_settings_restored() -> void:
 	load_audio_settings() 
 
 func _on_quit_pressed() -> void:
-	play_ui_sfx() # Llamada directa, sin usar el nombre global "AudioManager"
+	play_ui_sfx() # Direct call, without using the global name "AudioManager"
 	fade_out_and_stop(1.5)
 	await self.fade_completed
 	get_tree().quit()
@@ -160,7 +160,7 @@ func get_cached_audio(key: String) -> AudioStream:
 	return null
 
 # ==========================================
-# CONTROL DE VOLUMEN (TOTALMENTE DESACOPLADO)
+# VOLUME CONTROL (FULLY DECOUPLED)
 # ==========================================
 
 func set_bus_volume(bus_name: String, value: float) -> void:
@@ -174,14 +174,14 @@ func save_audio_settings(
 	focus_mute: bool
 ) -> void:
 	
-	# 1. Guardamos los Volúmenes en el archivo de guardado
+	# 1. We save the volumes in the save file.
 	_safe_set_pref("audio", "Master", vol_master)
 	_safe_set_pref("audio", "Music", vol_music)
 	_safe_set_pref("audio", "SFX", vol_sfx)
 	_safe_set_pref("audio", "UI", vol_ui)
 	_safe_set_pref("audio", "Voices", vol_voices)
 	
-	# 2. Guardamos los Estados de Mute en el archivo de guardado
+	# 2. We save the mute states in the save file.
 	_safe_set_pref("audio", "Master_mute", mute_master)
 	_safe_set_pref("audio", "Music_mute", mute_music)
 	_safe_set_pref("audio", "SFX_mute", mute_sfx)
@@ -196,12 +196,12 @@ func save_audio_settings(
 	set_bus_mute("UI", mute_ui)
 	set_bus_mute("Voices", mute_voices)
 	
-	# 4. Consolidamos en el disco duro
+	# 4. We consolidate onto the hard drive.
 	_safe_save_prefs()
 
 func set_bus_mute(bus_name: String, is_muted: bool) -> void:
 	var bus_index = AudioServer.get_bus_index(bus_name)
-	#print("[AUDIO_DEBUG] Intentando mutear el bus: '", bus_name, "' | Índice encontrado: ", bus_index, " | ¿Silenciar?: ", is_muted)
+	#print("[AUDIO_DEBUG] Attempting to mute bus: '", bus_name, "' | Index found: ", bus_index, " | Mute?: ", is_muted)
 	if bus_index >= 0:
 		AudioServer.set_bus_mute(bus_index, is_muted)
 
@@ -223,7 +223,7 @@ func load_audio_settings() -> Dictionary:
 	current_ui_theme = _safe_get_pref("audio", "ui_theme", 0)
 	mute_on_focus_loss = _safe_get_pref("audio", "mute_on_focus", false)
 	
-	# Aplicamos los volúmenes
+	# We apply the volumes
 	set_bus_volume("Master", vols["Master"])
 	set_bus_volume("Music", vols["Music"])
 	set_bus_volume("SFX", vols["SFX"])
@@ -244,7 +244,7 @@ func set_ui_theme(theme_index: int) -> void:
 	_safe_save_prefs()
 
 # ==========================================
-# EVENTOS DEL SISTEMA
+# SYSTEM EVENTS
 # ==========================================
 
 func _notification(what: int) -> void:
@@ -263,7 +263,7 @@ func _notification(what: int) -> void:
 
 
 # ==============================================================================
-# WRAPPERS DE SEGURIDAD (Para no depender estrictamente de los otros Autoloads)
+# S,ECURITY WRAPPERS (To avoid strict reliance on other autoloads)
 # ==============================================================================
 
 func _safe_log(msg: String) -> void:

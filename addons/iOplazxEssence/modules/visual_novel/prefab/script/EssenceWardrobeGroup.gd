@@ -1,10 +1,10 @@
 ## [EssenceWardrobeGroup]
-## Clase base abstracta. No expone nada al Inspector por sí misma.
-## Contiene la lógica matemática y física de sincronización.
+## Abstract base class. Does not expose anything to the Inspector on its own.
+## Contains the mathematical and physical synchronization logic.
 extends Node2D
 class_name EssenceWardrobeGroup
 
-## Diccionario genérico en RAM que usarán los métodos internos.
+## Generic dictionary in RAM to be used by internal methods.
 var registry: Dictionary = {}
 
 
