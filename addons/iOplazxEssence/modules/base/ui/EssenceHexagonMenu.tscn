@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://bgup7tvbdyw5m"]
+
+[ext_resource type="Script" uid="uid://vvov6ftihwse" path="res://addons/iOplazxEssence/modules/base/script/child/EssenceHexagonMenu.gd" id="1_t350g"]
+[ext_resource type="PackedScene" uid="uid://ctwx75uoljnxe" path="res://addons/iOplazxEssence/modules/base/ui/EssenceDemoInteractionButton.tscn" id="2_s86xh"]
+[ext_resource type="Texture2D" uid="uid://c5kqgibckk3nu" path="res://addons/iOplazxEssence/resources/images/icon/iconQuestion_1_2.png" id="3_4qjco"]
+[ext_resource type="Texture2D" uid="uid://wkp1irp3doby" path="res://addons/iOplazxEssence/resources/images/objects/hexagon_menu.png" id="3_nojbw"]
+[ext_resource type="Texture2D" uid="uid://dllvwsydtkl2i" path="res://addons/iOplazxEssence/resources/images/icon/iconArrowLeft_1_2.png" id="4_4v5n8"]
+[ext_resource type="Texture2D" uid="uid://blbe8qq53r66o" path="res://addons/iOplazxEssence/resources/images/icon/iconArrowRight_1_2.png" id="5_72mp6"]
+
+[node name="EssenceHexagonMenu" type="Control" unique_id=50996333]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_t350g")
+button_scene = ExtResource("2_s86xh")
+unknown_icon = ExtResource("3_4qjco")
+icon_prev = ExtResource("4_4v5n8")
+icon_next = ExtResource("5_72mp6")
+
+[node name="Anchor" type="Control" parent="." unique_id=288588710]
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="HexagonFrame" type="TextureRect" parent="Anchor" unique_id=2045549031]
+layout_mode = 0
+offset_left = -209.0
+offset_top = -209.0
+offset_right = 303.0
+offset_bottom = 303.0
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("3_nojbw")
+
+[node name="ButtonsContainer" type="Control" parent="Anchor" unique_id=184227855]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2

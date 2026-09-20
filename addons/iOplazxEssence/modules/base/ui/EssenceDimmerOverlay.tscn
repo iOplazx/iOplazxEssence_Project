@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://ftxprivp7m3g"]
+
+[ext_resource type="Script" uid="uid://cmp75lbbxomgs" path="res://addons/iOplazxEssence/modules/base/script/child/EssenceDimmerOverlay.gd" id="1_b2my5"]
+
+[node name="EssenceDimmerOverlay" type="ColorRect" unique_id=1581998541]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6313726)
+script = ExtResource("1_b2my5")

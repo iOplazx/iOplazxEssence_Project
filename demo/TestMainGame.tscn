@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://cfny0ci2r8dtn"]
+[gd_scene format=3 uid="uid://ci3qw0mgyt8tr"]
 
-[ext_resource type="Script" uid="uid://df7guifof0p3l" path="res://demo/scenes/TestMainGame.gd" id="1_r4y5j"]
+[ext_resource type="Script" uid="uid://r3n4sopgvnpj" path="res://demo/scenes/TestMainGame.gd" id="1_r4y5j"]
 [ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="2_36fp0"]
 [ext_resource type="PackedScene" uid="uid://buacpdfefp8fr" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/TemplateGameplayDirector.tscn" id="3_aw23q"]
 [ext_resource type="PackedScene" uid="uid://7lbtoybnlsus" path="res://addons/iOplazxEssence/modules/base/ui/EssenceTutorialPanelUI.tscn" id="4_faggg"]
@@ -21,6 +21,16 @@ btn_load = NodePath("PanelControles/HBoxContainer/btnLoad")
 tutorial_panel = NodePath("TutorialPanelUI")
 ui_principal = NodePath("PanelControles")
 
+[node name="ColorRect" type="ColorRect" parent="." unique_id=242458088]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.7665823, 0.7202664, 0, 1)
+
 [node name="BackgroundLayer" type="TextureRect" parent="." unique_id=1243969001]
 layout_mode = 1
 anchors_preset = 15
@@ -39,8 +49,8 @@ unique_name_in_owner = true
 [node name="ActiveLocation" parent="GameplayDirector" index="1" unique_id=115441188]
 position = Vector2(640, 360)
 
-[node name="DialogBoxUI" parent="GameplayDirector/HUD_Layer" parent_id_path=PackedInt32Array(1915930015, 1557427055) index="1" unique_id=894732781]
-metadata/_edit_use_anchors_ = true
+[node name="FadeOverlay" parent="GameplayDirector/HUD_Layer" parent_id_path=PackedInt32Array(1915930015, 1557427055) index="2" unique_id=1909526941]
+visible = false
 
 [node name="TutorialPanelUI" parent="." unique_id=806485748 instance=ExtResource("4_faggg")]
 layout_mode = 1

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b20lw8s6c0q6u"]
 
-[ext_resource type="Script" uid="uid://c05c17igci7a8" path="res://addons/iOplazxEssence/scriptsItems/EssenceLanguageCard.gd" id="1_ih1k2"]
+[ext_resource type="Script" uid="uid://c05c17igci7a8" path="res://addons/iOplazxEssence/scriptsItems/diminution/EssenceLanguageCard.gd" id="1_ih1k2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_StatusStrip"]
 bg_color = Color(0.08, 0.08, 0.08, 0.6)

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c56ktxpxnuj7j"]
 
-[ext_resource type="Script" uid="uid://dxt52v0noydt7" path="res://addons/iOplazxEssence/scriptsItems/GlobalLoading.gd" id="1_jbwmo"]
+[ext_resource type="Script" uid="uid://dxt52v0noydt7" path="res://addons/iOplazxEssence/scriptsItems/other/GlobalLoading.gd" id="1_jbwmo"]
 
 [node name="GlobalLoading" type="CanvasLayer" unique_id=1154965486 node_paths=PackedStringArray("label", "background")]
 visible = false

@@ -1,15 +1,16 @@
 [gd_scene format=3 uid="uid://buacpdfefp8fr"]
 
 [ext_resource type="Script" uid="uid://bmwro6b07v63e" path="res://addons/iOplazxEssence/modules/visual_novel/controlDirector/EssenceGameplayDirector.gd" id="1_6w5qv"]
+[ext_resource type="PackedScene" uid="uid://qk4l5y8he1dl" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/EssenceDialogBox.tscn" id="2_1i6vy"]
 
-[node name="GameplayDirector" type="Node2D" unique_id=1915930015 node_paths=PackedStringArray("environment_filter", "active_location_container", "characters_stage", "item_stage", "dialog_box_ui", "fade_overlay")]
+[node name="GameplayDirector" type="Node2D" unique_id=1915930015 node_paths=PackedStringArray("environment_filter", "active_location_container", "characters_stage", "item_stage", "fade_overlay", "hud_layer")]
 script = ExtResource("1_6w5qv")
 environment_filter = NodePath("EnvironmentFilter")
 active_location_container = NodePath("ActiveLocation")
 characters_stage = NodePath("CharactersStage")
 item_stage = NodePath("ItemStage")
-dialog_box_ui = NodePath("HUD_Layer/DialogBoxUI")
 fade_overlay = NodePath("HUD_Layer/FadeOverlay")
+hud_layer = NodePath("HUD_Layer")
 
 [node name="EnvironmentFilter" type="CanvasModulate" parent="." unique_id=1922817007]
 
@@ -24,11 +25,7 @@ layer = 100
 
 [node name="TranslationManager" type="Node" parent="HUD_Layer" unique_id=1288943535]
 
-[node name="DialogBoxUI" type="Control" parent="HUD_Layer" unique_id=894732781]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="EssenceDialogBox" parent="HUD_Layer" unique_id=940245501 instance=ExtResource("2_1i6vy")]
 
 [node name="FadeOverlay" type="ColorRect" parent="HUD_Layer" unique_id=1909526941]
 anchors_preset = 15

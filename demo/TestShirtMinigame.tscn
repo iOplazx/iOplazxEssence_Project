@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://ct36asxigt81v"]
+
+[ext_resource type="Script" uid="uid://hsemj53npgxl" path="res://demo/scenes/TestShirtMinigame.gd" id="1_5larn"]
+
+[node name="TestShirtMinigame" type="Control" unique_id=1239319867]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5larn")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1425373099]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -20.0
+offset_right = 220.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1050770466]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=1090034821]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=672716043]
+layout_mode = 2
+text = "Select all 3 shirts!"
+
+[node name="ShirtContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=151357699]
+layout_mode = 2
+
+[node name="ShirtButton1" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/ShirtContainer" unique_id=914003476]
+unique_name_in_owner = true
+layout_mode = 2
+text = "👕 Shirt 1"
+
+[node name="ShirtButton2" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/ShirtContainer" unique_id=1451027938]
+unique_name_in_owner = true
+layout_mode = 2
+text = "👕 Shirt 2"
+
+[node name="ShirtButton3" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/ShirtContainer" unique_id=835018447]
+unique_name_in_owner = true
+layout_mode = 2
+text = "👕 Shirt 3"

@@ -91,6 +91,6 @@ static func _get_fallback(usar_imagen_error: bool) -> Texture2D:
 	var emergency_placeholder = PlaceholderTexture2D.new()
 	emergency_placeholder.size = Vector2(64, 64)
 	
-	EssenceLogger.system_error("[%s] CRITICAL: La imagen ERROR_FALLBACK no existe. Creando placeholder en RAM." % ES_NAME_CLASS)
+	EssenceLogger.system_info("[%s] CRITICAL: La imagen ERROR_FALLBACK no existe. Creando placeholder en RAM." % ES_NAME_CLASS)
 	
 	return emergency_placeholder

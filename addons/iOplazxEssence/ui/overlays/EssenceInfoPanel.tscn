@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://eoxnxw3ulco1"]
 
-[ext_resource type="Script" uid="uid://cd38mrpths1jv" path="res://addons/iOplazxEssence/scriptsItems/EssenceInfoPanel.gd" id="1_lmdm1"]
+[ext_resource type="Script" uid="uid://cd38mrpths1jv" path="res://addons/iOplazxEssence/scriptsItems/items/EssenceInfoPanel.gd" id="1_lmdm1"]
 [ext_resource type="StyleBox" uid="uid://dqpk15j40jc0t" path="res://addons/iOplazxEssence/resources/file/lbl_description_border1.tres" id="2_lw3q0"]
 
 [node name="EssenceInfoPanel" type="Control" unique_id=293511402 node_paths=PackedStringArray("lbl_title", "btn_close", "window_panel", "game_data_node", "game_missing_node", "lbl_game_author", "lbl_game_version", "lbl_game_desc", "lbl_game_ai_warning", "lbl_game_missing_msg", "addon_data_node", "addon_missing_node", "lbl_addon_author", "lbl_addon_version", "lbl_addon_desc", "lbl_addon_ai_warning", "lbl_addon_missing_msg")]

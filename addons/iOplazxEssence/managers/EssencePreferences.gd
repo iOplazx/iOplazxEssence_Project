@@ -115,9 +115,6 @@ func _safe_log(msg: String) -> void:
 	else:
 		print("Fallback Log: ", msg)
 
-func _safe_error(title: String, msg: String, severity: int = 1) -> void:
-	var err_handler = get_tree().root.get_node_or_null("EssenceError")
-	if is_instance_valid(err_handler) and err_handler.has_method("report"):
-		err_handler.report(title, msg, severity) 
-	else:
-		push_warning("Fallback Error [" + title + "]: " + msg)
+## Safely forwards reporting calls to EssenceReportUtils without direct Autoload or scene tree coupling.
+func _safe_error(title: String, msg: String, severity: Variant = "WARNING") -> void:
+	EssenceReportUtils.report(title, msg, severity)

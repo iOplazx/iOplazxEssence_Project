@@ -43,19 +43,22 @@ func _enter_tree() -> void:
 	_deploy_user_scaffolding()
 	
 	# 2. Secure Autoload Registration
-	for autoload_name in AUTOLOADS:
-		var path = AUTOLOADS[autoload_name]
+	for autoload_name: String in AUTOLOADS:
+		var path: String = AUTOLOADS[autoload_name]
 		
 		# Optimization: Only register if the file actually exists to avoid compiler hangs
 		if FileAccess.file_exists(path):
 			add_autoload_singleton(autoload_name, path)
 		else:
-			push_warning("iOplazxEssence: Could not find " + autoload_name + " at " + path)
+			EssenceReportUtils.warning(
+				"Autoload Setup Warning",
+				"Could not find Autoload '%s' at path: %s." % [autoload_name, path]
+			)
 	
 	# 3. Apply Optimal Project Settings
 	_setup_project_settings()
 	
-	print("iOplazxEssence: Framework v0.1.1 activated and deployed successfully.")
+	EssenceLogger.system_info("[%s] Framework activated and deployed successfully." % ES_NAME_CLASS)
 
 func _exit_tree() -> void:
 	# Safe Cleanup: Only remove settings that actually exist
@@ -67,31 +70,40 @@ func _exit_tree() -> void:
 
 ## Creates necessary folders and copies base template files if they don't exist.
 func _deploy_user_scaffolding() -> void:
-	# 1. Crear carpeta _static si falta
+	# 1. Create _static folder if missing
 	if not DirAccess.dir_exists_absolute(USER_STATIC):
-		var err = DirAccess.make_dir_absolute(USER_STATIC)
+		var err: Error = DirAccess.make_dir_absolute(USER_STATIC)
 		if err != OK:
-			push_error("iOplazxEssence: Failed to create _static folder. Error code: " + str(err))
+			EssenceReportUtils.critical(
+				"Plugin Setup Error", 
+				"Failed to create _static folder. Error code: " + str(err)
+			)
 	
-	# 2. Desplegar GameSaveManager
+	# 2. Deploy GameSaveManager template
 	if not FileAccess.file_exists(USER_SAVE_MANAGER):
-		var template_path = PATH_TEMPLATES + "GameSaveManager.gd"
+		var template_path: String = PATH_TEMPLATES + "GameSaveManager.gd"
 		if FileAccess.file_exists(template_path):
-			var err = DirAccess.copy_absolute(template_path, USER_SAVE_MANAGER)
+			var err: Error = DirAccess.copy_absolute(template_path, USER_SAVE_MANAGER)
 			if err == OK:
-				print("iOplazxEssence: Deployed GameSaveManager.gd template to _static/")
+				EssenceLogger.system_info("[%s] Deployed GameSaveManager.gd template to _static/" % ES_NAME_CLASS)
 			else:
-				push_error("iOplazxEssence: Failed to copy GameSaveManager template. Error code: " + str(err))
+				EssenceReportUtils.critical(
+					"Plugin Setup Error", 
+					"Failed to copy GameSaveManager template. Error code: " + str(err)
+				)
 
-	# 3. Desplegar Bus Layout de Audio 
+	# 3. Deploy Audio Bus Layout template
 	if not FileAccess.file_exists(USER_BUS_LAYOUT):
-		var template_bus = PATH_TEMPLATES + "default_bus_layout.tres"
+		var template_bus: String = PATH_TEMPLATES + "default_bus_layout.tres"
 		if FileAccess.file_exists(template_bus):
-			var err = DirAccess.copy_absolute(template_bus, USER_BUS_LAYOUT)
+			var err: Error = DirAccess.copy_absolute(template_bus, USER_BUS_LAYOUT)
 			if err == OK:
-				print("iOplazxEssence: Deployed essence_bus_layout.tres template to _static/")
+				EssenceLogger.system_info("[%s] Deployed essence_bus_layout.tres template to _static/" % ES_NAME_CLASS)
 			else:
-				push_error("iOplazxEssence: Failed to copy Audio Bus template. Error code: " + str(err))
+				EssenceReportUtils.critical(
+					"Plugin Setup Error", 
+					"Failed to copy Audio Bus template. Error code: " + str(err)
+				)
 
 ## Forces base project configurations (Resolution, Rendering, etc.)
 func _setup_project_settings() -> void:

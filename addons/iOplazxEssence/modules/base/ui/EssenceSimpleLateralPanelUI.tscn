@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://m2obut6r5np8"]
 
-[ext_resource type="Script" uid="uid://di64dw4mkvteb" path="res://addons/iOplazxEssence/modules/base/script/EssenceSimpleLateralPanel.gd" id="1_gsaur"]
+[ext_resource type="Script" uid="uid://di64dw4mkvteb" path="res://addons/iOplazxEssence/modules/base/script/base/EssenceSimpleLateralPanel.gd" id="1_gsaur"]
 
 [node name="SimpleLateralPanelUi" type="Control" unique_id=806485748]
 layout_mode = 3

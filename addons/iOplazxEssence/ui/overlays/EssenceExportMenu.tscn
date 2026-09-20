@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://oe83ag7wpl1e"]
 
-[ext_resource type="Script" uid="uid://3et4af1ptsgk" path="res://addons/iOplazxEssence/scriptsItems/EssenceExportMenu.gd" id="1_qt5ep"]
+[ext_resource type="Script" uid="uid://3et4af1ptsgk" path="res://addons/iOplazxEssence/scriptsItems/items/EssenceExportMenu.gd" id="1_qt5ep"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a8shq"]
 bg_color = Color(0.38039216, 0.3647059, 0.34509805, 0.7882353)

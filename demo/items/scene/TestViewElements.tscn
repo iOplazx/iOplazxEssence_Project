@@ -1,0 +1,130 @@
+[gd_scene format=3 uid="uid://mq3dwbcvpss1"]
+
+[ext_resource type="Texture2D" uid="uid://dxxxtqn5kt12r" path="res://addons/iOplazxEssence/resources/images/background/background_generate_park.png" id="1_2vm2s"]
+[ext_resource type="Texture2D" uid="uid://droq2i785oeoo" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_1.png" id="1_pdi08"]
+[ext_resource type="Texture2D" uid="uid://ba3qksokc3fyv" path="res://addons/iOplazxEssence/resources/images/objects/item_house.png" id="2_xfmis"]
+[ext_resource type="PackedScene" uid="uid://d21xy7bwms1gu" path="res://demo/items/individual/ItemTouch.tscn" id="3_hfek6"]
+[ext_resource type="PackedScene" uid="uid://c2pv7r15ot7sa" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/GenericInteractiveCharacter.tscn" id="3_qvj7p"]
+[ext_resource type="PackedScene" uid="uid://x54s0atpf5hp" path="res://demo/items/individual/ItemDoor.tscn" id="4_hfek6"]
+[ext_resource type="PackedScene" uid="uid://bcvf50ewx78s8" path="res://demo/items/individual/ItemHouse.tscn" id="7_hfek6"]
+[ext_resource type="PackedScene" uid="uid://b401fn7q0figc" path="res://demo/items/actors/ActorParkPersonSit1.tscn" id="8_hfek6"]
+[ext_resource type="PackedScene" uid="uid://c45ye0pk4eicu" path="res://demo/items/actors/ActorParkPersonSit2.tscn" id="9_hfek6"]
+[ext_resource type="PackedScene" uid="uid://diw2k3v4ecj6k" path="res://demo/items/actors/ActorParkPersonSit3.tscn" id="10_1oxh2"]
+[ext_resource type="PackedScene" uid="uid://qbkmsd2uknpl" path="res://demo/items/actors/ActorParkDogRun.tscn" id="11_yhaki"]
+[ext_resource type="PackedScene" uid="uid://bw5w3adys2wnp" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/GenericModularCharacter.tscn" id="12_1oxh2"]
+
+[node name="TestViewElements" type="Node" unique_id=778837280]
+
+[node name="Node_initialRoom" type="Panel" parent="." unique_id=263414863]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="testBgInitialRoom" type="TextureRect" parent="Node_initialRoom" unique_id=1979547169]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_pdi08")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="CharacterRoot" parent="Node_initialRoom" unique_id=1680410021 node_paths=PackedStringArray("gic_poses") instance=ExtResource("3_qvj7p")]
+position = Vector2(637, 893)
+scale = Vector2(0.5, 0.5)
+gic_poses = {
+1: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Normal"),
+2: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Action")
+}
+
+[node name="ItemTouch" parent="Node_initialRoom" unique_id=1115261331 instance=ExtResource("3_hfek6")]
+position = Vector2(641.00006, 400.00003)
+scale = Vector2(0.54, 0.54)
+
+[node name="ItemDoor" parent="Node_initialRoom" unique_id=171361550 instance=ExtResource("4_hfek6")]
+position = Vector2(1223, 593)
+scale = Vector2(0.2, 0.2)
+
+[node name="Node_Park" type="Panel" parent="." unique_id=1149338417]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="testBgPark" type="TextureRect" parent="Node_Park" unique_id=1995223992]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_2vm2s")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="sprite_house" type="Sprite2D" parent="Node_Park" unique_id=571594556]
+visible = false
+position = Vector2(1198, 614)
+scale = Vector2(0.29376575, 0.3368125)
+texture = ExtResource("2_xfmis")
+
+[node name="ItemHouse" parent="Node_Park" unique_id=343310715 instance=ExtResource("7_hfek6")]
+position = Vector2(1217, 611.00006)
+scale = Vector2(0.294, 0.337)
+
+[node name="ActorParkPersonSit1" parent="Node_Park" unique_id=1403296527 instance=ExtResource("8_hfek6")]
+position = Vector2(288.00003, 500)
+rotation = -0.19896753
+scale = Vector2(0.23, 0.23)
+
+[node name="ActorParkPersonSit2" parent="Node_Park" unique_id=805589566 instance=ExtResource("9_hfek6")]
+position = Vector2(988, 386)
+scale = Vector2(0.07, 0.07)
+
+[node name="ActorParkPersonSit3" parent="Node_Park" unique_id=1785036450 instance=ExtResource("10_1oxh2")]
+position = Vector2(83, 573)
+scale = Vector2(0.25, 0.25)
+
+[node name="ActorParkDogRun" parent="Node_Park" unique_id=2039770915 instance=ExtResource("11_yhaki")]
+position = Vector2(802, 497)
+scale = Vector2(0.2, 0.2)
+
+[node name="CharacterModularRoot" parent="Node_Park" unique_id=560429094 node_paths=PackedStringArray("npc_poses") instance=ExtResource("12_1oxh2")]
+position = Vector2(724, 712.00006)
+scale = Vector2(0.3, 0.3)
+npc_poses = {
+1: NodePath("SubViewportContainer/SubViewport/Visuals/Pose_Normal")
+}
+
+[node name="ControlPanel_Example" type="Panel" parent="." unique_id=831380775]
+custom_minimum_size = Vector2(400, 50)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -57.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ControlPanel_Example" unique_id=881189752]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -282.0
+offset_top = -50.0
+offset_right = 282.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 6
+alignment = 1

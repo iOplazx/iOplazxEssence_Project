@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://35mqiemgmrnf"]
 
-[ext_resource type="Script" uid="uid://d053a0lsx0idk" path="res://addons/iOplazxEssence/scriptsItems/EssenceRowSlider.gd" id="1_4gdn4"]
+[ext_resource type="Script" uid="uid://d053a0lsx0idk" path="res://addons/iOplazxEssence/scriptsItems/items/EssenceRowSlider.gd" id="1_4gdn4"]
 
 [node name="RowSlider" type="MarginContainer" unique_id=1890518606 node_paths=PackedStringArray("icon_rect", "lbl_name", "slider", "lbl_value", "btn_mute")]
 anchors_preset = 10

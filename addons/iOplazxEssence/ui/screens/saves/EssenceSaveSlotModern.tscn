@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://v6c6fpdc1myv"]
 
 [ext_resource type="Script" uid="uid://bagota4jhojsp" path="res://addons/iOplazxEssence/core/controllers/saves_module/EssenceSaveSlotModern.gd" id="1_54c42"]
-[ext_resource type="Texture2D" uid="uid://ch73u0mmdqcql" path="res://addons/iOplazxEssence/resources/images/icon_save.png" id="2_wyko5"]
-[ext_resource type="Texture2D" uid="uid://dcshskjm2pfdk" path="res://addons/iOplazxEssence/resources/images/icon_bg_image.png" id="2_xfdxw"]
-[ext_resource type="Texture2D" uid="uid://n10s7noau54s" path="res://addons/iOplazxEssence/resources/images/iconImageNoLoad.png" id="2_xqf6f"]
-[ext_resource type="Texture2D" uid="uid://bjnt0yywcrjv3" path="res://addons/iOplazxEssence/resources/images/icon_pencil.png" id="3_6uswm"]
-[ext_resource type="Texture2D" uid="uid://fwqudcao7suo" path="res://addons/iOplazxEssence/resources/images/icon_load.png" id="3_xfdxw"]
-[ext_resource type="Texture2D" uid="uid://cxyunorkubncg" path="res://addons/iOplazxEssence/resources/images/icon_trash.png" id="4_6uswm"]
+[ext_resource type="Texture2D" uid="uid://ch73u0mmdqcql" path="res://addons/iOplazxEssence/resources/images/icon/icon_save.png" id="2_wyko5"]
+[ext_resource type="Texture2D" uid="uid://dcshskjm2pfdk" path="res://addons/iOplazxEssence/resources/images/icon/icon_bg_image.png" id="2_xfdxw"]
+[ext_resource type="Texture2D" uid="uid://n10s7noau54s" path="res://addons/iOplazxEssence/resources/images/icon/iconImageNoLoad.png" id="2_xqf6f"]
+[ext_resource type="Texture2D" uid="uid://bjnt0yywcrjv3" path="res://addons/iOplazxEssence/resources/images/icon/icon_pencil.png" id="3_6uswm"]
+[ext_resource type="Texture2D" uid="uid://fwqudcao7suo" path="res://addons/iOplazxEssence/resources/images/icon/icon_load.png" id="3_xfdxw"]
+[ext_resource type="Texture2D" uid="uid://cxyunorkubncg" path="res://addons/iOplazxEssence/resources/images/icon/icon_trash.png" id="4_6uswm"]
 
 [node name="SlotModern" type="PanelContainer" unique_id=713909698 node_paths=PackedStringArray("img_screenshot", "lbl_title", "lbl_date", "lbl_play_time", "btn_edit", "btn_save", "btn_load", "btn_delete")]
 custom_minimum_size = Vector2(400, 50)

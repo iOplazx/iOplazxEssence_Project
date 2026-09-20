@@ -1,65 +1,138 @@
 ## [EssenceModularActor]
-## Handles modular visual parts like clothing, accessories, or visual variations.
-## Automatically registers nodes added to the 'Wardrobe Nodes' array.
-extends EssenceActor
+## Framework base class responsible for modular appearance management,
+## safe pose control, and garment synchronization using immutable IDs.
 class_name EssenceModularActor
+extends EssenceActor
 
-# ==========================================
-# CONFIGURACIÓN EXPUESTA AL EDITOR (En Inglés)
-# ==========================================
-## Array of nodes (Sprite2D, Node2D, etc.) that represent clothing or body parts.
-## The exact name of the node in the Scene Tree will be used as its unique ID.
-@export var wardrobe_nodes: Array[Node2D] = []
+@export_category("Base Modular Configuration")
+## The initial active full pose.
+@export var current_pose_id: int = 1
 
-# ==========================================
-# VARIABLES INTERNAS
-# ==========================================
-# Diccionario para acceso ultrarrápido a los nodos: {"bra": Node, "camisa": Node}
-var _wardrobe_map: Dictionary = {}
+## Visual registry indexed by integers (Pose ID -> Visual Group Node)
+var poses_registry: Dictionary = {}
 
-# ==========================================
-# INICIALIZACIÓN
-# ==========================================
+## Master list storing the integers representing the clothing the character is wearing (Save State).
+var _equipped_items: Array[int] = []
+
+
 func _ready() -> void:
-	super._ready() # Llamamos al _ready() de EssenceActor por si acaso
-	_build_wardrobe_map()
+	super._ready()
+	_sync_modular_initial_state()
 
-func _build_wardrobe_map() -> void:
-	# Recorremos el Array que el dev llenó en el inspector
-	for node in wardrobe_nodes:
-		if is_instance_valid(node):
-			# Usamos el nombre exacto del nodo (ej: "Camisa") como llave
-			_wardrobe_map[node.name] = node
+## Validates at design time or runtime whether the developer forgot to connect the pose.
+func _validate_poses_registry() -> void:
+	if poses_registry.is_empty():
+		EssenceReportUtils.warning(
+			"Actor Pose Registry Empty",
+			"'poses_registry' is empty in the Inspector for %s. The character will not be able to update clothing or change poses." % name
+		)
+		
 
-# ==========================================
-# MÉTODOS PÚBLICOS (API en Inglés)
-# ==========================================
+func _sync_modular_initial_state() -> void:
+	_equipped_items.clear()
+	
+	for pose_id in poses_registry.keys():
+		var pose_node = poses_registry[pose_id]
+		if is_instance_valid(pose_node):
+			pose_node.visible = (int(pose_id) == current_pose_id)
+			
+	var active_pose = poses_registry.get(current_pose_id)
+	if active_pose:
+		# 1. Bake local inventory by forcing primitive integers
+		for item_id in active_pose.registry.keys():
+			if active_pose.registry[item_id].visible:
+				_equipped_items.append(int(item_id))
+				
+		# 2. Bake shared inventory, forcing primitive integers
+		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
+			var shared = active_pose.shared_clothing_group
+			for item_id in shared.registry.keys():
+				if shared.registry[item_id].visible and not int(item_id) in _equipped_items:
+					_equipped_items.append(int(item_id))
+					
+		# C,RITICAL FIX!: Force the first visual sync on startup
+		# This overwrites any manual state left visible in the editor.
+		active_pose.sync_equipped_items(_equipped_items)
+		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
+			active_pose.shared_clothing_group.sync_equipped_items(_equipped_items)
 
-## Returns a dictionary with the visibility state (true/false) of all wardrobe nodes.
-func get_clothing_state() -> Dictionary:
-	var state: Dictionary = {}
-	for garment_name in _wardrobe_map:
-		var node = _wardrobe_map[garment_name]
-		if is_instance_valid(node):
-			state[garment_name] = node.visible
-	return state
+## PUBLIC API: Changes the posture using pure numeric identifiers.
+func change_pose(target_pose_id: int) -> void:
+	var target_id: int = int(target_pose_id)
+	if not poses_registry.has(target_id) or target_id == current_pose_id:
+		return
+		
+	var old_pose = poses_registry.get(current_pose_id)
+	var new_pose = poses_registry.get(target_id)
+	
+	var old_shared = old_pose.shared_clothing_group if (old_pose and "shared_clothing_group" in old_pose) else null
+	var new_shared = new_pose.shared_clothing_group if (new_pose and "shared_clothing_group" in new_pose) else null
+	
+	if old_pose: old_pose.visible = false
+	if new_pose: new_pose.visible = true
+	
+	if old_shared and old_shared != new_shared: old_shared.visible = false
+	if new_shared: new_shared.visible = true
+	
+	current_pose_id = target_id
+	
+	if new_pose:
+		new_pose.hide_all_registered()
+		new_pose.sync_equipped_items(_equipped_items)
+	if new_shared:
+		new_shared.hide_all_registered()
+		new_shared.sync_equipped_items(_equipped_items)
 
-## Applies a saved visibility state to the wardrobe.
-func load_clothing_state(state: Dictionary) -> void:
-	for garment_name in state:
-		if _wardrobe_map.has(garment_name):
-			var node = _wardrobe_map[garment_name]
-			if is_instance_valid(node):
-				node.visible = state[garment_name]
-
-## Toggles the visibility of a specific garment by its node name.
-func toggle_garment(garment_name: String, is_visible: bool) -> void:
-	if _wardrobe_map.has(garment_name):
-		var node = _wardrobe_map[garment_name]
-		if is_instance_valid(node):
-			node.visible = is_visible
+## PUBLIC API: Modifies the status of an item in the logical inventory.
+func modify_clothing(item_id: int, is_equipped: bool) -> void:
+	var target_id: int = int(item_id)
+	
+	if is_equipped and not target_id in _equipped_items:
+		_equipped_items.append(target_id)
+	elif not is_equipped and target_id in _equipped_items:
+		_equipped_items.erase(target_id)
+		
+	var active_pose = poses_registry.get(current_pose_id)
+	if active_pose:
+		active_pose.sync_equipped_items(_equipped_items)
+		if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
+			active_pose.shared_clothing_group.sync_equipped_items(_equipped_items)
 	else:
-		# Aviso útil en consola si el dev intenta encender ropa que no existe
-		push_warning("[%s] Garment not found in wardrobe: %s" % [display_name, garment_name])
-	
-	
+		EssenceReportUtils.warning(
+			"Pose Not Found",
+			"Pose ID %d not found in 'poses_registry' for %s. Check the Inspector configuration." % [current_pose_id, name]
+		)
+					
+
+# ==========================================
+# STATE SERIALIZATION (SAVE & LOAD)
+# ==========================================
+
+## PUBLIC API: Serializes the current state of the wardrobe and pose.
+## Returns a clean dictionary containing only stable numeric IDs.
+func get_clothing_state() -> Dictionary:
+	return {
+		"equipped_ids": _equipped_items.duplicate(),
+		"current_pose": current_pose_id
+	}
+
+
+## PUBLIC API: Restores the pose and equipped items from the save file.
+## Automatically sanitizes float numbers generated by Godot's native JSON format.
+func apply_clothing_state(state: Dictionary) -> void:
+	if state.has("equipped_ids"):
+		_equipped_items.clear()
+		for id in state["equipped_ids"]:
+			_equipped_items.append(int(id)) # JSON Floating-Point Cleanup
+			
+	if state.has("current_pose"):
+		var target_pose_id: int = int(state["current_pose"])
+		if target_pose_id == current_pose_id:
+			var active_pose = poses_registry.get(current_pose_id)
+			if active_pose:
+				active_pose.hide_all_registered()
+				active_pose.sync_equipped_items(_equipped_items)
+				if "shared_clothing_group" in active_pose and is_instance_valid(active_pose.shared_clothing_group):
+					active_pose.shared_clothing_group.sync_equipped_items(_equipped_items)
+		else:
+			change_pose(target_pose_id)
