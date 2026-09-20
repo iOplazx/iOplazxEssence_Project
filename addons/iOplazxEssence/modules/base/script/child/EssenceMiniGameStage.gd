@@ -25,7 +25,10 @@ func _ready() -> void:
 ## Loads and instantiates a minigame scene inside the stage container.
 func launch_minigame_scene(minigame_scene: PackedScene, init_data: Dictionary = {}) -> Dictionary:
 	if not is_instance_valid(game_container) or not minigame_scene:
-		push_error("[%s] Invalid minigame scene or null container." % name)
+		EssenceReportUtils.critical(
+			"Minigame Launch Error", 
+			"Invalid minigame scene or null stage container in %s." % name
+		)
 		return {"victory": false, "cancelled": true}
 
 	# 1. Clean up previously loaded minigames if any
@@ -35,7 +38,10 @@ func launch_minigame_scene(minigame_scene: PackedScene, init_data: Dictionary = 
 	# 2. Instantiate the new minigame
 	var instance = minigame_scene.instantiate()
 	if not (instance is EssenceBaseMiniGame):
-		push_error("[%s] The provided scene does not extend EssenceBaseMiniGame." % name)
+		EssenceReportUtils.critical(
+			"Minigame Setup Error", 
+			"The provided scene does not extend EssenceBaseMiniGame in %s." % name
+		)
 		instance.queue_free()
 		return {"victory": false, "cancelled": true}
 

@@ -14,10 +14,10 @@ const ES_NAME_CLASS = "EssenceRowSlider"
 
 @export_category("Visual Formatting")
 @export var visual_multiplier: float = 100.0 
-## 0 para enteros (ej. 50%), 1 para un decimal (ej. 1.5x), 2 para dos decimales, etc.
+## 0 for integers (e.g., 50%), 1 for one decimal place (e.g., 1.5x), 2 for two decimal places, etc.
 @export var decimal_places: int = 0 
-@export var value_prefix: String = ""  # Ej: "x" para que diga "x1.5"
-@export var value_suffix: String = "%" # Ej: "%" para que diga "50%"
+@export var value_prefix: String = ""  # Ex: "x" to read "x1.5"
+@export var value_suffix: String = "%" # E.g., "%" so it says "50%"
 
 @export_category("Internal Nodes")
 @export var icon_rect: TextureRect
@@ -53,14 +53,14 @@ func _ready():
 			
 	if btn_mute:
 		btn_mute.visible = show_mute_button
-		# Conectamos el botón a nuestra nueva función
+		# We connect the button to our new function
 		btn_mute.toggled.connect(_on_btn_mute_toggled)
 		
 	if slider:
 		_update_value_label(slider.value)
 
 # ==========================================
-# BLINDAJE Y SEGURIDAD
+# ARMORING AND SECURITY
 # ==========================================
 func _check_security_nodes():
 	var missing = []
@@ -72,36 +72,33 @@ func _check_security_nodes():
 	
 	if missing.size() > 0:
 		var msg = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		if is_instance_valid(EssenceError) and EssenceError.has_method("report"):
-			EssenceError.report("UI Setup Warning", msg, EssenceError.Severity.WARNING)
-		else:
-			push_error(msg)
+		EssenceReportUtils.warning("UI Setup Warning", msg)
 
 # ==========================================
 # TRADUCCIÓN DINÁMICA
 # ==========================================
 func _notification(what):
-	# Si el jugador cambia el idioma estando en el menú de opciones, el slider se traduce solo
+	# If the player changes the language while in the options menu, the slider translates automatically.
 	if what == NOTIFICATION_TRANSLATION_CHANGED:
 		if lbl_name:
 			lbl_name.text = tr(label_text)
 
 # ==========================================
-# LÓGICA DE INTERFAZ
+# INTERFACE LOGIC
 # ==========================================
 func _on_slider_changed(val: float):
 	_update_value_label(val)
 	
-	# AUTO-UNMUTE: Si mueven el slider y estaba en mute, lo quitamos
+	# AUTO-UNMUTE: If the slider is moved and the audio was muted, we unmute it.
 	if btn_mute and slider:
 		if btn_mute.button_pressed and not _cambio_automatico:
 			_cambio_automatico = true 
-			btn_mute.button_pressed = false # Desmarca la casilla visualmente
-			mute_toggled.emit(false) # Le avisa al AudioManager que quite el mute
+			btn_mute.button_pressed = false # Visually uncheck the box
+			mute_toggled.emit(false) # Notifies the AudioManager to unmute
 			_cambio_automatico = false
 
 func _on_slider_drag_ended(value_changed: bool):
-	# Solo hace ruido si realmente moviste el valor, no si solo le hiciste clic
+	# It only makes noise if you actually changed the value, not if you just clicked on it.
 	if value_changed and is_instance_valid(AudioManager) and AudioManager.has_method("play_ui_sfx"):
 		AudioManager.play_ui_sfx()
 
@@ -109,18 +106,18 @@ func _update_value_label(val: float):
 	if not lbl_value: return
 	
 	var display_value = val * visual_multiplier
-	# Magia de formateo ultra-optimizada en Godot
+	# Ultra-optimized formatting magic in Godot
 	var formatted_number = "%0.*f" % [decimal_places, display_value]
 	
 	lbl_value.text = value_prefix + formatted_number + value_suffix
 
 func _on_btn_mute_toggled(is_muted: bool):
-	# Feedback de audio (solo si no es un cambio por código)
+	# Audio feedback (only if not a code-based change)
 	if not _cambio_automatico and is_instance_valid(AudioManager) and AudioManager.has_method("play_ui_sfx"):
 		AudioManager.play_ui_sfx()
 		
-	# YA NO bajamos el slider a 0.
-	# Simplemente emitimos la señal para que el TabAudio haga el Mute nativo.
+	# We no longer lower the slider to 0.
+	# We simply send the signal so that TabAudio performs the native mute.
 	if not _cambio_automatico:
 		mute_toggled.emit(is_muted)
 	

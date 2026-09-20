@@ -13,24 +13,24 @@ const ES_NAME_CLASS = "EssenceWarningUI"
 var _unread_count: int = 0
 
 func _ready() -> void:
-	# 1. Blindaje Inicial
+	# 1. Initial Shielding
 	_check_security_nodes()
 	
-	# 2. Empezamos invisibles y desactivados para ahorrar recursos
+	# 2. We start out invisible and disabled to save resources.
 	self.hide() 
 	if warning_panel: warning_panel.visible = false
 	if btn_trigger: btn_trigger.visible = false
 	
-	# 3. Conexiones Locales
+	# 3. Local Connections
 	if btn_trigger: btn_trigger.pressed.connect(_on_trigger_pressed)
 	if btn_close: btn_close.pressed.connect(_on_close_pressed)
 	if btn_clear: btn_clear.pressed.connect(_clear_history)
 	
-	# 4. Conexión Externa Segura (Late Binding)
+	# 4. Secure External Connection (Late Binding)
 	_safe_connect_error_signal()
 	
 # ==========================================
-# BLINDAJE DE SEGURIDAD
+# SECURITY ARMORING
 # ==========================================
 func _check_security_nodes():
 	var missing = []
@@ -42,38 +42,38 @@ func _check_security_nodes():
 	if not btn_clear: missing.append("btn_clear")
 	
 	if missing.size() > 0:
-		# Al ser parte del sistema de advertencias, si falla algo aquí usamos push_error
-		# para no crear un bucle infinito reportándonos a nosotros mismos.
-		push_error("[%s] CRITICAL: Missing exported nodes: %s" % [ES_NAME_CLASS, ", ".join(missing)])
+		var msg: String = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
+		# We report via critical to safely record the issue in session logs 
+		# while preventing UI recursive loops within the warning system.
+		EssenceReportUtils.critical("UI Setup Error", msg)
 
 # ==========================================
-# FLUJO AUTOMÁTICO
+# AUTOMATIC FLOW
 # ==========================================
 func _on_new_error(data: Dictionary) -> void:
-	# Usamos el valor crudo 1 (WARNING) para evitar dependencias de clase
+	# We use the raw value 1 (WARNING) to avoid class dependencies.
 	var severity = data.get("severity", 0)
 	
 	if severity == 1: # 1 = WARNING
 		_add_warning_to_list(data)
 		_unread_count += 1
 		
-		# ¡Despertamos la UI!
 		self.show() 
 		if btn_trigger:
 			btn_trigger.visible = true
-			btn_trigger.modulate = Color(1.0, 0.8, 0.2) # Brillo amarillo
+			btn_trigger.modulate = Color(1.0, 0.8, 0.2) # Yellow glow
 
 func _on_trigger_pressed():
 	_play_sfx()
 	if warning_panel: warning_panel.visible = true
-	if btn_trigger: btn_trigger.modulate = Color(1.0, 1.0, 1.0, 0.5) # Se vuelve tenue
+	if btn_trigger: btn_trigger.modulate = Color(1.0, 1.0, 1.0, 0.5) # It grows faint
 	
 	_unread_count = 0
 	
 	if lbl_title and warning_list:
-		# Usamos tr() para soporte de localización si el jugador está en otro idioma
+		# We use tr() for localization support if the player is using another language.
 		var title_base = tr("UI_WARNING_TITLE")
-		if title_base == "UI_WARNING_TITLE": title_base = "SYSTEM WARNINGS" # Fallback temporal
+		if title_base == "UI_WARNING_TITLE": title_base = "SYSTEM WARNINGS" # Temporary fallback
 		lbl_title.text = title_base + " (" + str(warning_list.get_child_count()) + ")"
 
 func _on_close_pressed() -> void:
@@ -83,11 +83,11 @@ func _on_close_pressed() -> void:
 	
 	_safe_log("[%s] Interface hidden by user." % ES_NAME_CLASS)
 	
-	# Si no hay más botones visibles, podemos volver a ocultar el CanvasLayer completo
+	# If there are no more visible buttons, we can hide the entire CanvasLayer again.
 	self.hide()
 
 # ==========================================
-# UTILIDADES
+# UTILITIES
 # ==========================================
 func _add_warning_to_list(data: Dictionary):
 	if not warning_list: return
@@ -116,7 +116,7 @@ func _play_sfx() -> void:
 	_safe_audio_ui()
 		
 # ==============================================================================
-# WRAPPERS DE SEGURIDAD (Desacoplamiento Total)
+# SECURITY WRAPPERS (Total Decoupling)
 # ==============================================================================
 
 func _safe_log(msg: String) -> void:

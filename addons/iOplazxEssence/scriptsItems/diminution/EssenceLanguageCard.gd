@@ -50,11 +50,8 @@ func _check_security_nodes():
 	if not icon_addon_status: missing.append("icon_addon_status")
 	
 	if missing.size() > 0:
-		var msg = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		if is_instance_valid(EssenceError) and EssenceError.has_method("report"):
-			EssenceError.report("UI Setup Warning", msg, EssenceError.Severity.WARNING)
-		else:
-			push_error(msg)
+		var msg: String = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
+		EssenceReportUtils.warning("UI Setup Warning", msg)
 
 # ==========================================
 # DATA INJECTION & SETUP
@@ -66,29 +63,28 @@ func setup_card(data: Dictionary, current_locale: String):
 	if lbl_name: 
 		lbl_name.text = data.get("name", "Unknown")
 	
-	# === 1. LÓGICA DE AUTORES (SIEMPRE DIVIDIDOS) ===
+	# === 1. AUTHOR LOGIC (ALWAYS DIVIDED) ===
 	if lbl_author:
-		var t_game = tr("LANG_GAME")           # "Juego"
-		var t_addon = tr("LANG_ADDON")         # "Sistema"
+		var t_game = tr("LANG_GAME")           # "Game"
+		var t_addon = tr("LANG_ADDON")         # "System"
 		
 		var author_game = data.get("game_data", {}).get("author", "Community")
 		var author_addon = data.get("addon_data", {}).get("author", "Community")
 		
 		lbl_author.text = t_game + ": " + author_game + " | " + t_addon + ": " + author_addon
 	
-	# === 2. LÓGICA DE LA BANDERA (Refactorizada con Smart Loader) ===
+	# === 2. FLAG LOGIC (Refactored with Smart Loader) ===
 	if tex_flag and data.has("flag_path"):
 		var path = data["flag_path"]
 		
-		# Resolvemos la ruta absoluta solo si es externa
+		# Resolve the absolute path only if it is external
 		var final_path = path
 		if not path.begins_with("res://"):
 			final_path = ProjectSettings.globalize_path(path)
 			
-		# ¡MAGIA! Usamos el método blindado que creamos antes
 		tex_flag.texture = EssenceLoader.smart_load_texture(final_path, true)
 			
-	# === 3. SEMÁFORO SIMPLIFICADO (VERDE / ROJO) ===
+	# === 3. SIMPLIFIED TRAFFIC LIGHT (GREEN / RED) ===
 	if icon_game_status:
 		var has_game = data.get("game_supported", false)
 		icon_game_status.modulate = Color(0.2, 0.8, 0.2) if has_game else Color(0.8, 0.2, 0.2)
@@ -98,7 +94,7 @@ func setup_card(data: Dictionary, current_locale: String):
 		var has_addon = data.get("addon_supported", false)
 		var is_fallback = data.get("addon_is_fallback", false)
 		
-		# Si es fallback (entró el default), para nosotros es ROJO (No disponible)
+		# If it is a fallback (default triggered), for us it is RED (Unavailable).
 		if has_addon and not is_fallback:
 			icon_addon_status.modulate = Color(0.2, 0.8, 0.2) # Verde
 			icon_addon_status.tooltip_text = tr("INFO_ADDON_LANG_OK")

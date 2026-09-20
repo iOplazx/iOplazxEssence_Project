@@ -4,7 +4,7 @@ enum Severity { INFO, WARNING, CRITICAL }
 
 signal on_error_reported(error_data: Dictionary)
 
-# Para el modo Dev: si es true, no sale la pantalla, solo el log
+# For Dev mode: if true, the screen does not appear, only the log
 var silent_mode: bool = false 
 
 func report(title: String, msg: String, severity: int = Severity.CRITICAL):
@@ -17,15 +17,15 @@ func report(title: String, msg: String, severity: int = Severity.CRITICAL):
 		"timestamp": Time.get_datetime_string_from_system()
 	}
 	
-	# 1. Registro en el Log de Sesión (session.log)
-	# Convertimos el error en una sola línea de texto para el log general
+	# 1. Session Log Entry (session.log)
+	# Convert the error into a single line of text for the general logal
 	var type_label = "CRITICAL" if severity == Severity.CRITICAL else "WARNING"
 	var log_line = "[%s] %s: %s" % [type_label, title, msg]
 	
-	# Usamos el método real del Logger
+	# We use the actual Logger method
 	EssenceLogger.system_info(log_line)
 	
-	# 2. Reaccionar según la gravedad
+	# 2. React according to severity
 	match severity:
 		Severity.WARNING:
 			_show_warning_icon(error_data)
@@ -38,16 +38,16 @@ func report(title: String, msg: String, severity: int = Severity.CRITICAL):
 	on_error_reported.emit(error_data)
 
 # ==========================================
-# HERRAMIENTAS PARA EL DESARROLLADOR
+# DEVELOPER TOOLS
 # ==========================================
 
-# Úsalo en funciones vacías en lugar de 'pass'
-func ExceptionNotImplement(method_name: String = "Desconocido"):
+# Use it in empty functions instead of 'pass'
+func ExceptionNotImplement(method_name: String = "Unknown"):
 	var stack = get_stack()
-	var script = stack[1]["source"] if stack.size() > 1 else "Script desconocido"
+	var script = stack[1]["source"] if stack.size() > 1 else "Unknown script"
 	var line = stack[1]["line"] if stack.size() > 1 else 0
 	
-	# Usamos %s para inyectar las variables en el texto traducido
+	# We use %s to inject the variables into the translated text.
 	var msg = tr("ERR_DESC_NOT_IMPLEMENTED") % [method_name, script, str(line)]
 	report(tr("ERR_TITLE_NOT_IMPLEMENTED"), msg, Severity.CRITICAL)
 
@@ -63,25 +63,35 @@ func safe_execute(object: Object, method: String, args: Array = [], default_valu
 	return object.callv(method, args)
 
 # ==========================================
-# REACCIONES VISUALES
+# VISUAL REACTIONS
 # ==========================================
 
 func _show_warning_icon(data: Dictionary):
-	# Por ahora, usamos el warning nativo del motor.
-	# Aquí podrías instanciar un pequeño panel flotante en la esquina.
+	# For now, we use the engine's native warning. 
+	# Here, you could instantiate a small floating panel in the corner.
 	push_warning("Essence WARNING: [" + data["title"] + "] " + data["message"])
 
 func _trigger_crash_screen(data: Dictionary):
 	get_tree().paused = true
 	
-	# 1. Generar el archivo físico del log y guardar la ruta
+	# 1. Generate the physical log file and save the path.
 	var log_path = EssenceLogger.create_crash_report(data)
 	data["log_path"] = log_path # Metemos la ruta en el diccionario
 	
-	# 2. Instanciar pantalla
+	# 2. Instantiate screen
 	var crash_path = EssencePaths.PATH_UI_SCREEN + "/EssenceCrashScreen.tscn"
 	if ResourceLoader.exists(crash_path):
 		var screen = load(crash_path).instantiate()
 		get_tree().root.add_child(screen)
 		if screen.has_method("setup"):
-			screen.setup(data) # Ahora 'data' lleva la ruta del log
+			screen.setup(data) # Now 'data' holds the log path
+
+## Convenience shortcuts for quick reporting by severity
+func report_warning(title: String, msg: String) -> void:
+	report(title, msg, Severity.WARNING)
+
+func report_critical(title: String, msg: String) -> void:
+	report(title, msg, Severity.CRITICAL)
+
+func report_info(title: String, msg: String) -> void:
+	report(title, msg, Severity.INFO)

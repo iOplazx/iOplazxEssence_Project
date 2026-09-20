@@ -2,7 +2,7 @@ class_name EssenceImportConflictBox extends CanvasLayer
 
 const ES_NAME_CLASS = "EssenceImportConflictBox"
 
-# Esta señal enviará el diccionario al controlador
+# This signal will send the dictionary to the controller
 signal on_conflict_resolved(respuesta: Dictionary)
 
 @export_category("UI References")
@@ -15,19 +15,19 @@ signal on_conflict_resolved(respuesta: Dictionary)
 func _ready():
 	_check_security_nodes()
 	
-	# Conexiones seguras: Si falta un botón, simplemente no se conecta.
+	# Secure connections: If a button is missing, it simply doesn't connect.
 	if btn_omit: btn_omit.pressed.connect(func(): _responder("OMITIR"))
 	if btn_overwrite: btn_overwrite.pressed.connect(func(): _responder("SOBRESCRIBIR"))
 	if btn_new: btn_new.pressed.connect(func(): _responder("NUEVO"))
 	
-	# Localización dinámica segura
+	# Secure dynamic localization
 	if chk_apply_all: chk_apply_all.text = tr("UI_IMPORT_APPLY_ALL")
 	if btn_omit: btn_omit.text = tr("UI_IMPORT_BTN_OMIT")
 	if btn_overwrite: btn_overwrite.text = tr("UI_IMPORT_BTN_OVERWRITE")
 	if btn_new: btn_new.text = tr("UI_IMPORT_BTN_NEW")
 
 # ==========================================
-# BLINDAJE DE SEGURIDAD
+# SECURITY ARMORING
 # ==========================================
 func _check_security_nodes():
 	var missing = []
@@ -39,33 +39,30 @@ func _check_security_nodes():
 	
 	if missing.size() > 0:
 		var msg = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		if EssenceError and EssenceError.has_method("report"):
-			EssenceError.report("UI Setup Warning", msg, EssenceError.Severity.WARNING)
-		else:
-			push_error(msg)
+		EssenceReportUtils.warning("UI Setup Error", msg)
 
 # ==========================================
-# INYECCIÓN DE DATOS
+# DATA INJECTION
 # ==========================================
 func setup(slot_id: String):
-	# Formateamos el texto traducido de forma segura
+	# We format the translated text safely.
 	if label_msg: 
 		label_msg.text = tr("UI_IMPORT_CONFLICT_MSG").format({"slot": slot_id})
 
 # ==========================================
-# RESPUESTA Y DESTRUCCIÓN
+# RESPONSE AND DESTRUCTION
 # ==========================================
 func _responder(accion: String):
 	# Sonido seguro
 	if AudioManager and AudioManager.has_method("play_ui_sfx"):
 		AudioManager.play_ui_sfx()
 		
-	# Preparamos el paquete de datos y lo disparamos.
-	# Usamos un operador ternario para el CheckBox por si el nodo se perdió/borró.
+	# We prepare the data packet and trigger it. 
+	# We use a ternary operator for the CheckBox in case the node is lost/deleted.
 	var paquete = {
 		"accion": accion,
 		"aplicar_a_todos": chk_apply_all.button_pressed if chk_apply_all else false
 	}
 	
 	on_conflict_resolved.emit(paquete)
-	queue_free() # Destruimos la ventana para limpiar la memoria
+	queue_free() # We destroy the window to clear the memory

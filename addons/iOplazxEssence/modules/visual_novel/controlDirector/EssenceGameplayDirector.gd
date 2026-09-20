@@ -150,7 +150,10 @@ func change_game_state(new_state: GameState) -> void:
 
 func load_location(location_scene: PackedScene) -> void:
 	if not active_location_container or not location_scene: 
-		push_error("[EssenceGameplayDirector] Missing container or scene to load.")
+		EssenceReportUtils.critical(
+			"Location Load Error", 
+			"Missing container or scene to load in %s." % name
+		)
 		return
 	
 	for child in active_location_container.get_children():
@@ -181,10 +184,13 @@ func unload_location() -> void:
 # NARRATIVE & DIALOGUE ENTRY POINTS
 # ==========================================
 
-## API PÚBLICA: Inicia una secuencia de diálogo directa pasando un arreglo de líneas.
+## PUBLIC API: Starts a direct dialogue sequence by passing an array of lines.s.
 func play_dialogue(lines: Array) -> void:
 	if not is_instance_valid(active_dialog_box):
-		push_error("[%s] Error: No dialog interface is configured or instantiated." % name)
+		EssenceReportUtils.critical(
+			"Dialogue Error", 
+			"No dialogue interface is configured or instantiated in %s." % name
+		)
 		return
 		
 	change_game_state(GameState.DIALOGUE)
@@ -194,14 +200,14 @@ func play_dialogue(lines: Array) -> void:
 ## Receiver automático que reestablece el control al terminar la conversación.
 func _on_dialogue_sequence_finished() -> void:
 	change_game_state(GameState.EXPLORATION)
-	print("[%s] Dialogue completed. State restored to EXPLORATION." % name)
+	#print("[%s] Dialogue completed. State restored to EXPLORATION." % name)
 
 
 ## Método legado de compatibilidad para guiones traducidos.
 func initialize_dialog_sequence(sequence_id: String) -> void:
-	print("\n=============================================")
-	print("[EssenceGameplayDirector] STARTING SEQUENCE: ", sequence_id)
-	print("=============================================")
+	#print("\n=============================================")
+	#print("[EssenceGameplayDirector] STARTING SEQUENCE: ", sequence_id)
+	#print("=============================================")
 	
 	change_game_state(GameState.CUTSCENE)
 	# TODO: In the future, the TranslationManager will resolve the ID and call play_dialogue()
@@ -245,14 +251,20 @@ func clear_item_stage() -> void:
 ## Dynamically transparent invocation for modals and notices
 func show_modal_prompt(title: String, body: String, preset: EssenceBaseModalPrompt.ButtonPreset = EssenceBaseModalPrompt.ButtonPreset.OK) -> String:
 	if not is_instance_valid(hud_layer):
-		push_error("[%s] Error: 'hud_layer' It is not assigned in the GameplayDirector." % name)
+		EssenceReportUtils.critical(
+			"Modal Setup Error", 
+			"'hud_layer' is not assigned in %s." % name
+		)
 		return ""
 		
 	# 1. We obtain the centralized path from EssencePaths.
 	var scene_path: String = EssencePaths.ESSENCE_MODULAR_PROMPT_INTERFACE
 	
 	if not ResourceLoader.exists(scene_path):
-		push_error("[%s] Error: The modal scene was not found at the path: %s" % [name, scene_path])
+		EssenceReportUtils.critical(
+			"Modal Resource Error", 
+			"The modal scene was not found at path: %s in %s." % [scene_path, name]
+		)
 		return ""
 		
 	# 2. Dynamic loading and instantiation
@@ -279,18 +291,27 @@ func show_modal_prompt(title: String, body: String, preset: EssenceBaseModalProm
 ## Launches a modal minigame scene, disables background interactions, and returns execution result via await.
 func launch_minigame(minigame_scene_path: String, init_data: Dictionary = {}) -> Dictionary:
 	if not is_instance_valid(hud_layer):
-		push_error("[%s] Error: 'hud_layer' is not assigned in GameplayDirector." % name)
+		EssenceReportUtils.critical(
+			"Minigame Launch Error", 
+			"'hud_layer' is not assigned in %s." % name
+		)
 		return {"victory": false, "cancelled": true}
 		
 	# 1. Get the container stage scene path from EssencePaths
 	var stage_path: String = EssencePaths.ESSENCE_MINIGAME_STAGE_INTERFACE
 	
 	if not ResourceLoader.exists(stage_path):
-		push_error("[%s] Error: MiniGameStage scene not found at path: %s" % [name, stage_path])
+		EssenceReportUtils.critical(
+			"Minigame Resource Error", 
+			"MiniGameStage scene not found at path: %s in %s." % [stage_path, name]
+		)
 		return {"victory": false, "cancelled": true}
 		
 	if not ResourceLoader.exists(minigame_scene_path):
-		push_error("[%s] Error: Target minigame scene not found at path: %s" % [name, minigame_scene_path])
+		EssenceReportUtils.critical(
+			"Minigame Resource Error", 
+			"Target minigame scene not found at path: %s in %s." % [minigame_scene_path, name]
+		)
 		return {"victory": false, "cancelled": true}
 
 	# 2. Instantiate the MiniGameStage host inside HUD_Layer

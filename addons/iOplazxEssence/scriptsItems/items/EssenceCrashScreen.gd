@@ -23,13 +23,13 @@ var _is_details_open: bool = false
 var _current_log_path
 
 func _ready():
-	# 1. Blindaje silencioso (Sin llamar a EssenceError)
+	# 1. Silent shielding (Without calling EssenceError)
 	_check_security_nodes()
 	
-	# Nos aseguramos de que este nodo corra aunque el juego esté pausado por el crash
+	# We ensure that this node runs even when the game is paused due to a crash
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	# 2. Conexiones seguras
+	# 2. Secure Connections
 	if btn_toggle_details: btn_toggle_details.pressed.connect(_on_toggle_details_pressed)
 	if btn_back: btn_back.pressed.connect(_on_back_pressed)
 	if btn_open_log: btn_open_log.pressed.connect(_on_open_log_pressed)
@@ -37,13 +37,13 @@ func _ready():
 	if btn_ignore: btn_ignore.pressed.connect(_on_ignore_pressed)
 	if btn_quit: btn_quit.pressed.connect(_on_quit_pressed)
 	
-	# 3. Estado inicial seguro
+	# 3. Safe initial state
 	if details_container: details_container.visible = false
 	
 	_update_ui_texts()
 
 # ==========================================
-# 0. BLINDAJE DE EMERGENCIA (Bucle-Free)
+# 0. EMERGENCY SHIELDING (Loop-Free)
 # ==========================================
 func _check_security_nodes():
 	var missing = []
@@ -60,11 +60,11 @@ func _check_security_nodes():
 	if not btn_quit: missing.append("btn_quit")
 	
 	if missing.size() > 0:
-		# ¡OJO! Usamos push_error nativo de Godot para no causar bucles con nuestro propio sistema
+		# Note! We use Godot's native push_error to avoid causing loops with our own system.
 		push_error("[%s] CRITICAL: Missing exported nodes: %s" % [ES_NAME_CLASS, ", ".join(missing)])
 
 # ==========================================
-# 1. CONFIGURACIÓN DE LA INTERFAZ
+# 1. INTERFACE CONFIGURATION
 # ==========================================
 func _update_ui_texts():
 	if lbl_header: lbl_header.text = tr("CRASH_HEADER")
@@ -87,7 +87,7 @@ func _update_ui_texts():
 		btn_quit.tooltip_text = tr("CRASH_TOOLTIP_QUIT")
 
 # ==========================================
-# INYECCIÓN DE DATOS
+# DATA INJECTION
 # ==========================================
 func setup(data: Dictionary):
 	if lbl_title: 
@@ -108,7 +108,7 @@ func setup(data: Dictionary):
 				var file = frame.get("source", "N/A")
 				var line = frame.get("line", 0)
 				var func_name = frame.get("function", "N/A")
-				# Mantenemos esto semi-técnico porque es para leer código
+				# We're keeping this semi-technical because it's for reading code.
 				stack_text += "[Lvl %d] %s -> %s() (Line %d)\n" % [i, file, func_name, line]
 				
 		txt_details.text = stack_text
@@ -121,7 +121,7 @@ func setup(data: Dictionary):
 func _on_toggle_details_pressed():
 	_is_details_open = not _is_details_open
 	
-	# Parche: Verificar nodos antes de tocarlos
+	# Patch: Verify nodes before touching them
 	if details_container:
 		details_container.visible = _is_details_open
 	if btn_toggle_details:
@@ -144,7 +144,7 @@ func _on_back_pressed():
 			EssenceLogger.system_info("[%s/_on_back_pressed] No checkpoints available. Reloading current scene." % ES_NAME_CLASS)
 			get_tree().reload_current_scene() 
 	else:
-		# Plan C: Si el SaveManager está roto, dejamos evidencia en el log antes de reiniciar
+		# Plan C: If the SaveManager is broken, we leave evidence in the log before restarting.
 		EssenceLogger.system_info("[%s/_on_back_pressed] WARNING: SaveManager invalid or missing. Forcing scene reload." % ES_NAME_CLASS)
 		get_tree().reload_current_scene()
 		
@@ -154,18 +154,18 @@ func _on_open_log_pressed():
 	if _current_log_path != "":
 		OS.shell_open(ProjectSettings.globalize_path(_current_log_path))
 	else:
-		_on_open_folder_pressed() # Si no hay log específico, abre la carpeta
+		_on_open_folder_pressed() # If there is no specific log, open the folder
 
 func _on_open_folder_pressed():
-	# Abre la carpeta 'user://' del juego en el explorador de Windows/Linux
+	# Open the game's 'user://' folder in the Windows/Linux file explorer
 	var path = ProjectSettings.globalize_path("user://")
 	OS.shell_open(path)
 
 func _on_ignore_pressed():
-	# Continúa bajo propio riesgo del usuario/dev
+	# Proceed at the user's/developer's own risk
 	get_tree().paused = false
 	queue_free()
 
 func _on_quit_pressed():
-	# Salida segura
+	# Safe exit
 	get_tree().quit()

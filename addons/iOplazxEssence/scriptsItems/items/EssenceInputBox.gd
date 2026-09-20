@@ -14,13 +14,13 @@ signal on_submit(new_text: String)
 func _ready():
 	_check_security_nodes()
 	
-	# Conexiones seguras
+	# Secure connections
 	if btn_confirm:
 		btn_confirm.pressed.connect(_on_confirm)
 	if btn_cancel:
 		btn_cancel.pressed.connect(_on_cancel)
 	
-	# Permite confirmar presionando "Enter"
+	# Allows confirmation by pressing "Enter"
 	if input_text:
 		input_text.text_submitted.connect(func(_text): _on_confirm())
 
@@ -37,11 +37,7 @@ func _check_security_nodes():
 	
 	if missing.size() > 0:
 		var msg = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		# Usamos un if seguro por si EssenceError no existe en este contexto
-		if is_instance_valid(EssenceError) and EssenceError.has_method("report"):
-			EssenceError.report("UI Setup Warning", msg, EssenceError.Severity.WARNING)
-		else:
-			push_error(msg)
+		EssenceReportUtils.warning("UI Setup Warning", msg)
 
 # ==========================================
 # CONFIGURATION
@@ -53,9 +49,9 @@ func setup(title_key: String, msg_key: String, current_text: String):
 	if input_text:
 		input_text.text = current_text
 		
-		# TRUCO SENIOR: call_deferred le dice a Godot:
-		# "Espera a terminar de dibujar todo el frame, y LUEGO pon el foco aquí".
-		# Esto evita el bug donde la caja de texto no te deja escribir al instante.
+		# call_deferred tells Godot:
+		# "Wait until the entire frame has finished rendering, and THEN set the focus here." 
+		# This prevents the bug where the text box doesn't let you type immediately.
 		input_text.call_deferred("grab_focus")
 		input_text.call_deferred("select_all")
 
@@ -68,14 +64,14 @@ func _on_confirm():
 		
 	var final_text = ""
 	if input_text:
-		final_text = input_text.text.strip_edges() # strip_edges elimina espacios accidentales al inicio/fin
+		final_text = input_text.text.strip_edges() # strip_edges removes accidental spaces at the beginning/end
 		
 	on_submit.emit(final_text)
-	queue_free() # Destruimos la UI para liberar RAM
+	queue_free() # We destroy the UI to free up RAM
 
 func _on_cancel():
 	if is_instance_valid(AudioManager) and AudioManager.has_method("play_ui_sfx"):
 		AudioManager.play_ui_sfx()
 		
-	on_submit.emit("") # Mandar un string vacío significa "Cancelar"
-	queue_free() # Destruimos la UI para liberar RAM
+	on_submit.emit("") # Sending an empty string means "Cancel"
+	queue_free() # We destroy the UI to free up RAM

@@ -18,7 +18,10 @@ extends EssenceBaseInteractionMenu
 ## Implementation of the geometric layout using direct vectors of a hexagonal ring.
 func _generate_geometric_structure() -> void:
 	if not button_scene:
-		push_error("[%s] Error: Assign the button scene in the Inspector." % name)
+		EssenceReportUtils.critical(
+			"UI Setup Error",
+			"Assign the button scene in the Inspector for %s." % name
+		)
 		return
 
 	# 1. HEXAGONAL RING DIRECTIONS (Pointy-Topped Hexagon)

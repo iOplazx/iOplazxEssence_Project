@@ -4,48 +4,50 @@ const ES_NAME_CLASS = "GlobalLoading"
 
 @export_category("UI Connections")
 @export var label: Label
-@export var background: ColorRect # (Opcional) Por si en el futuro quieres animar el fondo
+@export var background: ColorRect # (Optional) Used for background fade animations
 
-func _ready():
+func _ready() -> void:
 	_check_security_nodes()
 	
-	# TRUCO SENIOR: Forzamos la capa al máximo (100+) para garantizar 
-	# que NADA en todo el juego pueda dibujarse por encima de esta pantalla.
+	# Force layer to maximum (120) to guarantee 
+	# that no other UI element in the game renders above this overlay.
 	layer = 120 
 	
-	hide() # Nos aseguramos de que empiece invisible
+	hide() # Ensure it starts invisible
 
 # ==========================================
-# BLINDAJE DE SEGURIDAD
+# SECURITY ARMORING
 # ==========================================
-func _check_security_nodes():
+func _check_security_nodes() -> void:
 	if not label:
-		# Al ser un Autoload, usamos push_error directamente
-		push_error("[%s] CRITICAL: Missing exported Label node." % ES_NAME_CLASS)
+		EssenceReportUtils.critical(
+			"UI Setup Error",
+			"Missing exported Label node in %s." % ES_NAME_CLASS
+		)
 
 # ==========================================
-# MÉTODOS PÚBLICOS
+# PUBLIC METHODS
 # ==========================================
-## Muestra la pantalla bloqueando la UI con una suave transición
-func show_loading(text_key: String = "UI_LOADING_DEFAULT"):
+## Displays the loading overlay blocking background UI with a smooth fade-in.
+func show_loading(text_key: String = "UI_LOADING_DEFAULT") -> void:
 	if label:
 		label.text = tr(text_key) 
 		
 	show()
 	
-	# Parche: Aplicamos la micro-animación al 'background' (ColorRect), no al CanvasLayer
+	# Apply micro-animation to background ColorRect
 	if background:
 		background.modulate.a = 0.0
-		var tween = create_tween()
+		var tween: Tween = create_tween()
 		tween.tween_property(background, "modulate:a", 1.0, 0.15)
 
-## Oculta la pantalla de forma elegante
-func hide_loading():
+## Smoothly hides the loading overlay.
+func hide_loading() -> void:
 	if background:
-		var tween = create_tween()
+		var tween: Tween = create_tween()
 		tween.tween_property(background, "modulate:a", 0.0, 0.15)
-		# Ocultamos todo el CanvasLayer cuando el fondo termina de desaparecer
+		# Hide CanvasLayer once fade-out completes
 		tween.tween_callback(hide) 
 	else:
-		# Fallback de seguridad por si olvidaste asignar el background
+		# Defensive fallback if background reference is missing
 		hide()

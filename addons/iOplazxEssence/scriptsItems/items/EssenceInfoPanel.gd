@@ -8,26 +8,26 @@ const ES_NAME_CLASS = "EssenceInfoPanel"
 @export var window_panel: PanelContainer
 
 @export_category("Game Section")
-@export var game_data_node: Control # VBox que contiene la info
-@export var game_missing_node: Control # VBox/Label de "No encontrado"
+@export var game_data_node: Control # VBox containing the info
+@export var game_missing_node: Control # "Not found" VBox/Label
 
 @export_group("Dynamic Game Texts")
 @export var lbl_game_author: Label
 @export var lbl_game_version: Label
 @export var lbl_game_desc: Label
 @export var lbl_game_ai_warning: Label
-@export var lbl_game_missing_msg: Label # Para el texto de error
+@export var lbl_game_missing_msg: Label # For the error text
 
 @export_category("Addon Section")
-@export var addon_data_node: Control # VBox que contiene la info
-@export var addon_missing_node: Control # VBox/Label de "No encontrado"
+@export var addon_data_node: Control # VBox containing the info
+@export var addon_missing_node: Control # "Not found" VBox/Label
 
 @export_group("Dynamic Addon Texts")
 @export var lbl_addon_author: Label
 @export var lbl_addon_version: Label
 @export var lbl_addon_desc: Label
 @export var lbl_addon_ai_warning: Label
-@export var lbl_addon_missing_msg: Label # Para el texto de error
+@export var lbl_addon_missing_msg: Label # For the error text
 
 func _ready():
 	_check_security_nodes()
@@ -35,11 +35,11 @@ func _ready():
 	if btn_close: 
 		btn_close.pressed.connect(_on_close_pressed)
 	
-	# Ocultamos los warnings por defecto de forma segura
+	# We safely hide default warnings
 	if lbl_game_ai_warning: lbl_game_ai_warning.hide()
 	if lbl_addon_ai_warning: lbl_addon_ai_warning.hide()
 	
-	# Animación de entrada segura (protegida contra nodos nulos)
+	# Safe entry animation (protected against null nodes)
 	modulate.a = 0.0 
 	var tween = create_tween().set_parallel(true)
 	tween.tween_property(self, "modulate:a", 1.0, 0.15)
@@ -61,27 +61,22 @@ func _check_security_nodes():
 	if not addon_data_node: missing.append("addon_data_node")
 	if not addon_missing_node: missing.append("addon_missing_node")
 	
-	# Solo verificamos los nodos estructurales principales. 
-	# Los textos dinámicos no son críticos para que la ventana no crashee.
 	if missing.size() > 0:
 		var msg = "Missing exported core nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		if EssenceError and EssenceError.has_method("report"):
-			EssenceError.report("UI Setup Warning", msg, EssenceError.Severity.WARNING)
-		else:
-			push_error(msg)
+		EssenceReportUtils.warning("UI Setup Error", msg)
 
 # ==========================================
 # DATA INJECTION
 # ==========================================
 func setup(data: Dictionary):
-	# 1. TÍTULO PRINCIPAL
+	# 1. MAIN TITLE
 	if lbl_title: lbl_title.text = data.get("name", "Unknown Language")
 
-	# 2. SECCIÓN DEL JUEGO
+	# 2. GAME SECTION
 	var game_info = data.get("game_data", {}) 
 	_setup_game_section(game_info)
 
-	# 3. SECCIÓN DEL ADDON
+	# 3. ADD-ON SECTION
 	var addon_info = data.get("addon_data", {})
 	_setup_addon_section(addon_info)
 	
@@ -139,7 +134,7 @@ func _setup_addon_section(addon_info: Dictionary):
 # UI EVENTS
 # ==========================================
 func _on_close_pressed():
-	# Blindaje del AudioManager
+	# AudioManager Hardening
 	if is_instance_valid(AudioManager) and AudioManager.has_method("play_ui_sfx"):
 		AudioManager.play_ui_sfx()
 		

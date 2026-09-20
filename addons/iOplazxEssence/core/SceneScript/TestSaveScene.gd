@@ -48,11 +48,8 @@ func _check_security_nodes() -> void:
 	if not btn_warning: missing.append("btn_warning")
 	
 	if missing.size() > 0:
-		var msg = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
-		if is_instance_valid(EssenceError) and EssenceError.has_method("report"):
-			EssenceError.report("UI Setup Warning", msg, EssenceError.Severity.WARNING)
-		else:
-			push_error(msg)
+		var msg: String = "Missing exported nodes in %s: %s" % [ES_NAME_CLASS, ", ".join(missing)]
+		EssenceReportUtils.warning("UI Setup Warning", msg)
 
 # ==========================================
 # BUTTON CONFIGURATION
@@ -125,7 +122,7 @@ func _fallback_to_main_menu() -> void:
 	if is_instance_valid(SceneManager) and SceneManager.has_method("goto_main_menu"):
 		SceneManager.goto_main_menu()
 	else:
-		push_error("[%s] SceneManager unavailable for fallback." % ES_NAME_CLASS)
+		EssenceReportUtils.critical("Fallback Error", "SceneManager unavailable for fallback.")
 
 # ==========================================
 # EVENT HANDLERS
@@ -152,6 +149,4 @@ func _on_no_implement_pressed() -> void:
 		EssenceError.ExceptionNotImplement("Test")
 
 func _on_print_warning_pressed() -> void:
-	if is_instance_valid(EssenceError) and EssenceError.has_method("report"):
-		EssenceError.report("Hardware Check", "GPU running at high temperature.", EssenceError.Severity.WARNING)
-		
+	EssenceReportUtils.warning("Hardware Check", "GPU running at high temperature.")
