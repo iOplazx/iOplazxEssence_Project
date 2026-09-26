@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_nte1n")
-main_menu_scene = "uid://oli3ry0u0tyc"
+main_menu_scene = "uid://c5dv33v21frxr"
 new_game_scene = "uid://ci3qw0mgyt8tr"
 continue_game_scene = "uid://ci3qw0mgyt8tr"
 load_game_scene = "uid://c2yexvr2in0cr"

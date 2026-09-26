@@ -214,30 +214,33 @@ func _play_sfx() -> void:
 # SAVE/LOAD LOGIC
 # ==========================================
 func _preparar_datos_para_menu() -> void:
-	print("[%s] Capturing screen and preparing data..." % ES_NAME_CLASS)
+	EssenceLogger.system_info("[%s] Capturing screenshot and preparing menu state..." % ES_NAME_CLASS)
 	
 	await get_tree().process_frame
 	await SaveManager.take_temp_screenshot()
 	await get_tree().create_timer(0.1).timeout
 	
+	var current_playtime: float = EssenceTimeUtils.get_playtime_seconds()
+	
 	# ==========================================
-	# INTERFACE / CACHE DICTIONARY
+	# INTERFACE / CACHE DICTIONARY (STANDARDIZED)
 	# ==========================================
-	var current_game_data = {
-		"escena_actual": "MainRoom",
-		"fase_actual": current_phase, 
-		"habitacion_actual": current_room_id,
-		"story_flags": story_flags, 
-		"ropa_estado_personaje": active_character.get_clothing_state() if is_instance_valid(active_character) else {}
+	var current_game_data: Dictionary = {
+		GameSaveKeys.CURRENT_SCENE: "MainRoom",
+		GameSaveKeys.CURRENT_PHASE: current_phase,
+		GameSaveKeys.CURRENT_ROOM: current_room_id,
+		GameSaveKeys.STORY_FLAGS: story_flags,
+		GameSaveKeys.CHARACTER_CLOTHING_STATE: active_character.get_clothing_state() if is_instance_valid(active_character) else {},
+		GameSaveKeys.PLAYTIME_SECONDS: current_playtime
 	}
 	
-	var room_key = GameIDs.RoomID.find_key(current_room_id)
-	var room_name = room_key.capitalize().replace("_", " ") if room_key else "Unknown Room"
+	var room_key: String = GameIDs.RoomID.find_key(current_room_id)
+	var room_name: String = room_key.capitalize().replace("_", " ") if not room_key.is_empty() else "Unknown Room"
 	
-	var current_meta_data = {
+	var current_meta_data: Dictionary = {
 		"title": "Framework Test",
 		"description": "Place: %s | Phase: %s" % [room_name, ("Intro" if current_phase == TestPhase.INTRO else "Gameplay")],
-		"play_time": "00:01:00"
+		GameSaveKeys.META_PLAYTIME: EssenceTimeUtils.format_seconds(current_playtime)
 	}
 	
 	SaveManager.cache_current_state(current_game_data, current_meta_data)

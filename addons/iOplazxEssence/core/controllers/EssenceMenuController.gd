@@ -13,6 +13,8 @@ enum IdleAnimation { NONE, BREATHING }
 @export var btn_settings: Button
 @export var btn_credits: Button
 @export var btn_exit: Button
+## (Optional) Label node to display the current game version
+@export var lbl_version: Label
 
 @export_subgroup("Navigation Settings")
 ## The button that will grab focus by default for keyboard/gamepad
@@ -45,6 +47,7 @@ func _ready() -> void:
 		
 		_conectar_botones()
 		_update_continue_button_state()
+		_setup_version_display()
 		
 		# Setup initial visual state
 		if animate_buttons_entrance:
@@ -108,6 +111,25 @@ func _update_continue_button_state() -> void:
 func _iniciar_foco_teclado() -> void:
 	if is_instance_valid(first_focus_button):
 		first_focus_button.grab_focus()
+		
+## Dynamically resolves and displays the active game version string.
+func _setup_version_display() -> void:
+	if not is_instance_valid(lbl_version):
+		EssenceReportUtils.warning(
+			"UI Setup Warning",
+			"lbl_version is not assigned in the Inspector for %s." % ES_NAME_CLASS
+		)
+		return
+		
+	var active_version: String = str(ProjectSettings.get_setting("application/config/version", ""))
+	if active_version.is_empty():
+		active_version = GameConstants.GAME_VERSION
+		
+	lbl_version.text = "v" + active_version
+	
+	# Force container visibility and update layout tree
+	if lbl_version.get_parent() is Control:
+		(lbl_version.get_parent() as Control).visible = true
 
 # ==========================================
 # INTERFACE AUDIO
