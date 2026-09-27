@@ -7,7 +7,7 @@ extends RefCounted
 
 # --- METADATA KEYS (Used in Load Screen Cards) ---
 const META_LOCATION = "location"
-const META_PLAYTIME = "playtime"
+const META_PLAYTIME = "play_time"
 const META_PLAYER_LEVEL = "player_level"
 
 # --- PERSISTENT GAME DATA KEYS ---

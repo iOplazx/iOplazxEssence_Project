@@ -93,7 +93,17 @@ func get_total_playtime() -> float:
 func get_formatted_time(include_seconds: bool = true) -> String:
 	return EssenceTimeUtils.format_seconds(_total_playtime, include_seconds)
 
-
 ## Returns whether the clock is actively accumulating time.
 func is_running() -> bool:
 	return current_state == ClockState.RUNNING
+	
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_APPLICATION_FOCUS_OUT:
+			# Pause clock when window loses focus
+			if current_state == ClockState.RUNNING:
+				pause_clock()
+		NOTIFICATION_APPLICATION_FOCUS_IN:
+			# Resume clock when window regains focus
+			if current_state == ClockState.PAUSED:
+				resume_clock()
