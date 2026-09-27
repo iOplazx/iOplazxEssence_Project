@@ -248,9 +248,7 @@ func _preparar_datos_para_menu() -> void:
 	}
 	
 	SaveManager.cache_current_state(current_game_data, current_meta_data)
-	print("¿Existe TimeManager?: ", get_tree().root.has_node("TimeManager"))
-	print("Segundos contados: ", EssenceTimeUtils.get_playtime_seconds())
-
+	
 func _restaurar_partida_cargada() -> void:
 	#print("[%s] Restaurando datos cargados." % ES_NAME_CLASS)
 	var datos = SaveManager.loaded_game_data
