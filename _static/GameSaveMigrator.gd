@@ -58,21 +58,36 @@ func _migrate_v2_to_v3(_game_data: Dictionary, _meta_data: Dictionary) -> void:
 	# Future migration rules go here
 	pass
 	
-## Step 3 -> 4: Fixes missing playtime by setting a default fallback (e.g., 3 minutes = 180.0 seconds).
+## Step 3 -> 4: Establishes baseline Schema v4, backfilling legacy version fields and playtime.
 func _migrate_v3_to_v4(game_data: Dictionary, meta_data: Dictionary) -> void:
-	EssenceLogger.system_info("[%s] Executing migration step: v3 -> v4" % GAME_NAME_CLASS)
+	EssenceLogger.system_info("[%s] Executing migration step: v3 -> v4 (Legacy Sanitization)" % GAME_NAME_CLASS)
 	
-	# 1. Recover current playtime or set 3 minutes fallback (180.0 seconds) for legacy testing
+	# --------------------------------------------------------------------------
+	# 1. BACKFILL LEGACY GAME VERSION
+	# Pre-v4 saves lacked explicit game version tags. Normalize them to "0.0.3".
+	# --------------------------------------------------------------------------
+	# 1. Normalize game version if absent in legacy payload
+	if not game_data.has("game_version") or str(game_data["game_version"]).is_empty():
+		game_data["game_version"] = "0.0.3"
+	
+	# --------------------------------------------------------------------------
+	# 2. REPAIR PLAYTIME SECONDS
+	# Apply 3-minute test fallback (180.0 seconds) if no clock data was recorded.
+	# --------------------------------------------------------------------------
 	var raw_playtime: float = float(game_data.get(GameSaveKeys.PLAYTIME_SECONDS, 0.0))
 	if raw_playtime <= 0.0:
-		raw_playtime = 180.0 # 3 minutes test fallback
+		raw_playtime = 180.0
 		game_data[GameSaveKeys.PLAYTIME_SECONDS] = raw_playtime
-		
-	# 2. Update display metadata string to reflect the repaired playtime
-	meta_data[GameSaveKeys.META_PLAYTIME] = EssenceTimeUtils.format_seconds(raw_playtime)
 	
-	EssenceLogger.system_info("[%s/v3_to_v4] Repaired playtime data: %f seconds (%s)" % [
-		GAME_NAME_CLASS, 
-		raw_playtime, 
+	# --------------------------------------------------------------------------
+	# 3. SYNCHRONIZE DISPLAY METADATA FOR UI CARDS
+	# Update metadata so card labels (lbl_save_version / lbl_game_version) reflect state.
+	# --------------------------------------------------------------------------
+	meta_data[GameSaveKeys.META_PLAYTIME] = EssenceTimeUtils.format_seconds(raw_playtime)
+	meta_data["save_version"] = 4
+	meta_data["game_version"] = game_data["game_version"]
+	
+	EssenceLogger.system_info("[%s/v3_to_v4] Repaired legacy save (Origin: %s) | Schema: v4" % [
+		GAME_NAME_CLASS,
 		meta_data[GameSaveKeys.META_PLAYTIME]
 	])

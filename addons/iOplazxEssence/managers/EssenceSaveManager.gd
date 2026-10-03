@@ -382,63 +382,78 @@ func take_temp_screenshot() -> void:
 		img.resize(320, 180, Image.INTERPOLATE_BILINEAR)
 		img.save_webp(_save_dir + "temp_snap" + GameConstants.EXTENSION_IMAGE)
 
-# The UI calls this when the player selects a slot.
+## Commits temporary cache data to physical encrypted disk storage.
+## Automatically injects core framework version stamps before writing.
 func commit_save(slot_id: String, is_temp: bool = false) -> bool:
-	# === INTEGRATION HOOK ===
-	# We give the dev one last chance to modify or inject data 
-	# right before it is frozen to disk (e.g., exact playtime).
+	# 1. INTEGRATION HOOK (USER SPACE)
 	_on_before_save_hook(_temp_game_data, _temp_meta_data)
 	
-	if _temp_game_data.is_empty() and _temp_meta_data.is_empty(): return false
+	# 2. DEFENSIVE CONFIGURATION GUARD
+	# Verify that essential system constants are properly defined in GameConstants
+	if GameConstants.CURRENT_SAVE_VERSION <= 0:
+		_safe_error(
+			"Save System Error", 
+			"Invalid CURRENT_SAVE_VERSION in GameConstants (%d). Save aborted." % GameConstants.CURRENT_SAVE_VERSION, 
+			"ERROR"
+		)
+		return false
 		
-	var path = get_file_path(slot_id)
-	var save_obj = EssenceSaveFactory.create_save_instance(_config)
+	if GameConstants.GAME_VERSION.is_empty():
+		_safe_error(
+			"Save System Warning", 
+			"GAME_VERSION in GameConstants is empty. Fallback default will be applied.", 
+			"WARNING"
+		)
 	
-	# We verify the INTENT (Create vs. Overwrite)
+	# 3. MANDATORY FRAMEWORK STAMPING (CORE SHIELD)
+	_temp_meta_data["save_version"] = GameConstants.CURRENT_SAVE_VERSION
+	_temp_meta_data["game_version"] = GameConstants.GAME_VERSION
+	_temp_meta_data["build_number"] = GameConstants.GAME_BUILD_NUMBER
+	_temp_meta_data["min_supported_version"] = GameConstants.MIN_SUPPORTED_SAVE_VERSION
+	
+	_temp_game_data["save_version"] = GameConstants.CURRENT_SAVE_VERSION
+	_temp_game_data["game_version"] = GameConstants.GAME_VERSION
+	_temp_game_data["build_number"] = GameConstants.GAME_BUILD_NUMBER
+	
+	if _temp_game_data.is_empty() and _temp_meta_data.is_empty(): 
+		_safe_error(
+			"Save System Warning", 
+			"Attempted to commit an empty save payload for slot '%s'." % slot_id, 
+			"WARNING"
+		)
+		return false
+		
+	var path: String = get_file_path(slot_id)
+	var save_obj: EssenceSaveData = EssenceSaveFactory.create_save_instance(_config)
+	
+	# 4. SAVE INTENT RESOLUTION (CREATE VS OVERWRITE)
 	if FileAccess.file_exists(path):
-		var old_data = load_game(slot_id)
-		# We tell the object to merge with the old one.
+		var old_data: Dictionary = load_game(slot_id)
 		save_obj.prepare_as_overwrite(old_data, _temp_meta_data, _temp_game_data)
 	else:
-		# We tell the object to be created from scratch
 		save_obj.prepare_as_new(_temp_meta_data, _temp_game_data)
-		
-		# If it is new, we extract the page and slot from the ID.
-		var parts = slot_id.split("_")
+		var parts: PackedStringArray = slot_id.split("_")
 		if parts.size() >= 3:
 			save_obj.page = int(parts[1])
 			save_obj.slot_number = int(parts[2])
 	
-	# The Manager is only responsible for saving to disk.
-	var success = save_game(slot_id, save_obj, is_temp)
+	# 5. DISK SERIALIZATION
+	var success: bool = save_game(slot_id, save_obj, is_temp)
 	
+	# 6. SNAPSHOT FILE HANDLING
 	if success:
-		# 1. We define the full paths to avoid any ambiguity.
-		var source_path = _save_dir.path_join("temp_snap" + GameConstants.EXTENSION_IMAGE)
-		var target_folder = "user://saves/temp/" if is_temp else _save_dir
-		var target_path = target_folder.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
+		var source_path: String = _save_dir.path_join("temp_snap" + GameConstants.EXTENSION_IMAGE)
+		var target_folder: String = "user://saves/temp/" if is_temp else _save_dir
+		var target_path: String = target_folder.path_join(slot_id + GameConstants.EXTENSION_IMAGE)
 
-		# 2. We verify whether the temporary photo actually exists before copying.
 		if FileAccess.file_exists(source_path):
-			# We use copy_absolute to avoid Error 7
-			var err = DirAccess.copy_absolute(source_path, target_path)
-				
+			var err: Error = DirAccess.copy_absolute(source_path, target_path)
 			if err == OK:
-				var log_msg = "[%s/commit_save] Photo successfully copied to: %s" % [ES_NAME_CLASS, target_path]
-				_safe_log(log_msg)
+				_safe_log("[%s/commit_save] Photo successfully copied to: %s" % [ES_NAME_CLASS, target_path])
 			else:
-				_safe_error(
-					"Screenshot Failed",
-					"Error copying the photo to slot. Code: %s" % err, 
-					1
-				)
+				_safe_error("Screenshot Failed", "Error copying photo. Code: %s" % err, "WARNING")
 		else:
-			# If we reach this point, it means take_temp_screenshot() hasn't finished or wasn't called.
-			_safe_error(
-				"Missing Snapshot",
-				"Could not copy the photo because %s does not exist yet." % source_path, 
-				1
-			)
+			_safe_error("Missing Snapshot", "Could not copy photo: %s does not exist." % source_path, "WARNING")
 			
 	return success
 

@@ -16,6 +16,9 @@ var slot_number: int = 1
 var page: int = 1
 var is_auto: bool = false
 
+## Dynamic dictionary to hold developer custom metadata without modifying core addon code
+var custom_meta: Dictionary = {}
+
 
 # ==============================================================================
 # IN-MEMORY STATE MANAGEMENT (PREPARATION HOOKS)
@@ -26,6 +29,9 @@ func prepare_as_new(temp_meta: Dictionary, temp_game: Dictionary) -> void:
 	title = temp_meta.get("title", "Auto-Save")
 	description = temp_meta.get("description", "")
 	play_time = temp_meta.get("play_time", "00:00:00")
+	
+	# Preserve custom developer metadata dynamically (e.g., game_version, save_version)
+	custom_meta = temp_meta.duplicate()
 	_load_child_data(temp_game)
 
 
@@ -48,6 +54,9 @@ func prepare_as_overwrite(old_data: Dictionary, temp_meta: Dictionary, temp_game
 	page = old_meta.get("page", 1)
 	slot_number = old_meta.get("slot_number", 1)
 	
+	# Preserve custom developer metadata
+	custom_meta = temp_meta.duplicate()
+	
 	# 2. Delegate game state merging hook to child class
 	_handle_overwrite_game_data(old_data.get("game_data", {}), temp_game)
 
@@ -64,18 +73,23 @@ func to_dict() -> Dictionary:
 	if date_string.is_empty():
 		date_string = Time.get_datetime_string_from_system(false, true).replace("T", " ")
 	
+	var base_meta: Dictionary = {
+		"version": version,
+		"timestamp": timestamp,
+		"date_string": date_string,
+		"title": title,
+		"description": description,
+		"play_time": play_time,
+		"slot_number": slot_number,
+		"page": page,
+		"is_auto": is_auto
+	}
+	
+	# Dynamically merge extra metadata keys into the serialized output
+	base_meta.merge(custom_meta, true)
+	
 	return {
-		"essence_meta": {
-			"version": version,
-			"timestamp": timestamp,
-			"date_string": date_string,
-			"title": title,
-			"description": description,
-			"play_time": play_time,
-			"slot_number": slot_number,
-			"page": page,
-			"is_auto": is_auto
-		},
+		"essence_meta": base_meta,
 		"game_data": _get_child_data() 
 	}
 
@@ -98,6 +112,9 @@ func from_dict(data: Dictionary) -> void:
 	slot_number = meta.get("slot_number", 1)
 	page        = meta.get("page", 1)
 	is_auto     = meta.get("is_auto", false)
+
+	# Keep dynamic custom metadata in memory
+	custom_meta = meta.duplicate()
 
 	# 2. Unpack game-specific child data
 	_load_child_data(data.get("game_data", {}))
