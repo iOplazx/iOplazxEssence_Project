@@ -176,21 +176,44 @@ func patch_cache_and_prepare_load(overrides: Dictionary) -> void:
 	
 
 # ==========================================
-# UI UTILITIES
+# UI UTILITIES (LIGHTWEIGHT SCANNING)
 # ==========================================
+
+## Reads ONLY display metadata from a save file without loading game_data or running migrations.
+func get_slot_metadata(slot_id: String) -> Dictionary:
+	var path: String = get_file_path(slot_id)
+	if not FileAccess.file_exists(path):
+		return {}
+		
+	var file = FileAccess.open_encrypted_with_pass(path, FileAccess.READ, _encryption_key)
+	if file == null:
+		return {}
+		
+	var json_string: String = file.get_as_text()
+	file.close()
+	
+	var parsed_data = JSON.parse_string(json_string)
+	if typeof(parsed_data) != TYPE_DICTIONARY:
+		return {}
+		
+	return parsed_data.get(KEY_META, {})
+
+
+## Scans all existing save files on disk and returns their UI display metadata lightweight.
 func get_all_metadata() -> Dictionary:
-	var all_saves = {}
+	var all_saves: Dictionary = {}
 	var dir = DirAccess.open(_save_dir)
 	
 	if dir:
 		dir.list_dir_begin()
-		var file_name = dir.get_next()
+		var file_name: String = dir.get_next()
 		while file_name != "":
 			if not dir.current_is_dir() and file_name.ends_with(GameConstants.EXTENSION_SAVE_FILE):
-				var slot_id = file_name.replace(GameConstants.EXTENSION_SAVE_FILE, "")
-				var data = load_game(slot_id)
-				if not data.is_empty():
-					all_saves[slot_id] = data.get("essence_meta", {})
+				var slot_id: String = file_name.replace(GameConstants.EXTENSION_SAVE_FILE, "")
+				# FIXED: Reads metadata lightweight without triggering load_game() or _run_migrations()
+				var meta: Dictionary = get_slot_metadata(slot_id)
+				if not meta.is_empty():
+					all_saves[slot_id] = meta
 			file_name = dir.get_next()
 			
 	return all_saves
