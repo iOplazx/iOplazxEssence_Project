@@ -102,11 +102,15 @@ func _ready() -> void:
 		# We go straight into the restore system.
 		_restaurar_partida_cargada()
 	else:
-		# If it is a 100% new game
-		#_setup_initial_room_layout()
+		# If it is a 100% new game: start the clock from 0.0.
+		var main_loop: SceneTree = Engine.get_main_loop() as SceneTree
+		if is_instance_valid(main_loop) and main_loop.root.has_node("TimeManager"):
+			var tm = main_loop.root.get_node("TimeManager")
+			tm.stop_clock()   # Resets to 0.0
+			tm.start_clock()  # Start accumulating delta
+		
 		director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 		
-		# If it is a new game, we gently open the curtain.
 		var fade = director.open_curtain(0.4)
 		if fade: await fade.finished
 		
@@ -214,45 +218,50 @@ func _play_sfx() -> void:
 # SAVE/LOAD LOGIC
 # ==========================================
 func _preparar_datos_para_menu() -> void:
-	print("[%s] Capturing screen and preparing data..." % ES_NAME_CLASS)
+	EssenceLogger.system_info("[%s] Capturing screenshot and preparing menu state..." % ES_NAME_CLASS)
 	
 	await get_tree().process_frame
 	await SaveManager.take_temp_screenshot()
 	await get_tree().create_timer(0.1).timeout
 	
+	var current_playtime: float = EssenceTimeUtils.get_playtime_seconds()
+	
 	# ==========================================
-	# INTERFACE / CACHE DICTIONARY
+	# INTERFACE / CACHE DICTIONARY (STANDARDIZED)
 	# ==========================================
-	var current_game_data = {
-		"escena_actual": "MainRoom",
-		"fase_actual": current_phase, 
-		"habitacion_actual": current_room_id,
-		"story_flags": story_flags, 
-		"ropa_estado_personaje": active_character.get_clothing_state() if is_instance_valid(active_character) else {}
+	var current_game_data: Dictionary = {
+		GameSaveKeys.CURRENT_SCENE: "MainRoom",
+		GameSaveKeys.CURRENT_PHASE: current_phase,
+		GameSaveKeys.CURRENT_ROOM: current_room_id,
+		GameSaveKeys.STORY_FLAGS: story_flags,
+		GameSaveKeys.CHARACTER_CLOTHING_STATE: active_character.get_clothing_state() if is_instance_valid(active_character) else {},
+		GameSaveKeys.PLAYTIME_SECONDS: current_playtime
 	}
 	
-	var room_key = GameIDs.RoomID.find_key(current_room_id)
-	var room_name = room_key.capitalize().replace("_", " ") if room_key else "Unknown Room"
+	var room_key: String = GameIDs.RoomID.find_key(current_room_id)
+	var room_name: String = room_key.capitalize().replace("_", " ") if not room_key.is_empty() else "Unknown Room"
 	
-	var current_meta_data = {
+	var current_meta_data: Dictionary = {
 		"title": "Framework Test",
 		"description": "Place: %s | Phase: %s" % [room_name, ("Intro" if current_phase == TestPhase.INTRO else "Gameplay")],
-		"play_time": "00:01:00"
+		GameSaveKeys.META_PLAYTIME: EssenceTimeUtils.format_seconds(current_playtime)
 	}
 	
 	SaveManager.cache_current_state(current_game_data, current_meta_data)
-
+	
 func _restaurar_partida_cargada() -> void:
 	#print("[%s] Restaurando datos cargados." % ES_NAME_CLASS)
 	var datos = SaveManager.loaded_game_data
 	
-	current_phase = int(datos.get("fase_actual", 0)) as TestPhase
-	var room_saved_id = int(datos.get("habitacion_actual", GameIDs.RoomID.INITIAL_ROOM))
+	# 1. Recover standardized state keys
+	current_phase = int(datos.get(GameSaveKeys.CURRENT_PHASE, 0)) as TestPhase
+	var room_saved_id: int = int(datos.get(GameSaveKeys.CURRENT_ROOM, GameIDs.RoomID.INITIAL_ROOM))
 	
-	if datos.has("story_flags"):
-		story_flags = datos.get("story_flags").duplicate()
+	if datos.has(GameSaveKeys.STORY_FLAGS):
+		story_flags = datos.get(GameSaveKeys.STORY_FLAGS).duplicate()
 	
 	# The engine stabilizes. The player sees only black because we force Color.BLACK in `_ready` or in the Director.
+	# Engine frame stabilization
 	await get_tree().process_frame 
 	
 	if current_phase == TestPhase.GAMEPLAY:
@@ -267,33 +276,62 @@ func _restaurar_partida_cargada() -> void:
 			await _route_room_initialization(room_saved_id, room_data, true)
 		
 		if is_instance_valid(active_character):
-			var ropa_guardada = datos.get("ropa_estado_personaje", {})
+			var ropa_guardada = datos.get(GameSaveKeys.CHARACTER_CLOTHING_STATE, {})
 			active_character.apply_clothing_state(ropa_guardada)
 			
 	else:
 		_setup_initial_room_layout() #val TODO
 		_iniciar_secuencia_intro()
+	
+	# 2. RESTORE AND RESUME PLAYTIME CLOCK
+	var restored_seconds: float = float(datos.get(GameSaveKeys.PLAYTIME_SECONDS, 0.0))
+	var main_loop: SceneTree = Engine.get_main_loop() as SceneTree
+	if is_instance_valid(main_loop) and main_loop.root.has_node("TimeManager"):
+		var tm: Node = main_loop.root.get_node("TimeManager")
+		if tm.has_method("set_playtime"):
+			tm.set_playtime(restored_seconds)
+		if tm.has_method("start_clock"):
+			tm.start_clock()
 		
 	# We clear the cache immediately to leave the loader ready for the next time.
+	# 3. Clear temporary cache for the next cycle
 	SaveManager.loaded_game_data.clear()
 	
 	# We open the curtain automatically and flawlessly.
+	# 4. Open visual curtain
 	var fade_in = director.open_curtain(0.5)
 	if fade_in: 
 		await fade_in.finished
 		
-	print("[%s] Charging complete and screen filter illuminated!" % ES_NAME_CLASS)
-	
+	EssenceLogger.system_info("[%s] Restoration complete. Playtime set to: %s" % [
+		ES_NAME_CLASS, 
+		EssenceTimeUtils.format_seconds(restored_seconds)
+	])
+
+## Helper interno para congelar el reloj de forma segura
+func _pause_gameplay_clock() -> void:
+	var main_loop: SceneTree = Engine.get_main_loop() as SceneTree
+	if is_instance_valid(main_loop) and main_loop.root.has_node("TimeManager"):
+		var tm = main_loop.root.get_node("TimeManager")
+		if tm.has_method("pause_clock"):
+			tm.pause_clock()
+
 # ==========================================
 # EVENTOS DE BOTONES
 # ==========================================
 func _on_btn_save_pressed() -> void:
+	# Freeze the clock before capturing the state and switching screens.
+	_pause_gameplay_clock()
+	
 	if ui_principal: ui_principal.visible = false
 	await _preparar_datos_para_menu()
 	if is_instance_valid(SceneManager):
 		SceneManager.goto_save_game(SceneManager.TransitionType.INSTANT)
 
 func _on_btn_load_pressed() -> void:
+	# Freeze the clock
+	_pause_gameplay_clock()
+	
 	await _preparar_datos_para_menu()
 	if is_instance_valid(SceneManager):
 		SceneManager.goto_load_game(SceneManager.TransitionType.INSTANT)

@@ -1,5 +1,7 @@
 # iOplazx Essence Framework - Alpha 
 
+Current version: 0.1.4.1   
+
 A high-performance, modular framework for **Godot Engine 4.x**, designed to streamline the development of narrative-driven games, visual novels, and complex UI systems.
 
 ## 🚀 Overview

@@ -23,6 +23,7 @@ const AUTOLOADS = {
 	# LAYER 1: Core Systems (Depend on Layer 0)
 	"FileManager": PATH_MANAGERS + "EssenceFileManager.gd",
 	"Preferences": PATH_MANAGERS + "EssencePreferences.gd",
+	"TimeManager": PATH_MANAGERS + "EssenceTimeManager.gd",
 	
 	# LAYER 2: Complex Logic (Depend on Layer 1)
 	"LanguageManager": PATH_MANAGERS + "EssenceLanguageManager.gd",

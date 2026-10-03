@@ -151,8 +151,11 @@ func _set_mode(is_save: bool) -> void:
 # ==========================================
 # VISUAL MANAGEMENT (REFRESH)
 # ==========================================
+## Refreshes the active slot container using lightweight metadata (no heavy migrations triggered)
 func _refresh_slots() -> void:
 	var is_classic: bool = (_current_style == 0)
+	
+	# Fetch lightweight display metadata without deserializing full game_data payloads
 	_all_saves_meta = SaveManager.get_all_metadata()
 	
 	# 1. Visibility: Classic Mode
@@ -176,8 +179,10 @@ func _refresh_slots() -> void:
 			modern_scroll.mouse_filter = Control.MOUSE_FILTER_PASS if not is_classic else Control.MOUSE_FILTER_IGNORE
 	
 	# 3. Visibility of Exclusive Controls
-	if mode_toggle_container: mode_toggle_container.visible = is_classic
-	if pagination_container: pagination_container.visible = is_classic
+	if mode_toggle_container: 
+		mode_toggle_container.visible = is_classic
+	if pagination_container: 
+		pagination_container.visible = is_classic
 	
 	# 4. Content Generation
 	if is_classic:
@@ -351,18 +356,26 @@ func _execute_real_action(action: String, slot_id: String) -> void:
 			_refresh_slots() 
 			
 	elif action == "LOAD":
+		# LAZY MIGRATION POINT: Full load and GameSaveMigrator execute ONLY for this target slot
 		var data: Dictionary = SaveManager.load_game(slot_id)
-		if not data.is_empty() and data.has("game_data"):
-			SaveManager.loaded_game_data = data["game_data"]
-			
-			EssenceLogger.system_info("[%s] Data loaded to RAM. Navigating to gameplay scene..." % ES_NAME_CLASS)
-			
-			var target_scene: String = SceneManager._config.continue_game_scene 
-			if target_scene == "":
-				target_scene = SceneManager._config.main_menu_scene 
-			
-			SceneManager.goto_loaded_game(target_scene)
-			self.queue_free()
+		
+		# Validation guard: Ensure save was not rejected as INCOMPATIBLE by GameSaveMigrator
+		if data.is_empty() or not data.has("game_data"):
+			EssenceReportUtils.warning(
+				"Load Aborted", 
+				"Could not load save slot '%s'. File may be corrupt or incompatible." % slot_id
+			)
+			return
+
+		SaveManager.loaded_game_data = data["game_data"]
+		EssenceLogger.system_info("[%s] Target save slot '%s' loaded into RAM. Changing scene..." % [ES_NAME_CLASS, slot_id])
+		
+		var target_scene: String = SceneManager._config.continue_game_scene 
+		if target_scene.is_empty():
+			target_scene = SceneManager._config.main_menu_scene 
+		
+		SceneManager.goto_loaded_game(target_scene)
+		queue_free()
 			
 	elif action == "DELETE":
 		SaveManager.delete_save(slot_id)

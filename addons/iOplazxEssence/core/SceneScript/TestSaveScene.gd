@@ -81,26 +81,41 @@ func _prepare_menu_data() -> void:
 	# Extra delay for I/O file writing
 	await get_tree().create_timer(0.1).timeout
 	
-	var current_game_data = {
+	var current_playtime: float = EssenceTimeUtils.get_playtime_seconds()
+	
+	# Basic game data for sandbox testing
+	var current_game_data: Dictionary = {
 		"box_color": test_element.color.to_html(false) if test_element else "ffffff",
-		"player_hp": 100
+		"player_hp": 100,
+		GameSaveKeys.PLAYTIME_SECONDS: current_playtime
 	}
 	
-	var current_meta_data = {
+	# Metadata using framework standard keys
+	var current_meta_data: Dictionary = {
 		"title": "Save Test",
 		"description": "Sandbox Scene - Level 1",
-		"play_time": "99:15:20"
+		GameSaveKeys.META_PLAYTIME: EssenceTimeUtils.format_seconds(current_playtime)
 	}
 	
 	EssenceLogger.system_info("[%s/_prepare_menu_data] Caching state in SaveManager." % ES_NAME_CLASS)
 	if is_instance_valid(SaveManager) and SaveManager.has_method("cache_current_state"):
 		SaveManager.cache_current_state(current_game_data, current_meta_data)
 
+
 func _restore_loaded_game() -> void:
 	EssenceLogger.system_info("[%s/_restore_loaded_game] Restoring loaded data from SaveManager." % ES_NAME_CLASS)
 	
-	var saved_color_hex = SaveManager.loaded_game_data.get("box_color", "ffffff")
-	var saved_hp = SaveManager.loaded_game_data.get("player_hp", 0)
+	var saved_color_hex: String = SaveManager.loaded_game_data.get("box_color", "ffffff")
+	var saved_hp: int = int(SaveManager.loaded_game_data.get("player_hp", 0))
+	var restored_seconds: float = float(SaveManager.loaded_game_data.get(GameSaveKeys.PLAYTIME_SECONDS, 0.0))
+	
+	# Restore clock time if TimeManager is present
+	var main_loop: SceneTree = Engine.get_main_loop() as SceneTree
+	if is_instance_valid(main_loop) and main_loop.root.has_node("TimeManager"):
+		var tm: Node = main_loop.root.get_node("TimeManager")
+		if tm.has_method("set_playtime"):
+			tm.set_playtime(restored_seconds)
+			tm.start_clock()
 	
 	if not saved_color_hex.begins_with("#"):
 		saved_color_hex = "#" + saved_color_hex
@@ -109,9 +124,10 @@ func _restore_loaded_game() -> void:
 		test_element.color = Color(saved_color_hex)
 	
 	if lbl_output:
-		var info_text = "GAME LOADED!\n"
+		var info_text: String = "GAME LOADED!\n"
 		info_text += "Restored color: " + saved_color_hex + "\n"
-		info_text += "Player HP: " + str(saved_hp)
+		info_text += "Player HP: " + str(saved_hp) + "\n"
+		info_text += "Playtime: " + EssenceTimeUtils.format_seconds(restored_seconds)
 		lbl_output.text = info_text
 	
 	# Clear cache

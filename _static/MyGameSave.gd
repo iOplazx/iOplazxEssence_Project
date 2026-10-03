@@ -2,34 +2,36 @@ class_name MyGameSave extends EssenceSaveData
 
 
 # ==========================================
-# NUEVAS VARIABLES PARA TEST MAIN GAME
+# NEW VARIABLES FOR MAIN GAME TEST
 # ==========================================
-var escena_actual: String = "MainRoom"
-var fase_actual: int = 0 # Usamos int porque los enum (TestPhase.INTRO) se guardan como números
-var ropa_estado_personaje: Dictionary = {}
-var habitacion_actual: int = 0
+var current_scene: String = "MainRoom"
+var current_phase: int = 0 # We use int because enums (TestPhase.INTRO) are stored as numbers.
+var character_clothing_state: Dictionary = {}
+var current_room: int = 0
 var story_flags: Dictionary = {}
+var playtime_seconds: float = 0.0
 
-# 2. Empaquetado: El Manager llamará a esto para crear el JSON
+# 1. Packaging: The Manager will call this to create the save structure.
 func _get_child_data() -> Dictionary:
 	return {
-		"escena_actual": escena_actual,
-		"fase_actual": fase_actual,
-		"habitacion_actual": habitacion_actual,
-		"ropa_estado_personaje": ropa_estado_personaje,
-		"story_flags": story_flags
+		GameSaveKeys.CURRENT_SCENE: current_scene,
+		GameSaveKeys.CURRENT_PHASE: current_phase,
+		GameSaveKeys.CURRENT_ROOM: current_room,
+		GameSaveKeys.CHARACTER_CLOTHING_STATE: character_clothing_state,
+		GameSaveKeys.STORY_FLAGS: story_flags,
+		GameSaveKeys.PLAYTIME_SECONDS: playtime_seconds
 	}
 
-# 3. Desempaquetado: Se llama al cargar una partida existente
+# 2. Unpacking: Called when loading an existing game.
 func _load_child_data(data: Dictionary) -> void:
-	escena_actual = data.get("escena_actual", "MainRoom")
-	fase_actual = int(data.get("fase_actual", 0))
-	ropa_estado_personaje = data.get("ropa_estado_personaje", {})
+	current_scene = data.get(GameSaveKeys.CURRENT_SCENE, "MainRoom")
+	current_phase = int(data.get(GameSaveKeys.CURRENT_PHASE, 0))
+	character_clothing_state = data.get(GameSaveKeys.CHARACTER_CLOTHING_STATE, {})
+	current_room = int(data.get(GameSaveKeys.CURRENT_ROOM, 0))
+	story_flags = data.get(GameSaveKeys.STORY_FLAGS, {})
+	playtime_seconds = float(data.get(GameSaveKeys.PLAYTIME_SECONDS, 0.0))
 	
-	habitacion_actual = int(data.get("habitacion_actual", 0))
-	story_flags = data.get("story_flags", {})
-	
-	# Imprimimos un log completo para asegurarnos que la RAM tiene los datos reales
+	# We print a full log to ensure the RAM contains the actual data.
 	#print("[MyGameSave] ¡DATOS DE DISCO DESEMPAQUETADOS CON ÉXITO!")
 	#print(" -> Habitación Recuperada: ", habitacion_actual)
 	#print(" -> Fase: ", fase_actual)

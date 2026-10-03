@@ -17,7 +17,23 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.79607844, 0.73333335, 0.14901961, 0.81960785)
 
-[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_continue", "btn_load", "btn_settings", "btn_credits", "btn_exit", "first_focus_button", "buttons_panel", "title_container")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b2j7d"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.08235294, 0.08235294, 0.10196078, 0.8235294)
+border_width_left = 2
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.79607844, 0.73333335, 0.14901961, 0.7058824)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="MainMenu" type="Control" unique_id=1532018214 node_paths=PackedStringArray("btn_new_game", "btn_continue", "btn_load", "btn_settings", "btn_credits", "btn_exit", "lbl_version", "first_focus_button", "buttons_panel", "title_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,6 +47,7 @@ btn_load = NodePath("panelMenu/ButtonContainer/btnLoad")
 btn_settings = NodePath("panelMenu/ButtonContainer/btnSettings")
 btn_credits = NodePath("panelMenu/ButtonContainer/btnCredits")
 btn_exit = NodePath("panelMenu/ButtonContainer/btnExit")
+lbl_version = NodePath("VersionContainer/lblVersion")
 first_focus_button = NodePath("panelMenu/ButtonContainer/btnInit")
 buttons_panel = NodePath("panelMenu/ButtonContainer")
 title_container = NodePath("titleImage")
@@ -98,3 +115,24 @@ text = "MENU_CREDITS"
 [node name="btnExit" parent="panelMenu/ButtonContainer" unique_id=2026497379 instance=ExtResource("4_oaf5b")]
 layout_mode = 2
 text = "MENU_EXIT"
+
+[node name="VersionContainer" type="PanelContainer" parent="." unique_id=167426347]
+custom_minimum_size = Vector2(80, 20)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -110.0
+offset_top = -50.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_b2j7d")
+
+[node name="lblVersion" type="Label" parent="VersionContainer" unique_id=1575241403]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1

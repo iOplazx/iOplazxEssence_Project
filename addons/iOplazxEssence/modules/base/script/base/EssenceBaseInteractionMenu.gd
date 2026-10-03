@@ -50,6 +50,9 @@ const META_TARGET_POSITION: String = "target_position"
 ## Safety flag that blocks inputs and new interactions while visual transitions are active.
 var is_animating: bool = false
 
+# Internal flag to prevent accidental closure when pressing interaction buttons
+var _button_clicked_this_frame: bool = false
+
 ## Base initialization lifecycle for the interaction menu container.
 func _ready() -> void:
 	# 1. VERIFIED RADIAL BLUEPRINT FIXED LAYER: 
@@ -93,16 +96,16 @@ func configure_menu(data_by_pages: Array) -> void:
 
 ## Processes the visibility and icons of the buttons based on the currently active page.
 func _update_page_view() -> void:
-	var datos_pagina = paginas_acciones[pagina_actual] if not paginas_acciones.is_empty() else []
+	var datos_pagina: Array = paginas_acciones[pagina_actual] if not paginas_acciones.is_empty() else []
 	
 	# 1. Update standard action buttons
 	for i in range(botones_accion.size()):
-		var btn = botones_accion[i]
+		var btn: EssenceBaseInteractionButton = botones_accion[i]
 		if not is_instance_valid(btn): 
 			continue
 		
 		if i < datos_pagina.size() and datos_pagina[i].get("id", "") != "":
-			var action_data = datos_pagina[i]
+			var action_data: Dictionary = datos_pagina[i]
 			btn.action_name = action_data.get("id", "")
 			
 			# ===================================================================
@@ -242,6 +245,9 @@ func close_menu() -> void:
 func _on_action_button(action: String) -> void:
 	if action == "": return
 	
+	# Flag indicating this click originated from an internal button, not empty background
+	_button_clicked_this_frame = true
+
 	if action == ACTION_PREV_PAGE:
 		pagina_actual = max(0, pagina_actual - 1)
 		_update_page_view()
@@ -256,6 +262,12 @@ func _on_action_button(action: String) -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		# If the click was processed by a menu button, consume the event to prevent closing the overlay
+		if _button_clicked_this_frame:
+			_button_clicked_this_frame = false
+			accept_event()
+			return
+
 		if not is_animating:
 			close_menu()
 
