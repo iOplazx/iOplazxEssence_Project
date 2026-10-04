@@ -5,7 +5,7 @@ extends EssenceInteractiveLocation
 signal navigation_requested(next_place: int, mode: int, is_only_mode: bool)
 
 func _ready() -> void:
-	super._ready() # Ejecuta los clics automáticos del framework Essence
+	super._ready() # Executes framework automatic click hook
 	_setup_hover_effects()
 
 ## Scans hotspots and hooks mouse hover behavior automatically.

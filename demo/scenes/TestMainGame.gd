@@ -5,19 +5,17 @@ extends Control
 # TestMainGame.tscn
 # ==
 # TestMainGame (TestMainGame) [Script: TestMainGame]
+# ├── ColorRect (ColorRect)      
 # ├── BackgroundLayer (TextureRect)                     
 # ├── GameplayDirector (EssenceGameplayDirector)   
 # │   ├── EnviromentFilter (CanvasModulate)           
 # │   ├── ActiveLocation (Node2D)    
 # │   ├── CharacterStage (Node2D) 
 # │   ├── ItemStage (Node2D)      
-# │   └── HUD_Layer (CanvasLayer) (no visible)
-# │       ├── TranslationManager (Node)           
-# │       └── DialogBoxUI (Node)           
-# ├── Area2D_door (Area2D)     
-# │       ├── imgPuerta (Sprite2D)           
-# │       └── CollisionShape2D (CollisionShape2D)  
-# ├── CharacterRoot (GenericInteractiveCharacter)                    
+# │   └── HUD_Layer (CanvasLayer) 
+# │       ├── TranslationManager (Node)   
+# │       ├── EssenceDialogBox (EssenceDialogBox)              
+# │       └── FadeOverlay (ColorRect)                           
 # ├── TutorialPanelUI (EssenceTutorialPanel)    
 # └── PanelControles (Panel)   
 #     └── ...   
