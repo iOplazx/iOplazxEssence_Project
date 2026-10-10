@@ -32,6 +32,7 @@ mouse_filter = 2
 color = Color(0.7665823, 0.7202664, 0, 1)
 
 [node name="BackgroundLayer" type="TextureRect" parent="." unique_id=1243969001]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -45,9 +46,6 @@ stretch_mode = 6
 
 [node name="GameplayDirector" parent="." unique_id=1915930015 instance=ExtResource("3_aw23q")]
 unique_name_in_owner = true
-
-[node name="ActiveLocation" parent="GameplayDirector" index="1" unique_id=115441188]
-position = Vector2(640, 360)
 
 [node name="FadeOverlay" parent="GameplayDirector/HUD_Layer" parent_id_path=PackedInt32Array(1915930015, 1557427055) index="2" unique_id=1909526941]
 visible = false

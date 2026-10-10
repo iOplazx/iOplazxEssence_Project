@@ -16,6 +16,7 @@ const DEMO_ITEMS_INDIVIDUAL_ROUTE = DEMO_ITEMS_ROUTE + "individual/"
 const DEMO_ITEMS_ACTOR_ROUTE = DEMO_ITEMS_ROUTE + "actors/"
 const OVERLOAD_ADDON_ROUTE = BASE_ROUTE + "overloadAddon/"
 const DEMO_NON_OWN_ROUTE = DEMO_ROUTE + "non_own_resources/"
+const DEMO_SCENERY_ROUTE = DEMO_ROUTE + "scenaries/"
 
 # ==========================================
 # SCENE PATHS
@@ -35,6 +36,11 @@ const ACTOR_PARK_PERSON_SIT_2_SCENE = DEMO_ITEMS_ACTOR_ROUTE + "ActorParkPersonS
 const ACTOR_PARK_PERSON_SIT_3_SCENE = DEMO_ITEMS_ACTOR_ROUTE + "ActorParkPersonSit3.tscn"
 
 const TEST_SHIRT_MINIGAME_SCENE = DEMO_ROUTE + "TestShirtMinigame" + EXTENSION_TSCN
+
+const SCENERY_MAIN_ROOM_SCENE = DEMO_SCENERY_ROUTE + "MainRoomScenary" + EXTENSION_TSCN
+const SCENERY_THREE_DOORS_ROOM_SCENE = DEMO_SCENERY_ROUTE + "ThreeDoorsRoomScenary" + EXTENSION_TSCN
+const SCENERY_ONE_DOOR_ROOM_SCENE = DEMO_SCENERY_ROUTE + "OneDoorRoomScenary" + EXTENSION_TSCN
+const SCENERY_THE_PARK_SCENE = DEMO_SCENERY_ROUTE + "TheParkScenary" + EXTENSION_TSCN
 
 # ==========================================
 # RESOURCE Non Own

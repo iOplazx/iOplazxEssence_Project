@@ -3,34 +3,46 @@ extends Node2D
 
 const ES_NAME_CLASS = "EssenceSceneryManager"
 
+# [TemplateSceneryManager.tscn]
+# SceneryManager (Node2D) [Script: EssenceSceneryManager.gd] 
+# ├── EnvironmentFilter (CanvasModulate)  <-- Light/color filter (Day/Night)
+# ├── StageContainer (Node2D)             <-- Anchor point for visual scenery .tscn files
+# └── InteractiveContainer (Node2D)       <-- Anchor point for hotspots/doors .tscn files
+
 signal stage_loaded(stage_node: EssenceLocation)
+signal interactive_loaded(interactive_node: EssenceInteractiveLocation)
 signal stage_cleared()
 
-@export_group("Stage Container References")
-## Container node (Node2D) where room prefabs (.tscn) will be instantiated dynamically
+@export_group("Container References")
+## Container node where visual room prefabs (.tscn) will be instantiated
 @export var stage_container: Node2D
+## Container node where interactive hotspots prefabs (.tscn) will be instantiated
+@export var interactive_container: Node2D
 
-## Optional global environment filter (CanvasModulate) for time-of-day tints
-@export var environment_filter: CanvasModulate
-
-## Active stage instance in memory
+## Active visual room/stage instance currently loaded in memory
 var current_stage_node: EssenceLocation = null
+## Active interactive hotspots instance currently loaded in memory
+var current_interactive_node: EssenceInteractiveLocation = null
+
 var current_stage_id: int = -1
 var current_stage_mode: int = 1
 
 
 func _ready() -> void:
 	if not stage_container:
-		# Default fallback to self if no specific container node is assigned
 		stage_container = self
 
 
-## Instantiates a stage prefab dynamically into the scene tree.
+# ==============================================================================
+# VISUAL SCENERY LOADING
+# ==============================================================================
+
+## Dynamically instantiates a visual room prefab scene into the stage container.
 func load_stage_prefab(packed_stage: PackedScene, stage_id: int = -1, mode: int = 1) -> EssenceLocation:
-	clear_current_stage()
+	clear_visual_stage()
 
 	if not packed_stage:
-		EssenceReportUtils.critical("Scenery Load Error","Attempted to load a null PackedScene.")
+		EssenceReportUtils.critical("Scenery Load Error", "Attempted to load a null PackedScene.")
 		return null
 
 	var instance: Node = packed_stage.instantiate()
@@ -48,12 +60,11 @@ func load_stage_prefab(packed_stage: PackedScene, stage_id: int = -1, mode: int 
 
 	stage_container.add_child(current_stage_node)
 
-	# Apply room mode variant if the location supports environmental modes
 	if current_stage_node.has_method("set_environment_mode"):
 		current_stage_node.call("set_environment_mode", mode)
 
 	stage_loaded.emit(current_stage_node)
-	EssenceLogger.system_info("[%s] Stage loaded successfully: %s (ID: %d, Mode: %d)" % [
+	EssenceLogger.system_info("[%s] Visual stage loaded: %s (ID: %d, Mode: %d)" % [
 		ES_NAME_CLASS,
 		current_stage_node.name,
 		stage_id,
@@ -63,16 +74,60 @@ func load_stage_prefab(packed_stage: PackedScene, stage_id: int = -1, mode: int 
 	return current_stage_node
 
 
-## Safely clears the active stage instance from memory.
-func clear_current_stage() -> void:
+# ==============================================================================
+# INTERACTIVE HOTSPOTS LOADING
+# ==============================================================================
+
+## Dynamically instantiates an interactive hotspots prefab scene into the interactive container.
+func load_interactive_prefab(packed_interactive: PackedScene) -> EssenceInteractiveLocation:
+	clear_interactive_stage()
+
+	if not packed_interactive:
+		return null
+
+	var instance: Node = packed_interactive.instantiate()
+	if not (instance is EssenceInteractiveLocation or instance is EssenceLocation):
+		EssenceReportUtils.critical(
+			"Interactive Setup Error",
+			"Instantiated scene '%s' does not inherit from EssenceLocation/EssenceInteractiveLocation." % instance.name
+		)
+		instance.queue_free()
+		return null
+
+	current_interactive_node = instance as EssenceInteractiveLocation
+	
+	if is_instance_valid(interactive_container):
+		interactive_container.add_child(instance)
+	else:
+		add_child(instance)
+
+	interactive_loaded.emit(current_interactive_node)
+	EssenceLogger.system_info("[%s] Interactive layer loaded: %s" % [ES_NAME_CLASS, instance.name])
+
+	return current_interactive_node
+
+
+# ==============================================================================
+# CLEANUP METHODS
+# ==============================================================================
+
+## Clears only the active visual stage instance.
+func clear_visual_stage() -> void:
 	if is_instance_valid(current_stage_node):
 		current_stage_node.queue_free()
 		current_stage_node = null
-		current_stage_id = -1
-		stage_cleared.emit()
 
 
-## Applies global environmental color tint via CanvasModulate (e.g. Day/Night/Sunset).
-func set_global_atmosphere(color_tint: Color) -> void:
-	if environment_filter:
-		environment_filter.color = color_tint
+## Clears only the active interactive hotspots instance.
+func clear_interactive_stage() -> void:
+	if is_instance_valid(current_interactive_node):
+		current_interactive_node.queue_free()
+		current_interactive_node = null
+
+
+## Safely clears both visual and interactive stages from memory.
+func clear_current_stage() -> void:
+	clear_visual_stage()
+	clear_interactive_stage()
+	current_stage_id = -1
+	stage_cleared.emit()

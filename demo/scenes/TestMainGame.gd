@@ -42,7 +42,6 @@ var current_phase: TestPhase = TestPhase.INTRO
 
 # We use % instead of $ for instant access, regardless of hierarchy.
 @onready var director: EssenceGameplayDirector = %GameplayDirector
-@onready var active_location_container: Node2D = %GameplayDirector/ActiveLocation
 @onready var item_stage_container: Node2D = %GameplayDirector/ItemStage
 
 const ROUTES_PATH = "res://_static/RouteConfig.tres"
@@ -107,7 +106,9 @@ func _ready() -> void:
 			tm.stop_clock()   # Resets to 0.0
 			tm.start_clock()  # Start accumulating delta
 		
-		director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
+		# Get real data from the initial room and build the scene
+		var initial_data = LevelManager.get_scenery_config(GameIDs.RoomID.INITIAL_ROOM, GameIDs.RoomID.INITIAL_ROOM, 0, true)
+		_route_room_initialization(GameIDs.RoomID.INITIAL_ROOM, initial_data, true)
 		
 		var fade = director.open_curtain(0.4)
 		if fade: await fade.finished
@@ -271,14 +272,16 @@ func _restaurar_partida_cargada() -> void:
 		
 		if not room_data["flag_error"]:
 			# FIXED: Delegating routing and dynamically supporting the PARK scene lifecycle
-			await _route_room_initialization(room_saved_id, room_data, true)
+			_route_room_initialization(room_saved_id, room_data, true)
 		
 		if is_instance_valid(active_character):
 			var ropa_guardada = datos.get(GameSaveKeys.CHARACTER_CLOTHING_STATE, {})
 			active_character.apply_clothing_state(ropa_guardada)
 			
 	else:
-		_setup_initial_room_layout() #val TODO
+		# INTRO PHASE: Load clean initial scenario
+		var initial_data = LevelManager.get_scenery_config(GameIDs.RoomID.INITIAL_ROOM, GameIDs.RoomID.INITIAL_ROOM, 1, true)
+		_route_room_initialization(GameIDs.RoomID.INITIAL_ROOM, initial_data, true)
 		_iniciar_secuencia_intro()
 	
 	# 2. RESTORE AND RESUME PLAYTIME CLOCK
@@ -542,13 +545,13 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 	if data["id_room"] == GameIDs.RoomID.SAVE_SCENE:
 		spawned_items_in_room.clear()
 		if director: 
-			director.unload_location()
+			director.unload_scenery() # <-- Updated: unload_scenery()
 		await get_tree().process_frame
 		get_tree().change_scene_to_file(DemoItemsRoute.TESTSAVESCENE_SCENE)
 		return
 
-	# STANDARD ROOM FLOW: Safely initialize standard game rooms through our router
-	await _route_room_initialization(data["id_room"], data, true)
+	# STANDARD ROOM FLOW
+	_route_room_initialization(data["id_room"], data, true)
 	
 	if director:
 		# We wait for a stabilization frame so the engine finishes rendering the map.
@@ -558,6 +561,8 @@ func _on_room_navigation_requested(next_place: int, mode: int, is_only_mode: boo
 		var open_tween = director.open_curtain(0.4)
 		if open_tween:
 			await open_tween.finished
+			
+		director.change_game_state(EssenceGameplayDirector.GameState.EXPLORATION)
 
 ## Evaluates story conditions before enabling player control inside a room.
 ## [param room_id]: The active Room ID from GameIDs.RoomID.
@@ -629,20 +634,8 @@ func _build_stage_actors(room_id: int, current_layout_mode: int, is_instant: boo
 			continue
 			
 		# 4. IDENTIFICATION OF ASSET PATH (.TSCN)
-		var scene_path: String = ""
-		match actor_id:
-			GameIDs.ActorID.PROTAGONIST:
-				scene_path = EssencePaths.ITEM_GENERIC_INTERACTIVE_CHARACTER 
-			GameIDs.ActorID.SECONDARY:
-				scene_path = EssencePaths.ITEM_GENERIC_MODULAR_CHARACTER
-			GameIDs.ActorID.PARK_PERSON_SIT_1: 
-				scene_path = DemoItemsRoute.ACTOR_PARK_PERSON_SIT_1_SCENE
-			GameIDs.ActorID.PARK_PERSON_SIT_2: 
-				scene_path = DemoItemsRoute.ACTOR_PARK_PERSON_SIT_2_SCENE
-			GameIDs.ActorID.PARK_PERSON_SIT_3: 
-				scene_path = DemoItemsRoute.ACTOR_PARK_PERSON_SIT_3_SCENE
-			GameIDs.ActorID.PARK_DOG_1:        
-				scene_path = DemoItemsRoute.ACTOR_PARK_DOG_RUN_SCENE
+		# RESOLUTION VIA CENTRAL ROUTE SOLVER
+		var scene_path: String = GetRouteActors.get_actor_path(actor_id)
 				
 		if scene_path == "" or not ResourceLoader.exists(scene_path):
 			EssenceReportUtils.critical(
@@ -769,13 +762,9 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 			print("[%s/Spawner] Object ID %d REJECTED due to additional environment conditions (Mode: %d)." % [ES_NAME_CLASS, item_id, current_layout_mode])
 			continue
 			
-		# 3. ASSET PATH IDENTIFICATION (.TSCN)
-		var scene_path: String = ""
-		match item_id:
-			GameIDs.ItemID.DOOR_SPRITE:      scene_path = DemoItemsRoute.ITEMDOOR_SCENE
-			GameIDs.ItemID.HOUSE_SPRITE:     scene_path = DemoItemsRoute.ITEMHOUSE_SCENE 
-			GameIDs.ItemID.TOUCH_INDICATOR:  scene_path = DemoItemsRoute.ITEMTOUCH_SCENE
-			
+		# # RESOLUTION VIA CENTRAL ROUTE SOLVER
+		var scene_path: String = GetRouteItems.get_item_path(item_id)
+		
 		if scene_path == "" or not ResourceLoader.exists(scene_path):
 			EssenceReportUtils.critical(
 				"Item Setup Error",
@@ -861,46 +850,61 @@ func _on_dynamic_door_clicked(_viewport: Node, event: InputEvent, _shape_idx: in
 			_on_room_navigation_requested(next_room_id, 0, false)
 			
 ## BASE GENERIC METHOD (The Framework's Build Engine)
-## Executes the common steps and returns the location node in case the room
-## needs to have extra scripts, interactables, or logic attached to it in the middle of the flow.
-func _build_room_base(data: Dictionary, background_path: String, interactive_scene_path: String, skip_animations: bool) -> Node2D:
+## Automatically resolves and builds both scenery (.tscn) and interactive hotspots (.tscn) via resolvers.
+func _build_room_base(data: Dictionary, skip_animations: bool = false) -> Node2D:
 	current_room_id = data["id_room"]
+	var target_mode: int = data.get("interaction_mode", 1)
 	
-	# 1. Exit animation (if applicable)
-	if not skip_animations:
-		var fade_out_tween: Tween = EssenceUIAnimator.fade_out(background_layer, 0.4)
-		if fade_out_tween: await fade_out_tween.finished
-	
-	# 2. TOTAL CENTRALIZED CLEANUP
+	# 1. TOTAL CENTRALIZED CLEANUP
 	director.clear_character_stage()
 	active_character = null
 	director.clear_item_stage()
-	# We now clear the single unified items collection
 	spawned_items_in_room.clear() 
+	director.unload_scenery()
 	
-	director.unload_location()
+	# 2. AUTOMATED SCENERY PREFAB LOADING VIA GetRouteScenary
+	var scenery_path: String = GetRouteScenary.get_scenery_path(current_room_id)
+	#print("Scenery Path resolved by GetRouteScenary: '", scenery_path, "'")
 	
-	# 3. Fund Allocation
-	if background_path != "":
-		background_layer.texture = load(background_path)
+	if scenery_path == "":
+		EssenceReportUtils.critical(
+			"Scenery Mapping Error",
+			"No .tscn route registered for RoomID %d in GetRouteScenary." % current_room_id
+		)
+		return null
 		
-	# 4. Loading the Interactive Scene (Hotspots, collisions, doors)
-	var current_loc: Node2D = null
-	if interactive_scene_path != "":
-		var interactive_scene = load(interactive_scene_path) as PackedScene
-		if interactive_scene:
-			director.load_location(interactive_scene)
-			current_loc = director.current_location_node
-			if current_loc and current_loc.has_signal("navigation_requested"):
-				current_loc.navigation_requested.connect(_on_room_navigation_requested)
-				
-	# 5. Entrance animation (if applicable)
-	if not skip_animations:
-		var fade_in_tween: Tween = EssenceUIAnimator.fade_in(background_layer, 0.5)
-		if fade_in_tween: await fade_in_tween.finished
+	if not ResourceLoader.exists(scenery_path):
+		EssenceReportUtils.critical(
+			"Scenery File Missing",
+			"Scene file not found at path: '%s' for RoomID %d in %s." % [scenery_path, current_room_id, ES_NAME_CLASS]
+		)
+		return null
+		
+	var packed_scenery = load(scenery_path) as PackedScene
+	if packed_scenery:
+		director.load_scenery(packed_scenery, current_room_id, target_mode)
 	else:
-		background_layer.modulate.a = 1.0
-		
+		EssenceReportUtils.critical(
+			"Scenery Load Error",
+			"Failed to load PackedScene resource from path: '%s'." % scenery_path
+		)
+		return null
+
+	# 3. AUTOMATED INTERACTIVE HOTSPOTS LOADING VIA GetRouteFloatInteractive
+	var current_loc: Node2D = null
+	var interactive_path: String = GetRouteFloatInteractive.get_interactive_path(current_room_id)
+	if interactive_path != "" and ResourceLoader.exists(interactive_path):
+		var interactive_scene = load(interactive_path) as PackedScene
+		if interactive_scene:
+			current_loc = director.load_interactive(interactive_scene)
+			if current_loc and current_loc.has_signal("navigation_requested"):
+				if not current_loc.navigation_requested.is_connected(_on_room_navigation_requested):
+					current_loc.navigation_requested.connect(_on_room_navigation_requested)
+					
+	# 4. AUTOMATED STAGE ITEMS & ACTORS
+	_build_stage_interactables(current_room_id, target_mode)
+	_build_stage_actors(current_room_id, target_mode, skip_animations)
+	
 	return current_loc
 	
 ## Route and execute the specific setup pipeline for a room layout based on its unique ID.
@@ -910,13 +914,13 @@ func _build_room_base(data: Dictionary, background_path: String, interactive_sce
 func _route_room_initialization(room_id: int, scenery_data: Dictionary, skip_animations: bool) -> void:
 	match room_id:
 		GameIDs.RoomID.INITIAL_ROOM:
-			await _on_ready_initialRoom(scenery_data, skip_animations)
+			_on_ready_initialRoom(scenery_data, skip_animations)
 		GameIDs.RoomID.ROOM_3_DOORS:
-			await _on_ready_room3doors(scenery_data, skip_animations)
+			_on_ready_room3doors(scenery_data, skip_animations)
 		GameIDs.RoomID.ROOM_1_DOOR:
-			await _on_ready_room1door(scenery_data, skip_animations)
+			_on_ready_room1door(scenery_data, skip_animations)
 		GameIDs.RoomID.PARK:
-			await _on_ready_parkScene(scenery_data, skip_animations)
+			_on_ready_parkScene(scenery_data, skip_animations)
 		_:
 			EssenceReportUtils.critical(
 				"Routing Error",
@@ -929,12 +933,8 @@ func _route_room_initialization(room_id: int, scenery_data: Dictionary, skip_ani
 			
 ## Sets up the initial room layout. If skip_animations is true, it builds instantly.
 func _on_ready_initialRoom(data: Dictionary, skip_animations: bool = false) -> void:
-	# Llamamos a la base (pasamos "" en la escena interactiva porque no lleva)
-	# comentario en español xd
-	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_INITIAL, "", skip_animations)
-	
-	# End of transition
-	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
+	_build_room_base(data, skip_animations)
+	_evaluate_room_narrative_entry(data["id_room"], data.get("interaction_mode", 1))
 
 #########################
 # SECTION Room 3 Doors  #
@@ -942,10 +942,8 @@ func _on_ready_initialRoom(data: Dictionary, skip_animations: bool = false) -> v
 
 ## Sets up the 3 doors room. If skip_animations is true, it builds instantly.
 func _on_ready_room3doors(data: Dictionary, skip_animations: bool = false) -> void:
-	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_3DOORS, DemoItemsRoute.TESTROOMDOOR_SCENE, skip_animations)
-	if tutorial_panel:
-		tutorial_panel.visible = false
-	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
+	_build_room_base(data, skip_animations)
+	_evaluate_room_narrative_entry(data["id_room"], data.get("interaction_mode", 1))
 
 #########################
 # SECTION Room 1 Door   #
@@ -953,15 +951,15 @@ func _on_ready_room3doors(data: Dictionary, skip_animations: bool = false) -> vo
 
 ## Sets up the 3 doors room. If skip_animations is true, it builds instantly.
 func _on_ready_room1door(data: Dictionary, skip_animations: bool = false) -> void:
-	await _build_room_base(data, EssencePaths.BACKGROUND_ROOM_1DOOR, DemoItemsRoute.ONEDOORROOM_SCENE, skip_animations)
-	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
+	_build_room_base(data, skip_animations)
+	_evaluate_room_narrative_entry(data["id_room"], data.get("interaction_mode", 1))
 	
 ##################
 # SECTION PARK   #
 ##################
 func _on_ready_parkScene(data: Dictionary, skip_animations: bool = false) -> void:
-	await _build_room_base(data, EssencePaths.BACKGROUND_PARK, "", skip_animations)
-	_evaluate_room_narrative_entry(current_room_id, data["interaction_mode"])
+	_build_room_base(data, skip_animations)
+	_evaluate_room_narrative_entry(data["id_room"], data.get("interaction_mode", 1))
 	
 # Inside your central Game Director / Main Game script when instantiating a room:
 func _register_room_signals(room_instance: EssenceNavigationRoom) -> void:
@@ -977,7 +975,7 @@ func _on_ready_habitacion_secreta(data: Dictionary, skip_animations: bool = fals
 	#AudioManager.play_music("Musica_Tension")
 	
 	# We execute the common base load and capture the node it generates.
-	var locacion_actual = await _build_room_base(data, "res://FondoSecreto.tscn", "res://ColisionesSecretas.tscn", skip_animations)
+	var locacion_actual = _build_room_base(data, skip_animations)
 	
 	# SPECIFIC code AFTER loading (Modify things inside the room):
 	if is_instance_valid(locacion_actual):

@@ -4,9 +4,9 @@ extends Node2D
 # SCENE STRUCTURE: TemplateGameplayDirector (Master Controller)
 # ==
 # GameplayDirector (Node2D) [Script: EssenceGameplayDirector]
-# ├── EnvironmentFilter (CanvasModulate)     <-- Colors the whole screen (Day/Night)
-# ├── ActiveLocation (Node2D)                <-- The anchor where interactive hotspots are loaded
-# │   └── (Empty by default)
+# ├── SceneryManager (TemplateSceneryManager) [TemplateSceneryManager.tscn]
+# │   ├── EnvironmentFilter (CanvasModulate)
+# │   └── StageContainer (Node2D)
 # ├── CharactersStage (Node2D)               <-- Where actors/characters are placed
 # │   └── (Empty by default)
 # ├── ItemStage  (Node2D)                    <-- 
@@ -21,8 +21,7 @@ enum GameState { DIALOGUE, EXPLORATION, CUTSCENE }
 var current_state: GameState = GameState.CUTSCENE
 
 @export_category("Template References")
-@export var environment_filter: CanvasModulate
-@export var active_location_container: Node2D
+@export var scenery_manager: EssenceSceneryManager
 @export var characters_stage: Node2D
 @export var item_stage: Node2D
 @export var fade_overlay: ColorRect 
@@ -80,24 +79,27 @@ func _setup_dialog_system() -> void:
 			active_dialog_box.dialogue_finished.connect(_on_dialogue_sequence_finished)
 
 
-# ==========================================
-# ENVIRONMENT FILTER
-# ==========================================
+# ==============================================================================
+# ENVIRONMENT FILTER CONTROL (DELEGATED TO SCENERY MANAGER)
+# ==============================================================================
 
+## Smoothly fades the CanvasModulate color in SceneryManager over a given duration
 func fade_filter_color(target_color: Color, duration: float) -> Tween:
-	if not environment_filter: return null
+	if not is_instance_valid(scenery_manager) or not scenery_manager.environment_filter: 
+		return null
 	
 	var tween = create_tween()
-	tween.tween_property(environment_filter, "color", target_color, duration)\
+	tween.tween_property(scenery_manager.environment_filter, "color", target_color, duration)\
 		.set_trans(Tween.TRANS_SINE)\
 		.set_ease(Tween.EASE_IN_OUT)
 		
 	return tween
 
 
+## Instantly sets the CanvasModulate color in SceneryManager via hex string
 func set_environment_color(hex_color: String) -> void:
-	if environment_filter:
-		environment_filter.color = Color(hex_color)
+	if is_instance_valid(scenery_manager) and scenery_manager.environment_filter:
+		scenery_manager.environment_filter.color = Color(hex_color)
 		
 
 # ==========================================
@@ -144,40 +146,76 @@ func change_game_state(new_state: GameState) -> void:
 			current_location_node.environment_interactable = false
 
 
-# ==========================================
-# SCENE & ENVIRONMENT CONTROL
-# ==========================================
+# ==============================================================================
+# SCENERY & ENVIRONMENT DELEGATION
+# ==============================================================================
 
-func load_location(location_scene: PackedScene) -> void:
-	if not active_location_container or not location_scene: 
+## Instantiates a visual room prefab through SceneryManager and syncs interaction state
+func load_scenery(packed_stage: PackedScene, stage_id: int = -1, mode: int = 1) -> EssenceLocation:
+	if not is_instance_valid(scenery_manager):
 		EssenceReportUtils.critical(
-			"Location Load Error", 
-			"Missing container or scene to load in %s." % name
+			"Scenery Manager Error", 
+			"'scenery_manager' reference is missing in %s." % name
 		)
-		return
-	
-	for child in active_location_container.get_children():
-		child.queue_free()
-	
-	var new_location = location_scene.instantiate()
-	if new_location is Node2D:
-		new_location.transform = Transform2D.IDENTITY
-	
-	active_location_container.add_child(new_location)
-	
-	if new_location is EssenceLocation:
-		current_location_node = new_location
-		change_game_state(current_state)
+		return null
+
+	var stage_node = scenery_manager.load_stage_prefab(packed_stage, stage_id, mode)
+	change_game_state(current_state)
+	return stage_node
 
 
+## Instantiates an interactive hotspots prefab through SceneryManager
+func load_interactive(packed_interactive: PackedScene) -> EssenceInteractiveLocation:
+	if not is_instance_valid(scenery_manager):
+		EssenceReportUtils.critical(
+			"Scenery Manager Error", 
+			"'scenery_manager' reference is missing in %s." % name
+		)
+		return null
+
+	var interactive_node = scenery_manager.load_interactive_prefab(packed_interactive)
+	change_game_state(current_state)
+	return interactive_node
+
+
+## Unloads active scenery (both visual stage and interactive layer)
+func unload_scenery() -> void:
+	if is_instance_valid(scenery_manager):
+		scenery_manager.clear_current_stage()
+
+
+## Helper to retrieve active visual location instance from SceneryManager
+func get_current_location() -> EssenceLocation:
+	if is_instance_valid(scenery_manager):
+		return scenery_manager.current_stage_node
+	return null
+
+
+## Helper to retrieve active interactive location instance from SceneryManager
+func get_current_interactive() -> EssenceInteractiveLocation:
+	if is_instance_valid(scenery_manager):
+		return scenery_manager.current_interactive_node
+	return null
+
+
+# ==============================================================================
+# LEGACY COMPATIBILITY ALIASES (DEPRECATED)
+# ==============================================================================
+
+## @deprecated Use load_scenery() instead.
+func load_location(location_scene: PackedScene) -> void:
+	push_warning(
+		"'load_location()' is deprecated and will be removed in future releases. Please use 'load_scenery()' instead in %s." % name
+	)
+	load_scenery(location_scene)
+
+
+## @deprecated Use unload_scenery() instead.
 func unload_location() -> void:
-	if not active_location_container: 
-		return
-	
-	for child in active_location_container.get_children():
-		child.queue_free()
-		
-	current_location_node = null
+	push_warning(
+		"'unload_location()' is deprecated and will be removed in future releases. Please use 'unload_scenery()' instead in %s." % name
+	)
+	unload_scenery()
 
 
 # ==========================================

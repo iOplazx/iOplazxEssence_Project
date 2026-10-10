@@ -10,8 +10,6 @@ size = Vector2(176, 403)
 
 [node name="TestRoomDoor" unique_id=1565414698 instance=ExtResource("1_ri1ts")]
 script = ExtResource("2_neh04")
-location_id = "TestRoomDoor"
-location_name = "Room 3 Door"
 
 [node name="StageBackground" parent="." index="0" unique_id=104467830]
 visible = false
