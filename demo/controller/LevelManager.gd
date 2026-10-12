@@ -1,6 +1,12 @@
 class_name LevelManager
 extends RefCounted
 
+const DEFAULT_EXPLORATION_MODE: int = 1
+## Gets the saved active exploration mode or returns the default mode 1
+static func get_active_room_mode(room_id: int, story_flags: Dictionary) -> int:
+	var room_mode_key: String = "room_mode_" + str(room_id)
+	return story_flags.get(room_mode_key, DEFAULT_EXPLORATION_MODE)
+
 # --- DECLARATIVE NAVIGATION GRAPH ---
 # Registers which rooms are legally connected to each other.
 const NAVIGATION_MAP: Dictionary = {

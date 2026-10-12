@@ -3,9 +3,8 @@
 [ext_resource type="Script" uid="uid://begvqtswq14rd" path="res://addons/iOplazxEssence/modules/visual_novel/location/EssenceTemplateScenery.gd" id="1_mc5qf"]
 [ext_resource type="Texture2D" uid="uid://glodfv7s37sk" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_3.png" id="2_j2j1u"]
 
-[node name="ThreeDoorsRoomScenary" type="Node2D" unique_id=1258425628 node_paths=PackedStringArray("room_details", "background_layer", "foreground_layer", "atmosphere_fx")]
+[node name="ThreeDoorsRoomScenary" type="Node2D" unique_id=1258425628 node_paths=PackedStringArray("background_layer", "foreground_layer", "atmosphere_fx")]
 script = ExtResource("1_mc5qf")
-room_details = NodePath("")
 location_id = "three_doors_room"
 location_name = "Three Doors Room"
 background_layer = NodePath("BackgroundLayer")
@@ -20,6 +19,7 @@ offset_right = 1280.0
 offset_bottom = 720.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 6
 
@@ -33,6 +33,7 @@ offset_right = 1280.0
 offset_bottom = 720.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("2_j2j1u")
 expand_mode = 1
 stretch_mode = 6

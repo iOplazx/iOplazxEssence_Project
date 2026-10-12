@@ -19,8 +19,15 @@ const ES_LAYERED_CLASS = "EssenceLayeredLocation"
 
 
 func _ready() -> void:
-	EssenceLogger.system_info("[%s] Layered scenario initialized: %s (%s)" % [ES_LAYERED_CLASS, location_name, location_id])
+	#EssenceLogger.system_info("[%s] Layered scenario initialized: %s (%s)" % [ES_LAYERED_CLASS, location_name, location_id])
+	_disable_mouse_blocking_recursive(self)
 
+func _disable_mouse_blocking_recursive(node: Node) -> void:
+	if node is Control:
+		node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		
+	for child in node.get_children():
+		_disable_mouse_blocking_recursive(child)
 
 func set_environment_mode(mode: int) -> void:
 	if background_variants.has(mode):

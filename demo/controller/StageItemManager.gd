@@ -50,7 +50,7 @@ const ROOM_ITEM_MANIFESTO = {
 			"instance_id": 101,
 			"item_id": GameIDs.ItemID.DOOR_SPRITE,
 			"operator": GameIDs.StageCondition.GREATER_EQUAL,
-			"stage_value": 2,
+			"stage_value": 1,
 			"layout_preset": LayoutPreset.DOOR_LEFT, # Uso limpio del Enum
 			"destination": GameIDs.RoomID.ROOM_3_DOORS
 		}

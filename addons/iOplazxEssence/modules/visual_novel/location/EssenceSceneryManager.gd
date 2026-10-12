@@ -29,8 +29,11 @@ var current_stage_mode: int = 1
 
 
 func _ready() -> void:
-	if not stage_container:
-		stage_container = self
+	# Fallback automático si los exports no fueron asignados manualmente en el Inspector
+	if not is_instance_valid(stage_container):
+		stage_container = $StageContainer if has_node("StageContainer") else self
+	if not is_instance_valid(interactive_container):
+		interactive_container = $InteractiveContainer if has_node("InteractiveContainer") else self
 
 
 # ==============================================================================
@@ -95,34 +98,37 @@ func load_interactive_prefab(packed_interactive: PackedScene) -> EssenceInteract
 		return null
 
 	current_interactive_node = instance as EssenceInteractiveLocation
-	
-	if is_instance_valid(interactive_container):
-		interactive_container.add_child(instance)
-	else:
-		add_child(instance)
+	interactive_container.add_child(current_interactive_node)
+
+	# ALINEACIÓN Y RESTAURACIÓN DE TRANSFORMACIÓN
+	# Asegura que la escena interactiva coincida exactamente con las coordenadas del origen
+	current_interactive_node.position = Vector2.ZERO
+	current_interactive_node.rotation = 0.0
+	current_interactive_node.scale = Vector2.ONE
 
 	interactive_loaded.emit(current_interactive_node)
 	EssenceLogger.system_info("[%s] Interactive layer loaded: %s" % [ES_NAME_CLASS, instance.name])
 
 	return current_interactive_node
 
-
 # ==============================================================================
 # CLEANUP METHODS
 # ==============================================================================
 
-## Clears only the active visual stage instance.
+## Clears all children inside the visual stage container.
 func clear_visual_stage() -> void:
-	if is_instance_valid(current_stage_node):
-		current_stage_node.queue_free()
-		current_stage_node = null
+	if is_instance_valid(stage_container):
+		for child in stage_container.get_children():
+			child.queue_free()
+	current_stage_node = null
 
 
-## Clears only the active interactive hotspots instance.
+## Clears all children inside the interactive hotspots container.
 func clear_interactive_stage() -> void:
-	if is_instance_valid(current_interactive_node):
-		current_interactive_node.queue_free()
-		current_interactive_node = null
+	if is_instance_valid(interactive_container):
+		for child in interactive_container.get_children():
+			child.queue_free()
+	current_interactive_node = null
 
 
 ## Safely clears both visual and interactive stages from memory.

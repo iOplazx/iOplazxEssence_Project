@@ -1,9 +1,9 @@
 # ==============================================================================
-# SCRIPT: GetRouteInteractive.gd
+# SCRIPT: GetRouteInteractiveInScenary.gd
 # DESCRIPTION: Central resolver mapping GameIDs.RoomID to Interactive Hotspot scenes (.tscn).
 # ==============================================================================
 
-class_name GetRouteFloatInteractive
+class_name GetRouteInteractiveInScenary
 extends RefCounted
 
 ## Manifest mapping RoomIDs to DemoItemsRoute interactive scene constants

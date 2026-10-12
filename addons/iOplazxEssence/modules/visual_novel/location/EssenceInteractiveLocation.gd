@@ -23,18 +23,25 @@ var environment_interactable: bool = false:
 
 func _ready() -> void:
 	super._ready()
+	
+	if has_node("StageBackground"):
+		var guide_bg = get_node("StageBackground")
+		guide_bg.visible = false
+		if guide_bg is Control:
+			guide_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			
 	environment_interactable = false
 	_connect_fixed_hotspots()
-
 
 func _connect_fixed_hotspots() -> void:
 	if not fixed_hotspots: return
 	for object in fixed_hotspots.get_children():
 		if object is Area2D and object.has_signal("input_event"):
-			object.input_event.connect(func(_vp, event, _idx, obj=object):
+			var click_cb = func(_vp, event, _idx, obj=object):
 				_on_hotspot_clicked(event, obj)
-			)
-
+			
+			if not object.input_event.is_connected(click_cb):
+				object.input_event.connect(click_cb)
 
 func _on_hotspot_clicked(event: InputEvent, node: Area2D) -> void:
 	if not environment_interactable: return
