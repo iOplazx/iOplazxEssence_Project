@@ -714,7 +714,7 @@ func _check_room_interruptions(room_id: int) -> bool:
 	match room_id:
 		GameIDs.RoomID.INITIAL_ROOM:
 			if story_flags.get("is_first_time_here", false):
-				print("[Story] Interrupción: Primera vez en la habitación inicial. Esperando tutorial.")
+				#print("[Story] Interrupción: Primera vez en la habitación inicial. Esperando tutorial.")
 				director.change_game_state(EssenceGameplayDirector.GameState.DIALOGUE)
 				return true 
 				

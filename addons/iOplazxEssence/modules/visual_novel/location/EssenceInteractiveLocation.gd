@@ -46,7 +46,7 @@ func _connect_fixed_hotspots() -> void:
 func _on_hotspot_clicked(event: InputEvent, node: Area2D) -> void:
 	if not environment_interactable: return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		print("[%s] Player interacted with Hotspot: %s" % [ES_INTERACTIVE_CLASS, node.name])
+		#print("[%s] Player interacted with Hotspot: %s" % [ES_INTERACTIVE_CLASS, node.name])
 		get_viewport().set_input_as_handled()
 
 
