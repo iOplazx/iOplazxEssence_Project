@@ -422,6 +422,10 @@ func _open_interaction_menu() -> void:
 			{"id": "examine", "descripcion": "Inspect clothing", "icono": null},
 			{"id": "wardrobe", "descripcion": "Change outfit", "icono": EssencePaths.ICON_SHIRT},
 			{"id": "stretch", "descripcion": "Stretch arms", "icono": null}
+		],
+		# PÁGINA 2
+		[
+			{"id": "atmosphere", "descripcion": "Toggle Atmosphere", "icono": null}
 		]
 	]
 	
@@ -490,6 +494,15 @@ func _on_menu_action_selected(action: String) -> void:
 		"stretch":
 			#print("-> [MODO CINEMÁTICA] Ejecutando pose temporal de estiramiento...")
 			_ejecutar_animacion_pose_temporal()
+		"atmosphere":
+			# Alterna la visibilidad del degradado/atmósfera en el escenario visual activo
+			if is_instance_valid(director):
+				var current_loc = director.get_current_location()
+				if is_instance_valid(current_loc):
+					if current_loc.has_method("toggle_atmosphere"):
+						current_loc.toggle_atmosphere()
+					elif "atmosphere_fx" in current_loc and is_instance_valid(current_loc.atmosphere_fx):
+						current_loc.atmosphere_fx.visible = not current_loc.atmosphere_fx.visible
 			
 	# Smoothly retract the interface once the requested action is resolved
 	if is_instance_valid(_cached_interaction_menu):
@@ -707,7 +720,7 @@ func _should_allow_actor_spawn(room_id: int, _actor_id: int, _layout_mode: int) 
 ## Checks for pending story events in the given room.
 ## Returns TRUE if an event intercepted the flow, FALSE if the room is clear.
 func _check_room_interruptions(room_id: int) -> bool:
-	# Si ya estamos en Gameplay, NINGÚN evento inicial o tutorial viejo debe colarse.
+	# If we are already in the gameplay phase, NO initial events or old tutorials should slip through.
 	if current_phase == TestPhase.GAMEPLAY:
 		return false # There is no interruption; it continues freely.
 		
@@ -745,17 +758,17 @@ func set_room_interaction_mode(target_mode: int) -> void:
 	if data["flag_error"]:
 		return
 		
-	# 1. Aplicar estado en el Director (Bloquea/desbloquea la interfaz de interacción)
+	# 1. Apply state to the Director (Locks/unlocks the interaction interface)
 	_apply_interaction_state(data["interaction_mode"])
 	
-	# 2. Refrescar ítems flotantes para este nuevo modo
+	# 2. Refresh floating items for this new mode
 	director.clear_item_stage()
 	spawned_items_in_room.clear()
 	
 	if target_mode != 0:
 		_build_stage_interactables(current_room_id, target_mode)
 	
-	# 3. Refrescar actores para el nuevo modo
+	# 3. Refresh actors for the new mode
 	_build_stage_actors(current_room_id, target_mode, false)
 	
 	EssenceLogger.system_info("[%s] Transición de modo completada -> Modo: %d" % [ES_NAME_CLASS, target_mode])

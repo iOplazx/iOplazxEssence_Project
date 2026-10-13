@@ -92,7 +92,25 @@ func _ready() -> void:
 func configure_menu(data_by_pages: Array) -> void:
 	paginas_acciones = data_by_pages
 	pagina_actual = 0
+	
+	_validate_page_capacity(data_by_pages)
 	_update_page_view()
+	
+## Internal validation helper to detect menu page overflows at runtime.
+func _validate_page_capacity(data_by_pages: Array) -> void:
+	var max_slots: int = botones_accion.size()
+	if max_slots == 0:
+		return
+
+	for i in range(data_by_pages.size()):
+		var page_items: Array = data_by_pages[i]
+		if page_items.size() > max_slots:
+			EssenceReportUtils.warning(
+				"Menu Overflow Warning",
+				"Page %d of the '%s' menu contains %d actions, but the active geometry only supports %d cells per page." % [
+					i + 1, name, page_items.size(), max_slots
+				]
+			)
 
 ## Processes the visibility and icons of the buttons based on the currently active page.
 func _update_page_view() -> void:
