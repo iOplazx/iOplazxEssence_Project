@@ -31,11 +31,15 @@ var current_state: GameState = GameState.CUTSCENE
 ## If the user drags their own interface (inheriting from EssenceBaseDialogBox), that will be used.
 ## If left empty (<null>), the Director will automatically load the Addon's default interface.
 @export var custom_dialog_box: EssenceBaseDialogBox
+## Optional reference to the mode sign. If null, it will search the HUD_Layer or load the default.
+@export var custom_mode_indicator: EssenceBaseModeIndicator
 
 # Active internal reference to the dialog box
 var active_dialog_box: EssenceBaseDialogBox
 # Internal variable to track the currently instantiated room
 var current_location_node: EssenceLocation
+
+var active_mode_indicator: EssenceBaseModeIndicator = null
 
 func _ready() -> void:
 	if fade_overlay:
@@ -43,6 +47,10 @@ func _ready() -> void:
 		fade_overlay.modulate.a = 1.0
 
 	_setup_dialog_system()
+	_setup_mode_indicator_system()
+	# Start with indicator hidden while curtain is closed on boot
+	if is_instance_valid(active_mode_indicator):
+		active_mode_indicator.hide_indicator(false)
 
 
 # ==========================================
@@ -106,7 +114,12 @@ func set_environment_color(hex_color: String) -> void:
 # FADE OVERLAY
 # ==========================================
 
+## Smoothly closes the screen curtain and hides active HUD indicators.
 func close_curtain(duration: float = 0.4) -> Tween:
+	# Hide mode indicator badge as screen fades out
+	if is_instance_valid(active_mode_indicator):
+		active_mode_indicator.hide_indicator(true)
+
 	if not fade_overlay: return null
 	
 	fade_overlay.visible = true
@@ -115,7 +128,12 @@ func close_curtain(duration: float = 0.4) -> Tween:
 	return tween
 
 
+## Smoothly opens the screen curtain and reveals active HUD indicators.
 func open_curtain(duration: float = 0.5) -> Tween:
+	# Reveal mode indicator badge as screen opens
+	if is_instance_valid(active_mode_indicator):
+		active_mode_indicator.show_indicator(true)
+
 	if not fade_overlay: return null
 	
 	var tween = create_tween()
@@ -124,7 +142,12 @@ func open_curtain(duration: float = 0.5) -> Tween:
 	return tween
 
 
+## Instantly forces the curtain closed and suppresses indicator elements.
 func force_curtain_closed() -> void:
+	# Instantly hide mode indicator badge without transition
+	if is_instance_valid(active_mode_indicator):
+		active_mode_indicator.hide_indicator(false)
+
 	if fade_overlay:
 		fade_overlay.visible = true
 		fade_overlay.modulate.a = 1.0
@@ -137,6 +160,7 @@ func force_curtain_closed() -> void:
 func change_game_state(new_state: GameState) -> void:
 	current_state = new_state
 	
+	# 1. PHYSICAL INTERACTION CONTROL IN THE ROOM
 	if current_state == GameState.EXPLORATION:
 		if current_location_node and current_location_node is EssenceInteractiveLocation:
 			current_location_node.environment_interactable = true
@@ -145,6 +169,9 @@ func change_game_state(new_state: GameState) -> void:
 		if current_location_node and current_location_node is EssenceInteractiveLocation:
 			current_location_node.environment_interactable = false
 
+	# 2. VISUAL NOTIFICATION ON THE MODE SIGN
+	if is_instance_valid(active_mode_indicator):
+		active_mode_indicator.set_mode(new_state)
 
 # ==============================================================================
 # SCENERY & ENVIRONMENT DELEGATION
@@ -369,3 +396,38 @@ func launch_minigame(minigame_scene_path: String, init_data: Dictionary = {}) ->
 	change_game_state(GameState.EXPLORATION)
 
 	return result
+
+######################
+#
+##################
+func _setup_mode_indicator_system() -> void:
+	# 1. OPTION A: Asignado explícitamente en el Inspector
+	if is_instance_valid(custom_mode_indicator):
+		active_mode_indicator = custom_mode_indicator
+		
+	# 2. OPTION B: Buscar dentro del HUD_Layer existente
+	elif is_instance_valid(hud_layer):
+		for child in hud_layer.get_children():
+			if child is EssenceBaseModeIndicator:
+				active_mode_indicator = child
+				break
+				
+	# 3. OPTION C: Fallback automático al prefab base del Addon
+	if not is_instance_valid(active_mode_indicator):
+		var default_path: String = EssencePaths.ESSENCE_MODE_INDICATOR_INTERFACE
+		if ResourceLoader.exists(default_path):
+			var scene = load(default_path) as PackedScene
+			if scene:
+				var instance: Node = scene.instantiate()
+				if instance is EssenceBaseModeIndicator:
+					active_mode_indicator = instance as EssenceBaseModeIndicator
+					if is_instance_valid(hud_layer):
+						hud_layer.add_child(active_mode_indicator)
+					else:
+						add_child(active_mode_indicator)
+				else:
+					EssenceReportUtils.critical(
+						"UI Setup Error",
+						"The instantiated scene '%s' does not inherit from EssenceBaseModeIndicator." % default_path
+					)
+					instance.queue_free()
