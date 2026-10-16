@@ -10,7 +10,8 @@ extends RefCounted
 const ITEM_MANIFEST: Dictionary = {
 	GameIDs.ItemID.DOOR_SPRITE:     DemoItemsRoute.ITEMDOOR_SCENE,
 	GameIDs.ItemID.HOUSE_SPRITE:    DemoItemsRoute.ITEMHOUSE_SCENE,
-	GameIDs.ItemID.TOUCH_INDICATOR: DemoItemsRoute.ITEMTOUCH_SCENE
+	GameIDs.ItemID.TOUCH_INDICATOR: DemoItemsRoute.ITEMTOUCH_SCENE,
+	GameIDs.ItemID.WIP_DOOR_EXIT:   EssencePaths.ITEM_WIP_DOOR_SCENE
 }
 
 ## Resolves and returns the .tscn scene path bound to a specific ItemID

@@ -74,6 +74,16 @@ const ROOM_ITEM_MANIFESTO = {
 			"layout_preset": LayoutPreset.HOUSE_RIGHT,
 			"destination": GameIDs.RoomID.ROOM_3_DOORS
 		}
+	],
+	GameIDs.RoomID.WIP_ROOM: [
+		{
+			"instance_id": 900,
+			"item_id": GameIDs.ItemID.WIP_DOOR_EXIT,
+			"operator": GameIDs.StageCondition.EQUAL,
+			"stage_value": 1,
+			"layout_preset": LayoutPreset.DOOR_LEFT,
+			"destination": -1 
+		}
 	]
 }
 

@@ -954,6 +954,8 @@ func _route_room_initialization(room_id: int, scenery_data: Dictionary, skip_ani
 			_on_ready_room1door(scenery_data, skip_animations)
 		GameIDs.RoomID.PARK:
 			_on_ready_parkScene(scenery_data, skip_animations)
+		GameIDs.RoomID.WIP_ROOM:  
+			_build_room_base(scenery_data, skip_animations)
 		_:
 			EssenceReportUtils.critical(
 				"Routing Error",

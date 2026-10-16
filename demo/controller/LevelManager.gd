@@ -1,6 +1,9 @@
 class_name LevelManager
 extends RefCounted
 
+## Static memory variable to remember the origin room before jumping into the WIP stage.
+static var last_room_before_wip: int = 0
+
 const DEFAULT_EXPLORATION_MODE: int = 1
 ## Gets the saved active exploration mode or returns the default mode 1
 static func get_active_room_mode(room_id: int, story_flags: Dictionary) -> int:
@@ -11,9 +14,10 @@ static func get_active_room_mode(room_id: int, story_flags: Dictionary) -> int:
 # Registers which rooms are legally connected to each other.
 const NAVIGATION_MAP: Dictionary = {
 	GameIDs.RoomID.INITIAL_ROOM: [GameIDs.RoomID.ROOM_3_DOORS],
-	GameIDs.RoomID.ROOM_3_DOORS: [GameIDs.RoomID.INITIAL_ROOM, GameIDs.RoomID.ROOM_1_DOOR, GameIDs.RoomID.PARK], 
+	GameIDs.RoomID.ROOM_3_DOORS: [GameIDs.RoomID.INITIAL_ROOM, GameIDs.RoomID.ROOM_1_DOOR, GameIDs.RoomID.PARK, GameIDs.RoomID.WIP_ROOM], 
 	GameIDs.RoomID.ROOM_1_DOOR:  [GameIDs.RoomID.ROOM_3_DOORS, GameIDs.RoomID.SAVE_SCENE],  
-	GameIDs.RoomID.PARK:         [GameIDs.RoomID.ROOM_3_DOORS]
+	GameIDs.RoomID.PARK:         [GameIDs.RoomID.ROOM_3_DOORS],
+	GameIDs.RoomID.WIP_ROOM:     [GameIDs.RoomID.ROOM_3_DOORS]
 }
 
 ## Calculates and returns the scenery configuration based on spatial transitions and interaction modes.
@@ -57,8 +61,22 @@ static func get_scenery_config(current_place: int, next_place: int, mode: int, i
 
 ## Handles room-to-room switching by validating paths against the declarative navigation map.
 static func _handle_room_transitions(origin: int, destination: int, config: Dictionary) -> Dictionary:
-	if NAVIGATION_MAP.has(origin) and destination in NAVIGATION_MAP[origin]:
+	# 1. SPECIAL RULE: Entering the WIP room from ANY origin is always allowed for developers
+	if destination == GameIDs.RoomID.WIP_ROOM:
+		last_room_before_wip = origin
 		config["interaction_mode"] = 0 # All new rooms start in mode 0 (locked/cutscene)
+		config["id_background_scene"] = destination 
+		return config
+
+	# 2. SPECIAL RULE: Returning from the WIP room back to the cached origin room is always legal
+	if origin == GameIDs.RoomID.WIP_ROOM and destination == last_room_before_wip:
+		config["interaction_mode"] = 0
+		config["id_background_scene"] = destination 
+		return config
+
+	# 3. STANDARD NAVIGATION: Normal rooms must follow the declarative navigation map
+	if NAVIGATION_MAP.has(origin) and destination in NAVIGATION_MAP[origin]:
+		config["interaction_mode"] = 0 
 		config["id_background_scene"] = destination 
 		return config
 		
@@ -80,6 +98,8 @@ static func _handle_internal_room_modes(room: int, mode: int, config: Dictionary
 			config["interaction_mode"] = 1 if mode == 1 else 2
 		GameIDs.RoomID.ROOM_1_DOOR, GameIDs.RoomID.PARK:
 			config["interaction_mode"] = 1
+		GameIDs.RoomID.WIP_ROOM:
+			config["interaction_mode"] = 1 # The WIP is always interactive for the door to work
 		_:
 			EssenceReportUtils.warning(
 				"Unknown Room Mode",

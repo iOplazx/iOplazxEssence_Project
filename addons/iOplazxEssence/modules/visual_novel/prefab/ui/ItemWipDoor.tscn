@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bcq8kfo4wipx7"]
+
+[ext_resource type="Script" uid="uid://b72lta7ymagvx" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/script/EssenceWipDoorItem.gd" id="1_mdb7c"]
+[ext_resource type="Texture2D" uid="uid://cuacwqj5kr52s" path="res://addons/iOplazxEssence/resources/images/objects/item_door_kitchen_arrow.png" id="2_mdb7c"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ethqq"]
+size = Vector2(213.25012, 529.00037)
+
+[node name="ItemDoor" type="Area2D" unique_id=1115261331]
+script = ExtResource("1_mdb7c")
+
+[node name="ImgDoor" type="Sprite2D" parent="." unique_id=1056738629]
+position = Vector2(-9.1552734e-05, -0.00024414063)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("2_mdb7c")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1300142259]
+position = Vector2(2, -3)
+scale = Vector2(0.9999994, 0.9999994)
+shape = SubResource("RectangleShape2D_ethqq")

@@ -39,3 +39,6 @@ func _on_hotspot_clicked(event: InputEvent, node: Area2D) -> void:
 			# - mode: 0 (Starts in Mode 0 as a clean slate / loading screen)
 			# - is_only_mode: false (It's a full room switch, not an internal layout change)
 			navigation_requested.emit(GameIDs.RoomID.PARK, 0, false)
+		elif node.name == "ExampleDoor3":
+			# Navigation to the WIP development environment
+			navigation_requested.emit(GameIDs.RoomID.WIP_ROOM, 0, false)
