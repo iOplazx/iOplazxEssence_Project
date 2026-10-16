@@ -171,7 +171,12 @@ func change_game_state(new_state: GameState) -> void:
 
 	# 2. VISUAL NOTIFICATION ON THE MODE SIGN
 	if is_instance_valid(active_mode_indicator):
-		active_mode_indicator.set_mode(new_state)
+		if active_mode_indicator.visible and active_mode_indicator.modulate.a > 0.0:
+			# If it's already active, switch modes normally
+			active_mode_indicator.set_mode(new_state)
+		else:
+			# If it was hidden on boot/transition, initialize it cleanly without flashing default text
+			active_mode_indicator.initialize_and_show_mode(new_state)
 
 # ==============================================================================
 # SCENERY & ENVIRONMENT DELEGATION

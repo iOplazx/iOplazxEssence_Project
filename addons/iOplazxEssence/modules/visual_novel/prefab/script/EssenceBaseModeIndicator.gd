@@ -126,3 +126,11 @@ func show_indicator(animate: bool = true) -> void:
 ## Wrapper alias to hide the indicator badge with optional animation.
 func hide_indicator(animate: bool = true) -> void:
 	set_indicator_visible(false, animate)
+
+## Silently updates mode graphics while disabled and reveals the indicator with an entrance animation.
+func initialize_and_show_mode(game_state: EssenceGameplayDirector.GameState) -> void:
+	_is_indicator_enabled = true
+	_apply_mode_graphics(game_state)
+	visible = true
+	modulate.a = 0.0
+	EssenceUIAnimator.slide_from_top(self, 40.0, 0.3)
