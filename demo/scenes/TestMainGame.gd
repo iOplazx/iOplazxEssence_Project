@@ -85,6 +85,8 @@ var current_interactive_loc: EssenceInteractiveLocation = null
 # INITIALIZATION
 # ==========================================
 func _ready() -> void:
+	add_to_group("MainGame")
+	
 	director.clear_character_stage()
 	director.clear_item_stage()
 	
@@ -565,8 +567,18 @@ func _on_room_navigation_requested(next_place: int, mode: int = 1, is_only_mode:
 		get_tree().change_scene_to_file(DemoItemsRoute.TESTSAVESCENE_SCENE)
 		return
 
+	for item in spawned_items_in_room:
+		if is_instance_valid(item):
+			item.queue_free()
+	spawned_items_in_room.clear()
+
+	if director:
+		director.unload_scenery()
+
+	current_room_id = data["id_room"]
+
 	# STANDARD ROOM FLOW
-	_route_room_initialization(data["id_room"], data, true)
+	_route_room_initialization(current_room_id, data, true)
 	
 	if director:
 		# We wait for a stabilization frame so the engine finishes rendering the map.
