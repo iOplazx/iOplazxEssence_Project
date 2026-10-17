@@ -842,18 +842,15 @@ func _build_stage_interactables(room_id: int, current_layout_mode: int) -> void:
 		# 7. CONEXIÓN DE ACCIONES
 		if target_area:
 			if destination != -1:
-				# Conexión a evento de navegación con destino
+				# Conexión estándar para puertas fijas con destino conocido
 				var callable = _on_dynamic_door_clicked.bind(destination)
 				if not target_area.input_event.is_connected(callable):
 					target_area.input_event.connect(callable)
 			else:
-				# Elemento utilitario/interactivo sin cambio de escena
+				# Blindaje pasivo: Elemento interactivo autónomo (como la puerta WIP)
+				# No intenta conectar una señal estática, permitiendo que el script
+				# del ítem maneje su propia lógica de negocio de forma independiente.
 				pass
-		else:
-			EssenceReportUtils.warning(
-				"Item Area Warning",
-				"El Ítem %d no contiene un Area2D en %s. Se instanció únicamente como elemento visual." % [item_id, ES_NAME_CLASS]
-			)
 			
 ## INTERNAL VALIDATOR: Decides whether an item is eligible to enter based on the current rules
 func _should_allow_item_spawn(_room_id: int, _item_id: int, current_mode: int) -> bool:
@@ -955,7 +952,7 @@ func _route_room_initialization(room_id: int, scenery_data: Dictionary, skip_ani
 		GameIDs.RoomID.PARK:
 			_on_ready_parkScene(scenery_data, skip_animations)
 		GameIDs.RoomID.WIP_ROOM:  
-			_build_room_base(scenery_data, skip_animations)
+			_on_ready_wip_room(scenery_data, skip_animations)
 		_:
 			EssenceReportUtils.critical(
 				"Routing Error",
@@ -996,11 +993,15 @@ func _on_ready_parkScene(data: Dictionary, skip_animations: bool = false) -> voi
 	_build_room_base(data, skip_animations)
 	_evaluate_room_narrative_entry(data["id_room"], data.get("interaction_mode", 1))
 	
+func _on_ready_wip_room(data: Dictionary, skip_animations: bool) -> void:
+	_build_room_base(data, skip_animations)
+	_evaluate_room_narrative_entry(data["id_room"], data.get("interaction_mode", 1))
+	
 # Inside your central Game Director / Main Game script when instantiating a room:
 func _register_room_signals(room_instance: EssenceNavigationRoom) -> void:
 	if not room_instance.navigation_requested.is_connected(_on_room_navigation_requested):
 		room_instance.navigation_requested.connect(_on_room_navigation_requested)
-
+		
 ##############
 # Ejemplo
 #############

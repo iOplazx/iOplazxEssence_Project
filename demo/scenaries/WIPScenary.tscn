@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://c2yu0ngb2lum4"]
 
-[ext_resource type="Script" uid="uid://begvqtswq14rd" path="res://addons/iOplazxEssence/modules/visual_novel/location/EssenceTemplateScenery.gd" id="1_8j8ht"]
-[ext_resource type="Texture2D" uid="uid://dl3v1318ksyrv" path="res://addons/iOplazxEssence/resources/images/background/WIP_background.png" id="2_c3pd3"]
+[ext_resource type="Script" uid="uid://begvqtswq14rd" path="res://addons/iOplazxEssence/modules/visual_novel/location/EssenceTemplateScenery.gd" id="1_dy258"]
+[ext_resource type="Texture2D" uid="uid://dl3v1318ksyrv" path="res://addons/iOplazxEssence/resources/images/background/WIP_background.png" id="2_32aft"]
 
 [node name="WIPScenary" type="Node2D" unique_id=1258425628 node_paths=PackedStringArray("background_layer", "foreground_layer", "atmosphere_fx")]
-script = ExtResource("1_8j8ht")
+script = ExtResource("1_dy258")
 location_id = "WIP_room"
 location_name = "WIP"
 background_layer = NodePath("BackgroundLayer")
@@ -34,7 +34,7 @@ offset_bottom = 720.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("2_c3pd3")
+texture = ExtResource("2_32aft")
 expand_mode = 1
 stretch_mode = 6
 
