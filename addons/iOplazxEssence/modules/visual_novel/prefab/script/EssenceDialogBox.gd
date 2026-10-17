@@ -4,7 +4,7 @@ class_name EssenceDialogBox
 extends EssenceBaseDialogBox
 
 # ==
-# ESTRUCTURA DE LA ESCENA PROCESADA:
+# PROCESSED SCENE STRUCTURE:
 # ==
 # EssenceDialogBox (PanelContainer) [Script: EssenceDialogBox]
 # ├── Margin (MarginContainer)

@@ -9,7 +9,7 @@ size = Vector2(370.00015, 750.0005)
 [node name="ItemDoor" type="Area2D" unique_id=1115261331]
 script = ExtResource("1_ethqq")
 
-[node name="ImgPuerta" type="Sprite2D" parent="." unique_id=1056738629]
+[node name="ImgDoor" type="Sprite2D" parent="." unique_id=1056738629]
 position = Vector2(-9.1552734e-05, -0.00024414063)
 scale = Vector2(0.8, 0.8)
 texture = ExtResource("1_5pv7y")

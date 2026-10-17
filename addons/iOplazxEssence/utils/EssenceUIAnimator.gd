@@ -186,3 +186,23 @@ static func modulate_to(node: CanvasItem, target_color: Color, duration: float) 
 	var tween = node.create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(node, "modulate", target_color, duration)
 	return tween
+
+## Hides the node (up/down), executes a data-change function, and re-renders it.
+static func transition_mode_switch(node: Control, distance: float, duration: float, update_callback: Callable) -> Tween:
+	if not is_instance_valid(node): return null
+	
+	var original_y = _get_original_y(node)
+	var tween = node.create_tween()
+	
+	# 1. Exit Animation (Moves up and disappears)
+	tween.tween_property(node, "position:y", original_y - distance, duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(node, "modulate:a", 0.0, duration)
+	
+	# 2. Content Transition (Triggers the icon/text update at the midpoint)
+	tween.tween_callback(update_callback)
+	
+	# 3. Entrance Animation (Drops down and reappears with a bounce)
+	tween.tween_property(node, "position:y", original_y, duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(node, "modulate:a", 1.0, duration)
+	
+	return tween

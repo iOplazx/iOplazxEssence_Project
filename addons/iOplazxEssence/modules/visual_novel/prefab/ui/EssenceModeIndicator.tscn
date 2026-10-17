@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dm60gfyx47s38"]
+
+[ext_resource type="Script" uid="uid://csewycs844i4r" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/script/EssenceModeIndicator.gd" id="1_dspkp"]
+[ext_resource type="Texture2D" uid="uid://cwxqxtxry00n0" path="res://addons/iOplazxEssence/resources/images/icon/iconInteractiveMode.png" id="2_nqt83"]
+[ext_resource type="Texture2D" uid="uid://cycsd84p84eya" path="res://addons/iOplazxEssence/resources/images/icon/icon_audio.png" id="3_bgljf"]
+[ext_resource type="Texture2D" uid="uid://byfocbdr0b4vs" path="res://addons/iOplazxEssence/resources/images/icon/iconClapperboard.png" id="4_sqevf"]
+
+[node name="EssenceModeIndicator" type="Control" unique_id=1407555126 node_paths=PackedStringArray("mode_label", "mode_icon")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 180.0
+offset_bottom = 40.0
+mouse_filter = 2
+script = ExtResource("1_dspkp")
+mode_label = NodePath("PanelContainer/Margin/HBox/ModeLabel")
+mode_icon = NodePath("PanelContainer/Margin/HBox/ModeIcon")
+icon_exploration = ExtResource("2_nqt83")
+icon_dialogue = ExtResource("3_bgljf")
+icon_cutscene = ExtResource("4_sqevf")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1448333244]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="PanelContainer" unique_id=1112940202]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="HBox" type="HBoxContainer" parent="PanelContainer/Margin" unique_id=568037769]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="ModeIcon" type="TextureRect" parent="PanelContainer/Margin/HBox" unique_id=1156144912]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ModeLabel" type="Label" parent="PanelContainer/Margin/HBox" unique_id=928261686]
+layout_mode = 2
+text = "MODE_INDICATOR_EXPLORATION"
+vertical_alignment = 1

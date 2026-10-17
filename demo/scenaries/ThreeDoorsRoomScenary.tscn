@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://flwx1jj004uh"]
+
+[ext_resource type="Script" uid="uid://begvqtswq14rd" path="res://addons/iOplazxEssence/modules/visual_novel/location/EssenceTemplateScenery.gd" id="1_mc5qf"]
+[ext_resource type="Texture2D" uid="uid://glodfv7s37sk" path="res://addons/iOplazxEssence/resources/images/background/background_room_ai_3.png" id="2_j2j1u"]
+
+[node name="ThreeDoorsRoomScenary" type="Node2D" unique_id=1258425628 node_paths=PackedStringArray("background_layer", "foreground_layer", "atmosphere_fx")]
+script = ExtResource("1_mc5qf")
+location_id = "three_doors_room"
+location_name = "Three Doors Room"
+background_layer = NodePath("BackgroundLayer")
+foreground_layer = NodePath("ForegroundLayer")
+atmosphere_fx = NodePath("AtmosphereFX")
+
+[node name="BackgroundLayer" type="TextureRect" parent="." unique_id=1062973236]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="RoomStructure" type="Node2D" parent="." unique_id=1883705995]
+
+[node name="RoomBackgroundImage" type="TextureRect" parent="RoomStructure" unique_id=1119775266]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_j2j1u")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ForegroundLayer" type="Node2D" parent="." unique_id=432823217]
+
+[node name="AtmosphereFX" type="Node2D" parent="." unique_id=1932949150]

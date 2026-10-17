@@ -2,19 +2,17 @@
 
 [ext_resource type="Script" uid="uid://bmwro6b07v63e" path="res://addons/iOplazxEssence/modules/visual_novel/controlDirector/EssenceGameplayDirector.gd" id="1_6w5qv"]
 [ext_resource type="PackedScene" uid="uid://qk4l5y8he1dl" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/EssenceDialogBox.tscn" id="2_1i6vy"]
+[ext_resource type="PackedScene" uid="uid://ctmxodwx0l2kq" path="res://addons/iOplazxEssence/modules/visual_novel/prefab/ui/TemplateSceneryManager.tscn" id="2_72spe"]
 
-[node name="GameplayDirector" type="Node2D" unique_id=1915930015 node_paths=PackedStringArray("environment_filter", "active_location_container", "characters_stage", "item_stage", "fade_overlay", "hud_layer")]
+[node name="GameplayDirector" type="Node2D" unique_id=1915930015 node_paths=PackedStringArray("scenery_manager", "characters_stage", "item_stage", "fade_overlay", "hud_layer")]
 script = ExtResource("1_6w5qv")
-environment_filter = NodePath("EnvironmentFilter")
-active_location_container = NodePath("ActiveLocation")
+scenery_manager = NodePath("SceneryManager")
 characters_stage = NodePath("CharactersStage")
 item_stage = NodePath("ItemStage")
 fade_overlay = NodePath("HUD_Layer/FadeOverlay")
 hud_layer = NodePath("HUD_Layer")
 
-[node name="EnvironmentFilter" type="CanvasModulate" parent="." unique_id=1922817007]
-
-[node name="ActiveLocation" type="Node2D" parent="." unique_id=115441188]
+[node name="SceneryManager" parent="." unique_id=2035149599 instance=ExtResource("2_72spe")]
 
 [node name="CharactersStage" type="Node2D" parent="." unique_id=1365570825]
 

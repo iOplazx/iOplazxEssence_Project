@@ -9,7 +9,8 @@ const RoomID = {
 	"ROOM_3_DOORS" : 1,
 	"ROOM_1_DOOR" : 2,
 	"PARK"         : 3,
-	"SAVE_SCENE"   : 29
+	"SAVE_SCENE"   : 29,
+	"WIP_ROOM"     : 99
 }
 
 # SCENARIO MODE IDENTIFIERS
@@ -19,7 +20,8 @@ const RoomModeState= {
 	"INITIAL_ROOM_MODE_2": 2,
 	"ROOM_3_DOORS_NORMAL": 1,
 	"ROOM_1_DOORS_NORMAL" : 1,
-	"PARK_NORMAL": 1
+	"PARK_NORMAL": 1,
+	"WIP_ROOM_NORMAL": 1
 }
 
 # ==============================================================================
@@ -31,7 +33,8 @@ const ItemID = {
 	"NOTEBOOK"      : 2,
 	"DOOR_SPRITE"   : 4,
 	"HOUSE_SPRITE"  : 5,
-	"TOUCH_INDICATOR": 6
+	"TOUCH_INDICATOR": 6,
+	"WIP_DOOR_EXIT"  : 7
 }
 
 # ==============================================================================

@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://ctmxodwx0l2kq"]
+
+[ext_resource type="Script" uid="uid://dwecwxiianp5g" path="res://addons/iOplazxEssence/modules/visual_novel/location/EssenceSceneryManager.gd" id="1_22mvq"]
+
+[node name="TemplateSceneryManager" type="Node2D" unique_id=2035149599]
+script = ExtResource("1_22mvq")
+
+[node name="EnvironmentFilter" type="CanvasModulate" parent="." unique_id=1960963662]
+
+[node name="StageContainer" type="Node2D" parent="." unique_id=1305422330]
+
+[node name="InteractiveContainer" type="Node2D" parent="." unique_id=691205209]

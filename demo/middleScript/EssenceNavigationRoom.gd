@@ -5,7 +5,7 @@ extends EssenceInteractiveLocation
 signal navigation_requested(next_place: int, mode: int, is_only_mode: bool)
 
 func _ready() -> void:
-	super._ready() # Ejecuta los clics automáticos del framework Essence
+	super._ready() # Executes framework automatic click hook
 	_setup_hover_effects()
 
 ## Scans hotspots and hooks mouse hover behavior automatically.
@@ -14,20 +14,31 @@ func _setup_hover_effects() -> void:
 	
 	for hotspot in fixed_hotspots.get_children():
 		if hotspot is Area2D:
-			_set_hotspot_visual_visibility(hotspot, false)
+			# Disable hover/highlight visual visibility on startup
+			_apply_hover_state(hotspot, false)
 			
 			var on_entered = func(target: Area2D):
 				if environment_interactable:
-					_set_hotspot_visual_visibility(target, true)
+					_apply_hover_state(target, true)
 
 			var on_exited = func(target: Area2D):
-				_set_hotspot_visual_visibility(target, false)
+				_apply_hover_state(target, false)
 			
-			hotspot.mouse_entered.connect(on_entered.bind(hotspot))
-			hotspot.mouse_exited.connect(on_exited.bind(hotspot))
+			if not hotspot.mouse_entered.is_connected(on_entered):
+				hotspot.mouse_entered.connect(on_entered.bind(hotspot))
+			if not hotspot.mouse_exited.is_connected(on_exited):
+				hotspot.mouse_exited.connect(on_exited.bind(hotspot))
 
-## Helper to toggle hover visibility.
-func _set_hotspot_visual_visibility(hotspot: Area2D, p_visible: bool) -> void:
+## Apply visual logic when hovering over a hotspot.
+func _apply_hover_state(hotspot: Area2D, is_hovered: bool) -> void:
 	for child in hotspot.get_children():
 		if child is CanvasItem and not child is CollisionShape2D:
-			child.visible = p_visible
+			child.visible = is_hovered
+
+func _toggle_hotspots_interaction(enabled: bool) -> void:
+	super._toggle_hotspots_interaction(enabled)
+	# Turn off hover states when room interactions are locked
+	if not enabled and fixed_hotspots:
+		for hotspot in fixed_hotspots.get_children():
+			if hotspot is Area2D:
+				_apply_hover_state(hotspot, false)
